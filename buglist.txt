@@ -1,0 +1,11 @@
+* Switching playlists on should not reset playcounters
+    * unless you want it to?
+* /help common available to describe commands
+    * also help for other functions/features eg. fearts
+* change description for /dive
+* remove someone from the queue if they leave the room and don’t use /refresh
+* commands shouldn’t be case sensitive
+* don’t crash when non pmcommands are sent as a pm
+* Msg DJs when they’re going to be taken down while playlist is on, before their track
+    * give people the chance to pick their last track properly
+* 
