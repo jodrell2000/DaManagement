@@ -13,11 +13,6 @@ let roomDefaults = require('./defaultSettings/roomDefaults.js');
 let userDefaults = require('./defaultSettings/userDefaults.js');
 let musicDefaults = require('./defaultSettings/musicDefaults.js');
 
-let MESSAGE = true; //room message(on by default), the bot says your room info in intervals of whatever the  roomDefaultsModule.howOftenToRepeatMessage variable above is set to in minutes
-let defaultMessage = true;
-/*This corresponds to the MESSAGE variable directly above, if true it will give you the default repeat message along with your room info, if false it will only say your room info.
-                              (only works when MESSAGE = true) (this feature is on by default)
-                            */
 let GREET = true; //room greeting when someone joins the room(on by default)
 let voteSkip = false; //voteskipping(off by default)
 let roomAFK = false; //audience afk limit(off by default)
@@ -487,11 +482,11 @@ setInterval(eventMessagesIterator, eventMessageRepeatTime * 60 * 1000) //repeats
 
 repeatMessage = function ()
 {
-    if (MESSAGE === true && typeof detail !== 'undefined')
+    if (roomDefaults.MESSAGE === true && typeof detail !== 'undefined')
     {
         if (repeatMessageThroughPm === false) //if not doing through the pm
         {
-            if (defaultMessage === true) //if using default message
+            if (roomDefaults.defaultMessage === true) //if using default message
             {
                 bot.speak('Welcome to ' + roomName + ', ' + detail); //set the message you wish the bot to repeat here i.e rules and such.
             }
@@ -502,7 +497,7 @@ repeatMessage = function ()
         }
         else
         {
-            if (defaultMessage === true)
+            if (roomDefaults.defaultMessage === true)
             {
                 for (let jkl = 0; jkl < userIds.length; jkl++)
                 {
@@ -1284,7 +1279,7 @@ bot.on('speak', function (data)
         {
             whatsOn += 'event message: Off, ';
         }
-        if (MESSAGE === true)
+        if (roomDefaults.MESSAGE === true)
         {
             whatsOn += 'room message: On, ';
         }
@@ -1741,12 +1736,12 @@ bot.on('speak', function (data)
     else if (text.match(/^\/messageOn/) && condition === true)
     {
         bot.speak('message: On');
-        MESSAGE = true;
+        roomDefaults.MESSAGE = true;
     }
     else if (text.match(/^\/messageOff/) && condition === true)
     {
         bot.speak('message: Off');
-        MESSAGE = false;
+        roomDefaults.MESSAGE = false;
     }
     else if (text.match(/^\/pmcommands/))
     {
@@ -3716,12 +3711,12 @@ bot.on('pmmed', function (data)
     else if (text.match(/^\/messageOff/) && condition === true && isInRoom === true)
     {
         bot.pm('message: Off', data.senderid);
-        MESSAGE = false;
+        roomDefaults.MESSAGE = false;
     }
     else if (text.match(/^\/messageOn/) && condition === true && isInRoom === true)
     {
         bot.pm('message: On', data.senderid);
-        MESSAGE = true;
+        roomDefaults.MESSAGE = true;
     }
     else if (text.match(/^\/greetoff/) && condition === true && isInRoom === true)
     {
@@ -4074,7 +4069,7 @@ bot.on('pmmed', function (data)
         {
             whatsOn += 'event message: Off, ';
         }
-        if (MESSAGE === true)
+        if (roomDefaults.MESSAGE === true)
         {
             whatsOn += 'room message: On, ';
         }

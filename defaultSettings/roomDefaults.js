@@ -1,6 +1,11 @@
 module.exports = {
     roomJoinMessage: 'elo', //the message users will see when they join the room, leave it empty for the default message (only works when greet is turned on)
+    MESSAGE: true, //room message(on by default), the bot says your room info in intervals of whatever the howOftenToRepeatMessage variable is set to in minutes
     howOftenToRepeatMessage: 15, //how often (in minutes) to repeat the room message (only works when MESSAGE = true;)
+    defaultMessage: true,
+    /*  This corresponds to the MESSAGE variable directly above, if true it will give you the default repeat message along with your room info, if false it will only say your room info.
+        (only works when MESSAGE = true) (this feature is on by default)
+    */
 
     playLimit: 3, //set the playlimit here (default 4 songs)
     songLengthLimit: 10.0, //set song limit in minutes
