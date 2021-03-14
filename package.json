@@ -1,0 +1,7 @@
+{
+	"name": "Da_Management",
+	"private": true,
+	"dependencies": {
+		"ttapi": "^4.0.1"
+	}
+}
