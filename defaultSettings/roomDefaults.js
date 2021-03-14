@@ -12,4 +12,6 @@ module.exports = {
 
     HowManyVotesToSkip: 2, //how many votes for a song to get skipped(default value, only works if voteSkip = true)
 
+    queue: true, //queue(on by default)
+
 }

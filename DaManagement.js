@@ -19,7 +19,6 @@ global.masterIds = ['']; //example (clear this before using)
                          You can put the person's name in the array either before or after a userid to tell who it belongs to, it will not affect its ability to function.
                        */
 
-var queue = true; //queue(on by default)
 var AFK = true; //afk limit(on by default), this is for the dj's on stage
 var MESSAGE = true; //room message(on by default), the bot says your room info in intervals of whatever the  roomDefaultsModule.howOftenToRepeatMessage variable above is set to in minutes
 var defaultMessage = true;
@@ -410,7 +409,7 @@ queueCheck15 = function ()
 {
     //if queue is turned on once someone leaves the stage the first person
     //in line has 60 seconds to get on stage before being remove from the queue
-    if (queue === true && queueList.length !== 0)
+    if (roomDefaults.queue === true && queueList.length !== 0)
     {
         if (sayOnce === true && (refreshList.length + currentDjs.length) < 5)
         {
@@ -1142,7 +1141,7 @@ bot.on('speak', function (data)
     }
     else if (text.match('/bumptop') && condition === true)
     {
-        if (queue === true)
+        if (roomDefaults.queue === true)
         {
             var topOfQueue = data.text.slice(10);
             var index35 = queueList.indexOf(topOfQueue);
@@ -1230,11 +1229,11 @@ bot.on('speak', function (data)
     {
         var checkPosition = queueName.indexOf(data.name);
 
-        if (checkPosition != -1 && queue === true) //if person is in the queue and queue is active
+        if (checkPosition != -1 && roomDefaults.queue === true) //if person is in the queue and queue is active
         {
             bot.speak('@' + name + ' you are currently in position number ' + (checkPosition + 1) + ' in the queue');
         }
-        else if (checkPosition == -1 && queue === true)
+        else if (checkPosition == -1 && roomDefaults.queue === true)
         {
             bot.speak('@' + name + ' i can\'t tell you your position unless you are currently in the queue');
         }
@@ -1260,7 +1259,7 @@ bot.on('speak', function (data)
     {
         var whatsOn = '';
 
-        if (queue === true)
+        if (roomDefaults.queue === true)
         {
             whatsOn += 'queue: On, ';
         }
@@ -2046,7 +2045,7 @@ bot.on('speak', function (data)
         }
         else
         {
-            if (queue == true) //if queue is turned on
+            if (roomDefaults.queue == true) //if queue is turned on
             {
                 if (tempName.length == 3 && areTheyInTheQueue != -1) //if three parameters, and name found
                 {
@@ -2197,7 +2196,7 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/queuewithnumbers$/))
     {
-        if (queue === true && queueName.length !== 0)
+        if (queue === true && roomDefaults.queueName.length !== 0)
         {
             var temp95 = 'The queue is now: ';
             for (var kl = 0; kl < queueName.length; kl++)
@@ -2213,7 +2212,7 @@ bot.on('speak', function (data)
             }
             bot.speak(temp95);
         }
-        else if (queue === true)
+        else if (roomDefaults.queue === true)
         {
             bot.speak('The queue is currently empty.');
         }
@@ -2224,7 +2223,7 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/queue$/))
     {
-        if (queue === true && queueName.length !== 0)
+        if (roomDefaults.queue === true && queueName.length !== 0)
         {
             var temp95 = 'The queue is now: ';
             for (var kl = 0; kl < queueName.length; kl++)
@@ -2241,7 +2240,7 @@ bot.on('speak', function (data)
             bot.speak(temp95);
 
         }
-        else if (queue === true)
+        else if (roomDefaults.queue === true)
         {
             bot.speak('The queue is currently empty.');
         }
@@ -2323,7 +2322,7 @@ bot.on('speak', function (data)
             bot.speak('The banned from stage list is currently empty.');
         }
     }
-    else if (text.match('/removefromqueue') && queue === true)
+    else if (text.match('/removefromqueue') && roomDefaults.queue === true)
     {
         if (condition === true)
         {
@@ -2424,7 +2423,7 @@ bot.on('speak', function (data)
             }
         }
     }
-    else if (text.match(/^\/addme$/) && queue === true)
+    else if (text.match(/^\/addme$/) && roomDefaults.queue === true)
     {
         if (typeof data.userid == 'undefined')
         {
@@ -2483,7 +2482,7 @@ bot.on('speak', function (data)
         queueList = [];
         queueName = [];
         bot.speak('the queue is now active.');
-        queue = true;
+        roomDefaults.queue = true;
         clearTimeout(beginTimer); //if queue is turned on again while somebody was on timeout to get on stage, then clear it
         sayOnce = true;
     }
@@ -2559,7 +2558,7 @@ bot.on('speak', function (data)
     else if (text.match(/^\/queueOff$/) && condition === true)
     {
         bot.speak('the queue is now inactive.');
-        queue = false;
+        roomDefaults.queue = false;
     }
     else if (text.match(/^\/warnme/))
     {
@@ -2858,14 +2857,14 @@ bot.on('add_dj', function (data)
         {
             //tells a dj trying to get on stage how to add themselves to the queuelist
             var ifUser2 = queueList.indexOf(data.user[0].userid);
-            if (queue === true && ifUser2 == -1)
+            if (roomDefaults.queue === true && ifUser2 == -1)
             {
                 if (queueList.length !== 0)
                 {
                     bot.pm('The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.', data.user[0].userid);
                 }
             }
-            else if (queue === true && ifUser2 !== -1 && data.user[0].name !== queueName[0])
+            else if (roomDefaults.queue === true && ifUser2 !== -1 && data.user[0].name !== queueName[0])
             {
                 bot.pm('sorry, but you are not first in queue. please wait your turn.', data.user[0].userid);
             }
@@ -2884,7 +2883,7 @@ bot.on('add_dj', function (data)
         if ((refreshList.length + currentDjs.length) <= 5) //if there are still seats left to give out, then give them(but reserve for refreshers)
         {
             //removes a user from the queue list when they join the stage.
-            if (queue === true)
+            if (roomDefaults.queue === true)
             {
                 var firstOnly = queueList.indexOf(data.user[0].userid);
                 var queueListLength = queueList.length;
@@ -2895,7 +2894,7 @@ bot.on('add_dj', function (data)
                     incrementSpamCounter(data.user[0].userid);
                 }
             }
-            if (queue === true)
+            if (roomDefaults.queue === true)
             {
                 var checkQueue = queueList.indexOf(data.user[0].name);
                 var checkName2 = queueName.indexOf(data.user[0].name);
@@ -3230,7 +3229,7 @@ bot.on('pmmed', function (data)
         }
         else
         {
-            if (queue == true) //if queue is turned on
+            if (roomDefaults.queue == true) //if queue is turned on
             {
                 if (tempName.length == 3 && areTheyInTheQueue != -1) //if three parameters, and name found
                 {
@@ -3300,11 +3299,11 @@ bot.on('pmmed', function (data)
     {
         var checkPosition = queueName.indexOf(theUsersList[name1]);
 
-        if (checkPosition != -1 && queue === true) //if person is in the queue and queue is active
+        if (checkPosition != -1 && roomDefaults.queue === true) //if person is in the queue and queue is active
         {
             bot.pm('you are currently in position number ' + (checkPosition + 1) + ' in the queue', data.senderid);
         }
-        else if (checkPosition == -1 && queue === true)
+        else if (checkPosition == -1 && roomDefaults.queue === true)
         {
             bot.pm('i can\'t tell you your position unless you are currently in the queue', data.senderid);
         }
@@ -3469,16 +3468,16 @@ bot.on('pmmed', function (data)
         queueList = [];
         queueName = [];
         bot.pm('the queue is now active.', data.senderid);
-        queue = true;
+        roomDefaults.queue = true;
         clearTimeout(beginTimer); //if queue is turned on again while somebody was on timeout to get on stage, then clear it
         sayOnce = true;
     }
     else if (text.match(/^\/queueOff$/) && condition === true && isInRoom === true)
     {
         bot.pm('the queue is now inactive.', data.senderid);
-        queue = false;
+        roomDefaults.queue = false;
     }
-    else if (text.match(/^\/addme$/) && queue === true && isInRoom === true)
+    else if (text.match(/^\/addme$/) && roomDefaults.queue === true && isInRoom === true)
     {
         if (typeof data.senderid == 'undefined' || typeof theUsersList[name1] == 'undefined')
         {
@@ -3529,7 +3528,7 @@ bot.on('pmmed', function (data)
             }
         }
     }
-    else if (text.match(/^\/removeme$/) && queue === true && isInRoom === true)
+    else if (text.match(/^\/removeme$/) && roomDefaults.queue === true && isInRoom === true)
     {
         if (typeof theUsersList[name1] == 'undefined')
         {
@@ -3585,7 +3584,7 @@ bot.on('pmmed', function (data)
             }
         }
     }
-    else if (text.match('/removefromqueue') && queue === true && isInRoom === true)
+    else if (text.match('/removefromqueue') && roomDefaults.queue === true && isInRoom === true)
     {
         if (condition === true)
         {
@@ -3901,7 +3900,7 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/queuewithnumbers$/) && isInRoom === true)
     {
-        if (queue === true && queueName.length !== 0)
+        if (roomDefaults.queue === true && queueName.length !== 0)
         {
             var temp95 = 'The queue is now: ';
             for (var kl = 0; kl < queueName.length; kl++)
@@ -3918,7 +3917,7 @@ bot.on('pmmed', function (data)
             bot.pm(temp95, data.senderid);
 
         }
-        else if (queue === true)
+        else if (roomDefaults.queue === true)
         {
             bot.pm('The queue is currently empty.', data.senderid);
         }
@@ -3929,7 +3928,7 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/queue$/) && isInRoom === true)
     {
-        if (queue === true && queueName.length !== 0)
+        if (roomDefaults.queue === true && queueName.length !== 0)
         {
             var temp95 = 'The queue is now: ';
             for (var kl = 0; kl < queueName.length; kl++)
@@ -3946,7 +3945,7 @@ bot.on('pmmed', function (data)
             bot.pm(temp95, data.senderid);
 
         }
-        else if (queue === true)
+        else if (roomDefaults.queue === true)
         {
             bot.pm('The queue is currently empty.', data.senderid);
         }
@@ -3987,7 +3986,7 @@ bot.on('pmmed', function (data)
     }
     else if (text.match('/bumptop') && condition === true && isInRoom === true)
     {
-        if (queue === true)
+        if (roomDefaults.queue === true)
         {
             var topOfQueue = data.text.slice(10);
             var index35 = queueList.indexOf(topOfQueue);
@@ -4050,7 +4049,7 @@ bot.on('pmmed', function (data)
     {
         var whatsOn = '';
 
-        if (queue === true)
+        if (roomDefaults.queue === true)
         {
             whatsOn += 'queue: On, ';
         }
@@ -4709,7 +4708,7 @@ bot.on('roomChanged', function (data)
 bot.on('registered', function (data)
 {
     //if there are 5 dj's on stage and the queue is turned on when a user enters the room
-    if (queue === true && currentDjs.length == 5)
+    if (roomDefaults.queue === true && currentDjs.length == 5)
     {
         bot.pm('The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.', data.user[0].userid);
     }
