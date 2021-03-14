@@ -8,4 +8,10 @@ module.exports = {
 
     //banned artist / song list
     bannedArtists: ['dj tiesto', 'skrillex', 'lil wayne', 't-pain', 'tpain', 'katy perry', 'eminem', 'porter robinson', 'gorgoroth', 'justin bieber', 'deadmau5', 'nosia', 'infected mushroom', 'spongebob squarepants', 'usher'],
+
+    voteSkip: false, //voteskipping(off by default)
+    LIMIT: true, //song length limit (on by default)
+    PLAYLIMIT: false, //song play limit, this is for the playLimit variable up above(off by default)
+
+
 }

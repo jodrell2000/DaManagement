@@ -12,11 +12,6 @@ let botDefaults = require('./defaultSettings/botDefaults.js');
 let roomDefaults = require('./defaultSettings/roomDefaults.js');
 let userDefaults = require('./defaultSettings/userDefaults.js');
 let musicDefaults = require('./defaultSettings/musicDefaults.js');
-
-let voteSkip = false; //voteskipping(off by default)
-let LIMIT = true; //song length limit (on by default)
-let PLAYLIMIT = false; //song play limit, this is for the playLimit variable up above(off by default)
-
 /************************************EndSetUp**********************************************************************/
 
 //do not change the values of any of the global variables below unless you know what you are doing, the discriptions given are for reference only
@@ -850,7 +845,7 @@ global.checkOnNewSong = function (data)
     {
         if (lastdj == authModule.USERID || masterIndex == -1) //if dj is the bot or not a master
         {
-            if (LIMIT === true)
+            if (musicDefaults.LIMIT === true)
             {
                 if (typeof theUsersList[theUsersList.indexOf(lastdj) + 1] !== 'undefined')
                 {
@@ -1205,14 +1200,14 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/lengthLimit/) && condition === true)
     {
-        if (LIMIT === true)
+        if (musicDefaults.LIMIT === true)
         {
-            LIMIT = false;
+            musicDefaults.LIMIT = false;
             bot.speak('the song length limit is now inactive');
         }
         else
         {
-            LIMIT = true;
+            musicDefaults.LIMIT = true;
             bot.speak('the song length limit is now active');
         }
     }
@@ -1268,7 +1263,7 @@ bot.on('speak', function (data)
         {
             whatsOn += 'greeting message: Off, ';
         }
-        if (voteSkip === true)
+        if (musicDefaults.voteSkip === true)
         {
             whatsOn += 'voteskipping: On, ';
         }
@@ -1300,7 +1295,7 @@ bot.on('speak', function (data)
         {
             whatsOn += 'auto ttstat kick: Off, ';
         }
-        if (LIMIT === true)
+        if (musicDefaults.LIMIT === true)
         {
             whatsOn += 'song length limit: On, ';
         }
@@ -1308,7 +1303,7 @@ bot.on('speak', function (data)
         {
             whatsOn += 'song length limit: Off, ';
         }
-        if (PLAYLIMIT === true)
+        if (musicDefaults.PLAYLIMIT === true)
         {
             whatsOn += 'song play limit: On, ';
         }
@@ -1371,7 +1366,7 @@ bot.on('speak', function (data)
         if (!isNaN(roomDefaults.HowManyVotesToSkip) && roomDefaults.HowManyVotesToSkip !== 0)
         {
             bot.speak("vote skipping is now active, current votes needed to pass " + "the vote is " + roomDefaults.HowManyVotesToSkip);
-            voteSkip = true;
+            musicDefaults.voteSkip = true;
             voteCountSkip = 0;
             votesLeft = roomDefaults.HowManyVotesToSkip;
         }
@@ -1401,11 +1396,11 @@ bot.on('speak', function (data)
     else if (text.match(/^\/voteskipoff$/) && condition === true)
     {
         bot.speak("vote skipping is now inactive");
-        voteSkip = false;
+        musicDefaults.voteSkip = false;
         voteCountSkip = 0;
         votesLeft = roomDefaults.HowManyVotesToSkip;
     }
-    else if (text.match(/^\/skip$/) && voteSkip === true) //if command matches and voteskipping is enabled
+    else if (text.match(/^\/skip$/) && musicDefaults.voteSkip === true) //if command matches and voteskipping is enabled
     {
         let isMaster = userDefaults.masterIds.includes(data.userid);
         let checkIfOnList = checkVotes.indexOf(data.userid); //check if the person using the command has already voted
@@ -2212,7 +2207,7 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/playminus/) && condition === true)
     {
-        if (PLAYLIMIT === true) //is the play limit on?
+        if (musicDefaults.PLAYLIMIT === true) //is the play limit on?
         {
             let playMinus = data.text.slice(12);
             let areTheyInRoom = theUsersList.indexOf(playMinus);
@@ -2449,7 +2444,7 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/whatsplaylimit/))
     {
-        if (PLAYLIMIT === true)
+        if (musicDefaults.PLAYLIMIT === true)
         {
             bot.speak('the play limit is currently set to: ' + roomDefaults.playLimit + ' songs.');
         }
@@ -2479,14 +2474,14 @@ bot.on('speak', function (data)
                     };
                 }
 
-                PLAYLIMIT = true; //mark playlimit as being on               
+                musicDefaults.PLAYLIMIT = true; //mark playlimit as being on
             }
             else
             {
                 bot.pm('invalid arguement given, the play limit must be set to an integer. ' +
                     'it can either be used as /playLimitOn or /playLimitOn #.', data.userid);
 
-                PLAYLIMIT = false; // on failure turn it off
+                musicDefaults.PLAYLIMIT = false; // on failure turn it off
             }
         }
         else
@@ -2504,12 +2499,12 @@ bot.on('speak', function (data)
                 };
             }
 
-            PLAYLIMIT = true; //mark playlimit as being on    
+            musicDefaults.PLAYLIMIT = true; //mark playlimit as being on
         }
     }
     else if (text.match(/^\/playLimitOff$/) && condition === true)
     {
-        PLAYLIMIT = false;
+        musicDefaults.PLAYLIMIT = false;
         bot.speak('the play limit is now inactive.');
     }
     else if (text.match('/surf'))
@@ -3309,7 +3304,7 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/playminus/) && condition === true && isInRoom === true)
     {
-        if (PLAYLIMIT === true) //is the play limit on?
+        if (musicDefaults.PLAYLIMIT === true) //is the play limit on?
         {
             let playMinus = data.text.slice(12);
             let areTheyInRoom = theUsersList.indexOf(playMinus);
@@ -3361,7 +3356,7 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/whatsplaylimit/) && isInRoom === true)
     {
-        if (PLAYLIMIT === true)
+        if (musicDefaults.PLAYLIMIT === true)
         {
             bot.pm('the play limit is currently set to: ' + roomDefaults.playLimit + ' songs.', data.senderid);
         }
@@ -3391,14 +3386,14 @@ bot.on('pmmed', function (data)
                     };
                 }
 
-                PLAYLIMIT = true; //mark playlimit as being on               
+                musicDefaults.PLAYLIMIT = true; //mark playlimit as being on
             }
             else
             {
                 bot.pm('invalid arguement given, the play limit must be set to an integer. ' +
                     'it can either be used as /playLimitOn or /playLimitOn #.', data.senderid);
 
-                PLAYLIMIT = false; //on failure turn it off
+                musicDefaults.PLAYLIMIT = false; //on failure turn it off
             }
         }
         else
@@ -3416,12 +3411,12 @@ bot.on('pmmed', function (data)
                 };
             }
 
-            PLAYLIMIT = true; //mark playlimit as being on    
+            musicDefaults.PLAYLIMIT = true; //mark playlimit as being on
         }
     }
     else if (text.match(/^\/playLimitOff$/) && condition === true && isInRoom === true)
     {
-        PLAYLIMIT = false;
+        musicDefaults.PLAYLIMIT = false;
         bot.pm('the play limit is now inactive.', data.senderid);
     }
     else if (text.match(/^\/queueOn$/) && condition === true && isInRoom === true)
@@ -3800,7 +3795,7 @@ bot.on('pmmed', function (data)
     else if (text.match(/^\/voteskipoff$/) && condition === true && isInRoom === true)
     {
         bot.pm("vote skipping is now inactive", data.senderid);
-        voteSkip = false;
+        musicDefaults.voteSkip = false;
         voteCountSkip = 0;
         votesLeft = roomDefaults.HowManyVotesToSkip;
     }
@@ -3854,7 +3849,7 @@ bot.on('pmmed', function (data)
         if (!isNaN(roomDefaults.HowManyVotesToSkip) && roomDefaults.HowManyVotesToSkip !== 0)
         {
             bot.pm("vote skipping is now active, current votes needed to pass " + "the vote is " + roomDefaults.HowManyVotesToSkip, data.senderid);
-            voteSkip = true;
+            musicDefaults.voteSkip = true;
             voteCountSkip = 0;
             votesLeft = roomDefaults.HowManyVotesToSkip;
         }
@@ -3981,14 +3976,14 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/lengthLimit/) && condition === true && isInRoom === true)
     {
-        if (LIMIT === true)
+        if (musicDefaults.LIMIT === true)
         {
-            LIMIT = false;
+            musicDefaults.LIMIT = false;
             bot.pm('the song length limit is now inactive', data.senderid);
         }
         else
         {
-            LIMIT = true;
+            musicDefaults.LIMIT = true;
             bot.pm('the song length limit is now active', data.senderid);
         }
     }
@@ -4058,7 +4053,7 @@ bot.on('pmmed', function (data)
         {
             whatsOn += 'greeting message: Off, ';
         }
-        if (voteSkip === true)
+        if (musicDefaults.voteSkip === true)
         {
             whatsOn += 'voteskipping: On, ';
         }
@@ -4090,7 +4085,7 @@ bot.on('pmmed', function (data)
         {
             whatsOn += 'auto ttstat kick: Off, ';
         }
-        if (LIMIT === true)
+        if (musicDefaults.LIMIT === true)
         {
             whatsOn += 'song length limit: On, ';
         }
@@ -4098,7 +4093,7 @@ bot.on('pmmed', function (data)
         {
             whatsOn += 'song length limit: Off, ';
         }
-        if (PLAYLIMIT === true)
+        if (musicDefaults.PLAYLIMIT === true)
         {
             whatsOn += 'song play limit: On, ';
         }
@@ -4971,7 +4966,7 @@ bot.on('endsong', function (data)
     {
         if (++djs20[djId].nbSong >= roomDefaults.playLimit)
         {
-            if (PLAYLIMIT === true) //is playlimit on?
+            if (musicDefaults.PLAYLIMIT === true) //is playlimit on?
             {
                 if (djId == currentDjs[0] && roomDefaults.playLimit === 1) //if person is in the far left seat and limit is set to one
                 {
