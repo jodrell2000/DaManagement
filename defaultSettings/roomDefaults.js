@@ -14,4 +14,6 @@ module.exports = {
 
     queue: true, //queue(on by default)
 
+    AFK: true, //afk limit(on by default), this is for the dj's on stage
+
 }

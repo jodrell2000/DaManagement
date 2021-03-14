@@ -283,7 +283,7 @@ global.isAfk = function (userId, num, whichFunction)
 global.updateAfkPostionOfUser = function (userid)
 {
     //updates the afk position of the speaker.
-    if (AFK === true || roomAFK === true)
+    if (roomDefaults.AFK === true || roomAFK === true)
     {
         justSaw(userid, 'justSaw');
         justSaw(userid, 'justSaw1');
@@ -303,7 +303,7 @@ global.afkCheck = function ()
         afker = currentDjs[i]; //Pick a DJ
         let isAfkMaster = userDefaults.masterIds.indexOf(afker); //master ids check
         let whatIsAfkerName = theUsersList.indexOf(afker) + 1;
-        if ((isAfk(afker, (roomDefaults.afkLimit - 5), 'isAfk1')) && AFK === true)
+        if ((isAfk(afker, (roomDefaults.afkLimit - 5), 'isAfk1')) && roomDefaults.AFK === true)
         {
             if (afker != authModule.USERID && isAfkMaster == -1)
             {
@@ -318,7 +318,7 @@ global.afkCheck = function ()
                 justSaw(afker, 'justSaw1');
             }
         }
-        if ((isAfk(afker, (roomDefaults.afkLimit - 1), 'isAfk2')) && AFK === true)
+        if ((isAfk(afker, (roomDefaults.afkLimit - 1), 'isAfk2')) && roomDefaults.AFK === true)
         {
             if (afker != authModule.USERID && isAfkMaster == -1)
             {
@@ -333,7 +333,7 @@ global.afkCheck = function ()
                 justSaw(afker, 'justSaw2');
             }
         }
-        if ((isAfk(afker, roomDefaults.afkLimit, 'isAfk')) && AFK === true)
+        if ((isAfk(afker, roomDefaults.afkLimit, 'isAfk')) && roomDefaults.AFK === true)
         { //if Dj is afk then      
             if (afker != authModule.USERID && isAfkMaster == -1) //checks to see if afker is a mod or a bot or the current dj, if they are is does not kick them.
             {
@@ -1187,7 +1187,7 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/djafk/))
     {
-        if (AFK === true) //afk limit turned on?
+        if (roomDefaults.AFK === true) //afk limit turned on?
         {
             if (currentDjs.length !== 0) //any dj's on stage?
             {
@@ -1261,7 +1261,7 @@ bot.on('speak', function (data)
         {
             whatsOn += 'queue: Off, ';
         }
-        if (AFK === true)
+        if (roomDefaults.AFK === true)
         {
             whatsOn += 'dj afk limit: On, ';
         }
@@ -1470,7 +1470,7 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/afkon/) && condition === true)
     {
-        AFK = true;
+        roomDefaults.AFK = true;
         bot.speak('the afk list is now active.');
         for (let z = 0; z < currentDjs.length; z++)
         {
@@ -1481,7 +1481,7 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/afkoff/) && condition === true)
     {
-        AFK = false;
+        roomDefaults.AFK = false;
         bot.speak('the afk list is now inactive.');
     }
     else if (text.match(/^\/roomafkon/) && condition === true)
@@ -3308,7 +3308,7 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/djafk/) && isInRoom === true)
     {
-        if (AFK === true) //afk limit turned on?
+        if (roomDefaults.AFK === true) //afk limit turned on?
         {
             if (currentDjs.length !== 0) //any dj's on stage?
             {
@@ -3808,12 +3808,12 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/afkoff/) && condition === true && isInRoom === true)
     {
-        AFK = false;
+        roomDefaults.AFK = false;
         bot.pm('the afk list is now inactive.', data.senderid);
     }
     else if (text.match(/^\/afkon/) && condition === true && isInRoom === true)
     {
-        AFK = true;
+        roomDefaults.AFK = true;
         bot.pm('the afk list is now active.', data.senderid);
         for (let z = 0; z < currentDjs.length; z++)
         {
@@ -4051,7 +4051,7 @@ bot.on('pmmed', function (data)
         {
             whatsOn += 'queue: Off, ';
         }
-        if (AFK === true)
+        if (roomDefaults.AFK === true)
         {
             whatsOn += 'dj afk limit: On, ';
         }
