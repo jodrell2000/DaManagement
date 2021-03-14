@@ -16,9 +16,6 @@ let musicDefaults = require('./defaultSettings/musicDefaults.js');
 let voteSkip = false; //voteskipping(off by default)
 let LIMIT = true; //song length limit (on by default)
 let PLAYLIMIT = false; //song play limit, this is for the playLimit variable up above(off by default)
-let autoSnag = true; //auto song adding(different from every song adding), tied to  botDefaultsModule.howManyVotes up above, (off by default)
-let autoBop = true; //choose whether the bot will autobop for each song or not(against the rules but i leave it up to you) (off by default)
-
 
 /************************************EndSetUp**********************************************************************/
 
@@ -921,7 +918,7 @@ bot.on('newsong', function (data)
 
 
     //if true causes the bot to start bopping to the currently playing song
-    if (autoBop === true)
+    if (botDefaults.autoBop === true)
     {
         bot.bop();
     }
@@ -1343,7 +1340,7 @@ bot.on('speak', function (data)
         {
             whatsOn += 'every song adding: Off, ';
         }
-        if (autoSnag === true)
+        if (botDefaults.autoSnag === true)
         {
             whatsOn += 'vote based song adding: On, ';
         }
@@ -2095,21 +2092,21 @@ bot.on('speak', function (data)
         else if (snagSong === false)
         {
             snagSong = true; //this is for /snagevery
-            autoSnag = false; //this turns off /autosnag
+            botDefaults.autoSnag = false; //this turns off /autosnag
             bot.speak('I am now adding every song that plays, /autosnag has been turned off');
         }
     }
     else if (text.match(/^\/autosnag/) && condition === true)
     {
-        if (autoSnag === false)
+        if (botDefaults.autoSnag === false)
         {
-            autoSnag = true; //this is for /autosnag
+            botDefaults.autoSnag = true; //this is for /autosnag
             snagSong = false; //this is for /snagevery          
             bot.speak('I am now adding every song that gets at least (' +  botDefaults.howManyVotes + ') awesome\'s, /snagevery has been turned off');
         }
-        else if (autoSnag === true)
+        else if (botDefaults.autoSnag === true)
         {
-            autoSnag = false;
+            botDefaults.autoSnag = false;
             bot.speak('vote snagging has been turned off');
         }
     }
@@ -2747,7 +2744,7 @@ bot.on('update_votes', function (data)
     //this is for /autosnag, automatically adds songs that get over the awesome threshold
     //thanks to alain gilbert for playlist pre - testing, snag animation only when song not
     //already in playlist
-    if (autoSnag === true && snagSong === false && upVotes >=  botDefaults.howManyVotes && ALLREADYCALLED === false)
+    if (botDefaults.autoSnag === true && snagSong === false && upVotes >=  botDefaults.howManyVotes && ALLREADYCALLED === false)
     {
         ALLREADYCALLED = true; //this makes it so that it can only be called once per song
 
@@ -3602,21 +3599,21 @@ bot.on('pmmed', function (data)
         else if (snagSong === false)
         {
             snagSong = true; //this is for /snagevery
-            autoSnag = false; //this turns off /autosnag
+            botDefaults.autoSnag = false; //this turns off /autosnag
             bot.pm('I am now adding every song that plays, /autosnag has been turned off', data.senderid);
         }
     }
     else if (text.match(/^\/autosnag/) && condition === true && isInRoom === true)
     {
-        if (autoSnag === false)
+        if (botDefaults.autoSnag === false)
         {
-            autoSnag = true; //this is for /autosnag
+            botDefaults.autoSnag = true; //this is for /autosnag
             snagSong = false; //this is for /snagevery          
             bot.pm('I am now adding every song that gets at least (' +  botDefaults.howManyVotes + ') awesome\'s, /snagevery has been turned off', data.senderid);
         }
-        else if (autoSnag === true)
+        else if (botDefaults.autoSnag === true)
         {
-            autoSnag = false;
+            botDefaults.autoSnag = false;
             bot.pm('vote snagging has been turned off', data.senderid);
         }
     }
@@ -4133,7 +4130,7 @@ bot.on('pmmed', function (data)
         {
             whatsOn += 'every song adding: Off, ';
         }
-        if (autoSnag === true)
+        if (botDefaults.autoSnag === true)
         {
             whatsOn += 'vote based song adding: On, ';
         }
