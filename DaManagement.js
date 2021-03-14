@@ -177,7 +177,7 @@ function attempToReconnect()
             }
         });
     }, 1000 * 10);
-};
+}
 
 
 
@@ -211,33 +211,31 @@ global.justSaw = function (uid, whichFunction)
 //userid is the person's userid
 global.isAfk = function (userId, num, whichFunction)
 {
-    //which last seen object to use?
+    let last;
+//which last seen object to use?
     switch (whichFunction)
     {
     case 'isAfk':
-        var last = lastSeen[userId];
+        last = lastSeen[userId];
         break;
     case 'isAfk1':
-        var last = lastSeen1[userId];
+        last = lastSeen1[userId];
         break;
     case 'isAfk2':
-        var last = lastSeen2[userId];
+        last = lastSeen2[userId];
         break;
     case 'isAfk3':
-        var last = lastSeen3[userId];
+        last = lastSeen3[userId];
         break;
     case 'isAfk4':
-        var last = lastSeen4[userId];
+        last = lastSeen4[userId];
         break;
     }
 
     let age_ms = Date.now() - last;
     let age_m = Math.floor(age_ms / 1000 / 60);
-    if (age_m >= num)
-    {
-        return true;
-    }
-    return false;
+    return age_m >= num;
+
 };
 
 
@@ -296,7 +294,7 @@ global.afkCheck = function ()
             }
         }
         if ((isAfk(afker, roomDefaults.afkLimit, 'isAfk')) && roomDefaults.AFK === true)
-        { //if Dj is afk then      
+        { //if Dj is afk then
             if (afker != authModule.USERID && isAfkMaster == -1) //checks to see if afker is a mod or a bot or the current dj, if they are is does not kick them.
             {
                 if (afker != checkWhoIsDj)
@@ -646,14 +644,7 @@ global.checkIfUserIsMod = function (userid)
 {
     let modIndex = modList.indexOf(userid);
 
-    if (modIndex != -1)
-    {
-        condition = true;
-    }
-    else
-    {
-        condition = false;
-    }
+    condition = modIndex != -1;
 };
 
 
@@ -663,14 +654,7 @@ global.checkToseeIfPmmerIsInRoom = function (userid)
 {
     let isInRoom = theUsersList.indexOf(userid);
 
-    if (isInRoom != -1)
-    {
-        isInRoom = true;
-    }
-    else
-    {
-        isInRoom = false;
-    }
+    isInRoom = isInRoom != -1;
 
     return isInRoom;
 };
@@ -2322,7 +2306,7 @@ bot.on('speak', function (data)
             }
         }
     }
-    else if (text.match(/^\/removeme$/) && queue === true)
+    else if (text.match(/^\/removeme$/) && roomDefaults.queue === true)
     {
         if (typeof data.name == 'undefined')
         {
