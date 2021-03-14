@@ -13,35 +13,11 @@ let roomDefaults = require('./defaultSettings/roomDefaults.js');
 let userDefaults = require('./defaultSettings/userDefaults.js');
 let musicDefaults = require('./defaultSettings/musicDefaults.js');
 
-let GREET = true; //room greeting when someone joins the room(on by default)
 let voteSkip = false; //voteskipping(off by default)
-let roomAFK = false; //audience afk limit(off by default)
-let SONGSTATS = true; //song stats after each song(on by default)
-let kickTTSTAT = false; //kicks the ttstats bot when it tries to join the room(off by default)
 let LIMIT = true; //song length limit (on by default)
 let PLAYLIMIT = false; //song play limit, this is for the playLimit variable up above(off by default)
 let autoSnag = true; //auto song adding(different from every song adding), tied to  botDefaultsModule.howManyVotes up above, (off by default)
 let autoBop = true; //choose whether the bot will autobop for each song or not(against the rules but i leave it up to you) (off by default)
-let afkThroughPm = true; //choose whether afk warnings(for dj's on stage) will be given through the pm or the chatbox (false = chatbox, true = pm message)
-let greetThroughPm = false; //choose whether greeting message is through the pm or the chatbox(false = chatbox, true = pm), (only works when greeting message is turned on) (off by default)
-let repeatMessageThroughPm = false;
-/*choose whether the repeating room message(the one corresponding to MESSAGE up above) will be through the chatbox or the pm,
-                                      (false = through the chatbox, true = through the pm) (MESSAGE must equal true for this to work) (this feature is off by default)                                      
-                                    */
-//this is for the event messages
-//This cycles through all the different messages that you enter into this array. one message per time cycle, once it gets to the end of your messages it starts over again
-let eventMessageRepeatTime = 15; //how long in minutes between event messages(must have EVENTMESSAGE = true to see any messages)
-let eventMessageThroughPm = false; //determines whether event message will be pmmed or said in chat, false = chatbox, true = pm box
-let EVENTMESSAGE = false; //this disables / enables event message on startup - true = enabled, false = disabled                                 
-
-//the messages in here are examples, it is recommended that you clear them before using
-global.eventMessages = ['hello there', //enter your different event messages here, any messages that you want repeated
-
-    'message 2' +
-    ' this is an example message, multiple lines should be separate strings added together',
-
-    'this is a test'
-];
 
 
 /************************************EndSetUp**********************************************************************/
@@ -277,7 +253,7 @@ global.isAfk = function (userId, num, whichFunction)
 global.updateAfkPostionOfUser = function (userid)
 {
     //updates the afk position of the speaker.
-    if (roomDefaults.AFK === true || roomAFK === true)
+    if (roomDefaults.AFK === true || roomDefaults.roomAFK === true)
     {
         justSaw(userid, 'justSaw');
         justSaw(userid, 'justSaw1');
@@ -301,7 +277,7 @@ global.afkCheck = function ()
         {
             if (afker != authModule.USERID && isAfkMaster == -1)
             {
-                if (afkThroughPm === false)
+                if (roomDefaults.afkThroughPm === false)
                 {
                     bot.speak('@' + theUsersList[whatIsAfkerName] + ' you have 5 minutes left of afk, chat or awesome please.');
                 }
@@ -316,7 +292,7 @@ global.afkCheck = function ()
         {
             if (afker != authModule.USERID && isAfkMaster == -1)
             {
-                if (afkThroughPm === false)
+                if (roomDefaults.afkThroughPm === false)
                 {
                     bot.speak('@' + theUsersList[whatIsAfkerName] + ' you have 1 minute left of afk, chat or awesome please.');
                 }
@@ -333,7 +309,7 @@ global.afkCheck = function ()
             {
                 if (afker != checkWhoIsDj)
                 {
-                    if (afkThroughPm === false)
+                    if (roomDefaults.afkThroughPm === false)
                     {
                         bot.speak('@' + theUsersList[whatIsAfkerName] + ' you are over the afk limit of ' + roomDefaults.afkLimit + ' minutes.');
                     }
@@ -363,7 +339,7 @@ roomAfkCheck = function ()
         let afker2 = userIds[i]; //Pick a DJ
         let isAfkMod = modList.indexOf(afker2);
         let isDj = currentDjs.indexOf(afker2);
-        if ((isAfk(afker2, ( roomDefaults.roomafkLimit - 1), 'isAfk3')) && roomAFK === true)
+        if ((isAfk(afker2, ( roomDefaults.roomafkLimit - 1), 'isAfk3')) && roomDefaults.roomAFK === true)
         {
 
             if (afker2 != authModule.USERID && isDj == -1 && isAfkMod == -1)
@@ -372,7 +348,7 @@ roomAfkCheck = function ()
                 justSaw(afker2, 'justSaw3');
             }
         }
-        if ((isAfk(afker2,  roomDefaults.roomafkLimit, 'isAfk4')) && roomAFK === true)
+        if ((isAfk(afker2,  roomDefaults.roomafkLimit, 'isAfk4')) && roomDefaults.roomAFK === true)
         { //if person is afk then      
             if (afker2 != authModule.USERID && isAfkMod == -1) //checks to see if afker is a mod or a bot or a dj, if they are is does not kick them.
             {
@@ -453,22 +429,22 @@ setInterval(vipListCheck, 5000) //repeats the check every five seconds.
 //this is for the event messages array
 global.eventMessagesIterator = function ()
 {
-    if (EVENTMESSAGE == true && eventMessages.length !== 0)
+    if (roomDefaults.EVENTMESSAGE == true && roomDefaults.eventMessages.length !== 0)
     {
-        if (messageCounter == eventMessages.length)
+        if (messageCounter == roomDefaults.eventMessages.length)
         {
             messageCounter = 0; //if end of event messages array reached, reset counter
         }
 
-        if (eventMessageThroughPm == false) //if set to send messages through chatbox, do so
+        if (roomDefaults.eventMessageThroughPm == false) //if set to send messages through chatbox, do so
         {
-            bot.speak(eventMessages[messageCounter] + "");
+            bot.speak(roomDefaults.eventMessages[messageCounter] + "");
         }
         else //else send message through pm
         {
             for (let jio = 0; jio < userIds.length; jio++)
             {
-                bot.pm(eventMessages[messageCounter] + "", userIds[jio]);
+                bot.pm(roomDefaults.eventMessages[messageCounter] + "", userIds[jio]);
             }
         }
 
@@ -476,7 +452,7 @@ global.eventMessagesIterator = function ()
     }
 }
 
-setInterval(eventMessagesIterator, eventMessageRepeatTime * 60 * 1000) //repeats check
+setInterval(eventMessagesIterator, roomDefaults.eventMessageRepeatTime * 60 * 1000) //repeats check
 
 
 
@@ -484,7 +460,7 @@ repeatMessage = function ()
 {
     if (roomDefaults.MESSAGE === true && typeof detail !== 'undefined')
     {
-        if (repeatMessageThroughPm === false) //if not doing through the pm
+        if (roomDefaults.repeatMessageThroughPm === false) //if not doing through the pm
         {
             if (roomDefaults.defaultMessage === true) //if using default message
             {
@@ -1271,7 +1247,7 @@ bot.on('speak', function (data)
         {
             whatsOn += 'autodjing: Off, ';
         }
-        if (EVENTMESSAGE === true)
+        if (roomDefaults.EVENTMESSAGE === true)
         {
             whatsOn += 'event message: On, ';
         }
@@ -1287,7 +1263,7 @@ bot.on('speak', function (data)
         {
             whatsOn += 'room message: Off, ';
         }
-        if (GREET === true)
+        if (roomDefaults.GREET === true)
         {
             whatsOn += 'greeting message: On, ';
         }
@@ -1303,7 +1279,7 @@ bot.on('speak', function (data)
         {
             whatsOn += 'voteskipping: Off, ';
         }
-        if (roomAFK === true)
+        if (roomDefaults.roomAFK === true)
         {
             whatsOn += 'audience afk limit: On, ';
         }
@@ -1311,7 +1287,7 @@ bot.on('speak', function (data)
         {
             whatsOn += 'audience afk limit: Off, ';
         }
-        if (SONGSTATS === true)
+        if (roomDefaults.SONGSTATS === true)
         {
             whatsOn += 'song stats: On, ';
         }
@@ -1319,7 +1295,7 @@ bot.on('speak', function (data)
         {
             whatsOn += 'song stats: Off, ';
         }
-        if (kickTTSTAT === true)
+        if (roomDefaults.kickTTSTAT === true)
         {
             whatsOn += 'auto ttstat kick: On, ';
         }
@@ -1480,7 +1456,7 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/roomafkon/) && condition === true)
     {
-        roomAFK = true;
+        roomDefaults.roomAFK = true;
         bot.speak('the audience afk list is now active.');
         for (let zh = 0; zh < userIds.length; zh++)
         {
@@ -1494,7 +1470,7 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/roomafkoff/) && condition === true)
     {
-        roomAFK = false;
+        roomDefaults.roomAFK = false;
         bot.speak('the audience afk list is now inactive.');
     }
     else if (text.match(/^\/djplays/))
@@ -1589,14 +1565,14 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/songstats/) && condition === true)
     {
-        if (SONGSTATS === true)
+        if (roomDefaults.SONGSTATS === true)
         {
-            SONGSTATS = false;
+            roomDefaults.SONGSTATS = false;
             bot.speak('song stats is now inactive');
         }
-        else if (SONGSTATS === false)
+        else if (roomDefaults.SONGSTATS === false)
         {
-            SONGSTATS = true;
+            roomDefaults.SONGSTATS = true;
             bot.speak('song stats is now active');
         }
     }
@@ -1716,22 +1692,22 @@ bot.on('speak', function (data)
     else if (text.match(/^\/greeton/) && condition === true)
     {
         bot.speak('room greeting: On');
-        GREET = true;
+        roomDefaults.GREET = true;
     }
     else if (text.match(/^\/greetoff/) && condition === true)
     {
         bot.speak('room greeting: Off');
-        GREET = false;
+        roomDefaults.GREET = false;
     }
     else if (text.match(/^\/eventmessageOn/) && condition === true)
     {
         bot.speak('event message: On');
-        EVENTMESSAGE = true;
+        roomDefaults.EVENTMESSAGE = true;
     }
     else if (text.match(/^\/eventmessageOff/) && condition === true)
     {
         bot.speak('event message: Off');
-        EVENTMESSAGE = false;
+        roomDefaults.EVENTMESSAGE = false;
     }
     else if (text.match(/^\/messageOn/) && condition === true)
     {
@@ -3701,12 +3677,12 @@ bot.on('pmmed', function (data)
     else if (text.match(/^\/eventmessageOn/) && condition === true && isInRoom === true)
     {
         bot.pm('event message: On', data.senderid);
-        EVENTMESSAGE = true;
+        roomDefaults.EVENTMESSAGE = true;
     }
     else if (text.match(/^\/eventmessageOff/) && condition === true && isInRoom === true)
     {
         bot.pm('event message: Off', data.senderid);
-        EVENTMESSAGE = false;
+        roomDefaults.EVENTMESSAGE = false;
     }
     else if (text.match(/^\/messageOff/) && condition === true && isInRoom === true)
     {
@@ -3721,23 +3697,23 @@ bot.on('pmmed', function (data)
     else if (text.match(/^\/greetoff/) && condition === true && isInRoom === true)
     {
         bot.pm('room greeting: Off', data.senderid);
-        GREET = false;
+        roomDefaults.GREET = false;
     }
     else if (text.match(/^\/greeton/) && condition === true && isInRoom === true)
     {
         bot.pm('room greeting: On', data.senderid);
-        GREET = true;
+        roomDefaults.GREET = true;
     }
     else if (text.match(/^\/songstats/) && condition === true && isInRoom === true)
     {
-        if (SONGSTATS === true)
+        if (roomDefaults.SONGSTATS === true)
         {
-            SONGSTATS = false;
+            roomDefaults.SONGSTATS = false;
             bot.pm('song stats is now inactive', data.senderid);
         }
-        else if (SONGSTATS === false)
+        else if (roomDefaults.SONGSTATS === false)
         {
-            SONGSTATS = true;
+            roomDefaults.SONGSTATS = true;
             bot.pm('song stats is now active', data.senderid);
         }
     }
@@ -3783,12 +3759,12 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/roomafkoff/) && condition === true && isInRoom === true)
     {
-        roomAFK = false;
+        roomDefaults.roomAFK = false;
         bot.pm('the audience afk list is now inactive.', data.senderid);
     }
     else if (text.match(/^\/roomafkon/) && condition === true && isInRoom === true)
     {
-        roomAFK = true;
+        roomDefaults.roomAFK = true;
         bot.pm('the audience afk list is now active.', data.senderid);
         for (let zh = 0; zh < userIds.length; zh++)
         {
@@ -4061,7 +4037,7 @@ bot.on('pmmed', function (data)
         {
             whatsOn += 'autodjing: Off, ';
         }
-        if (EVENTMESSAGE === true)
+        if (roomDefaults.EVENTMESSAGE === true)
         {
             whatsOn += 'event message: On, ';
         }
@@ -4077,7 +4053,7 @@ bot.on('pmmed', function (data)
         {
             whatsOn += 'room message: Off, ';
         }
-        if (GREET === true)
+        if (roomDefaults.GREET === true)
         {
             whatsOn += 'greeting message: On, ';
         }
@@ -4093,7 +4069,7 @@ bot.on('pmmed', function (data)
         {
             whatsOn += 'voteskipping: Off, ';
         }
-        if (roomAFK === true)
+        if (roomDefaults.roomAFK === true)
         {
             whatsOn += 'audience afk limit: On, ';
         }
@@ -4101,7 +4077,7 @@ bot.on('pmmed', function (data)
         {
             whatsOn += 'audience afk limit: Off, ';
         }
-        if (SONGSTATS === true)
+        if (roomDefaults.SONGSTATS === true)
         {
             whatsOn += 'song stats: On, ';
         }
@@ -4109,7 +4085,7 @@ bot.on('pmmed', function (data)
         {
             whatsOn += 'song stats: Off, ';
         }
-        if (kickTTSTAT === true)
+        if (roomDefaults.kickTTSTAT === true)
         {
             whatsOn += 'auto ttstat kick: On, ';
         }
@@ -4706,7 +4682,7 @@ bot.on('registered', function (data)
     let roomjoin = data.user[0];
     let areTheyBanned = blackList.indexOf(data.user[0].userid);
     let areTheyBanned2 = userDefaults.bannedUsers.indexOf(data.user[0].userid);
-    if (GREET === true && data.user[0].userid != authModule.USERID && !data.user[0].name.match('@ttstat'))
+    if (roomDefaults.GREET === true && data.user[0].userid != authModule.USERID && !data.user[0].name.match('@ttstat'))
     {
         if (areTheyBanned == -1 && areTheyBanned2 == -1)
         {
@@ -4722,7 +4698,7 @@ bot.on('registered', function (data)
                 {
                     if (THEME === false) //if theres no theme this is the message.
                     {
-                        if (greetThroughPm === false) //if your not sending the message through the pm
+                        if (roomDefaults.greetThroughPm === false) //if your not sending the message through the pm
                         {
                             bot.speak('@' + roomjoin.name + ', ' +  roomDefaults.roomJoinMessage);
                         }
@@ -4733,7 +4709,7 @@ bot.on('registered', function (data)
                     }
                     else
                     {
-                        if (greetThroughPm === false)
+                        if (roomDefaults.greetThroughPm === false)
                         {
                             bot.speak('@' + roomjoin.name + ', ' +  roomDefaults.roomJoinMessage + '; The theme is currently set to: ' + whatIsTheme);
                         }
@@ -4747,7 +4723,7 @@ bot.on('registered', function (data)
                 {
                     if (THEME === false) //if theres no theme this is the message.
                     {
-                        if (greetThroughPm === false)
+                        if (roomDefaults.greetThroughPm === false)
                         {
                             bot.speak('Welcome to ' + roomName + ' @' + roomjoin.name + ', enjoy your stay!');
                         }
@@ -4758,7 +4734,7 @@ bot.on('registered', function (data)
                     }
                     else
                     {
-                        if (greetThroughPm === false)
+                        if (roomDefaults.greetThroughPm === false)
                         {
                             bot.speak('Welcome to ' + roomName + ' @' + roomjoin.name + ', the theme is currently set to: ' + whatIsTheme);
                         }
@@ -4818,7 +4794,7 @@ bot.on('registered', function (data)
 
 
     //puts people who join the room on the global afk list
-    if (roomAFK === true)
+    if (roomDefaults.roomAFK === true)
     {
         justSaw(data.user[0].userid, 'justSaw3');
         justSaw(data.user[0].userid, 'justSaw4');
@@ -4826,7 +4802,7 @@ bot.on('registered', function (data)
 
 
     //this kicks the ttstats bot
-    if (kickTTSTAT === true)
+    if (roomDefaults.kickTTSTAT === true)
     {
         if (data.user[0].name.match('@ttstat'))
         {
@@ -4984,7 +4960,7 @@ bot.on('deregistered', function (data)
 bot.on('endsong', function (data)
 {
     //bot says song stats for each song
-    if (SONGSTATS === true)
+    if (roomDefaults.SONGSTATS === true)
     {
         bot.speak('Stats for ' + song + ' by ' + artist + ': ' + ':thumbsup:' + upVotes + ':thumbsdown:' + downVotes + ':heart:' + whoSnagged);
     }
