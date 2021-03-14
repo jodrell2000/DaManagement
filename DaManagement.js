@@ -16,7 +16,6 @@ let musicDefaults = require('./defaultSettings/musicDefaults.js');
 
 //do not change the values of any of the global variables below unless you know what you are doing, the discriptions given are for reference only
 
-let defaultPlayLimit = roomDefaults.playLimit; //saves the default value for the play limit
 let spamLimit = 3; //number of times a user can spam being kicked off the stage within 10 secs
 let myId = null; //the userid of the person using the /fanme command, speak event only
 let detail = null; //the discription given in the "room" tab of the room that the bot is in
@@ -688,7 +687,7 @@ global.formatBannedArtists = function ()
         //add a backslash in front of all special characters
         for (let i = 0; i < musicDefaults.bannedArtists.length; i++)
         {
-            tempArray.push(musicDefaults.bannedArtists[i].replace(/([-[\]{}()*^=!:+?.,\\^$|#\s])/g, "\\$1"));
+            tempArray.push(musicDefaults.bannedArtists[i].replace(/([-[\]{}()*^=!:+?.,\\$|#\s])/g, "\\$1"));
         }
 
         //join everything into one string
@@ -2462,9 +2461,7 @@ bot.on('speak', function (data)
         else
         {
             bot.speak('the play limit is now active and has been set to the default value of ' +
-                defaultPlayLimit + ' songs. dj song counters have been reset.');
-
-            roomDefaults.playLimit = defaultPlayLimit; //set playlimit to default
+                roomDefaults.playLimit + ' songs. dj song counters have been reset.');
 
             //reset song counters
             for (let ig = 0; ig < currentDjs.length; ig++)
@@ -3374,9 +3371,7 @@ bot.on('pmmed', function (data)
         else
         {
             bot.pm('the play limit is now active and has been set to the default value of ' +
-                defaultPlayLimit + ' songs. dj song counters have been reset.', data.senderid);
-
-            roomDefaults.playLimit = defaultPlayLimit; //set playlimit to default
+                roomDefaults.playLimit + ' songs. dj song counters have been reset.', data.senderid);
 
             //reset song counters
             for (let ig = 0; ig < currentDjs.length; ig++)
