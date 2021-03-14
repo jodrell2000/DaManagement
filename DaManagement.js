@@ -13,7 +13,6 @@ let roomDefaults = require('./defaultSettings/roomDefaults.js');
 let userDefaults = require('./defaultSettings/userDefaults.js');
 let musicDefaults = require('./defaultSettings/musicDefaults.js');
 
-let AFK = true; //afk limit(on by default), this is for the dj's on stage
 let MESSAGE = true; //room message(on by default), the bot says your room info in intervals of whatever the  roomDefaultsModule.howOftenToRepeatMessage variable above is set to in minutes
 let defaultMessage = true;
 /*This corresponds to the MESSAGE variable directly above, if true it will give you the default repeat message along with your room info, if false it will only say your room info.
