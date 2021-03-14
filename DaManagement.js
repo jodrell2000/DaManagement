@@ -13,12 +13,6 @@ let roomDefaults = require('./defaultSettings/roomDefaults.js');
 let userDefaults = require('./defaultSettings/userDefaults.js');
 let musicDefaults = require('./defaultSettings/musicDefaults.js');
 
-global.masterIds = ['']; //example (clear this before using)
-/*This is the master id list, userid's that are put in here will not be affected by the song length limit, artist / song banning, the /skip command, or the dj afk limit.
-                         This is meant to explicitly give extra privileges to yourself and anyone else you want to put in here. It takes userid's as input in string format separated by commas.
-                         You can put the person's name in the array either before or after a userid to tell who it belongs to, it will not affect its ability to function.
-                       */
-
 var AFK = true; //afk limit(on by default), this is for the dj's on stage
 var MESSAGE = true; //room message(on by default), the bot says your room info in intervals of whatever the  roomDefaultsModule.howOftenToRepeatMessage variable above is set to in minutes
 var defaultMessage = true;
@@ -307,7 +301,7 @@ global.afkCheck = function ()
     for (var i = 0; i < currentDjs.length; i++)
     {
         afker = currentDjs[i]; //Pick a DJ
-        var isAfkMaster = masterIds.indexOf(afker); //master ids check
+        var isAfkMaster = userDefaults.masterIds.indexOf(afker); //master ids check
         var whatIsAfkerName = theUsersList.indexOf(afker) + 1;
         if ((isAfk(afker, (roomDefaults.afkLimit - 5), 'isAfk1')) && AFK === true)
         {
@@ -858,7 +852,7 @@ global.checkOnNewSong = function (data)
 
     // Set this after processing things from last timer calls
     lastdj = data.room.metadata.current_dj;
-    masterIndex = masterIds.indexOf(lastdj); //master id's check
+    masterIndex = userDefaults.masterIds.indexOf(lastdj); //master id's check
 
 
     // Set a new watchdog timer for the current song.
@@ -989,7 +983,7 @@ bot.on('newsong', function (data)
     //removes current dj from stage if they play a banned song or artist.
     if (musicDefaults.bannedArtists.length !== 0 && typeof artist !== 'undefined' && typeof song !== 'undefined')
     {
-        var checkIfAdmin = masterIds.indexOf(checkWhoIsDj); //is user an exempt admin?
+        var checkIfAdmin = userDefaults.masterIds.indexOf(checkWhoIsDj); //is user an exempt admin?
         var nameDj = theUsersList.indexOf(checkWhoIsDj) + 1; //the currently playing dj's name
 
         if (checkIfAdmin == -1)
@@ -1446,9 +1440,9 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/skip$/) && voteSkip === true) //if command matches and voteskipping is enabled
     {
-        var isMaster = masterIds.includes(data.userid);
+        var isMaster = userDefaults.masterIds.includes(data.userid);
         var checkIfOnList = checkVotes.indexOf(data.userid); //check if the person using the command has already voted
-        var checkIfMaster = masterIds.indexOf(lastdj); //is the currently playing dj on the master id's list?
+        var checkIfMaster = userDefaults.masterIds.indexOf(lastdj); //is the currently playing dj on the master id's list?
 
         if ((checkIfOnList == -1 || isMaster) && data.userid != authModule.USERID) //if command user has not voted and command user is not the bot
         {
