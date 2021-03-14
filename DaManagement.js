@@ -13,32 +13,32 @@ let roomDefaults = require('./defaultSettings/roomDefaults.js');
 let userDefaults = require('./defaultSettings/userDefaults.js');
 let musicDefaults = require('./defaultSettings/musicDefaults.js');
 
-var AFK = true; //afk limit(on by default), this is for the dj's on stage
-var MESSAGE = true; //room message(on by default), the bot says your room info in intervals of whatever the  roomDefaultsModule.howOftenToRepeatMessage variable above is set to in minutes
-var defaultMessage = true;
+let AFK = true; //afk limit(on by default), this is for the dj's on stage
+let MESSAGE = true; //room message(on by default), the bot says your room info in intervals of whatever the  roomDefaultsModule.howOftenToRepeatMessage variable above is set to in minutes
+let defaultMessage = true;
 /*This corresponds to the MESSAGE variable directly above, if true it will give you the default repeat message along with your room info, if false it will only say your room info.
                               (only works when MESSAGE = true) (this feature is on by default)
                             */
-var GREET = true; //room greeting when someone joins the room(on by default)
-var voteSkip = false; //voteskipping(off by default)
-var roomAFK = false; //audience afk limit(off by default)
-var SONGSTATS = true; //song stats after each song(on by default)
-var kickTTSTAT = false; //kicks the ttstats bot when it tries to join the room(off by default)
-var LIMIT = true; //song length limit (on by default)
-var PLAYLIMIT = false; //song play limit, this is for the playLimit variable up above(off by default)
-var autoSnag = true; //auto song adding(different from every song adding), tied to  botDefaultsModule.howManyVotes up above, (off by default)
-var autoBop = true; //choose whether the bot will autobop for each song or not(against the rules but i leave it up to you) (off by default)
-var afkThroughPm = true; //choose whether afk warnings(for dj's on stage) will be given through the pm or the chatbox (false = chatbox, true = pm message)
-var greetThroughPm = false; //choose whether greeting message is through the pm or the chatbox(false = chatbox, true = pm), (only works when greeting message is turned on) (off by default)
-var repeatMessageThroughPm = false;
+let GREET = true; //room greeting when someone joins the room(on by default)
+let voteSkip = false; //voteskipping(off by default)
+let roomAFK = false; //audience afk limit(off by default)
+let SONGSTATS = true; //song stats after each song(on by default)
+let kickTTSTAT = false; //kicks the ttstats bot when it tries to join the room(off by default)
+let LIMIT = true; //song length limit (on by default)
+let PLAYLIMIT = false; //song play limit, this is for the playLimit variable up above(off by default)
+let autoSnag = true; //auto song adding(different from every song adding), tied to  botDefaultsModule.howManyVotes up above, (off by default)
+let autoBop = true; //choose whether the bot will autobop for each song or not(against the rules but i leave it up to you) (off by default)
+let afkThroughPm = true; //choose whether afk warnings(for dj's on stage) will be given through the pm or the chatbox (false = chatbox, true = pm message)
+let greetThroughPm = false; //choose whether greeting message is through the pm or the chatbox(false = chatbox, true = pm), (only works when greeting message is turned on) (off by default)
+let repeatMessageThroughPm = false;
 /*choose whether the repeating room message(the one corresponding to MESSAGE up above) will be through the chatbox or the pm,
                                       (false = through the chatbox, true = through the pm) (MESSAGE must equal true for this to work) (this feature is off by default)                                      
                                     */
 //this is for the event messages
 //This cycles through all the different messages that you enter into this array. one message per time cycle, once it gets to the end of your messages it starts over again
-var eventMessageRepeatTime = 15; //how long in minutes between event messages(must have EVENTMESSAGE = true to see any messages)
-var eventMessageThroughPm = false; //determines whether event message will be pmmed or said in chat, false = chatbox, true = pm box
-var EVENTMESSAGE = false; //this disables / enables event message on startup - true = enabled, false = disabled                                 
+let eventMessageRepeatTime = 15; //how long in minutes between event messages(must have EVENTMESSAGE = true to see any messages)
+let eventMessageThroughPm = false; //determines whether event message will be pmmed or said in chat, false = chatbox, true = pm box
+let EVENTMESSAGE = false; //this disables / enables event message on startup - true = enabled, false = disabled                                 
 
 //the messages in here are examples, it is recommended that you clear them before using
 global.eventMessages = ['hello there', //enter your different event messages here, any messages that you want repeated
@@ -54,48 +54,48 @@ global.eventMessages = ['hello there', //enter your different event messages her
 
 //do not change the values of any of the global variables below unless you know what you are doing, the discriptions given are for reference only
 
-var defaultPlayLimit = roomDefaults.playLimit; //saves the default value for the play limit
-var spamLimit = 3; //number of times a user can spam being kicked off the stage within 10 secs
-var myId = null; //the userid of the person using the /fanme command, speak event only
-var detail = null; //the discription given in the "room" tab of the room that the bot is in
-var current = null; //the number of dj's on stage, gets reset every song
-var name = null; //the name of the person using the person who activated the speak event
-var dj = null; //the name of the currently playing dj
-var condition = null; //is the person using a command a moderator? true or false
-var index = null; //the index returned when using unban commands
-var song = null; //the name of the current song
-var album = null; //the album name of the current song
-var genre = null; //the genre of the current song
-var skipOn = null; //if true causes the bot to skip every song it plays, toggled on and off by commands
-var snagSong = false; //if true causes the bot to add every song that plays to its queue
-var checkWhoIsDj = null; //the userid of the currently playing dj
-var randomOnce = 0; //a flag used to check if the /randomSong command has already been activated, 0 is no, 1 is yes
-var voteCountSkip = 0; //the current amount of votes for a song skip, gets reset every song
-var votesLeft = roomDefaults.HowManyVotesToSkip; //a countdown of the amount of votes needed till a song gets skipped
-var sayOnce = true; //makes it so that the queue timeout can only be used once per per person, stops the bot from spamming
-var artist = null; //the artist name of the currently playing song
-var getSong = null; //the id3 tag id of the currently playing song
-var informTimer = null; //holds the timeout for the /inform command, null lets it know that it hasn't already been set
-var upVotes = null; //the amount of upvotes or "awesome's" that the currently playing song has recieved
-var downVotes = null; //the amount of downvotes or "lame's" that the currently playing song has recieved
-var whoSnagged = 0; //the amount of people who have added the currently playing song to their dj queue
-var beginTime = null; //the current time in milliseconds when the bot has started, used for the /uptime
-var endTime = null; //the current time in milliseconds when the /uptime is actually used
-var roomName = null; //the name of the room, example "straight chillin" would be the format for the straight chillin room...
-var ttRoomName = null; //the url extension of the room name, example "straight_chillin16" would be the format
-var THEME = false; //has a current theme been set? true or false. handled by commands
-var whatIsTheme = null; //this holds a string which is set by the /setTheme command
-var messageCounter = 0; //this is for the array of messages, it lets it know which message it is currently on, resets to 0 after cycling through all of them
-var ALLREADYCALLED = false; //resets votesnagging so that it can be called again
-var thisHoldsThePlaylist = null; //holds a copy of the playlist
-var netwatchdogTimer = null; // Used to detect internet connection dropping out
-var checkActivity = Date.now();
-var attemptToReconnect = null; //used for reconnecting to the bots room if its not in there (only works if internet connection is working)
-var returnToRoom = true; //used to toggle on and off the bot reconnecting to its room(it toggles off when theres no internet connection because it only works when its connected to turntable.fm)
-var wserrorTimeout = null; //this is for the setTimeout in ws error
-var errorMessage = null; //the error message you get when trying to connect to the room
-var bannedArtistsMatcher; //holds the regular expression for banned artist / song matching
-var autoDjingTimer = null; //governs the timer for the bot's auto djing
+let defaultPlayLimit = roomDefaults.playLimit; //saves the default value for the play limit
+let spamLimit = 3; //number of times a user can spam being kicked off the stage within 10 secs
+let myId = null; //the userid of the person using the /fanme command, speak event only
+let detail = null; //the discription given in the "room" tab of the room that the bot is in
+let current = null; //the number of dj's on stage, gets reset every song
+let name = null; //the name of the person using the person who activated the speak event
+let dj = null; //the name of the currently playing dj
+let condition = null; //is the person using a command a moderator? true or false
+let index = null; //the index returned when using unban commands
+let song = null; //the name of the current song
+let album = null; //the album name of the current song
+let genre = null; //the genre of the current song
+let skipOn = null; //if true causes the bot to skip every song it plays, toggled on and off by commands
+let snagSong = false; //if true causes the bot to add every song that plays to its queue
+let checkWhoIsDj = null; //the userid of the currently playing dj
+let randomOnce = 0; //a flag used to check if the /randomSong command has already been activated, 0 is no, 1 is yes
+let voteCountSkip = 0; //the current amount of votes for a song skip, gets reset every song
+let votesLeft = roomDefaults.HowManyVotesToSkip; //a countdown of the amount of votes needed till a song gets skipped
+let sayOnce = true; //makes it so that the queue timeout can only be used once per per person, stops the bot from spamming
+let artist = null; //the artist name of the currently playing song
+let getSong = null; //the id3 tag id of the currently playing song
+let informTimer = null; //holds the timeout for the /inform command, null lets it know that it hasn't already been set
+let upVotes = null; //the amount of upvotes or "awesome's" that the currently playing song has recieved
+let downVotes = null; //the amount of downvotes or "lame's" that the currently playing song has recieved
+let whoSnagged = 0; //the amount of people who have added the currently playing song to their dj queue
+let beginTime = null; //the current time in milliseconds when the bot has started, used for the /uptime
+let endTime = null; //the current time in milliseconds when the /uptime is actually used
+let roomName = null; //the name of the room, example "straight chillin" would be the format for the straight chillin room...
+let ttRoomName = null; //the url extension of the room name, example "straight_chillin16" would be the format
+let THEME = false; //has a current theme been set? true or false. handled by commands
+let whatIsTheme = null; //this holds a string which is set by the /setTheme command
+let messageCounter = 0; //this is for the array of messages, it lets it know which message it is currently on, resets to 0 after cycling through all of them
+let ALLREADYCALLED = false; //resets votesnagging so that it can be called again
+let thisHoldsThePlaylist = null; //holds a copy of the playlist
+let netwatchdogTimer = null; // Used to detect internet connection dropping out
+let checkActivity = Date.now();
+let attemptToReconnect = null; //used for reconnecting to the bots room if its not in there (only works if internet connection is working)
+let returnToRoom = true; //used to toggle on and off the bot reconnecting to its room(it toggles off when theres no internet connection because it only works when its connected to turntable.fm)
+let wserrorTimeout = null; //this is for the setTimeout in ws error
+let errorMessage = null; //the error message you get when trying to connect to the room
+let bannedArtistsMatcher; //holds the regular expression for banned artist / song matching
+let autoDjingTimer = null; //governs the timer for the bot's auto djing
 
 global.playLimitOfRefresher = []; //holds a copy of the number of plays for people who have used the /refresh command
 global.refreshList = []; //this holds the userid's of people who have used the /refresh command
@@ -140,13 +140,13 @@ bot.on('disconnected', function (data) {
 
 
 
-var checkIfConnected = function ()
+let checkIfConnected = function ()
 {
     if (attemptToReconnect === null) //if a reconnection attempt is already in progress, do not attempt it
     {
         if (bot._isAuthenticated) // if bot is actually connected to turntable use the speaking method
         {
-            var currentActivity = (Date.now() - checkActivity) / 1000 / 60;
+            let currentActivity = (Date.now() - checkActivity) / 1000 / 60;
 
             if (currentActivity > 30) //if greater than 30 minutes of no talking
             {
@@ -269,8 +269,8 @@ global.isAfk = function (userId, num, whichFunction)
         break;
     }
 
-    var age_ms = Date.now() - last;
-    var age_m = Math.floor(age_ms / 1000 / 60);
+    let age_ms = Date.now() - last;
+    let age_m = Math.floor(age_ms / 1000 / 60);
     if (age_m >= num)
     {
         return true;
@@ -298,11 +298,11 @@ global.updateAfkPostionOfUser = function (userid)
 //removes afk dj's after roomDefaultsModule.afkLimit is up.
 global.afkCheck = function ()
 {
-    for (var i = 0; i < currentDjs.length; i++)
+    for (let i = 0; i < currentDjs.length; i++)
     {
         afker = currentDjs[i]; //Pick a DJ
-        var isAfkMaster = userDefaults.masterIds.indexOf(afker); //master ids check
-        var whatIsAfkerName = theUsersList.indexOf(afker) + 1;
+        let isAfkMaster = userDefaults.masterIds.indexOf(afker); //master ids check
+        let whatIsAfkerName = theUsersList.indexOf(afker) + 1;
         if ((isAfk(afker, (roomDefaults.afkLimit - 5), 'isAfk1')) && AFK === true)
         {
             if (afker != authModule.USERID && isAfkMaster == -1)
@@ -364,11 +364,11 @@ setInterval(afkCheck, 5000); //This repeats the check every five seconds.
 //this removes people on the floor, not the djs
 roomAfkCheck = function ()
 {
-    for (var i = 0; i < userIds.length; i++)
+    for (let i = 0; i < userIds.length; i++)
     {
-        var afker2 = userIds[i]; //Pick a DJ
-        var isAfkMod = modList.indexOf(afker2);
-        var isDj = currentDjs.indexOf(afker2);
+        let afker2 = userIds[i]; //Pick a DJ
+        let isAfkMod = modList.indexOf(afker2);
+        let isDj = currentDjs.indexOf(afker2);
         if ((isAfk(afker2, ( roomDefaults.roomafkLimit - 1), 'isAfk3')) && roomAFK === true)
         {
 
@@ -414,12 +414,12 @@ queueCheck15 = function ()
             }
             else if (( botDefaults.howLongStage / 60) == 1) //is it one minute
             {
-                var minute = Math.floor(( botDefaults.howLongStage / 60));
+                let minute = Math.floor(( botDefaults.howLongStage / 60));
                 bot.speak('@' + queueName[0] + ' you have ' + minute + ' minute to get on stage.');
             }
             else if (( botDefaults.howLongStage / 60) > 1) //is it more than one minute
             {
-                var minutes = Math.floor(( botDefaults.howLongStage / 60));
+                let minutes = Math.floor(( botDefaults.howLongStage / 60));
                 bot.speak('@' + queueName[0] + ' you have ' + minutes + ' minutes to get on stage.');
             }
             beginTimer = setTimeout(function ()
@@ -441,9 +441,9 @@ vipListCheck = function ()
     //this kicks all users off stage when the vip list is not empty
     if (userDefaults.vipList.length !== 0 && currentDjs.length != userDefaults.vipList.length)
     {
-        for (var p = 0; p < currentDjs.length; p++)
+        for (let p = 0; p < currentDjs.length; p++)
         {
-            var checkIfVip = userDefaults.vipList.indexOf(currentDjs[p]);
+            let checkIfVip = userDefaults.vipList.indexOf(currentDjs[p]);
             if (checkIfVip == -1 && currentDjs[p] != authModule.USERID)
             {
                 bot.remDj(currentDjs[p]);
@@ -472,7 +472,7 @@ global.eventMessagesIterator = function ()
         }
         else //else send message through pm
         {
-            for (var jio = 0; jio < userIds.length; jio++)
+            for (let jio = 0; jio < userIds.length; jio++)
             {
                 bot.pm(eventMessages[messageCounter] + "", userIds[jio]);
             }
@@ -505,14 +505,14 @@ repeatMessage = function ()
         {
             if (defaultMessage === true)
             {
-                for (var jkl = 0; jkl < userIds.length; jkl++)
+                for (let jkl = 0; jkl < userIds.length; jkl++)
                 {
                     bot.pm('Welcome to ' + roomName + ', ' + detail, userIds[jkl]); //set the message you wish the bot to repeat here i.e rules and such.
                 }
             }
             else
             {
-                for (var lkj = 0; lkj < userIds.length; lkj++)
+                for (let lkj = 0; lkj < userIds.length; lkj++)
                 {
                     bot.pm('' + detail, userIds[lkj]); //set the message you wish the bot to repeat here i.e rules and such.
                 }
@@ -535,7 +535,7 @@ global.verifyUsersList = function ()
         {
             if (typeof data.users === 'object')
             {
-                var theUsersListOkay = true; //assume it will not need to be rebuilt
+                let theUsersListOkay = true; //assume it will not need to be rebuilt
 
                 //if the length of the users list does not match
                 //the amount of people in the room
@@ -548,7 +548,7 @@ global.verifyUsersList = function ()
                 if (theUsersListOkay)
                 {
                     //if any undefined values are found
-                    for (var i = 0; i < theUsersList.length; i++)
+                    for (let i = 0; i < theUsersList.length; i++)
                     {
                         if (typeof theUsersList[i] === 'undefined')
                         {
@@ -563,7 +563,7 @@ global.verifyUsersList = function ()
                 {
                     theUsersList = [];
 
-                    for (var i = 0; i < data.users.length; i++)
+                    for (let i = 0; i < data.users.length; i++)
                     {
                         if (typeof data.users[i] !== 'undefined')
                         {
@@ -592,7 +592,7 @@ global.autoDjing = function ()
 
     autoDjingTimer = setTimeout(function ()
     {
-        var isBotAlreadyOnStage = currentDjs.indexOf(authModule.USERID);
+        let isBotAlreadyOnStage = currentDjs.indexOf(authModule.USERID);
 
         if (isBotAlreadyOnStage == -1) //if the bot is not already on stage
         {
@@ -621,8 +621,8 @@ global.addSongIfNotAlreadyInPlaylist = function (bool)
 {
     if (thisHoldsThePlaylist !== null && getSong !== null)
     {
-        var found = false;
-        for (var igh = 0; igh < thisHoldsThePlaylist.length; igh++)
+        let found = false;
+        for (let igh = 0; igh < thisHoldsThePlaylist.length; igh++)
         {
             if (thisHoldsThePlaylist[igh]._id == getSong)
             {
@@ -633,7 +633,7 @@ global.addSongIfNotAlreadyInPlaylist = function (bool)
         if (!found)
         {
             bot.playlistAdd(getSong, -1); //add song to the end of the playlist                    
-            var tempSongHolder = {
+            let tempSongHolder = {
                 _id: getSong
             };
             thisHoldsThePlaylist.push(tempSongHolder);
@@ -652,11 +652,11 @@ global.warnMeCall = function ()
 {
     if (warnme.length != 0) //is there anyone in the warnme?
     {
-        var whatIsPosition = currentDjs.indexOf(checkWhoIsDj); //what position are they
+        let whatIsPosition = currentDjs.indexOf(checkWhoIsDj); //what position are they
 
         if (whatIsPosition == currentDjs.length - 1) //if 5th dj is playing, check guy on the left
         {
-            var areTheyNext = warnme.indexOf(currentDjs[0]);
+            let areTheyNext = warnme.indexOf(currentDjs[0]);
             if (areTheyNext != -1) //is the next dj up in the warnme?
             {
                 bot.pm('your song is up next!', currentDjs[0]);
@@ -666,7 +666,7 @@ global.warnMeCall = function ()
         }
         else
         {
-            var areTheyNext = warnme.indexOf(currentDjs[whatIsPosition + 1]);
+            let areTheyNext = warnme.indexOf(currentDjs[whatIsPosition + 1]);
             if (areTheyNext != -1) //is the next dj up in the warnme?
             {
                 bot.pm('your song is up next!', currentDjs[whatIsPosition + 1]);
@@ -682,7 +682,7 @@ global.warnMeCall = function ()
 //checks to see if a command user is contained within the moderator list or not
 global.checkIfUserIsMod = function (userid)
 {
-    var modIndex = modList.indexOf(userid);
+    let modIndex = modList.indexOf(userid);
 
     if (modIndex != -1)
     {
@@ -699,7 +699,7 @@ global.checkIfUserIsMod = function (userid)
 //makes sure the person who pmmed the bot a command is in the room
 global.checkToseeIfPmmerIsInRoom = function (userid)
 {
-    var isInRoom = theUsersList.indexOf(userid);
+    let isInRoom = theUsersList.indexOf(userid);
 
     if (isInRoom != -1)
     {
@@ -745,17 +745,17 @@ global.formatBannedArtists = function ()
 {
     if (musicDefaults.bannedArtists.length !== 0)
     {
-        var tempArray = [];
-        var tempString = '(';
+        let tempArray = [];
+        let tempString = '(';
 
         //add a backslash in front of all special characters
-        for (var i = 0; i < musicDefaults.bannedArtists.length; i++)
+        for (let i = 0; i < musicDefaults.bannedArtists.length; i++)
         {
             tempArray.push(musicDefaults.bannedArtists[i].replace(/([-[\]{}()*^=!:+?.,\\^$|#\s])/g, "\\$1"));
         }
 
         //join everything into one string
-        for (var i = 0; i < musicDefaults.bannedArtists.length; i++)
+        for (let i = 0; i < musicDefaults.bannedArtists.length; i++)
         {
             if (i < musicDefaults.bannedArtists.length - 1)
             {
@@ -842,8 +842,8 @@ global.clearTimers = function ()
 //stuck song detection, song length limit, /inform command
 global.checkOnNewSong = function (data)
 {
-    var length = data.room.metadata.current_song.metadata.length;
-    var masterIndex; //used to tell whether current dj is on the master id's list or not
+    let length = data.room.metadata.current_song.metadata.length;
+    let masterIndex; //used to tell whether current dj is on the master id's list or not
 
 
     //clears timers if previously set
@@ -983,8 +983,8 @@ bot.on('newsong', function (data)
     //removes current dj from stage if they play a banned song or artist.
     if (musicDefaults.bannedArtists.length !== 0 && typeof artist !== 'undefined' && typeof song !== 'undefined')
     {
-        var checkIfAdmin = userDefaults.masterIds.indexOf(checkWhoIsDj); //is user an exempt admin?
-        var nameDj = theUsersList.indexOf(checkWhoIsDj) + 1; //the currently playing dj's name
+        let checkIfAdmin = userDefaults.masterIds.indexOf(checkWhoIsDj); //is user an exempt admin?
+        let nameDj = theUsersList.indexOf(checkWhoIsDj) + 1; //the currently playing dj's name
 
         if (checkIfAdmin == -1)
         {
@@ -1051,7 +1051,7 @@ bot.on('newsong', function (data)
     {
         currentDjs = []; //reset current djs array
 
-        for (var hjg = 0; hjg < data.room.metadata.djcount; hjg++)
+        for (let hjg = 0; hjg < data.room.metadata.djcount; hjg++)
         {
             if (typeof data.room.metadata.djs[hjg] !== 'undefined')
             {
@@ -1080,7 +1080,7 @@ bot.on('nosong', function (data)
 //checks when the bot speaks
 bot.on('speak', function (data)
 {
-    var text = data.text; //the most recent text in the chatbox on turntable    
+    let text = data.text; //the most recent text in the chatbox on turntable    
     name = data.name; //name of latest person to say something
     checkActivity = Date.now(); //update when someone says something   
 
@@ -1103,14 +1103,14 @@ bot.on('speak', function (data)
     {
         if (randomOnce != 1)
         {
-            var ez = 0;
+            let ez = 0;
             bot.speak("Reorder initiated.");
             ++randomOnce;
-            var reorder = setInterval(function ()
+            let reorder = setInterval(function ()
             {
                 if (ez <= thisHoldsThePlaylist.length)
                 {
-                    var nextId = Math.ceil(Math.random() * thisHoldsThePlaylist);
+                    let nextId = Math.ceil(Math.random() * thisHoldsThePlaylist);
                     bot.playlistReorder(ez, nextId);
                     console.log("Song " + ez + " changed.");
                     ez++;
@@ -1137,12 +1137,12 @@ bot.on('speak', function (data)
     {
         if (roomDefaults.queue === true)
         {
-            var topOfQueue = data.text.slice(10);
-            var index35 = queueList.indexOf(topOfQueue);
-            var index46 = queueName.indexOf(topOfQueue);
-            var index80 = theUsersList.indexOf(topOfQueue);
-            var index81 = theUsersList[index80];
-            var index82 = theUsersList[index80 - 1];
+            let topOfQueue = data.text.slice(10);
+            let index35 = queueList.indexOf(topOfQueue);
+            let index46 = queueName.indexOf(topOfQueue);
+            let index80 = theUsersList.indexOf(topOfQueue);
+            let index81 = theUsersList[index80];
+            let index82 = theUsersList[index80 - 1];
             if (index35 != -1 && index80 != -1)
             {
                 clearTimeout(beginTimer);
@@ -1151,8 +1151,8 @@ bot.on('speak', function (data)
                 queueList.unshift(index81, index82);
                 queueName.splice(index46, 1);
                 queueName.unshift(index81);
-                var temp92 = 'The queue is now: ';
-                for (var po = 0; po < queueName.length; po++)
+                let temp92 = 'The queue is now: ';
+                for (let po = 0; po < queueName.length; po++)
                 {
                     if (po != (queueName.length - 1))
                     {
@@ -1169,7 +1169,7 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/stalk/) && condition === true)
     {
-        var stalker = text.substring(8);
+        let stalker = text.substring(8);
         bot.getUserId(stalker, function (data6)
         {
             bot.stalk(data6.userid, allInformations = true, function (data4)
@@ -1191,12 +1191,12 @@ bot.on('speak', function (data)
         {
             if (currentDjs.length !== 0) //any dj's on stage?
             {
-                var afkDjs = 'dj afk time: ';
+                let afkDjs = 'dj afk time: ';
 
-                for (var ijhp = 0; ijhp < currentDjs.length; ijhp++)
+                for (let ijhp = 0; ijhp < currentDjs.length; ijhp++)
                 {
-                    var lastUpdate = Math.floor((Date.now() - lastSeen[currentDjs[ijhp]]) / 1000 / 60); //their afk time in minutes
-                    var whatIsTheName = theUsersList.indexOf(currentDjs[ijhp]); //their name
+                    let lastUpdate = Math.floor((Date.now() - lastSeen[currentDjs[ijhp]]) / 1000 / 60); //their afk time in minutes
+                    let whatIsTheName = theUsersList.indexOf(currentDjs[ijhp]); //their name
 
                     if (currentDjs[ijhp] != currentDjs[currentDjs.length - 1])
                     {
@@ -1221,7 +1221,7 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/position/))
     {
-        var checkPosition = queueName.indexOf(data.name);
+        let checkPosition = queueName.indexOf(data.name);
 
         if (checkPosition != -1 && roomDefaults.queue === true) //if person is in the queue and queue is active
         {
@@ -1251,7 +1251,7 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/botstatus/) && condition === true)
     {
-        var whatsOn = '';
+        let whatsOn = '';
 
         if (roomDefaults.queue === true)
         {
@@ -1440,9 +1440,9 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/skip$/) && voteSkip === true) //if command matches and voteskipping is enabled
     {
-        var isMaster = userDefaults.masterIds.includes(data.userid);
-        var checkIfOnList = checkVotes.indexOf(data.userid); //check if the person using the command has already voted
-        var checkIfMaster = userDefaults.masterIds.indexOf(lastdj); //is the currently playing dj on the master id's list?
+        let isMaster = userDefaults.masterIds.includes(data.userid);
+        let checkIfOnList = checkVotes.indexOf(data.userid); //check if the person using the command has already voted
+        let checkIfMaster = userDefaults.masterIds.indexOf(lastdj); //is the currently playing dj on the master id's list?
 
         if ((checkIfOnList == -1 || isMaster) && data.userid != authModule.USERID) //if command user has not voted and command user is not the bot
         {
@@ -1450,7 +1450,7 @@ bot.on('speak', function (data)
             votesLeft -= 1; //decrement votes left by one (the votes remaining till the song will be skipped)
             checkVotes.unshift(data.userid); //add them to an array to make sure that they can't vote again this song
 
-            var findLastDj = theUsersList.indexOf(lastdj); //the index of the currently playing dj's userid in the theUser's list
+            let findLastDj = theUsersList.indexOf(lastdj); //the index of the currently playing dj's userid in the theUser's list
             if (votesLeft !== 0 && checkIfMaster == -1) //if votesLeft has not reached zero and the current dj is not on the master id's list
             {
                 //the bot will say the following
@@ -1472,7 +1472,7 @@ bot.on('speak', function (data)
     {
         AFK = true;
         bot.speak('the afk list is now active.');
-        for (var z = 0; z < currentDjs.length; z++)
+        for (let z = 0; z < currentDjs.length; z++)
         {
             justSaw(currentDjs[z], 'justSaw');
             justSaw(currentDjs[z], 'justSaw1');
@@ -1488,9 +1488,9 @@ bot.on('speak', function (data)
     {
         roomAFK = true;
         bot.speak('the audience afk list is now active.');
-        for (var zh = 0; zh < userIds.length; zh++)
+        for (let zh = 0; zh < userIds.length; zh++)
         {
-            var isDj2 = currentDjs.indexOf(userIds[zh])
+            let isDj2 = currentDjs.indexOf(userIds[zh])
             if (isDj2 == -1)
             {
                 justSaw(userIds[zh], 'justSaw3');
@@ -1507,11 +1507,11 @@ bot.on('speak', function (data)
     {
         if (currentDjs.length !== 0)
         {
-            var djsnames = [];
-            var djplays = 'dj plays: ';
-            for (var i = 0; i < currentDjs.length; i++)
+            let djsnames = [];
+            let djplays = 'dj plays: ';
+            for (let i = 0; i < currentDjs.length; i++)
             {
-                var djname = theUsersList.indexOf(currentDjs[i]) + 1;
+                let djname = theUsersList.indexOf(currentDjs[i]) + 1;
                 djsnames.push(theUsersList[djname]);
 
                 if (typeof djs20[currentDjs[i]] == 'undefined' && typeof currentDjs[i] != 'undefined') //if doesn't exist at this point, create it
@@ -1556,19 +1556,19 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/mytime/))
     {
-        var msecPerMinute1 = 1000 * 60;
-        var msecPerHour1 = msecPerMinute1 * 60;
-        var msecPerDay1 = msecPerHour1 * 24;
-        var endTime1 = Date.now();
-        var currentTime1 = endTime1 - myTime[data.userid];
+        let msecPerMinute1 = 1000 * 60;
+        let msecPerHour1 = msecPerMinute1 * 60;
+        let msecPerDay1 = msecPerHour1 * 24;
+        let endTime1 = Date.now();
+        let currentTime1 = endTime1 - myTime[data.userid];
 
-        var days1 = Math.floor(currentTime1 / msecPerDay1);
+        let days1 = Math.floor(currentTime1 / msecPerDay1);
         currentTime1 = currentTime1 - (days1 * msecPerDay1);
 
-        var hours1 = Math.floor(currentTime1 / msecPerHour1);
+        let hours1 = Math.floor(currentTime1 / msecPerHour1);
         currentTime1 = currentTime1 - (hours1 * msecPerHour1);
 
-        var minutes1 = Math.floor(currentTime1 / msecPerMinute1);
+        let minutes1 = Math.floor(currentTime1 / msecPerMinute1);
 
         bot.getProfile(data.userid, function (data6)
         {
@@ -1577,19 +1577,19 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/uptime/))
     {
-        var msecPerMinute = 1000 * 60;
-        var msecPerHour = msecPerMinute * 60;
-        var msecPerDay = msecPerHour * 24;
+        let msecPerMinute = 1000 * 60;
+        let msecPerHour = msecPerMinute * 60;
+        let msecPerDay = msecPerHour * 24;
         endTime = Date.now();
-        var currentTime = endTime - beginTime;
+        let currentTime = endTime - beginTime;
 
-        var days = Math.floor(currentTime / msecPerDay);
+        let days = Math.floor(currentTime / msecPerDay);
         currentTime = currentTime - (days * msecPerDay);
 
-        var hours = Math.floor(currentTime / msecPerHour);
+        let hours = Math.floor(currentTime / msecPerHour);
         currentTime = currentTime - (hours * msecPerHour);
 
-        var minutes = Math.floor(currentTime / msecPerMinute);
+        let minutes = Math.floor(currentTime / msecPerMinute);
 
         bot.speak('bot uptime: ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes');
     }
@@ -1614,10 +1614,10 @@ bot.on('speak', function (data)
     {
         if (refreshList.length != 0)
         {
-            var whosRefreshing = 'refreshing: ';
-            var namesOfRefresher;
+            let whosRefreshing = 'refreshing: ';
+            let namesOfRefresher;
 
-            for (var i = 0; i < refreshList.length; i++)
+            for (let i = 0; i < refreshList.length; i++)
             {
                 namesOfRefresher = theUsersList.indexOf(data.userid) + 1;
 
@@ -1656,10 +1656,10 @@ bot.on('speak', function (data)
         }
         else
         {
-            var isRefresherOnStage = currentDjs.indexOf(data.userid); //are they a dj
-            var hasRefreshAlreadyBeenUsed = refreshList.indexOf(data.userid); //are they already being refreshed?
-            var whatIsRefresherName = theUsersList.indexOf(data.userid) + 1;
-            var numberRepresent = (roomDefaults.amountOfTimeToRefresh / 60);
+            let isRefresherOnStage = currentDjs.indexOf(data.userid); //are they a dj
+            let hasRefreshAlreadyBeenUsed = refreshList.indexOf(data.userid); //are they already being refreshed?
+            let whatIsRefresherName = theUsersList.indexOf(data.userid) + 1;
+            let numberRepresent = (roomDefaults.amountOfTimeToRefresh / 60);
 
             if (hasRefreshAlreadyBeenUsed != -1) //if they are already being refreshed
             {
@@ -1792,7 +1792,7 @@ bot.on('speak', function (data)
         {
             if (informTimer === null)
             {
-                var checkDjsName = theUsersList.indexOf(lastdj) + 1;
+                let checkDjsName = theUsersList.indexOf(lastdj) + 1;
                 bot.speak('@' + theUsersList[checkDjsName] + ' your song is not the appropriate genre for this room, please skip or you will be removed in 20 seconds');
                 informTimer = setTimeout(function ()
                 {
@@ -1817,7 +1817,7 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/mom$/))
     {
-        var x = Math.round(Math.random() * 3);
+        let x = Math.round(Math.random() * 3);
         switch (x)
         {
         case 0:
@@ -1837,7 +1837,7 @@ bot.on('speak', function (data)
     }
     else if (text.match('/coinflip'))
     {
-        var y = Math.ceil(Math.random() * 2);
+        let y = Math.ceil(Math.random() * 2);
         switch (y)
         {
         case 1:
@@ -1912,15 +1912,15 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/fanratio/)) //this one courtesy of JenTheInstigator of turntable.fm
     {
-        var tmpuser = data.text.substring(11);
+        let tmpuser = data.text.substring(11);
         bot.getUserId(tmpuser, function (data1)
         {
-            var tmpid = data1.userid;
+            let tmpid = data1.userid;
             bot.getProfile(tmpid, function (data2)
             {
                 if (typeof (data1.userid) !== 'undefined')
                 {
-                    var tmp = tmpuser + " has " + data2.points + " points and " + data2.fans + " fans, for a ratio of " + Math.round(data2.points / data2.fans) + ".";
+                    let tmp = tmpuser + " has " + data2.points + " points and " + data2.fans + " fans, for a ratio of " + Math.round(data2.points / data2.fans) + ".";
                     bot.speak(tmp);
                 }
                 else
@@ -1945,13 +1945,13 @@ bot.on('speak', function (data)
     }
     else if (text.match('/beer'))
     {
-        var botname = theUsersList.indexOf(authModule.USERID) + 1;
+        let botname = theUsersList.indexOf(authModule.USERID) + 1;
         bot.speak('@' + theUsersList[botname] + ' hands ' + '@' + name + ' a nice cold :beer:');
     }
     else if (data.text == '/escortme')
     {
-        var djListIndex = currentDjs.indexOf(data.userid);
-        var escortmeIndex = escortList.indexOf(data.userid);
+        let djListIndex = currentDjs.indexOf(data.userid);
+        let escortmeIndex = escortList.indexOf(data.userid);
         if (djListIndex != -1 && escortmeIndex == -1)
         {
             escortList.push(data.userid);
@@ -1961,7 +1961,7 @@ bot.on('speak', function (data)
     else if (data.text == '/stopescortme')
     {
         bot.speak('@' + name + ' you will no longer be escorted after you play your song');
-        var escortIndex = escortList.indexOf(data.userid);
+        let escortIndex = escortList.indexOf(data.userid);
         if (escortIndex != -1)
         {
             escortList.splice(escortIndex, 1);
@@ -1986,12 +1986,12 @@ bot.on('speak', function (data)
     }
     else if (data.text == '/dice')
     {
-        var random = Math.floor(Math.random() * 12 + 1);
+        let random = Math.floor(Math.random() * 12 + 1);
         bot.speak('@' + name + ' i am rolling the dice... your number is... ' + random);
     }
     else if (text.match(/^\/dive/))
     {
-        var checkDj = currentDjs.indexOf(data.userid);
+        let checkDj = currentDjs.indexOf(data.userid);
         if (checkDj != -1)
         {
             bot.remDj(data.userid);
@@ -2013,17 +2013,17 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/move/) && condition === true)
     {
-        var moveName = data.text.slice(5);
-        var tempName = moveName.split(" ");
+        let moveName = data.text.slice(5);
+        let tempName = moveName.split(" ");
 
         if (typeof (tempName[1]) !== 'undefined')
         {
-            var whatIsTheirName = tempName[1].substring(1); //cut the @ off
+            let whatIsTheirName = tempName[1].substring(1); //cut the @ off
         }
 
-        var areTheyInTheQueue = queueName.indexOf(whatIsTheirName); //name in queueName
-        var areTheyInTheQueueList = queueList.indexOf(whatIsTheirName); //name in queuList
-        var whatIsTheirUserid2 = theUsersList.indexOf(whatIsTheirName); //userid    
+        let areTheyInTheQueue = queueName.indexOf(whatIsTheirName); //name in queueName
+        let areTheyInTheQueueList = queueList.indexOf(whatIsTheirName); //name in queuList
+        let whatIsTheirUserid2 = theUsersList.indexOf(whatIsTheirName); //userid    
 
         //if either name or userid is undefined, do not perform a move operation        
         if (typeof theUsersList[whatIsTheirUserid2 - 1] == 'undefined' || typeof tempName[1] == 'undefined')
@@ -2147,8 +2147,8 @@ bot.on('speak', function (data)
     {
         if (getSong !== null && thisHoldsThePlaylist !== null)
         {
-            var found = false;
-            for (var igh = 0; igh < thisHoldsThePlaylist.length; igh++)
+            let found = false;
+            for (let igh = 0; igh < thisHoldsThePlaylist.length; igh++)
             {
                 if (thisHoldsThePlaylist[igh]._id == getSong)
                 {
@@ -2161,7 +2161,7 @@ bot.on('speak', function (data)
             {
                 bot.playlistAdd(getSong, -1); //add song to the end of the playlist
                 bot.speak('song added');
-                var tempSongHolder = {
+                let tempSongHolder = {
                     _id: getSong
                 };
                 thisHoldsThePlaylist.push(tempSongHolder);
@@ -2192,8 +2192,8 @@ bot.on('speak', function (data)
     {
         if (queue === true && roomDefaults.queueName.length !== 0)
         {
-            var temp95 = 'The queue is now: ';
-            for (var kl = 0; kl < queueName.length; kl++)
+            let temp95 = 'The queue is now: ';
+            for (let kl = 0; kl < queueName.length; kl++)
             {
                 if (kl != (queueName.length - 1))
                 {
@@ -2219,8 +2219,8 @@ bot.on('speak', function (data)
     {
         if (roomDefaults.queue === true && queueName.length !== 0)
         {
-            var temp95 = 'The queue is now: ';
-            for (var kl = 0; kl < queueName.length; kl++)
+            let temp95 = 'The queue is now: ';
+            for (let kl = 0; kl < queueName.length; kl++)
             {
                 if (kl != (queueName.length - 1))
                 {
@@ -2247,9 +2247,9 @@ bot.on('speak', function (data)
     {
         if (PLAYLIMIT === true) //is the play limit on?
         {
-            var playMinus = data.text.slice(12);
-            var areTheyInRoom = theUsersList.indexOf(playMinus);
-            var areTheyDj = currentDjs.indexOf(theUsersList[areTheyInRoom - 1]);
+            let playMinus = data.text.slice(12);
+            let areTheyInRoom = theUsersList.indexOf(playMinus);
+            let areTheyDj = currentDjs.indexOf(theUsersList[areTheyInRoom - 1]);
 
             if (areTheyInRoom != -1) //are they in the room?
             {
@@ -2320,9 +2320,9 @@ bot.on('speak', function (data)
     {
         if (condition === true)
         {
-            var removeFromQueue = data.text.slice(18);
-            var index5 = queueList.indexOf(removeFromQueue);
-            var index6 = queueName.indexOf(removeFromQueue);
+            let removeFromQueue = data.text.slice(18);
+            let index5 = queueList.indexOf(removeFromQueue);
+            let index6 = queueName.indexOf(removeFromQueue);
             if (index5 != -1)
             {
                 if (queueName[index6] == queueName[0])
@@ -2335,8 +2335,8 @@ bot.on('speak', function (data)
 
                 if (queueName.length !== 0)
                 {
-                    var temp89 = 'The queue is now: ';
-                    for (var jk = 0; jk < queueName.length; jk++)
+                    let temp89 = 'The queue is now: ';
+                    for (let jk = 0; jk < queueName.length; jk++)
                     {
                         if (jk != (queueName.length - 1))
                         {
@@ -2375,8 +2375,8 @@ bot.on('speak', function (data)
         }
         else
         {
-            var list1 = queueList.indexOf(data.name);
-            var list2 = queueName.indexOf(data.name);
+            let list1 = queueList.indexOf(data.name);
+            let list2 = queueName.indexOf(data.name);
 
             if (list2 != -1 && list1 != -1)
             {
@@ -2392,8 +2392,8 @@ bot.on('speak', function (data)
 
                 if (queueName.length !== 0)
                 {
-                    var temp90 = 'The queue is now: ';
-                    for (var kj = 0; kj < queueName.length; kj++)
+                    let temp90 = 'The queue is now: ';
+                    for (let kj = 0; kj < queueName.length; kj++)
                     {
                         if (kj != (queueName.length - 1))
                         {
@@ -2425,7 +2425,7 @@ bot.on('speak', function (data)
         }
         else
         {
-            var indexInUsersList = theUsersList.indexOf(data.userid) + 1;
+            let indexInUsersList = theUsersList.indexOf(data.userid) + 1;
 
             if (typeof theUsersList[indexInUsersList] == 'undefined')
             {
@@ -2433,17 +2433,17 @@ bot.on('speak', function (data)
             }
             else
             {
-                var list3 = queueList.indexOf(theUsersList[indexInUsersList]);
-                var list10 = currentDjs.indexOf(data.userid)
-                var checkStageList = stageList.indexOf(data.userid);
-                var checkManualStageList = userDefaults.bannedFromStage.indexOf(data.userid);
+                let list3 = queueList.indexOf(theUsersList[indexInUsersList]);
+                let list10 = currentDjs.indexOf(data.userid)
+                let checkStageList = stageList.indexOf(data.userid);
+                let checkManualStageList = userDefaults.bannedFromStage.indexOf(data.userid);
                 //if not in the queue already, not already a dj, not banned from stage
                 if (list3 == -1 && list10 == -1 && checkStageList == -1 && checkManualStageList == -1)
                 {
                     queueList.push(theUsersList[indexInUsersList], data.userid);
                     queueName.push(theUsersList[indexInUsersList]);
-                    var temp91 = 'The queue is now: ';
-                    for (var hj = 0; hj < queueName.length; hj++)
+                    let temp91 = 'The queue is now: ';
+                    for (let hj = 0; hj < queueName.length; hj++)
                     {
                         if (hj != (queueName.length - 1))
                         {
@@ -2493,7 +2493,7 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/playLimitOn/) && condition === true)
     {
-        var playLimitNumber = Number(data.text.slice(13)); //holds given number
+        let playLimitNumber = Number(data.text.slice(13)); //holds given number
 
         if (playLimitNumber != '') //if an additional arguement was given
         {
@@ -2505,7 +2505,7 @@ bot.on('speak', function (data)
                     roomDefaults.playLimit + ' songs. dj song counters have been reset.');
 
                 //reset song counters
-                for (var ig = 0; ig < currentDjs.length; ig++)
+                for (let ig = 0; ig < currentDjs.length; ig++)
                 {
                     djs20[currentDjs[ig]] = {
                         nbSong: 0
@@ -2530,7 +2530,7 @@ bot.on('speak', function (data)
             roomDefaults.playLimit = defaultPlayLimit; //set playlimit to default
 
             //reset song counters
-            for (var ig = 0; ig < currentDjs.length; ig++)
+            for (let ig = 0; ig < currentDjs.length; ig++)
             {
                 djs20[currentDjs[ig]] = {
                     nbSong: 0
@@ -2556,9 +2556,9 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/warnme/))
     {
-        var areTheyBeingWarned = warnme.indexOf(data.userid);
-        var areTheyDj80 = currentDjs.indexOf(data.userid);
-        var Position56 = currentDjs.indexOf(checkWhoIsDj); //current djs index
+        let areTheyBeingWarned = warnme.indexOf(data.userid);
+        let areTheyDj80 = currentDjs.indexOf(data.userid);
+        let Position56 = currentDjs.indexOf(checkWhoIsDj); //current djs index
 
         if (areTheyDj80 != -1) //are they on stage?
         {
@@ -2600,9 +2600,9 @@ bot.on('speak', function (data)
     }
     else if (text.match('/banstage') && condition === true)
     {
-        var ban = data.text.slice(11);
-        var checkBan = stageList.indexOf(ban);
-        var checkUser = theUsersList.indexOf(ban);
+        let ban = data.text.slice(11);
+        let checkBan = stageList.indexOf(ban);
+        let checkUser = theUsersList.indexOf(ban);
         if (checkBan == -1 && checkUser != -1)
         {
             stageList.push(theUsersList[checkUser - 1], theUsersList[checkUser]);
@@ -2616,7 +2616,7 @@ bot.on('speak', function (data)
     }
     else if (text.match('/unbanstage') && condition === true)
     {
-        var ban2 = data.text.slice(13);
+        let ban2 = data.text.slice(13);
         index = stageList.indexOf(ban2);
         if (index != -1)
         {
@@ -2631,9 +2631,9 @@ bot.on('speak', function (data)
     }
     else if (text.match('/ban') && condition === true)
     {
-        var ban3 = data.text.slice(6);
-        var checkBan5 = blackList.indexOf(ban3);
-        var checkUser3 = theUsersList.indexOf(ban3);
+        let ban3 = data.text.slice(6);
+        let checkBan5 = blackList.indexOf(ban3);
+        let checkUser3 = theUsersList.indexOf(ban3);
         if (checkBan5 == -1 && checkUser3 != -1)
         {
             blackList.push(theUsersList[checkUser3 - 1], theUsersList[checkUser3]);
@@ -2647,7 +2647,7 @@ bot.on('speak', function (data)
     }
     else if (text.match('/unban') && condition === true)
     {
-        var ban6 = data.text.slice(8);
+        let ban6 = data.text.slice(8);
         index = blackList.indexOf(ban6);
         if (index != -1)
         {
@@ -2662,10 +2662,10 @@ bot.on('speak', function (data)
     }
     else if (text.match('/userid') && condition === true)
     {
-        var ban8 = data.text.slice(9);
-        var checkUser8 = bot.getUserId(ban8, function (data)
+        let ban8 = data.text.slice(9);
+        let checkUser8 = bot.getUserId(ban8, function (data)
         {
-            var userid56 = data.userid;
+            let userid56 = data.userid;
             if (typeof (userid56) !== 'undefined')
             {
                 bot.speak(userid56);
@@ -2679,15 +2679,15 @@ bot.on('speak', function (data)
     }
     else if (text.match('/username') && condition === true)
     {
-        var ban50 = data.text.slice(10);
-        var tmp94 = bot.getProfile(ban50, function (data)
+        let ban50 = data.text.slice(10);
+        let tmp94 = bot.getProfile(ban50, function (data)
         {
             bot.speak(''+data.name);
         });
     }
     else if (text.match(/^\/afk/))
     {
-        var isAlreadyAfk = afkPeople.indexOf(data.name);
+        let isAlreadyAfk = afkPeople.indexOf(data.name);
         if (isAlreadyAfk == -1)
         {
             if (typeof data.name == 'undefined')
@@ -2708,7 +2708,7 @@ bot.on('speak', function (data)
     }
     else if (text == '/up?') //works for djs on stage
     {
-        var areTheyADj = currentDjs.indexOf(data.userid); //are they a dj?
+        let areTheyADj = currentDjs.indexOf(data.userid); //are they a dj?
         if (areTheyADj != -1) //yes
         {
             bot.speak('anybody want up?');
@@ -2722,8 +2722,8 @@ bot.on('speak', function (data)
     {
         if (afkPeople.length !== 0)
         {
-            var whosAfk = 'marked as afk: ';
-            for (var f = 0; f < afkPeople.length; f++)
+            let whosAfk = 'marked as afk: ';
+            for (let f = 0; f < afkPeople.length; f++)
             {
                 if (f != (afkPeople.length - 1))
                 {
@@ -2746,11 +2746,11 @@ bot.on('speak', function (data)
     //checks to see if someone is trying to speak to an afk person or not.  
     if (afkPeople.length !== 0 && data.userid != authModule.USERID)
     {
-        for (var j = 0; j < afkPeople.length; j++) //loop through afk people array
+        for (let j = 0; j < afkPeople.length; j++) //loop through afk people array
         {
             if (typeof (afkPeople[j] !== 'undefined'))
             {
-                var areTheyAfk56 = data.text.toLowerCase().indexOf(afkPeople[j].toLowerCase()); //is an afk persons name being called   
+                let areTheyAfk56 = data.text.toLowerCase().indexOf(afkPeople[j].toLowerCase()); //is an afk persons name being called   
 
                 if (areTheyAfk56 !== -1)
                 {
@@ -2802,7 +2802,7 @@ bot.on('add_dj', function (data)
 {
     //removes dj when they try to join the stage if the vip list has members in it.
     //does not remove the bot
-    var checkVip = userDefaults.vipList.indexOf(data.user[0].userid);
+    let checkVip = userDefaults.vipList.indexOf(data.user[0].userid);
     if (userDefaults.vipList.length !== 0 && checkVip == -1 && data.user[0].userid != authModule.USERID)
     {
         bot.remDj(data.user[0].userid);
@@ -2837,7 +2837,7 @@ bot.on('add_dj', function (data)
 
 
     //adds a user to the current Djs list when they join the stage.
-    var check89 = currentDjs.indexOf(data.user[0].userid);
+    let check89 = currentDjs.indexOf(data.user[0].userid);
     if (check89 == -1 && typeof data.user[0] != 'undefined')
     {
         currentDjs.push(data.user[0].userid);
@@ -2850,7 +2850,7 @@ bot.on('add_dj', function (data)
         if (refreshList.indexOf(data.user[0].userid) == -1) //don't show these messages to people on the refresh list
         {
             //tells a dj trying to get on stage how to add themselves to the queuelist
-            var ifUser2 = queueList.indexOf(data.user[0].userid);
+            let ifUser2 = queueList.indexOf(data.user[0].userid);
             if (roomDefaults.queue === true && ifUser2 == -1)
             {
                 if (queueList.length !== 0)
@@ -2879,8 +2879,8 @@ bot.on('add_dj', function (data)
             //removes a user from the queue list when they join the stage.
             if (roomDefaults.queue === true)
             {
-                var firstOnly = queueList.indexOf(data.user[0].userid);
-                var queueListLength = queueList.length;
+                let firstOnly = queueList.indexOf(data.user[0].userid);
+                let queueListLength = queueList.length;
                 if (firstOnly != 1 && queueListLength !== 0)
                 {
                     bot.remDj(data.user[0].userid);
@@ -2890,8 +2890,8 @@ bot.on('add_dj', function (data)
             }
             if (roomDefaults.queue === true)
             {
-                var checkQueue = queueList.indexOf(data.user[0].name);
-                var checkName2 = queueName.indexOf(data.user[0].name);
+                let checkQueue = queueList.indexOf(data.user[0].name);
+                let checkName2 = queueName.indexOf(data.user[0].name);
                 if (checkQueue != -1 && checkQueue === 0)
                 {
                     clearTimeout(beginTimer);
@@ -2920,7 +2920,7 @@ bot.on('add_dj', function (data)
 
 
     //if user is still in refresh list when they get on stage, remove them
-    var areTheyStillInRefreshList = refreshList.indexOf(data.user[0].userid);
+    let areTheyStillInRefreshList = refreshList.indexOf(data.user[0].userid);
     if (areTheyStillInRefreshList != -1)
     {
         clearTimeout(refreshTimer[data.user[0].userid]); //clear their timeout
@@ -2931,7 +2931,7 @@ bot.on('add_dj', function (data)
 
 
     //checks to see if user is on the banned from stage list, if they are they are removed from stage
-    for (var g = 0; g < stageList.length; g++)
+    for (let g = 0; g < stageList.length; g++)
     {
         if (data.user[0].userid == stageList[g])
         {
@@ -2946,7 +2946,7 @@ bot.on('add_dj', function (data)
 
 
     //checks to see if user is on the manually added banned from stage list, if they are they are removed from stage
-    for (var z = 0; z < userDefaults.bannedFromStage.length; z++)
+    for (let z = 0; z < userDefaults.bannedFromStage.length; z++)
     {
         if (userDefaults.bannedFromStage[z].match(data.user[0].userid)) //== userDefaults.bannedFromStage[z])
         {
@@ -2995,7 +2995,7 @@ bot.on('rem_dj', function (data)
 
 
     //updates the current dj's list.
-    var check30 = currentDjs.indexOf(data.user[0].userid);
+    let check30 = currentDjs.indexOf(data.user[0].userid);
     if (check30 != -1)
     {
         currentDjs.splice(check30, 1);
@@ -3005,7 +3005,7 @@ bot.on('rem_dj', function (data)
     //this is for /warnme
     if (warnme.length != 0)
     {
-        var areTheyBeingWarned = warnme.indexOf(data.user[0].userid);
+        let areTheyBeingWarned = warnme.indexOf(data.user[0].userid);
 
         if (areTheyBeingWarned != -1) //if theyre on /warnme and they leave the stage
         {
@@ -3024,7 +3024,7 @@ bot.on('rem_dj', function (data)
 
 
     //takes a user off the escort list if they leave the stage.
-    var checkEscort = escortList.indexOf(data.user[0].userid);
+    let checkEscort = escortList.indexOf(data.user[0].userid);
     if (checkEscort != -1)
     {
         escortList.splice(checkEscort, 1);
@@ -3036,21 +3036,21 @@ bot.on('rem_dj', function (data)
 //checks when the bot recieves a pm
 bot.on('pmmed', function (data)
 {
-    var senderid = data.senderid; //the userid of the person who just pmmed the bot
-    var text = data.text; //the text sent to the bot in a pm    
-    var name1 = theUsersList.indexOf(data.senderid) + 1; //the name of the person who sent the bot a pm
-    var isInRoom = checkToseeIfPmmerIsInRoom(senderid); //check to see whether pmmer is in the same room as the bot
+    let senderid = data.senderid; //the userid of the person who just pmmed the bot
+    let text = data.text; //the text sent to the bot in a pm    
+    let name1 = theUsersList.indexOf(data.senderid) + 1; //the name of the person who sent the bot a pm
+    let isInRoom = checkToseeIfPmmerIsInRoom(senderid); //check to see whether pmmer is in the same room as the bot
 
     checkIfUserIsMod(data.senderid); //check to see if person pming the bot a command is a moderator or not
 
     //if no commands match, the pmmer is a moderator and theres more than zero people in the modpm chat
     if (modpm.length != 0 && data.text.charAt(0) != '/' && condition === true) //if no other commands match, send modpm
     {
-        var areTheyInModPm = modpm.indexOf(data.senderid);
+        let areTheyInModPm = modpm.indexOf(data.senderid);
 
         if (areTheyInModPm != -1)
         {
-            for (var jhg = 0; jhg < modpm.length; jhg++)
+            for (let jhg = 0; jhg < modpm.length; jhg++)
             {
                 if (modpm[jhg] != data.senderid && modpm[jhg] != authModule.USERID) //this will prevent you from messaging yourself
                 {
@@ -3061,7 +3061,7 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/modpm/) && condition === true && isInRoom === true)
     {
-        var areTheyInModPm = modpm.indexOf(data.senderid);
+        let areTheyInModPm = modpm.indexOf(data.senderid);
 
         if (areTheyInModPm == -1) //are they already in modpm? no
         {
@@ -3070,7 +3070,7 @@ bot.on('pmmed', function (data)
                 'will go to other moderators currently in the modpm', data.senderid);
             if (modpm.length != 0)
             {
-                for (var jk = 0; jk < modpm.length; jk++)
+                for (let jk = 0; jk < modpm.length; jk++)
                 {
                     if (modpm[jk] != data.senderid)
                     {
@@ -3085,7 +3085,7 @@ bot.on('pmmed', function (data)
             bot.pm('you have now left modpm mode', data.senderid);
             if (modpm.length != 0)
             {
-                for (var jk = 0; jk < modpm.length; jk++)
+                for (let jk = 0; jk < modpm.length; jk++)
                 {
                     bot.pm(theUsersList[name1] + ' has left the modpm chat', modpm[jk]); //declare user has entered chat
                 }
@@ -3096,10 +3096,10 @@ bot.on('pmmed', function (data)
     {
         if (refreshList.length != 0)
         {
-            var whosRefreshing = 'refreshing: ';
-            var namesOfRefresher;
+            let whosRefreshing = 'refreshing: ';
+            let namesOfRefresher;
 
-            for (var i = 0; i < refreshList.length; i++)
+            for (let i = 0; i < refreshList.length; i++)
             {
                 namesOfRefresher = theUsersList.indexOf(data.senderid) + 1;
 
@@ -3134,11 +3134,11 @@ bot.on('pmmed', function (data)
     {
         if (modpm.length != 0)
         {
-            var temper = "Users in modpm: "; //holds names
+            let temper = "Users in modpm: "; //holds names
 
-            for (var gfh = 0; gfh < modpm.length; gfh++)
+            for (let gfh = 0; gfh < modpm.length; gfh++)
             {
-                var whatAreTheirNames = theUsersList.indexOf(modpm[gfh]) + 1;
+                let whatAreTheirNames = theUsersList.indexOf(modpm[gfh]) + 1;
 
                 if (gfh != (modpm.length - 1))
                 {
@@ -3159,9 +3159,9 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/warnme/) && isInRoom === true)
     {
-        var areTheyBeingWarned = warnme.indexOf(data.senderid);
-        var areTheyDj80 = currentDjs.indexOf(data.senderid);
-        var Position56 = currentDjs.indexOf(checkWhoIsDj); //current djs index
+        let areTheyBeingWarned = warnme.indexOf(data.senderid);
+        let areTheyDj80 = currentDjs.indexOf(data.senderid);
+        let Position56 = currentDjs.indexOf(checkWhoIsDj); //current djs index
 
         if (areTheyDj80 != -1) //are they on stage?
         {
@@ -3203,11 +3203,11 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/move/) && condition === true && isInRoom === true)
     {
-        var moveName = data.text.slice(5);
-        var tempName = moveName.split(" ");
-        var areTheyInTheQueue = queueName.indexOf(tempName[1]); //name in queueName
-        var areTheyInTheQueueList = queueList.indexOf(tempName[1]); //name in queuList
-        var whatIsTheirUserid2 = theUsersList.indexOf(tempName[1]); //userid
+        let moveName = data.text.slice(5);
+        let tempName = moveName.split(" ");
+        let areTheyInTheQueue = queueName.indexOf(tempName[1]); //name in queueName
+        let areTheyInTheQueueList = queueList.indexOf(tempName[1]); //name in queuList
+        let whatIsTheirUserid2 = theUsersList.indexOf(tempName[1]); //userid
 
         //if either name or userid is undefined, do not perform a move operation        
         if (typeof theUsersList[whatIsTheirUserid2 - 1] == 'undefined' || typeof tempName[1] == 'undefined')
@@ -3291,7 +3291,7 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/position/)) //tells you your position in the queue, if there is one
     {
-        var checkPosition = queueName.indexOf(theUsersList[name1]);
+        let checkPosition = queueName.indexOf(theUsersList[name1]);
 
         if (checkPosition != -1 && roomDefaults.queue === true) //if person is in the queue and queue is active
         {
@@ -3312,12 +3312,12 @@ bot.on('pmmed', function (data)
         {
             if (currentDjs.length !== 0) //any dj's on stage?
             {
-                var afkDjs = 'dj afk time: ';
+                let afkDjs = 'dj afk time: ';
 
-                for (var ijhp = 0; ijhp < currentDjs.length; ijhp++)
+                for (let ijhp = 0; ijhp < currentDjs.length; ijhp++)
                 {
-                    var lastUpdate = Math.floor((Date.now() - lastSeen[currentDjs[ijhp]]) / 1000 / 60); //their afk time in minutes
-                    var whatIsTheName = theUsersList.indexOf(currentDjs[ijhp]); //their name
+                    let lastUpdate = Math.floor((Date.now() - lastSeen[currentDjs[ijhp]]) / 1000 / 60); //their afk time in minutes
+                    let whatIsTheName = theUsersList.indexOf(currentDjs[ijhp]); //their name
 
                     if (currentDjs[ijhp] != currentDjs[currentDjs.length - 1])
                     {
@@ -3344,9 +3344,9 @@ bot.on('pmmed', function (data)
     {
         if (PLAYLIMIT === true) //is the play limit on?
         {
-            var playMinus = data.text.slice(12);
-            var areTheyInRoom = theUsersList.indexOf(playMinus);
-            var areTheyDj = currentDjs.indexOf(theUsersList[areTheyInRoom - 1]);
+            let playMinus = data.text.slice(12);
+            let areTheyInRoom = theUsersList.indexOf(playMinus);
+            let areTheyDj = currentDjs.indexOf(theUsersList[areTheyInRoom - 1]);
             if (areTheyInRoom != -1) //are they in the room?
             {
                 if (areTheyDj != -1) //are they a dj?
@@ -3405,7 +3405,7 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/playLimitOn/) && condition === true && isInRoom === true)
     {
-        var playLimitNumber = Number(data.text.slice(13)); //holds given number
+        let playLimitNumber = Number(data.text.slice(13)); //holds given number
 
         if (playLimitNumber != '') //if an additional arguement was given
         {
@@ -3417,7 +3417,7 @@ bot.on('pmmed', function (data)
                     roomDefaults.playLimit + ' songs. dj song counters have been reset.', data.senderid);
 
                 //reset song counters
-                for (var ig = 0; ig < currentDjs.length; ig++)
+                for (let ig = 0; ig < currentDjs.length; ig++)
                 {
                     djs20[currentDjs[ig]] = {
                         nbSong: 0
@@ -3442,7 +3442,7 @@ bot.on('pmmed', function (data)
             roomDefaults.playLimit = defaultPlayLimit; //set playlimit to default
 
             //reset song counters
-            for (var ig = 0; ig < currentDjs.length; ig++)
+            for (let ig = 0; ig < currentDjs.length; ig++)
             {
                 djs20[currentDjs[ig]] = {
                     nbSong: 0
@@ -3486,16 +3486,16 @@ bot.on('pmmed', function (data)
         }
         else
         {
-            var list3 = queueList.indexOf(theUsersList[name1]);
-            var list10 = currentDjs.indexOf(data.senderid)
-            var checkStageList = stageList.indexOf(data.senderid);
-            var checkManualStageList = userDefaults.bannedFromStage.indexOf(data.senderid);
+            let list3 = queueList.indexOf(theUsersList[name1]);
+            let list10 = currentDjs.indexOf(data.senderid)
+            let checkStageList = stageList.indexOf(data.senderid);
+            let checkManualStageList = userDefaults.bannedFromStage.indexOf(data.senderid);
             if (list3 == -1 && list10 == -1 && checkStageList == -1 && checkManualStageList == -1)
             {
                 queueList.push(theUsersList[name1], data.senderid);
                 queueName.push(theUsersList[name1]);
-                var temp91 = 'The queue is now: ';
-                for (var hj = 0; hj < queueName.length; hj++)
+                let temp91 = 'The queue is now: ';
+                for (let hj = 0; hj < queueName.length; hj++)
                 {
                     if (hj != (queueName.length - 1))
                     {
@@ -3537,8 +3537,8 @@ bot.on('pmmed', function (data)
         }
         else
         {
-            var list1 = queueList.indexOf(theUsersList[name1]);
-            var list2 = queueName.indexOf(theUsersList[name1]);
+            let list1 = queueList.indexOf(theUsersList[name1]);
+            let list2 = queueName.indexOf(theUsersList[name1]);
 
             if (list2 != -1 && list1 != -1)
             {
@@ -3553,8 +3553,8 @@ bot.on('pmmed', function (data)
 
                 if (queueName.length !== 0)
                 {
-                    var temp90 = 'The queue is now: ';
-                    for (var kj = 0; kj < queueName.length; kj++)
+                    let temp90 = 'The queue is now: ';
+                    for (let kj = 0; kj < queueName.length; kj++)
                     {
                         if (kj != (queueName.length - 1))
                         {
@@ -3582,9 +3582,9 @@ bot.on('pmmed', function (data)
     {
         if (condition === true)
         {
-            var removeFromQueue = data.text.slice(18);
-            var index5 = queueList.indexOf(removeFromQueue);
-            var index6 = queueName.indexOf(removeFromQueue);
+            let removeFromQueue = data.text.slice(18);
+            let index5 = queueList.indexOf(removeFromQueue);
+            let index6 = queueName.indexOf(removeFromQueue);
             if (index5 != -1)
             {
                 if (queueName[index6] == queueName[0])
@@ -3597,8 +3597,8 @@ bot.on('pmmed', function (data)
 
                 if (queueName.length !== 0)
                 {
-                    var temp89 = 'The queue is now: ';
-                    for (var jk = 0; jk < queueName.length; jk++)
+                    let temp89 = 'The queue is now: ';
+                    for (let jk = 0; jk < queueName.length; jk++)
                     {
                         if (jk != (queueName.length - 1))
                         {
@@ -3652,7 +3652,7 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/dive/) && isInRoom === true)
     {
-        var checkDj = currentDjs.indexOf(data.senderid);
+        let checkDj = currentDjs.indexOf(data.senderid);
         if (checkDj != -1)
         {
             bot.remDj(data.senderid);
@@ -3796,9 +3796,9 @@ bot.on('pmmed', function (data)
     {
         roomAFK = true;
         bot.pm('the audience afk list is now active.', data.senderid);
-        for (var zh = 0; zh < userIds.length; zh++)
+        for (let zh = 0; zh < userIds.length; zh++)
         {
-            var isDj2 = currentDjs.indexOf(userIds[zh])
+            let isDj2 = currentDjs.indexOf(userIds[zh])
             if (isDj2 == -1)
             {
                 justSaw(userIds[zh], 'justSaw3');
@@ -3815,7 +3815,7 @@ bot.on('pmmed', function (data)
     {
         AFK = true;
         bot.pm('the afk list is now active.', data.senderid);
-        for (var z = 0; z < currentDjs.length; z++)
+        for (let z = 0; z < currentDjs.length; z++)
         {
             justSaw(currentDjs[z], 'justSaw');
             justSaw(currentDjs[z], 'justSaw1');
@@ -3839,19 +3839,19 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/mytime/) && isInRoom === true)
     {
-        var msecPerMinute1 = 1000 * 60;
-        var msecPerHour1 = msecPerMinute1 * 60;
-        var msecPerDay1 = msecPerHour1 * 24;
-        var endTime1 = Date.now();
-        var currentTime1 = endTime1 - myTime[data.senderid];
+        let msecPerMinute1 = 1000 * 60;
+        let msecPerHour1 = msecPerMinute1 * 60;
+        let msecPerDay1 = msecPerHour1 * 24;
+        let endTime1 = Date.now();
+        let currentTime1 = endTime1 - myTime[data.senderid];
 
-        var days1 = Math.floor(currentTime1 / msecPerDay1);
+        let days1 = Math.floor(currentTime1 / msecPerDay1);
         currentTime1 = currentTime1 - (days1 * msecPerDay1);
 
-        var hours1 = Math.floor(currentTime1 / msecPerHour1);
+        let hours1 = Math.floor(currentTime1 / msecPerHour1);
         currentTime1 = currentTime1 - (hours1 * msecPerHour1);
 
-        var minutes1 = Math.floor(currentTime1 / msecPerMinute1);
+        let minutes1 = Math.floor(currentTime1 / msecPerMinute1);
 
 
         bot.pm('you have been in the room for: ' + days1 + ' days, ' + hours1 + ' hours, ' + minutes1 + ' minutes', data.senderid);
@@ -3859,19 +3859,19 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/uptime/) && isInRoom === true)
     {
-        var msecPerMinute = 1000 * 60;
-        var msecPerHour = msecPerMinute * 60;
-        var msecPerDay = msecPerHour * 24;
+        let msecPerMinute = 1000 * 60;
+        let msecPerHour = msecPerMinute * 60;
+        let msecPerDay = msecPerHour * 24;
         endTime = Date.now();
-        var currentTime = endTime - beginTime;
+        let currentTime = endTime - beginTime;
 
-        var days = Math.floor(currentTime / msecPerDay);
+        let days = Math.floor(currentTime / msecPerDay);
         currentTime = currentTime - (days * msecPerDay);
 
-        var hours = Math.floor(currentTime / msecPerHour);
+        let hours = Math.floor(currentTime / msecPerHour);
         currentTime = currentTime - (hours * msecPerHour);
 
-        var minutes = Math.floor(currentTime / msecPerMinute);
+        let minutes = Math.floor(currentTime / msecPerMinute);
 
         bot.pm('bot uptime: ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes', data.senderid);
     }
@@ -3896,8 +3896,8 @@ bot.on('pmmed', function (data)
     {
         if (roomDefaults.queue === true && queueName.length !== 0)
         {
-            var temp95 = 'The queue is now: ';
-            for (var kl = 0; kl < queueName.length; kl++)
+            let temp95 = 'The queue is now: ';
+            for (let kl = 0; kl < queueName.length; kl++)
             {
                 if (kl != (queueName.length - 1))
                 {
@@ -3924,8 +3924,8 @@ bot.on('pmmed', function (data)
     {
         if (roomDefaults.queue === true && queueName.length !== 0)
         {
-            var temp95 = 'The queue is now: ';
-            for (var kl = 0; kl < queueName.length; kl++)
+            let temp95 = 'The queue is now: ';
+            for (let kl = 0; kl < queueName.length; kl++)
             {
                 if (kl != (queueName.length - 1))
                 {
@@ -3952,14 +3952,14 @@ bot.on('pmmed', function (data)
     {
         if (randomOnce != 1)
         {
-            var ez = 0;
+            let ez = 0;
             bot.pm("Reorder initiated.", data.senderid);
             ++randomOnce;
-            var reorder = setInterval(function ()
+            let reorder = setInterval(function ()
             {
                 if (ez <= thisHoldsThePlaylist.length)
                 {
-                    var nextId = Math.ceil(Math.random() * thisHoldsThePlaylist);
+                    let nextId = Math.ceil(Math.random() * thisHoldsThePlaylist);
                     bot.playlistReorder(ez, nextId);
                     console.log("Song " + ez + " changed.");
                     ez++;
@@ -3982,12 +3982,12 @@ bot.on('pmmed', function (data)
     {
         if (roomDefaults.queue === true)
         {
-            var topOfQueue = data.text.slice(10);
-            var index35 = queueList.indexOf(topOfQueue);
-            var index46 = queueName.indexOf(topOfQueue);
-            var index80 = theUsersList.indexOf(topOfQueue);
-            var index81 = theUsersList[index80];
-            var index82 = theUsersList[index80 - 1];
+            let topOfQueue = data.text.slice(10);
+            let index35 = queueList.indexOf(topOfQueue);
+            let index46 = queueName.indexOf(topOfQueue);
+            let index80 = theUsersList.indexOf(topOfQueue);
+            let index81 = theUsersList[index80];
+            let index82 = theUsersList[index80 - 1];
             if (index35 != -1 && index80 != -1)
             {
                 clearTimeout(beginTimer);
@@ -3996,8 +3996,8 @@ bot.on('pmmed', function (data)
                 queueList.unshift(index81, index82);
                 queueName.splice(index46, 1);
                 queueName.unshift(index81);
-                var temp92 = 'The queue is now: ';
-                for (var po = 0; po < queueName.length; po++)
+                let temp92 = 'The queue is now: ';
+                for (let po = 0; po < queueName.length; po++)
                 {
                     if (po != (queueName.length - 1))
                     {
@@ -4031,8 +4031,8 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/stage/) && condition === true && isInRoom === true)
     {
-        var ban = data.text.slice(8);
-        var checkUser = theUsersList.indexOf(ban) - 1;
+        let ban = data.text.slice(8);
+        let checkUser = theUsersList.indexOf(ban) - 1;
         if (checkUser != -1)
         {
             bot.remDj(theUsersList[checkUser]);
@@ -4041,7 +4041,7 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/botstatus/) && condition === true && isInRoom === true)
     {
-        var whatsOn = '';
+        let whatsOn = '';
 
         if (roomDefaults.queue === true)
         {
@@ -4186,11 +4186,11 @@ bot.on('pmmed', function (data)
     {
         if (currentDjs.length !== 0)
         {
-            var djsnames = [];
-            var djplays = 'dj plays: ';
-            for (var i = 0; i < currentDjs.length; i++)
+            let djsnames = [];
+            let djplays = 'dj plays: ';
+            for (let i = 0; i < currentDjs.length; i++)
             {
-                var djname = theUsersList.indexOf(currentDjs[i]) + 1;
+                let djname = theUsersList.indexOf(currentDjs[i]) + 1;
                 djsnames.push(theUsersList[djname]);
 
                 if (typeof djs20[currentDjs[i]] == 'undefined' && typeof currentDjs[i] != 'undefined') //if doesn't exist at this point, create it
@@ -4225,9 +4225,9 @@ bot.on('pmmed', function (data)
     }
     else if (text.match('/banstage') && condition === true && isInRoom === true)
     {
-        var ban12 = data.text.slice(11);
-        var checkBan = stageList.indexOf(ban12);
-        var checkUser12 = theUsersList.indexOf(ban12);
+        let ban12 = data.text.slice(11);
+        let checkBan = stageList.indexOf(ban12);
+        let checkUser12 = theUsersList.indexOf(ban12);
         if (checkBan == -1 && checkUser12 != -1)
         {
             stageList.push(theUsersList[checkUser12 - 1], theUsersList[checkUser12]);
@@ -4237,7 +4237,7 @@ bot.on('pmmed', function (data)
     }
     else if (text.match('/unbanstage') && condition === true && isInRoom === true)
     {
-        var ban2 = data.text.slice(13);
+        let ban2 = data.text.slice(13);
         index = stageList.indexOf(ban2);
         if (index != -1)
         {
@@ -4248,10 +4248,10 @@ bot.on('pmmed', function (data)
     }
     else if (text.match('/userid') && condition === true && isInRoom === true)
     {
-        var ban86 = data.text.slice(9);
-        var checkUser9 = bot.getUserId(ban86, function (data)
+        let ban86 = data.text.slice(9);
+        let checkUser9 = bot.getUserId(ban86, function (data)
         {
-            var userid59 = data.userid;
+            let userid59 = data.userid;
             if (typeof (userid59) !== 'undefined')
             {
                 bot.pm(userid59, senderid);
@@ -4265,9 +4265,9 @@ bot.on('pmmed', function (data)
     }
     else if (text.match('/ban') && condition === true && isInRoom === true)
     {
-        var ban17 = data.text.slice(6);
-        var checkBan17 = blackList.indexOf(ban17);
-        var checkUser17 = theUsersList.indexOf(ban17);
+        let ban17 = data.text.slice(6);
+        let checkBan17 = blackList.indexOf(ban17);
+        let checkUser17 = theUsersList.indexOf(ban17);
         if (checkBan17 == -1 && checkUser17 != -1)
         {
             blackList.push(theUsersList[checkUser17 - 1], theUsersList[checkUser17]);
@@ -4277,7 +4277,7 @@ bot.on('pmmed', function (data)
     }
     else if (text.match('/unban') && condition === true && isInRoom === true)
     {
-        var ban20 = data.text.slice(8);
+        let ban20 = data.text.slice(8);
         index = blackList.indexOf(ban20);
         if (index != -1)
         {
@@ -4288,7 +4288,7 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/stalk/) && condition === true && isInRoom === true)
     {
-        var stalker = text.substring(8);
+        let stalker = text.substring(8);
         bot.getUserId(stalker, function (data6)
         {
             bot.stalk(data6.userid, allInformations = true, function (data4)
@@ -4329,7 +4329,7 @@ bot.on('pmmed', function (data)
     else if (data.text == '/stopescortme' && isInRoom === true)
     {
         bot.pm('you will no longer be escorted after you play your song', data.senderid);
-        var escortIndex = escortList.indexOf(data.senderid);
+        let escortIndex = escortList.indexOf(data.senderid);
         if (escortIndex != -1)
         {
             escortList.splice(escortIndex, 1);
@@ -4337,8 +4337,8 @@ bot.on('pmmed', function (data)
     }
     else if (data.text == '/escortme' && isInRoom === true)
     {
-        var djListIndex = currentDjs.indexOf(data.senderid);
-        var escortmeIndex = escortList.indexOf(data.senderid);
+        let djListIndex = currentDjs.indexOf(data.senderid);
+        let escortmeIndex = escortList.indexOf(data.senderid);
         if (djListIndex != -1 && escortmeIndex == -1)
         {
             escortList.push(data.senderid);
@@ -4349,8 +4349,8 @@ bot.on('pmmed', function (data)
     {
         if (getSong !== null && thisHoldsThePlaylist !== null)
         {
-            var found = false;
-            for (var igh = 0; igh < thisHoldsThePlaylist.length; igh++)
+            let found = false;
+            for (let igh = 0; igh < thisHoldsThePlaylist.length; igh++)
             {
                 if (thisHoldsThePlaylist[igh]._id == getSong)
                 {
@@ -4363,7 +4363,7 @@ bot.on('pmmed', function (data)
             {
                 bot.playlistAdd(getSong, -1); //add song to the end of the playlist
                 bot.pm('song added', data.senderid);
-                var tempSongHolder = {
+                let tempSongHolder = {
                     _id: getSong
                 };
                 thisHoldsThePlaylist.push(tempSongHolder);
@@ -4380,7 +4380,7 @@ bot.on('pmmed', function (data)
         {
             if (informTimer === null)
             {
-                var checkDjsName = theUsersList.indexOf(lastdj) + 1;
+                let checkDjsName = theUsersList.indexOf(lastdj) + 1;
                 bot.speak('@' + theUsersList[checkDjsName] + ' your song is not the appropriate genre for this room, please skip or you will be removed in 20 seconds');
                 informTimer = setTimeout(function ()
                 {
@@ -4417,20 +4417,20 @@ bot.on('pmmed', function (data)
     }
     else if (text.match('/username') && condition === true && isInRoom === true)
     {
-        var ban7 = data.text.slice(10);
-        var tmp94 = bot.getProfile(ban7, function (data)
+        let ban7 = data.text.slice(10);
+        let tmp94 = bot.getProfile(ban7, function (data)
         {
             bot.pm(data.name, senderid);
         });
     }
     else if (text.match(/^\/boot/) && condition === true && isInRoom === true) //admin only
     {
-        var bootName = data.text.slice(5); //holds their name
-        var tempArray = bootName.split(" ");
-        var reason = "";
-        var whatIsTheirUserid = theUsersList.indexOf(tempArray[1]);
-        var theirName = ""; //holds the person's name
-        var isNameValid; //if second param is int value this is used to hold name index        
+        let bootName = data.text.slice(5); //holds their name
+        let tempArray = bootName.split(" ");
+        let reason = "";
+        let whatIsTheirUserid = theUsersList.indexOf(tempArray[1]);
+        let theirName = ""; //holds the person's name
+        let isNameValid; //if second param is int value this is used to hold name index        
 
 
         //if second arg is a number and that number is not a name of someone in the room
@@ -4441,7 +4441,7 @@ bot.on('pmmed', function (data)
             //if arg given will not produce index of bounds error
             if (tempArray[1] < tempArray.length - 1)
             {
-                for (var gj = 2; gj <= (2 + Math.round(tempArray[1])) - 1; gj++)
+                for (let gj = 2; gj <= (2 + Math.round(tempArray[1])) - 1; gj++)
                 {
                     theirName += tempArray[gj] + " ";
                 }
@@ -4452,7 +4452,7 @@ bot.on('pmmed', function (data)
                 if (isNameValid !== -1)
                 {
                     //get the message                
-                    for (var gyj = 2 + Math.round(tempArray[1]); gyj < tempArray.length; gyj++)
+                    for (let gyj = 2 + Math.round(tempArray[1]); gyj < tempArray.length; gyj++)
                     {
                         reason += tempArray[gyj] + " ";
                     }
@@ -4484,7 +4484,7 @@ bot.on('pmmed', function (data)
         //it comes to here
         else if (tempArray.length > 2 && whatIsTheirUserid !== -1)
         {
-            for (var ikp = 2; ikp < tempArray.length; ikp++)
+            for (let ikp = 2; ikp < tempArray.length; ikp++)
             {
                 reason += tempArray[ikp] + " ";
             }
@@ -4504,8 +4504,8 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/afk/) && isInRoom === true)
     {
-        var isUserAfk = theUsersList.indexOf(data.senderid) + 1;
-        var isAlreadyAfk = afkPeople.indexOf(theUsersList[isUserAfk]);
+        let isUserAfk = theUsersList.indexOf(data.senderid) + 1;
+        let isAlreadyAfk = afkPeople.indexOf(theUsersList[isUserAfk]);
         if (isAlreadyAfk == -1)
         {
             if (typeof theUsersList[isUserAfk] == 'undefined')
@@ -4528,8 +4528,8 @@ bot.on('pmmed', function (data)
     {
         if (afkPeople.length !== 0)
         {
-            var whosAfk = 'marked as afk: ';
-            for (var f = 0; f < afkPeople.length; f++)
+            let whosAfk = 'marked as afk: ';
+            for (let f = 0; f < afkPeople.length; f++)
             {
                 if (f != (afkPeople.length - 1))
                 {
@@ -4625,7 +4625,7 @@ bot.on('roomChanged', function (data)
 
 
         //finds out who the currently playing dj's are.    
-        for (var iop = 0; iop < data.room.metadata.djs.length; iop++)
+        for (let iop = 0; iop < data.room.metadata.djs.length; iop++)
         {
             if (typeof data.room.metadata.djs[iop] !== 'undefined')
             {
@@ -4642,14 +4642,14 @@ bot.on('roomChanged', function (data)
 
         //set modlist to list of moderators
         //modList = data.room.metadata.moderator_id;
-        for (var ihp = 0; ihp < data.room.metadata.moderator_id.length; ihp++)
+        for (let ihp = 0; ihp < data.room.metadata.moderator_id.length; ihp++)
         {
             modList.push(data.room.metadata.moderator_id[ihp]);
         }
 
 
         //used to get user names and user id's      
-        for (var i = 0; i < data.users.length; i++)
+        for (let i = 0; i < data.users.length; i++)
         {
             if (typeof data.users[i] !== 'undefined')
             {
@@ -4661,7 +4661,7 @@ bot.on('roomChanged', function (data)
 
         //sets everyones spam count to zero 
         //puts people on the global afk list when it joins the room 
-        for (var z = 0; z < userIds.length; z++)
+        for (let z = 0; z < userIds.length; z++)
         {
             if (typeof userIds[z] !== 'undefined')
             {
@@ -4675,7 +4675,7 @@ bot.on('roomChanged', function (data)
 
 
         //starts time in room for everyone currently in the room
-        for (var zy = 0; zy < userIds.length; zy++)
+        for (let zy = 0; zy < userIds.length; zy++)
         {
             if (typeof userIds[zy] !== 'undefined')
             {
@@ -4709,9 +4709,9 @@ bot.on('registered', function (data)
 
 
     //gets newest user and prints greeting, does not greet the bot or the ttstats bot, or banned users
-    var roomjoin = data.user[0];
-    var areTheyBanned = blackList.indexOf(data.user[0].userid);
-    var areTheyBanned2 = userDefaults.bannedUsers.indexOf(data.user[0].userid);
+    let roomjoin = data.user[0];
+    let areTheyBanned = blackList.indexOf(data.user[0].userid);
+    let areTheyBanned2 = userDefaults.bannedUsers.indexOf(data.user[0].userid);
     if (GREET === true && data.user[0].userid != authModule.USERID && !data.user[0].name.match('@ttstat'))
     {
         if (areTheyBanned == -1 && areTheyBanned2 == -1)
@@ -4791,7 +4791,7 @@ bot.on('registered', function (data)
 
 
     //adds users who join the room to the user list if their not already on the list
-    var checkList = theUsersList.indexOf(data.user[0].userid);
+    let checkList = theUsersList.indexOf(data.user[0].userid);
     if (checkList == -1)
     {
         if (typeof data.user[0] !== 'undefined')
@@ -4802,7 +4802,7 @@ bot.on('registered', function (data)
 
 
     //checks to see if user is on the banlist, if they are they are booted from the room.
-    for (var i = 0; i < blackList.length; i++)
+    for (let i = 0; i < blackList.length; i++)
     {
         if (roomjoin.userid == blackList[i])
         {
@@ -4813,7 +4813,7 @@ bot.on('registered', function (data)
 
 
     //checks manually added users
-    for (var z = 0; z < userDefaults.bannedUsers.length; z++)
+    for (let z = 0; z < userDefaults.bannedUsers.length; z++)
     {
         if (userDefaults.bannedUsers[z].match(roomjoin.userid))
         {
@@ -4847,17 +4847,17 @@ bot.on('update_user', function (data)
 {
     if (typeof data.name === 'string')
     {
-        var oldname = ''; //holds users old name if exists
-        var queueNamePosition;
-        var queueListPosition;
-        var afkPeoplePosition;
+        let oldname = ''; //holds users old name if exists
+        let queueNamePosition;
+        let queueListPosition;
+        let afkPeoplePosition;
 
         //when when person updates their profile
         //and their name is not found in the users list then they must have changed
         //their name   
         if (theUsersList.indexOf(data.name) === -1)
         {
-            var nameIndex = theUsersList.indexOf(data.userid);
+            let nameIndex = theUsersList.indexOf(data.userid);
             if (nameIndex !== -1) //if their userid was found in theUsersList
             {
                 oldname = theUsersList[nameIndex + 1];
@@ -4895,7 +4895,7 @@ bot.on('update_user', function (data)
 //updates the moderator list when a moderator is added.
 bot.on('new_moderator', function (data)
 {
-    var test50 = modList.indexOf(data.userid);
+    let test50 = modList.indexOf(data.userid);
     if (test50 == -1)
     {
         modList.push(data.userid);
@@ -4907,7 +4907,7 @@ bot.on('new_moderator', function (data)
 //updates the moderator list when a moderator is removed.
 bot.on('rem_moderator', function (data)
 {
-    var test51 = modList.indexOf(data.userid);
+    let test51 = modList.indexOf(data.userid);
     modList.splice(test51, 1);
 })
 
@@ -4929,7 +4929,7 @@ bot.on('deregistered', function (data)
 
     //double check to make sure that if someone is on stage and they disconnect, that they are being removed
     //from the current Dj's array
-    var checkIfStillInDjArray = currentDjs.indexOf(data.user[0].userid);
+    let checkIfStillInDjArray = currentDjs.indexOf(data.user[0].userid);
     if (checkIfStillInDjArray != -1)
     {
         currentDjs.splice(checkIfStillInDjArray, 1);
@@ -4939,8 +4939,8 @@ bot.on('deregistered', function (data)
     //removes people who leave the room from the afk list
     if (afkPeople.length !== 0)
     {
-        var userName = data.user[0].name;
-        var checkUserName = afkPeople.indexOf(data.user[0].name);
+        let userName = data.user[0].name;
+        let checkUserName = afkPeople.indexOf(data.user[0].name);
         if (checkUserName != -1)
         {
             afkPeople.splice(checkUserName, 1);
@@ -4951,16 +4951,16 @@ bot.on('deregistered', function (data)
     //removes people leaving the room in modpm still
     if (modpm.length !== 0)
     {
-        var areTheyStillInModpm = modpm.indexOf(data.user[0].userid);
+        let areTheyStillInModpm = modpm.indexOf(data.user[0].userid);
 
         if (areTheyStillInModpm != -1)
         {
-            var whatIsTheirName = theUsersList.indexOf(data.user[0].userid);
+            let whatIsTheirName = theUsersList.indexOf(data.user[0].userid);
             modpm.splice(areTheyStillInModpm, 1);
 
             if (whatIsTheirName !== -1)
             {
-                for (var hg = 0; hg < modpm.length; hg++)
+                for (let hg = 0; hg < modpm.length; hg++)
                 {
                     if (typeof modpm[hg] !== 'undefined' && modpm[hg] != data.user[0].userid)
                     {
@@ -4973,9 +4973,9 @@ bot.on('deregistered', function (data)
 
 
     //updates the users list when a user leaves the room.
-    var user = data.user[0].userid;
-    var checkLeave = theUsersList.indexOf(data.user[0].userid);
-    var checkUserIds = userIds.indexOf(data.user[0].userid);
+    let user = data.user[0].userid;
+    let checkLeave = theUsersList.indexOf(data.user[0].userid);
+    let checkUserIds = userIds.indexOf(data.user[0].userid);
 
     if (checkLeave != -1 && checkUserIds != -1)
     {
@@ -4998,7 +4998,7 @@ bot.on('endsong', function (data)
 
     //iterates through the dj list incrementing dj song counts and
     //removing them if they are over the limit.
-    var djId = data.room.metadata.current_dj;
+    let djId = data.room.metadata.current_dj;
 
     if (typeof (djs20[djId]) !== 'undefined' && typeof djId != 'undefined')
     {
@@ -5008,7 +5008,7 @@ bot.on('endsong', function (data)
             {
                 if (djId == currentDjs[0] && roomDefaults.playLimit === 1) //if person is in the far left seat and limit is set to one
                 {
-                    var checklist33 = theUsersList.indexOf(djId) + 1;
+                    let checklist33 = theUsersList.indexOf(djId) + 1;
 
                     if (checklist33 !== -1)
                     {
@@ -5019,7 +5019,7 @@ bot.on('endsong', function (data)
                 }
                 else if (djId != authModule.USERID && roomDefaults.playLimit !== 1) //if limit is more than one
                 {
-                    var checklist33 = theUsersList.indexOf(djId) + 1;
+                    let checklist33 = theUsersList.indexOf(djId) + 1;
 
                     if (checklist33 !== -1)
                     {
@@ -5034,11 +5034,11 @@ bot.on('endsong', function (data)
 
 
     //iterates through the escort list and escorts all djs on the list off the stage.     
-    for (var i = 0; i < escortList.length; i++)
+    for (let i = 0; i < escortList.length; i++)
     {
         if (typeof escortList[i] !== 'undefined' && data.room.metadata.current_dj == escortList[i])
         {
-            var lookname = theUsersList.indexOf(data.room.metadata.current_dj) + 1;
+            let lookname = theUsersList.indexOf(data.room.metadata.current_dj) + 1;
             bot.remDj(escortList[i]);
 
             if (lookname !== -1)
@@ -5046,7 +5046,7 @@ bot.on('endsong', function (data)
                 bot.speak('@' + theUsersList[lookname] + ' had enabled escortme');
             }
 
-            var removeFromList = escortList.indexOf(escortList[i]);
+            let removeFromList = escortList.indexOf(escortList[i]);
 
             if (removeFromList !== -1)
             {
