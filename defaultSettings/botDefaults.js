@@ -11,4 +11,7 @@ module.exports = {
     whenToGetOnStage: 1, //when this many or less people djing the bot will get on stage(only if autodjing is enabled)
     whenToGetOffStage: 3, //when this many people are on stage and auto djing is enabled the bot will get off stage(note: the bot counts as one person)
 
+    autoBop: true, //choose whether the bot will autobop for each song or not(against the rules but i leave it up to you) (off by default)
+    autoSnag: false, //auto song adding(different from every song adding), tied to  botDefaultsModule.howManyVotes up above, (off by default)
+
 }
