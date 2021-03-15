@@ -12,6 +12,8 @@ let botDefaults = require('./defaultSettings/botDefaults.js');
 let roomDefaults = require('./defaultSettings/roomDefaults.js');
 let userDefaults = require('./defaultSettings/userDefaults.js');
 let musicDefaults = require('./defaultSettings/musicDefaults.js');
+
+let afkModule = require('./modules/afkModule.js');
 /************************************EndSetUp**********************************************************************/
 
 //do not change the values of any of the global variables below unless you know what you are doing, the discriptions given are for reference only
@@ -42,13 +44,9 @@ let downVotes = null; //the amount of downvotes or "lame's" that the currently p
 let whoSnagged = 0; //the amount of people who have added the currently playing song to their dj queue
 let beginTime = null; //the current time in milliseconds when the bot has started, used for the /uptime
 let endTime = null; //the current time in milliseconds when the /uptime is actually used
-let roomName = null; //the name of the room, example "straight chillin" would be the format for the straight chillin room...
-let ttRoomName = null; //the url extension of the room name, example "straight_chillin16" would be the format
-let THEME = false; //has a current theme been set? true or false. handled by commands
 let whatIsTheme = null; //this holds a string which is set by the /setTheme command
 let messageCounter = 0; //this is for the array of messages, it lets it know which message it is currently on, resets to 0 after cycling through all of them
 let ALLREADYCALLED = false; //resets votesnagging so that it can be called again
-let thisHoldsThePlaylist = null; //holds a copy of the playlist
 let netwatchdogTimer = null; // Used to detect internet connection dropping out
 let checkActivity = Date.now();
 let attemptToReconnect = null; //used for reconnecting to the bots room if its not in there (only works if internet connection is working)
@@ -178,23 +176,6 @@ function attempToReconnect()
     }, 1000 * 10);
 }
 
-//whichFunction represents which justSaw object do you want to access
-global.justSaw = function (uid, whichFunction)
-{
-    switch (whichFunction)
-    {
-    case 'justSaw':
-        return lastSeen[uid] = Date.now();
-    case 'justSaw1':
-        return lastSeen1[uid] = Date.now();
-    case 'justSaw2':
-        return lastSeen2[uid] = Date.now();
-    case 'justSaw3':
-        return lastSeen3[uid] = Date.now();
-    case 'justSaw4':
-        return lastSeen4[uid] = Date.now();
-    }
-}
 
 //whichFunction represents which justSaw object do you want to access
 //num is the time in minutes till afk timeout
@@ -230,21 +211,6 @@ global.isAfk = function (userId, num, whichFunction)
 
 
 
-global.updateAfkPostionOfUser = function (userid)
-{
-    //updates the afk position of the speaker.
-    if (roomDefaults.AFK === true || roomDefaults.roomAFK === true)
-    {
-        justSaw(userid, 'justSaw');
-        justSaw(userid, 'justSaw1');
-        justSaw(userid, 'justSaw2');
-        justSaw(userid, 'justSaw3');
-        justSaw(userid, 'justSaw4');
-    }
-};
-
-
-
 //removes afk dj's after roomDefaultsModule.afkLimit is up.
 global.afkCheck = function ()
 {
@@ -253,7 +219,7 @@ global.afkCheck = function ()
         afker = currentDjs[i]; //Pick a DJ
         let isAfkMaster = userDefaults.masterIds.indexOf(afker); //master ids check
         let whatIsAfkerName = theUsersList.indexOf(afker) + 1;
-        if ((isAfk(afker, (roomDefaults.afkLimit - 5), 'isAfk1')) && roomDefaults.AFK === true)
+        if ((isAfk(afker, (afkModule.afkLimit - 5), 'isAfk1')) && afkModule.AFK === true)
         {
             if (afker !== authModule.USERID && isAfkMaster === -1)
             {
@@ -265,10 +231,10 @@ global.afkCheck = function ()
                 {
                     bot.pm('you have 5 minutes left of afk, chat or awesome please.', afker);
                 }
-                justSaw(afker, 'justSaw1');
+                afkModule.justSaw(afker, 'justSaw1');
             }
         }
-        if ((isAfk(afker, (roomDefaults.afkLimit - 1), 'isAfk2')) && roomDefaults.AFK === true)
+        if ((isAfk(afker, (afkModule.afkLimit - 1), 'isAfk2')) && afkModule.AFK === true)
         {
             if (afker !== authModule.USERID && isAfkMaster === -1)
             {
@@ -280,10 +246,10 @@ global.afkCheck = function ()
                 {
                     bot.pm('you have 1 minute left of afk, chat or awesome please.', afker);
                 }
-                justSaw(afker, 'justSaw2');
+                afkModule.justSaw(afker, 'justSaw2');
             }
         }
-        if ((isAfk(afker, roomDefaults.afkLimit, 'isAfk')) && roomDefaults.AFK === true)
+        if ((isAfk(afker, afkModule.afkLimit, 'isAfk')) && afkModule.AFK === true)
         { //if Dj is afk then
             if (afker !== authModule.USERID && isAfkMaster === -1) //checks to see if afker is a mod or a bot or the current dj, if they are is does not kick them.
             {
@@ -291,15 +257,15 @@ global.afkCheck = function ()
                 {
                     if (roomDefaults.afkThroughPm === false)
                     {
-                        bot.speak('@' + theUsersList[whatIsAfkerName] + ' you are over the afk limit of ' + roomDefaults.afkLimit + ' minutes.');
+                        bot.speak('@' + theUsersList[whatIsAfkerName] + ' you are over the afk limit of ' + afkModule.afkLimit + ' minutes.');
                     }
                     else
                     {
-                        bot.pm('you are over the afk limit of ' + roomDefaults.afkLimit + ' minutes.', afker);
+                        bot.pm('you are over the afk limit of ' + afkModule.afkLimit + ' minutes.', afker);
                     }
-                    justSaw(afker, 'justSaw1');
-                    justSaw(afker, 'justSaw2');
-                    justSaw(afker, 'justSaw');
+                    afkModule.justSaw(afker, 'justSaw1');
+                    afkModule.justSaw(afker, 'justSaw2');
+                    afkModule.justSaw(afker, 'justSaw');
                     bot.remDj(afker); //remove them 
                 }
             }
@@ -319,25 +285,25 @@ roomAfkCheck = function ()
         let afker2 = userIds[i]; //Pick a DJ
         let isAfkMod = modList.indexOf(afker2);
         let isDj = currentDjs.indexOf(afker2);
-        if ((isAfk(afker2, ( roomDefaults.roomafkLimit - 1), 'isAfk3')) && roomDefaults.roomAFK === true)
+        if ((isAfk(afker2, ( afkModule.roomafkLimit - 1), 'isAfk3')) && afkModule.roomAFK === true)
         {
 
             if (afker2 !== authModule.USERID && isDj === -1 && isAfkMod === -1)
             {
                 bot.pm('you have 1 minute left of afk, chat or awesome please.', afker2);
-                justSaw(afker2, 'justSaw3');
+                afkModule.justSaw(afker2, 'justSaw3');
             }
         }
-        if ((isAfk(afker2,  roomDefaults.roomafkLimit, 'isAfk4')) && roomDefaults.roomAFK === true)
+        if ((isAfk(afker2,  afkModule.roomafkLimit, 'isAfk4')) && afkModule.roomAFK === true)
         { //if person is afk then      
             if (afker2 !== authModule.USERID && isAfkMod === -1) //checks to see if afker is a mod or a bot or a dj, if they are is does not kick them.
             {
                 if (isDj === -1)
                 {
-                    bot.pm('you are over the afk limit of ' +  roomDefaults.roomafkLimit + ' minutes.', afker2);
+                    bot.pm('you are over the afk limit of ' +  afkModule.roomafkLimit + ' minutes.', afker2);
                     bot.boot(afker2, 'you are over the afk limit');
-                    justSaw(afker2, 'justSaw3');
-                    justSaw(afker2, 'justSaw4');
+                    afkModule.justSaw(afker2, 'justSaw3');
+                    afkModule.justSaw(afker2, 'justSaw4');
                 }
             }
         }
@@ -444,7 +410,7 @@ repeatMessage = function ()
         {
             if (roomDefaults.defaultMessage === true) //if using default message
             {
-                bot.speak('Welcome to ' + roomName + ', ' + detail); //set the message you wish the bot to repeat here i.e rules and such.
+                bot.speak('Welcome to ' + roomDefaults.roomName + ', ' + detail); //set the message you wish the bot to repeat here i.e rules and such.
             }
             else
             {
@@ -457,7 +423,7 @@ repeatMessage = function ()
             {
                 for (let jkl = 0; jkl < userIds.length; jkl++)
                 {
-                    bot.pm('Welcome to ' + roomName + ', ' + detail, userIds[jkl]); //set the message you wish the bot to repeat here i.e rules and such.
+                    bot.pm('Welcome to ' + roomDefaults.roomName + ', ' + detail, userIds[jkl]); //set the message you wish the bot to repeat here i.e rules and such.
                 }
             }
             else
@@ -569,12 +535,12 @@ global.autoDjing = function ()
 //adds a song to the end of the bots queue if it is not already contained in the bots queue
 global.addSongIfNotAlreadyInPlaylist = function (bool)
 {
-    if (thisHoldsThePlaylist !== null && getSong !== null)
+    if (roomDefaults.thisHoldsThePlaylist !== null && getSong !== null)
     {
         let found = false;
-        for (let igh = 0; igh < thisHoldsThePlaylist.length; igh++)
+        for (let igh = 0; igh < roomDefaults.thisHoldsThePlaylist.length; igh++)
         {
-            if (thisHoldsThePlaylist[igh]._id === getSong)
+            if (roomDefaults.thisHoldsThePlaylist[igh]._id === getSong)
             {
                 found = true;
                 break;
@@ -586,7 +552,7 @@ global.addSongIfNotAlreadyInPlaylist = function (bool)
             let tempSongHolder = {
                 _id: getSong
             };
-            thisHoldsThePlaylist.push(tempSongHolder);
+            roomDefaults.thisHoldsThePlaylist.push(tempSongHolder);
 
             if (bool) //whether the bot will show the heart animation or not
             {
@@ -1025,7 +991,7 @@ bot.on('speak', function (data)
 
     checkIfUserIsMod(data.userid); //check to see if speaker is a moderator or not
 
-    updateAfkPostionOfUser(data.userid); //update the afk position of the speaker    
+    afkModule.updateAfkPostionOfUser(data.userid); //update the afk position of the speaker
 
     if (text.match(/^\/autodj$/) && condition === true)
     {
@@ -1033,9 +999,9 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/playlist/))
     {
-        if (thisHoldsThePlaylist !== null)
+        if (roomDefaults.thisHoldsThePlaylist !== null)
         {
-            bot.speak('There are currently ' + thisHoldsThePlaylist.length + ' songs in my playlist.');
+            bot.speak('There are currently ' + roomDefaults.thisHoldsThePlaylist.length + ' songs in my playlist.');
         }
     }
     else if (text.match(/^\/randomSong$/) && condition === true)
@@ -1047,9 +1013,9 @@ bot.on('speak', function (data)
             ++randomOnce;
             let reorder = setInterval(function ()
             {
-                if (ez <= thisHoldsThePlaylist.length)
+                if (ez <= roomDefaults.thisHoldsThePlaylist.length)
                 {
-                    let nextId = Math.ceil(Math.random() * thisHoldsThePlaylist);
+                    let nextId = Math.ceil(Math.random() * roomDefaults.thisHoldsThePlaylist);
                     bot.playlistReorder(ez, nextId);
                     console.log("Song " + ez + " changed.");
                     ez++;
@@ -1068,7 +1034,7 @@ bot.on('speak', function (data)
             bot.pm('error, playlist reordering is already in progress', data.userid);
         }
     }
-    else if (text.match('turntable.fm/') && !text.match('turntable.fm/' + ttRoomName) && !condition && data.userid !== authModule.USERID)
+    else if (text.match('turntable.fm/') && !text.match('turntable.fm/' + roomDefaults.ttRoomName) && !condition && data.userid !== authModule.USERID)
     {
         bot.boot(data.userid, 'do not advertise other rooms here');
     }
@@ -1126,7 +1092,7 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/djafk/))
     {
-        if (roomDefaults.AFK === true) //afk limit turned on?
+        if (afkModule.AFK === true) //afk limit turned on?
         {
             if (currentDjs.length !== 0) //any dj's on stage?
             {
@@ -1208,7 +1174,7 @@ bot.on('speak', function (data)
         {
             whatsOn += 'queue: Off, ';
         }
-        if (roomDefaults.AFK === true)
+        if (afkModule.AFK === true)
         {
             whatsOn += 'dj afk limit: On, ';
         }
@@ -1256,7 +1222,7 @@ bot.on('speak', function (data)
         {
             whatsOn += 'voteskipping: Off, ';
         }
-        if (roomDefaults.roomAFK === true)
+        if (afkModule.roomAFK === true)
         {
             whatsOn += 'audience afk limit: On, ';
         }
@@ -1358,18 +1324,18 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/noTheme/) && condition === true)
     {
-        THEME = false;
+        roomDefaults.THEME = false;
         bot.speak('The theme is now inactive');
     }
     else if (text.match(/^\/setTheme/) && condition === true)
     {
         whatIsTheme = data.text.slice(10);
-        THEME = true;
+        roomDefaults.THEME = true;
         bot.speak('The theme is now set to: ' + whatIsTheme);
     }
     else if (text.match(/^\/theme/))
     {
-        if (THEME === false)
+        if (roomDefaults.THEME === false)
         {
             bot.speak('There is currently no theme, standard rules apply');
         }
@@ -1417,37 +1383,37 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/afkon/) && condition === true)
     {
-        roomDefaults.AFK = true;
+        afkModule.AFK = true;
         bot.speak('the afk list is now active.');
         for (let z = 0; z < currentDjs.length; z++)
         {
-            justSaw(currentDjs[z], 'justSaw');
-            justSaw(currentDjs[z], 'justSaw1');
-            justSaw(currentDjs[z], 'justSaw2');
+            afkModule.justSaw(currentDjs[z], 'justSaw');
+            afkModule.justSaw(currentDjs[z], 'justSaw1');
+            afkModule.justSaw(currentDjs[z], 'justSaw2');
         }
     }
     else if (text.match(/^\/afkoff/) && condition === true)
     {
-        roomDefaults.AFK = false;
+        afkModule.AFK = false;
         bot.speak('the afk list is now inactive.');
     }
     else if (text.match(/^\/roomafkon/) && condition === true)
     {
-        roomDefaults.roomAFK = true;
+        afkModule.roomAFK = true;
         bot.speak('the audience afk list is now active.');
         for (let zh = 0; zh < userIds.length; zh++)
         {
             let isDj2 = currentDjs.indexOf(userIds[zh])
             if (isDj2 === -1)
             {
-                justSaw(userIds[zh], 'justSaw3');
-                justSaw(userIds[zh], 'justSaw4');
+                afkModule.justSaw(userIds[zh], 'justSaw3');
+                afkModule.justSaw(userIds[zh], 'justSaw4');
             }
         }
     }
     else if (text.match(/^\/roomafkoff/) && condition === true)
     {
-        roomDefaults.roomAFK = false;
+        afkModule.roomAFK = false;
         bot.speak('the audience afk list is now inactive.');
     }
     else if (text.match(/^\/djplays/))
@@ -2093,12 +2059,12 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/snag/) && condition === true)
     {
-        if (getSong !== null && thisHoldsThePlaylist !== null)
+        if (getSong !== null && roomDefaults.thisHoldsThePlaylist !== null)
         {
             let found = false;
-            for (let igh = 0; igh < thisHoldsThePlaylist.length; igh++)
+            for (let igh = 0; igh < roomDefaults.thisHoldsThePlaylist.length; igh++)
             {
-                if (thisHoldsThePlaylist[igh]._id === getSong)
+                if (roomDefaults.thisHoldsThePlaylist[igh]._id === getSong)
                 {
                     found = true;
                     bot.speak('I already have that song');
@@ -2112,7 +2078,7 @@ bot.on('speak', function (data)
                 let tempSongHolder = {
                     _id: getSong
                 };
-                thisHoldsThePlaylist.push(tempSongHolder);
+                roomDefaults.thisHoldsThePlaylist.push(tempSongHolder);
             }
         }
         else
@@ -2126,12 +2092,12 @@ bot.on('speak', function (data)
         {
             bot.skip();
             bot.playlistRemove(-1);
-            thisHoldsThePlaylist.splice(thisHoldsThePlaylist.length - 1, 1);
+            roomDefaults.thisHoldsThePlaylist.splice(roomDefaults.thisHoldsThePlaylist.length - 1, 1);
             bot.speak('the last snagged song has been removed.');
         }
         else
         {
-            thisHoldsThePlaylist.splice(thisHoldsThePlaylist.length - 1, 1);
+            roomDefaults.thisHoldsThePlaylist.splice(roomDefaults.thisHoldsThePlaylist.length - 1, 1);
             bot.playlistRemove(-1);
             bot.speak('the last snagged song has been removed.');
         }
@@ -2717,7 +2683,7 @@ bot.on('update_votes', function (data)
     downVotes = data.room.metadata.downvotes;
 
 
-    updateAfkPostionOfUser(data.room.metadata.votelog[0][0]); //update the afk position of people who vote for a song    
+    afkModule.updateAfkPostionOfUser(data.room.metadata.votelog[0][0]); //update the afk position of people who vote for a song
 
 
     //this is for /autosnag, automatically adds songs that get over the awesome threshold
@@ -2736,7 +2702,7 @@ bot.on('update_votes', function (data)
 //checks who added a song and updates their position on the afk list. 
 bot.on('snagged', function (data)
 {
-    updateAfkPostionOfUser(data.userid); //update the afk position of people who add a song to their queue    
+    afkModule.updateAfkPostionOfUser(data.userid); //update the afk position of people who add a song to their queue
 
     whoSnagged += 1; //add one to the count of people who have snagged the currently playing song
 })
@@ -2778,7 +2744,7 @@ bot.on('add_dj', function (data)
 
 
     //updates the afk position of the person who joins the stage.
-    updateAfkPostionOfUser(data.user[0].userid);
+    afkModule.updateAfkPostionOfUser(data.user[0].userid);
 
 
 
@@ -3254,7 +3220,7 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/djafk/) && isInRoom === true)
     {
-        if (roomDefaults.AFK === true) //afk limit turned on?
+        if (afkModule.AFK === true) //afk limit turned on?
         {
             if (currentDjs.length !== 0) //any dj's on stage?
             {
@@ -3693,25 +3659,25 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/playlist/) && condition === true && isInRoom === true)
     {
-        if (thisHoldsThePlaylist !== null)
+        if (roomDefaults.thisHoldsThePlaylist !== null)
         {
-            bot.pm('There are currently ' + thisHoldsThePlaylist.length + ' songs in my playlist.', data.senderid);
+            bot.pm('There are currently ' + roomDefaults.thisHoldsThePlaylist.length + ' songs in my playlist.', data.senderid);
         }
     }
     else if (text.match(/^\/setTheme/) && condition === true && isInRoom === true)
     {
         whatIsTheme = data.text.slice(10);
-        THEME = true;
+        roomDefaults.THEME = true;
         bot.pm('The theme is now set to: ' + whatIsTheme, data.senderid);
     }
     else if (text.match(/^\/noTheme/) && condition === true && isInRoom === true)
     {
-        THEME = false;
+        roomDefaults.THEME = false;
         bot.pm('The theme is now inactive', data.senderid);
     }
     else if (text.match(/^\/theme/) && isInRoom === true)
     {
-        if (THEME === false)
+        if (roomDefaults.THEME === false)
         {
             bot.pm('There is currently no theme, standard rules apply', data.senderid);
         }
@@ -3733,37 +3699,37 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/roomafkoff/) && condition === true && isInRoom === true)
     {
-        roomDefaults.roomAFK = false;
+        afkModule.roomAFK = false;
         bot.pm('the audience afk list is now inactive.', data.senderid);
     }
     else if (text.match(/^\/roomafkon/) && condition === true && isInRoom === true)
     {
-        roomDefaults.roomAFK = true;
+        afkModule.roomAFK = true;
         bot.pm('the audience afk list is now active.', data.senderid);
         for (let zh = 0; zh < userIds.length; zh++)
         {
             let isDj2 = currentDjs.indexOf(userIds[zh])
             if (isDj2 === -1)
             {
-                justSaw(userIds[zh], 'justSaw3');
-                justSaw(userIds[zh], 'justSaw4');
+                afkModule.justSaw(userIds[zh], 'justSaw3');
+                afkModule.justSaw(userIds[zh], 'justSaw4');
             }
         }
     }
     else if (text.match(/^\/afkoff/) && condition === true && isInRoom === true)
     {
-        roomDefaults.AFK = false;
+        afkModule.AFK = false;
         bot.pm('the afk list is now inactive.', data.senderid);
     }
     else if (text.match(/^\/afkon/) && condition === true && isInRoom === true)
     {
-        roomDefaults.AFK = true;
+        afkModule.AFK = true;
         bot.pm('the afk list is now active.', data.senderid);
         for (let z = 0; z < currentDjs.length; z++)
         {
-            justSaw(currentDjs[z], 'justSaw');
-            justSaw(currentDjs[z], 'justSaw1');
-            justSaw(currentDjs[z], 'justSaw2');
+            afkModule.justSaw(currentDjs[z], 'justSaw');
+            afkModule.justSaw(currentDjs[z], 'justSaw1');
+            afkModule.justSaw(currentDjs[z], 'justSaw2');
         }
     }
     else if (text.match(/^\/autodj$/) && condition === true && isInRoom === true)
@@ -3901,9 +3867,9 @@ bot.on('pmmed', function (data)
             ++randomOnce;
             let reorder = setInterval(function ()
             {
-                if (ez <= thisHoldsThePlaylist.length)
+                if (ez <= roomDefaults.thisHoldsThePlaylist.length)
                 {
-                    let nextId = Math.ceil(Math.random() * thisHoldsThePlaylist);
+                    let nextId = Math.ceil(Math.random() * roomDefaults.thisHoldsThePlaylist);
                     bot.playlistReorder(ez, nextId);
                     console.log("Song " + ez + " changed.");
                     ez++;
@@ -3995,7 +3961,7 @@ bot.on('pmmed', function (data)
         {
             whatsOn += 'queue: Off, ';
         }
-        if (roomDefaults.AFK === true)
+        if (afkModule.AFK === true)
         {
             whatsOn += 'dj afk limit: On, ';
         }
@@ -4043,7 +4009,7 @@ bot.on('pmmed', function (data)
         {
             whatsOn += 'voteskipping: Off, ';
         }
-        if (roomDefaults.roomAFK === true)
+        if (afkModule.roomAFK === true)
         {
             whatsOn += 'audience afk limit: On, ';
         }
@@ -4291,12 +4257,12 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/snag/) && condition === true && isInRoom === true)
     {
-        if (getSong !== null && thisHoldsThePlaylist !== null)
+        if (getSong !== null && roomDefaults.thisHoldsThePlaylist !== null)
         {
             let found = false;
-            for (let igh = 0; igh < thisHoldsThePlaylist.length; igh++)
+            for (let igh = 0; igh < roomDefaults.thisHoldsThePlaylist.length; igh++)
             {
-                if (thisHoldsThePlaylist[igh]._id === getSong)
+                if (roomDefaults.thisHoldsThePlaylist[igh]._id === getSong)
                 {
                     found = true;
                     bot.pm('I already have that song', data.senderid);
@@ -4310,7 +4276,7 @@ bot.on('pmmed', function (data)
                 let tempSongHolder = {
                     _id: getSong
                 };
-                thisHoldsThePlaylist.push(tempSongHolder);
+                roomDefaults.thisHoldsThePlaylist.push(tempSongHolder);
             }
         }
         else
@@ -4349,12 +4315,12 @@ bot.on('pmmed', function (data)
         {
             bot.skip();
             bot.playlistRemove(-1);
-            thisHoldsThePlaylist.splice(thisHoldsThePlaylist.length - 1, 1);
+            roomDefaults.thisHoldsThePlaylist.splice(roomDefaults.thisHoldsThePlaylist.length - 1, 1);
             bot.pm('the last snagged song has been removed.', data.senderid);
         }
         else
         {
-            thisHoldsThePlaylist.splice(thisHoldsThePlaylist.length - 1, 1);
+            roomDefaults.thisHoldsThePlaylist.splice(roomDefaults.thisHoldsThePlaylist.length - 1, 1);
             bot.playlistRemove(-1);
             bot.pm('the last snagged song has been removed.', data.senderid);
         }
@@ -4550,14 +4516,14 @@ bot.on('roomChanged', function (data)
 
         //set information 
         detail = data.room.description; //used to get room description
-        roomName = data.room.name; //gets your rooms name
-        ttRoomName = data.room.shortcut; //gets room shortcut
+        roomDefaults.roomName = data.room.name; //gets your rooms name
+        roomDefaults.ttRoomName = data.room.shortcut; //gets room shortcut
 
 
         //load the playlist into memory
         bot.playlistAll(function (callback)
         {
-            thisHoldsThePlaylist = callback.list;
+            roomDefaults.thisHoldsThePlaylist = callback.list;
         });
 
 
@@ -4577,9 +4543,9 @@ bot.on('roomChanged', function (data)
                 djs20[data.room.metadata.djs[iop]] = { //set dj song play count to zero
                     nbSong: 0
                 };
-                justSaw(data.room.metadata.djs[iop], 'justSaw'); //initialize dj afk count
-                justSaw(data.room.metadata.djs[iop], 'justSaw1');
-                justSaw(data.room.metadata.djs[iop], 'justSaw2');
+                afkModule.justSaw(data.room.metadata.djs[iop], 'justSaw'); //initialize dj afk count
+                afkModule.justSaw(data.room.metadata.djs[iop], 'justSaw1');
+                afkModule.justSaw(data.room.metadata.djs[iop], 'justSaw2');
             }
         }
 
@@ -4612,8 +4578,8 @@ bot.on('roomChanged', function (data)
                 people[userIds[z]] = {
                     spamCount: 0
                 };
-                justSaw(userIds[z], 'justSaw3');
-                justSaw(userIds[z], 'justSaw4');
+                afkModule.justSaw(userIds[z], 'justSaw3');
+                afkModule.justSaw(userIds[z], 'justSaw4');
             }
         }
 
@@ -4670,7 +4636,7 @@ bot.on('registered', function (data)
                 greetingTimer[data.user[0].userid] = null;
                 if ( roomDefaults.roomJoinMessage !== '') //if your not using the default greeting
                 {
-                    if (THEME === false) //if theres no theme this is the message.
+                    if (roomDefaults.THEME === false) //if theres no theme this is the message.
                     {
                         if (roomDefaults.greetThroughPm === false) //if your not sending the message through the pm
                         {
@@ -4695,26 +4661,26 @@ bot.on('registered', function (data)
                 }
                 else
                 {
-                    if (THEME === false) //if theres no theme this is the message.
+                    if (roomDefaults.THEME === false) //if theres no theme this is the message.
                     {
                         if (roomDefaults.greetThroughPm === false)
                         {
-                            bot.speak('Welcome to ' + roomName + ' @' + roomjoin.name + ', enjoy your stay!');
+                            bot.speak('Welcome to ' + roomDefaults.roomName + ' @' + roomjoin.name + ', enjoy your stay!');
                         }
                         else
                         {
-                            bot.pm('Welcome to ' + roomName + ' @' + roomjoin.name + ', enjoy your stay!', roomjoin.userid);
+                            bot.pm('Welcome to ' + roomDefaults.roomName + ' @' + roomjoin.name + ', enjoy your stay!', roomjoin.userid);
                         }
                     }
                     else
                     {
                         if (roomDefaults.greetThroughPm === false)
                         {
-                            bot.speak('Welcome to ' + roomName + ' @' + roomjoin.name + ', the theme is currently set to: ' + whatIsTheme);
+                            bot.speak('Welcome to ' + roomDefaults.roomName + ' @' + roomjoin.name + ', the theme is currently set to: ' + whatIsTheme);
                         }
                         else
                         {
-                            bot.pm('Welcome to ' + roomName + ' @' + roomjoin.name + ', the theme is currently set to: ' + whatIsTheme, roomjoin.userid);
+                            bot.pm('Welcome to ' + roomDefaults.roomName + ' @' + roomjoin.name + ', the theme is currently set to: ' + whatIsTheme, roomjoin.userid);
                         }
                     }
                 }
@@ -4768,10 +4734,10 @@ bot.on('registered', function (data)
 
 
     //puts people who join the room on the global afk list
-    if (roomDefaults.roomAFK === true)
+    if (afkModule.roomAFK === true)
     {
-        justSaw(data.user[0].userid, 'justSaw3');
-        justSaw(data.user[0].userid, 'justSaw4');
+        afkModule.justSaw(data.user[0].userid, 'justSaw3');
+        afkModule.justSaw(data.user[0].userid, 'justSaw4');
     }
 
 

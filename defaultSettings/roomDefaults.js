@@ -36,10 +36,6 @@ module.exports = {
     // other stuff
     playLimit: 3, //set the playlimit here (default 4 songs)
     songLengthLimit: 10.0, //set song limit in minutes
-    afkLimit: 20, //set the afk limit in minutes here
-    roomAFK: false, //audience afk limit(off by default)
-
-    roomafkLimit: 30, //set the afk limit for the audience here(in minutes), this feature is off by default
 
     isRefreshing: true, //whether or not /refresh can be used or not (true = yes, false = no)
     amountOfTimeToRefresh: 30, //the amount of seconds someone has to use the refresh command(if enabled)
@@ -51,5 +47,11 @@ module.exports = {
     AFK: true, //afk limit(on by default), this is for the dj's on stage
 
     kickTTSTAT: false, //kicks the ttstats bot when it tries to join the room(off by default)
+
+    // declarations, DO NOT SET
+    roomName: null, //the name of the room, example "straight chillin" would be the format for the straight chillin room...
+    ttRoomName: null, //the url extension of the room name, example "straight_chillin16" would be the format
+    THEME: false, //has a current theme been set? true or false. handled by commands
+    thisHoldsThePlaylist: null, //holds a copy of the playlist
 
 }
