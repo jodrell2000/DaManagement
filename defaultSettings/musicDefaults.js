@@ -11,7 +11,7 @@ module.exports = {
 
     voteSkip: false, //voteskipping(off by default)
     LIMIT: true, //song length limit (on by default)
-    PLAYLIMIT: false, //song play limit, this is for the playLimit variable up above(off by default)
+    PLAYLIMIT: true, //song play limit, this is for the playLimit variable up above(off by default)
 
 
 }

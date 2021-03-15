@@ -854,6 +854,8 @@ bot.on('ready', function (data)
 //checks at the beggining of the song
 bot.on('newsong', function (data)
 {
+    bot.speak("entered newsong");
+
     //resets counters and array for vote skipping
     checkVotes = [];
     voteCountSkip = 0;
@@ -889,6 +891,7 @@ bot.on('newsong', function (data)
     //if true causes the bot to start bopping to the currently playing song
     if (botDefaults.autoBop === true)
     {
+        bot.speak('autoBop: ' + botDefaults.autoBop);
         bot.bop();
     }
 
@@ -1189,6 +1192,14 @@ bot.on('speak', function (data)
     {
         let whatsOn = '';
 
+        if (botDefaults.autoBop === true)
+        {
+            whatsOn += 'autoBop: On, ';
+        }
+        else
+        {
+            whatsOn += 'autoBop: Off, ';
+        }
         if (roomDefaults.queue === true)
         {
             whatsOn += 'queue: On, ';
@@ -1483,6 +1494,7 @@ bot.on('speak', function (data)
     {
         if (checkWhoIsDj === authModule.USERID)
         {
+            bot.speak("Sorry...I'll play something better next time!");
             bot.skip();
         }
         else
