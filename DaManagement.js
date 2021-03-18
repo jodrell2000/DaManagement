@@ -4800,23 +4800,17 @@ bot.on('update_user', function (data)
     }
 })
 
-
-
 //updates the moderator list when a moderator is added.
 bot.on('new_moderator', function (bot, data)
 {
-    moderatorModule.newModerator(data)
+    moderatorModule.newModerator(bot, data)
 })
-
-
 
 //updates the moderator list when a moderator is removed.
 bot.on('rem_moderator', function (bot, data)
 {
-    moderatorModule.updateModeratorList(data)
+    moderatorModule.updateModeratorList(bot, data)
 })
-
-
 
 //starts up when a user leaves the room
 bot.on('deregistered', function (data)
