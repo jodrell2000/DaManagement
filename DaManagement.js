@@ -820,7 +820,7 @@ bot.on('ready', function (data)
 //checks at the beggining of the song
 bot.on('newsong', function (data)
 {
-    bot.speak("entered newsong");
+    // bot.speak("entered newsong");
 
     //resets counters and array for vote skipping
     checkVotes = [];
@@ -857,7 +857,7 @@ bot.on('newsong', function (data)
     //if true causes the bot to start bopping to the currently playing song
     if (botDefaults.autoBop === true)
     {
-        bot.speak('autoBop: ' + botDefaults.autoBop);
+        // bot.speak('autoBop: ' + botDefaults.autoBop);
         bot.bop();
     }
 
