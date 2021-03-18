@@ -14,6 +14,7 @@ let userDefaults = require('./defaultSettings/userDefaults.js');
 let musicDefaults = require('./defaultSettings/musicDefaults.js');
 
 let afkModule = require('./modules/afkModule.js');
+let moderatorModule = require('./modules/moderatorModule.js');
 /************************************EndSetUp**********************************************************************/
 
 //do not change the values of any of the global variables below unless you know what you are doing, the discriptions given are for reference only
@@ -76,7 +77,6 @@ global.stageList = []; //holds the userid of everyone who is in the command base
 global.userIds = []; //holds the userid's of everyone who is in the room
 global.checkVotes = []; //holds the userid's of everyone who has voted for the currently playing song to be skipped, is cleared every song
 global.theUsersList = []; //holds the name and userid of everyone in the room
-global.modList = []; //holds the userid of everyone who is a moderator in the room
 global.escortList = []; //holds the userid of everyone who has used the /escortme command, auto removed when the person leaves the stage
 global.currentDjs = []; //holds the userid of all the dj's who are on stage currently
 global.queueList = []; //holds the name and userid of everyone in the queue
@@ -283,7 +283,7 @@ roomAfkCheck = function ()
     for (let i = 0; i < userIds.length; i++)
     {
         let afker2 = userIds[i]; //Pick a DJ
-        let isAfkMod = modList.indexOf(afker2);
+        let isAfkMod = moderatorModule.modList.indexOf(afker2);
         let isDj = currentDjs.indexOf(afker2);
         if ((isAfk(afker2, ( afkModule.roomafkLimit - 1), 'isAfk3')) && afkModule.roomAFK === true)
         {
@@ -598,7 +598,7 @@ global.warnMeCall = function ()
 //checks to see if a command user is contained within the moderator list or not
 global.checkIfUserIsMod = function (userid)
 {
-    let modIndex = modList.indexOf(userid);
+    let modIndex = moderatorModule.modList.indexOf(userid);
 
     condition = modIndex !== -1;
 };
@@ -4496,7 +4496,7 @@ bot.on('roomChanged', function (data)
         //reset arrays in case this was triggered by the bot restarting   
         escortList = [];
         theUsersList = [];
-        modList = [];
+        moderatorModule.resetModList(bot);
         currentDjs = [];
         userIds = [];
         queueList = [];
@@ -4554,7 +4554,7 @@ bot.on('roomChanged', function (data)
         //modList = data.room.metadata.moderator_id;
         for (let ihp = 0; ihp < data.room.metadata.moderator_id.length; ihp++)
         {
-            modList.push(data.room.metadata.moderator_id[ihp]);
+            moderatorModule.modList.push(data.room.metadata.moderator_id[ihp]);
         }
 
 
@@ -4800,28 +4800,17 @@ bot.on('update_user', function (data)
     }
 })
 
-
-
 //updates the moderator list when a moderator is added.
 bot.on('new_moderator', function (data)
 {
-    let test50 = modList.indexOf(data.userid);
-    if (test50 === -1)
-    {
-        modList.push(data.userid);
-    }
+    moderatorModule.newModerator(data, bot)
 })
-
-
 
 //updates the moderator list when a moderator is removed.
 bot.on('rem_moderator', function (data)
 {
-    let test51 = modList.indexOf(data.userid);
-    modList.splice(test51, 1);
+    moderatorModule.updateModeratorList(data, bot)
 })
-
-
 
 //starts up when a user leaves the room
 bot.on('deregistered', function (data)
