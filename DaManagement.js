@@ -4801,15 +4801,15 @@ bot.on('update_user', function (data)
 })
 
 //updates the moderator list when a moderator is added.
-bot.on('new_moderator', function (bot, data)
+bot.on('new_moderator', function (data, bot)
 {
-    moderatorModule.newModerator(bot, data)
+    moderatorModule.newModerator(data, bot)
 })
 
 //updates the moderator list when a moderator is removed.
-bot.on('rem_moderator', function (bot, data)
+bot.on('rem_moderator', function (data, bot)
 {
-    moderatorModule.updateModeratorList(bot, data)
+    moderatorModule.updateModeratorList(data, bot)
 })
 
 //starts up when a user leaves the room
