@@ -4801,13 +4801,13 @@ bot.on('update_user', function (data)
 })
 
 //updates the moderator list when a moderator is added.
-bot.on('new_moderator', function (data, bot)
+bot.on('new_moderator', function (data)
 {
     moderatorModule.newModerator(data, bot)
 })
 
 //updates the moderator list when a moderator is removed.
-bot.on('rem_moderator', function (data, bot)
+bot.on('rem_moderator', function (data)
 {
     moderatorModule.updateModeratorList(data, bot)
 })
