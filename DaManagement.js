@@ -10,11 +10,11 @@ let Bot = require('ttapi');
 let authModule = require('./auth.js');
 let botDefaults = require('./defaultSettings/botDefaults.js');
 let roomDefaults = require('./defaultSettings/roomDefaults.js');
-let userDefaults = require('./defaultSettings/userDefaults.js');
 let musicDefaults = require('./defaultSettings/musicDefaults.js');
 
 let afkModule = require('./modules/afkModule.js');
 let moderatorModule = require('./modules/moderatorModule.js');
+let userModule = require('./modules/userModule.js');
 /************************************EndSetUp**********************************************************************/
 
 //do not change the values of any of the global variables below unless you know what you are doing, the discriptions given are for reference only
@@ -71,16 +71,12 @@ global.lastSeen1 = {}; //holds a date object to be used for the dj afk timer
 global.lastSeen2 = {}; //holds a date object to be used for the dj afk timer
 global.lastSeen3 = {}; //holds a date object to be used for the audience afk limit
 global.lastSeen4 = {}; //holds a date object to be used for the audience afk limit
-global.afkPeople = []; //holds the userid of everyone who has used the /afk command
 global.blackList = []; //holds the userid of everyone who is in the command based banned from the room list
 global.stageList = []; //holds the userid of everyone who is in the command based banned from stage list
 global.userIds = []; //holds the userid's of everyone who is in the room
 global.checkVotes = []; //holds the userid's of everyone who has voted for the currently playing song to be skipped, is cleared every song
-global.theUsersList = []; //holds the name and userid of everyone in the room
 global.escortList = []; //holds the userid of everyone who has used the /escortme command, auto removed when the person leaves the stage
 global.currentDjs = []; //holds the userid of all the dj's who are on stage currently
-global.queueList = []; //holds the name and userid of everyone in the queue
-global.queueName = []; //holds just the name of everyone who is in the queue
 global.myTime = []; //holds a date object for everyone in the room, which represents the time when they joined the room, resets every time the person rejoins
 global.curSongWatchdog = null; //used to hold the timer for stuck songs
 global.takedownTimer = null; //used to hold the timer that fires after curSongWatchDog which represents the time a person with a stuck song has left to skip their song
@@ -217,15 +213,15 @@ global.afkCheck = function ()
     for (let i = 0; i < currentDjs.length; i++)
     {
         afker = currentDjs[i]; //Pick a DJ
-        let isAfkMaster = userDefaults.masterIds.indexOf(afker); //master ids check
-        let whatIsAfkerName = theUsersList.indexOf(afker) + 1;
+        let isAfkMaster = userModule.masterIds.indexOf(afker); //master ids check
+        let whatIsAfkerName = userModule.theUsersList.indexOf(afker) + 1;
         if ((isAfk(afker, (afkModule.afkLimit - 5), 'isAfk1')) && afkModule.AFK === true)
         {
             if (afker !== authModule.USERID && isAfkMaster === -1)
             {
                 if (roomDefaults.afkThroughPm === false)
                 {
-                    bot.speak('@' + theUsersList[whatIsAfkerName] + ' you have 5 minutes left of afk, chat or awesome please.');
+                    bot.speak('@' + userModule.theUsersList[whatIsAfkerName] + ' you have 5 minutes left of afk, chat or awesome please.');
                 }
                 else
                 {
@@ -319,29 +315,29 @@ queueCheck15 = function ()
 {
     //if queue is turned on once someone leaves the stage the first person
     //in line has 60 seconds to get on stage before being remove from the queue
-    if (roomDefaults.queue === true && queueList.length !== 0)
+    if (roomDefaults.queue === true && userModule.queueList.length !== 0)
     {
         if (sayOnce === true && (refreshList.length + currentDjs.length) < 5)
         {
             sayOnce = false;
             if (( botDefaults.howLongStage / 60) < 1) //is it seconds
             {
-                bot.speak('@' + queueName[0] + ' you have ' +  botDefaults.howLongStage + ' seconds to get on stage.');
+                bot.speak('@' + userModule.queueName[0] + ' you have ' +  botDefaults.howLongStage + ' seconds to get on stage.');
             }
             else if (( botDefaults.howLongStage / 60) === 1) //is it one minute
             {
                 let minute = Math.floor(( botDefaults.howLongStage / 60));
-                bot.speak('@' + queueName[0] + ' you have ' + minute + ' minute to get on stage.');
+                bot.speak('@' + userModule.queueName[0] + ' you have ' + minute + ' minute to get on stage.');
             }
             else if (( botDefaults.howLongStage / 60) > 1) //is it more than one minute
             {
                 let minutes = Math.floor(( botDefaults.howLongStage / 60));
-                bot.speak('@' + queueName[0] + ' you have ' + minutes + ' minutes to get on stage.');
+                bot.speak('@' + userModule.queueName[0] + ' you have ' + minutes + ' minutes to get on stage.');
             }
             beginTimer = setTimeout(function ()
             {
-                queueList.splice(0, 2);
-                queueName.splice(0, 1);
+                userModule.queueList.splice(0, 2);
+                userModule.queueName.splice(0, 1);
                 sayOnce = true;
             },  botDefaults.howLongStage * 1000); //timeout variably set
         }
@@ -355,11 +351,11 @@ setInterval(queueCheck15, 5000) //repeats the check every five seconds.
 vipListCheck = function ()
 {
     //this kicks all users off stage when the vip list is not empty
-    if (userDefaults.vipList.length !== 0 && currentDjs.length !== userDefaults.vipList.length)
+    if (userModule.vipList.length !== 0 && currentDjs.length !== userModule.vipList.length)
     {
         for (let p = 0; p < currentDjs.length; p++)
         {
-            let checkIfVip = userDefaults.vipList.indexOf(currentDjs[p]);
+            let checkIfVip = userModule.vipList.indexOf(currentDjs[p]);
             if (checkIfVip === -1 && currentDjs[p] !== authModule.USERID)
             {
                 bot.remDj(currentDjs[p]);
@@ -455,7 +451,7 @@ global.verifyUsersList = function ()
 
                 //if the length of the users list does not match
                 //the amount of people in the room
-                if (theUsersList.length !== (data.users.length * 2))
+                if (userModule.theUsersList.length !== (data.users.length * 2))
                 {
                     theUsersListOkay = false;
                 }
@@ -464,9 +460,9 @@ global.verifyUsersList = function ()
                 if (theUsersListOkay)
                 {
                     //if any undefined values are found
-                    for (let i = 0; i < theUsersList.length; i++)
+                    for (let i = 0; i < userModule.theUsersList.length; i++)
                     {
-                        if (typeof theUsersList[i] === 'undefined')
+                        if (typeof userModule.theUsersList[i] === 'undefined')
                         {
                             theUsersListOkay = false;
                             break;
@@ -477,14 +473,14 @@ global.verifyUsersList = function ()
                 //if data got corrupted then rebuild theUsersList array
                 if (!theUsersListOkay)
                 {
-                    theUsersList = [];
+                    userModule.theUsersList = [];
 
                     for (let i = 0; i < data.users.length; i++)
                     {
                         if (typeof data.users[i] !== 'undefined')
                         {
                             //userid then the name
-                            theUsersList.push(data.users[i].userid, data.users[i].name);
+                            userModule.theUsersList.push(data.users[i].userid, data.users[i].name);
                         }
                     }
                 }
@@ -512,9 +508,9 @@ global.autoDjing = function ()
 
         if (isBotAlreadyOnStage === -1) //if the bot is not already on stage
         {
-            if (currentDjs.length >= 1 && currentDjs.length <=  botDefaults.whenToGetOnStage && queueList.length === 0)
+            if (currentDjs.length >= 1 && currentDjs.length <=  botDefaults.whenToGetOnStage && userModule.queueList.length === 0)
             {
-                if (botDefaults.getonstage === true && userDefaults.vipList.length === 0 && refreshList.length === 0)
+                if (botDefaults.getonstage === true && userModule.vipList.length === 0 && refreshList.length === 0)
                 {
                     bot.addDj();
                 }
@@ -608,7 +604,7 @@ global.checkIfUserIsMod = function (userid)
 //makes sure the person who pmmed the bot a command is in the room
 global.checkToseeIfPmmerIsInRoom = function (userid)
 {
-    let isInRoom = theUsersList.indexOf(userid);
+    let isInRoom = userModule.theUsersList.indexOf(userid);
 
     isInRoom = isInRoom !== -1;
 
@@ -684,9 +680,9 @@ global.clearTimers = function ()
         clearTimeout(informTimer);
         informTimer = null;
 
-        if (typeof theUsersList[theUsersList.indexOf(lastdj) + 1] !== 'undefined')
+        if (typeof userModule.theUsersList[userModule.theUsersList.indexOf(lastdj) + 1] !== 'undefined')
         {
-            bot.speak("@" + theUsersList[theUsersList.indexOf(lastdj) + 1] + ", Thanks buddy ;-)");
+            bot.speak("@" + userModule.theUsersList[userModule.theUsersList.indexOf(lastdj) + 1] + ", Thanks buddy ;-)");
         }
         else
         {
@@ -701,9 +697,9 @@ global.clearTimers = function ()
         clearTimeout(songLimitTimer);
         songLimitTimer = null;
 
-        if (typeof theUsersList[theUsersList.indexOf(lastdj) + 1] !== 'undefined')
+        if (typeof userModule.theUsersList[userModule.theUsersList.indexOf(lastdj) + 1] !== 'undefined')
         {
-            bot.speak("@" + theUsersList[theUsersList.indexOf(lastdj) + 1] + ", Thanks buddy ;-)");
+            bot.speak("@" + userModule.theUsersList[userModule.theUsersList.indexOf(lastdj) + 1] + ", Thanks buddy ;-)");
         }
         else
         {
@@ -728,9 +724,9 @@ global.clearTimers = function ()
         clearTimeout(takedownTimer);
         takedownTimer = null;
 
-        if (typeof theUsersList[theUsersList.indexOf(lastdj) + 1] !== 'undefined')
+        if (typeof userModule.theUsersList[userModule.theUsersList.indexOf(lastdj) + 1] !== 'undefined')
         {
-            bot.speak("@" + theUsersList[theUsersList.indexOf(lastdj) + 1] + ", Thanks buddy ;-)");
+            bot.speak("@" + userModule.theUsersList[userModule.theUsersList.indexOf(lastdj) + 1] + ", Thanks buddy ;-)");
         }
         else
         {
@@ -754,7 +750,7 @@ global.checkOnNewSong = function (data)
 
     // Set this after processing things from last timer calls
     lastdj = data.room.metadata.current_dj;
-    masterIndex = userDefaults.masterIds.indexOf(lastdj); //master id's check
+    masterIndex = userModule.masterIds.indexOf(lastdj); //master id's check
 
 
     // Set a new watchdog timer for the current song.
@@ -762,9 +758,9 @@ global.checkOnNewSong = function (data)
     {
         curSongWatchdog = null;
 
-        if (typeof theUsersList[theUsersList.indexOf(lastdj) + 1] !== 'undefined')
+        if (typeof userModule.theUsersList[userModule.theUsersList.indexOf(lastdj) + 1] !== 'undefined')
         {
-            bot.speak("@" + theUsersList[theUsersList.indexOf(lastdj) + 1] + ", you have 20 seconds to skip your stuck song before you are removed");
+            bot.speak("@" + userModule.theUsersList[userModule.theUsersList.indexOf(lastdj) + 1] + ", you have 20 seconds to skip your stuck song before you are removed");
         }
         else
         {
@@ -787,9 +783,9 @@ global.checkOnNewSong = function (data)
         {
             if (musicDefaults.LIMIT === true)
             {
-                if (typeof theUsersList[theUsersList.indexOf(lastdj) + 1] !== 'undefined')
+                if (typeof userModule.theUsersList[userModule.theUsersList.indexOf(lastdj) + 1] !== 'undefined')
                 {
-                    bot.speak("@" + theUsersList[theUsersList.indexOf(lastdj) + 1] + ", your song is over " + roomDefaults.songLengthLimit + " mins long, you have 20 seconds to skip before being removed.");
+                    bot.speak("@" + userModule.theUsersList[userModule.theUsersList.indexOf(lastdj) + 1] + ", your song is over " + roomDefaults.songLengthLimit + " mins long, you have 20 seconds to skip before being removed.");
                 }
                 else
                 {
@@ -888,8 +884,8 @@ bot.on('newsong', function (data)
     //removes current dj from stage if they play a banned song or artist.
     if (musicDefaults.bannedArtists.length !== 0 && typeof artist !== 'undefined' && typeof song !== 'undefined')
     {
-        let checkIfAdmin = userDefaults.masterIds.indexOf(checkWhoIsDj); //is user an exempt admin?
-        let nameDj = theUsersList.indexOf(checkWhoIsDj) + 1; //the currently playing dj's name
+        let checkIfAdmin = userModule.masterIds.indexOf(checkWhoIsDj); //is user an exempt admin?
+        let nameDj = userModule.theUsersList.indexOf(checkWhoIsDj) + 1; //the currently playing dj's name
 
         if (checkIfAdmin === -1)
         {
@@ -900,9 +896,9 @@ bot.on('newsong', function (data)
                 {
                     bot.remDj(checkWhoIsDj);
 
-                    if (typeof theUsersList[nameDj] !== 'undefined')
+                    if (typeof userModule.theUsersList[nameDj] !== 'undefined')
                     {
-                        bot.speak('@' + theUsersList[nameDj] + ' you have played a banned track or artist.');
+                        bot.speak('@' + userModule.theUsersList[nameDj] + ' you have played a banned track or artist.');
                     }
                     else
                     {
@@ -916,9 +912,9 @@ bot.on('newsong', function (data)
                 {
                     bot.remDj(checkWhoIsDj);
 
-                    if (typeof theUsersList[nameDj] !== 'undefined')
+                    if (typeof userModule.theUsersList[nameDj] !== 'undefined')
                     {
-                        bot.speak('@' + theUsersList[nameDj] + ' you have played a banned artist.');
+                        bot.speak('@' + userModule.theUsersList[nameDj] + ' you have played a banned artist.');
                     }
                     else
                     {
@@ -932,9 +928,9 @@ bot.on('newsong', function (data)
                 {
                     bot.remDj(checkWhoIsDj);
 
-                    if (typeof theUsersList[nameDj] !== 'undefined')
+                    if (typeof userModule.theUsersList[nameDj] !== 'undefined')
                     {
-                        bot.speak('@' + theUsersList[nameDj] + ' you have played a banned track.');
+                        bot.speak('@' + userModule.theUsersList[nameDj] + ' you have played a banned track.');
                     }
                     else
                     {
@@ -971,7 +967,7 @@ bot.on('newsong', function (data)
 //bot gets on stage and starts djing if no song is playing.
 bot.on('nosong', function (data)
 {
-    if (botDefaults.getonstage === true && userDefaults.vipList.length === 0 && queueList.length === 0 && refreshList.length === 0)
+    if (botDefaults.getonstage === true && userModule.vipList.length === 0 && userModule.queueList.length === 0 && refreshList.length === 0)
     {
         bot.addDj();
     }
@@ -1043,29 +1039,29 @@ bot.on('speak', function (data)
         if (roomDefaults.queue === true)
         {
             let topOfQueue = data.text.slice(10);
-            let index35 = queueList.indexOf(topOfQueue);
-            let index46 = queueName.indexOf(topOfQueue);
-            let index80 = theUsersList.indexOf(topOfQueue);
-            let index81 = theUsersList[index80];
-            let index82 = theUsersList[index80 - 1];
+            let index35 = userModule.queueList.indexOf(topOfQueue);
+            let index46 = userModule.queueName.indexOf(topOfQueue);
+            let index80 = userModule.theUsersList.indexOf(topOfQueue);
+            let index81 = userModule.theUsersList[index80];
+            let index82 = userModule.theUsersList[index80 - 1];
             if (index35 !== -1 && index80 !== -1)
             {
                 clearTimeout(beginTimer);
                 sayOnce = true;
-                queueList.splice(index35, 2);
-                queueList.unshift(index81, index82);
-                queueName.splice(index46, 1);
-                queueName.unshift(index81);
+                userModule.queueList.splice(index35, 2);
+                userModule.queueList.unshift(index81, index82);
+                userModule.queueName.splice(index46, 1);
+                userModule.queueName.unshift(index81);
                 let temp92 = 'The queue is now: ';
-                for (let po = 0; po < queueName.length; po++)
+                for (let po = 0; po < userModule.queueName.length; po++)
                 {
-                    if (po !== (queueName.length - 1))
+                    if (po !== (userModule.queueName.length - 1))
                     {
-                        temp92 += queueName[po] + ', ';
+                        temp92 += userModule.queueName[po] + ', ';
                     }
-                    else if (po === (queueName.length - 1))
+                    else if (po === (userModule.queueName.length - 1))
                     {
-                        temp92 += queueName[po];
+                        temp92 += userModule.queueName[po];
                     }
                 }
                 bot.speak(temp92);
@@ -1101,15 +1097,15 @@ bot.on('speak', function (data)
                 for (let ijhp = 0; ijhp < currentDjs.length; ijhp++)
                 {
                     let lastUpdate = Math.floor((Date.now() - lastSeen[currentDjs[ijhp]]) / 1000 / 60); //their afk time in minutes
-                    let whatIsTheName = theUsersList.indexOf(currentDjs[ijhp]); //their name
+                    let whatIsTheName = userModule.theUsersList.indexOf(currentDjs[ijhp]); //their name
 
                     if (currentDjs[ijhp] !== currentDjs[currentDjs.length - 1])
                     {
-                        afkDjs += theUsersList[whatIsTheName + 1] + ': ' + lastUpdate + ' mins, ';
+                        afkDjs += userModule.theUsersList[whatIsTheName + 1] + ': ' + lastUpdate + ' mins, ';
                     }
                     else
                     {
-                        afkDjs += theUsersList[whatIsTheName + 1] + ': ' + lastUpdate + ' mins';
+                        afkDjs += userModule.theUsersList[whatIsTheName + 1] + ': ' + lastUpdate + ' mins';
                     }
                 }
                 bot.speak(afkDjs);
@@ -1126,7 +1122,7 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/position/))
     {
-        let checkPosition = queueName.indexOf(data.name);
+        let checkPosition = userModule.queueName.indexOf(data.name);
 
         if (checkPosition !== -1 && roomDefaults.queue === true) //if person is in the queue and queue is active
         {
@@ -1353,9 +1349,9 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/skip$/) && musicDefaults.voteSkip === true) //if command matches and voteskipping is enabled
     {
-        let isMaster = userDefaults.masterIds.includes(data.userid);
+        let isMaster = userModule.masterIds.includes(data.userid);
         let checkIfOnList = checkVotes.indexOf(data.userid); //check if the person using the command has already voted
-        let checkIfMaster = userDefaults.masterIds.indexOf(lastdj); //is the currently playing dj on the master id's list?
+        let checkIfMaster = userModule.masterIds.indexOf(lastdj); //is the currently playing dj on the master id's list?
 
         if ((checkIfOnList === -1 || isMaster) && data.userid !== authModule.USERID) //if command user has not voted and command user is not the bot
         {
@@ -1363,7 +1359,7 @@ bot.on('speak', function (data)
             votesLeft -= 1; //decrement votes left by one (the votes remaining till the song will be skipped)
             checkVotes.unshift(data.userid); //add them to an array to make sure that they can't vote again this song
 
-            let findLastDj = theUsersList.indexOf(lastdj); //the index of the currently playing dj's userid in the theUser's list
+            let findLastDj = userModule.theUsersList.indexOf(lastdj); //the index of the currently playing dj's userid in the theUser's list
             if (votesLeft !== 0 && checkIfMaster === -1) //if votesLeft has not reached zero and the current dj is not on the master id's list
             {
                 //the bot will say the following
@@ -1372,7 +1368,7 @@ bot.on('speak', function (data)
             }
             if (votesLeft === 0 && checkIfMaster === -1 && !isNaN(roomDefaults.HowManyVotesToSkip)) //if there are no votes left and the current dj is not on the master list and the
             { //the amount of votes set was a valid number
-                bot.speak("@" + theUsersList[findLastDj + 1] + " you have been voted off stage");
+                bot.speak("@" + userModule.theUsersList[findLastDj + 1] + " you have been voted off stage");
                 bot.remDj(lastdj); //remove the current dj and display the above message
             }
         }
@@ -1424,8 +1420,8 @@ bot.on('speak', function (data)
             let djplays = 'dj plays: ';
             for (let i = 0; i < currentDjs.length; i++)
             {
-                let djname = theUsersList.indexOf(currentDjs[i]) + 1;
-                djsnames.push(theUsersList[djname]);
+                let djname = userModule.theUsersList.indexOf(currentDjs[i]) + 1;
+                djsnames.push(userModule.theUsersList[djname]);
 
                 if (typeof djs20[currentDjs[i]] == 'undefined' && typeof currentDjs[i] != 'undefined') //if doesn't exist at this point, create it
                 {
@@ -1533,15 +1529,15 @@ bot.on('speak', function (data)
 
             for (let i = 0; i < refreshList.length; i++)
             {
-                namesOfRefresher = theUsersList.indexOf(data.userid) + 1;
+                namesOfRefresher = userModule.theUsersList.indexOf(data.userid) + 1;
 
                 if (i < refreshList.length - 1)
                 {
-                    whosRefreshing += theUsersList[namesOfRefresher] + ', ';
+                    whosRefreshing += userModule.theUsersList[namesOfRefresher] + ', ';
                 }
                 else
                 {
-                    whosRefreshing += theUsersList[namesOfRefresher];
+                    whosRefreshing += userModule.theUsersList[namesOfRefresher];
                 }
             }
 
@@ -1572,7 +1568,7 @@ bot.on('speak', function (data)
         {
             let isRefresherOnStage = currentDjs.indexOf(data.userid); //are they a dj
             let hasRefreshAlreadyBeenUsed = refreshList.indexOf(data.userid); //are they already being refreshed?
-            let whatIsRefresherName = theUsersList.indexOf(data.userid) + 1;
+            let whatIsRefresherName = userModule.theUsersList.indexOf(data.userid) + 1;
             let numberRepresent = (roomDefaults.amountOfTimeToRefresh / 60);
 
             if (hasRefreshAlreadyBeenUsed !== -1) //if they are already being refreshed
@@ -1581,7 +1577,7 @@ bot.on('speak', function (data)
                 delete refreshTimer[data.userid];
                 refreshList.splice(hasRefreshAlreadyBeenUsed, 1); //remove them from the refresh list       
 
-                bot.speak('@' + theUsersList[whatIsRefresherName] + ' you have been removed from the refresh list');
+                bot.speak('@' + userModule.theUsersList[whatIsRefresherName] + ' you have been removed from the refresh list');
             }
             else
             {
@@ -1610,15 +1606,15 @@ bot.on('speak', function (data)
 
                         if (numberRepresent < 1)
                         {
-                            bot.speak('@' + theUsersList[whatIsRefresherName] + ' i\'ll hold your spot on stage for the next ' + roomDefaults.amountOfTimeToRefresh + ' seconds');
+                            bot.speak('@' + userModule.theUsersList[whatIsRefresherName] + ' i\'ll hold your spot on stage for the next ' + roomDefaults.amountOfTimeToRefresh + ' seconds');
                         }
                         else if (numberRepresent === 1)
                         {
-                            bot.speak('@' + theUsersList[whatIsRefresherName] + ' i\'ll hold your spot on stage for the next ' + numberRepresent + ' minute');
+                            bot.speak('@' + userModule.theUsersList[whatIsRefresherName] + ' i\'ll hold your spot on stage for the next ' + numberRepresent + ' minute');
                         }
                         else
                         {
-                            bot.speak('@' + theUsersList[whatIsRefresherName] + ' i\'ll hold your spot on stage for the next ' + numberRepresent + ' minutes');
+                            bot.speak('@' + userModule.theUsersList[whatIsRefresherName] + ' i\'ll hold your spot on stage for the next ' + numberRepresent + ' minutes');
                         }
                     }
                     else
@@ -1706,8 +1702,8 @@ bot.on('speak', function (data)
         {
             if (informTimer === null)
             {
-                let checkDjsName = theUsersList.indexOf(lastdj) + 1;
-                bot.speak('@' + theUsersList[checkDjsName] + ' your song is not the appropriate genre for this room, please skip or you will be removed in 20 seconds');
+                let checkDjsName = userModule.theUsersList.indexOf(lastdj) + 1;
+                bot.speak('@' + userModule.theUsersList[checkDjsName] + ' your song is not the appropriate genre for this room, please skip or you will be removed in 20 seconds');
                 informTimer = setTimeout(function ()
                 {
                     bot.pm('you took too long to skip your song', lastdj);
@@ -1859,8 +1855,8 @@ bot.on('speak', function (data)
     }
     else if (text.match('/beer'))
     {
-        let botname = theUsersList.indexOf(authModule.USERID) + 1;
-        bot.speak('@' + theUsersList[botname] + ' hands ' + '@' + name + ' a nice cold :beer:');
+        let botname = userModule.theUsersList.indexOf(authModule.USERID) + 1;
+        bot.speak('@' + userModule.theUsersList[botname] + ' hands ' + '@' + name + ' a nice cold :beer:');
     }
     else if (data.text === '/escortme')
     {
@@ -1935,16 +1931,16 @@ bot.on('speak', function (data)
             let whatIsTheirName = tempName[1].substring(1); //cut the @ off
         }
 
-        let areTheyInTheQueue = queueName.indexOf(whatIsTheirName); //name in queueName
-        let areTheyInTheQueueList = queueList.indexOf(whatIsTheirName); //name in queuList
-        let whatIsTheirUserid2 = theUsersList.indexOf(whatIsTheirName); //userid    
+        let areTheyInTheQueue = userModule.queueName.indexOf(whatIsTheirName); //name in queueName
+        let areTheyInTheQueueList = userModule.queueList.indexOf(whatIsTheirName); //name in queuList
+        let whatIsTheirUserid2 = userModule.theUsersList.indexOf(whatIsTheirName); //userid    
 
         //if either name or userid is undefined, do not perform a move operation        
-        if (typeof theUsersList[whatIsTheirUserid2 - 1] == 'undefined' || typeof tempName[1] == 'undefined')
+        if (typeof userModule.theUsersList[whatIsTheirUserid2 - 1] == 'undefined' || typeof tempName[1] == 'undefined')
         {
-            if (typeof theUsersList[whatIsTheirUserid2 - 1] != 'undefined')
+            if (typeof userModule.theUsersList[whatIsTheirUserid2 - 1] != 'undefined')
             {
-                bot.pm('failed to perform move operation, please try the command again', theUsersList[whatIsTheirUserid2 - 1]);
+                bot.pm('failed to perform move operation, please try the command again', userModule.theUsersList[whatIsTheirUserid2 - 1]);
             }
             else
             {
@@ -1961,40 +1957,40 @@ bot.on('speak', function (data)
                     {
                         if (tempName[2] <= 1) //if position given lower than 1
                         {
-                            queueName.splice(areTheyInTheQueue, 1); //remove them
-                            queueList.splice(areTheyInTheQueueList, 2); //remove them
-                            queueName.splice(0, 0, whatIsTheirName); //add them to beggining
-                            queueList.splice(0, 0, whatIsTheirName, theUsersList[whatIsTheirUserid2 - 1]); //add them to beggining
+                            userModule.queueName.splice(areTheyInTheQueue, 1); //remove them
+                            userModule.queueList.splice(areTheyInTheQueueList, 2); //remove them
+                            userModule.queueName.splice(0, 0, whatIsTheirName); //add them to beggining
+                            userModule.queueList.splice(0, 0, whatIsTheirName, userModule.theUsersList[whatIsTheirUserid2 - 1]); //add them to beggining
                             clearTimeout(beginTimer); //clear timeout because first person has been replaced
                             sayOnce = true;
                             bot.speak(whatIsTheirName + ' has been moved to position 1 in the queue');
                         }
-                        else if (tempName[2] >= queueName.length)
+                        else if (tempName[2] >= userModule.queueName.length)
                         {
-                            if (queueName[areTheyInTheQueue] === queueName[0]) //if position given higher than end
+                            if (userModule.queueName[areTheyInTheQueue] === userModule.queueName[0]) //if position given higher than end
                             {
                                 clearTimeout(beginTimer); //clear timeout because first person has been replaced
                                 sayOnce = true;
                             }
-                            queueName.splice(areTheyInTheQueue, 1); //remove them
-                            queueList.splice(areTheyInTheQueueList, 2); //remove them
-                            queueName.splice(queueName.length + 1, 0, whatIsTheirName); //add them to end
-                            queueList.splice(queueName.length + 1, 0, whatIsTheirName, theUsersList[whatIsTheirUserid2 - 1]); //add them to end
+                            userModule.queueName.splice(areTheyInTheQueue, 1); //remove them
+                            userModule.queueList.splice(areTheyInTheQueueList, 2); //remove them
+                            userModule.queueName.splice(userModule.queueName.length + 1, 0, whatIsTheirName); //add them to end
+                            userModule.queueList.splice(userModule.queueName.length + 1, 0, whatIsTheirName, userModule.theUsersList[whatIsTheirUserid2 - 1]); //add them to end
 
-                            bot.speak(whatIsTheirName + ' has been moved to position ' + queueName.length + ' in the queue');
+                            bot.speak(whatIsTheirName + ' has been moved to position ' + userModule.queueName.length + ' in the queue');
                         }
                         else
                         {
-                            if (queueName[areTheyInTheQueue] === queueName[0])
+                            if (userModule.queueName[areTheyInTheQueue] === userModule.queueName[0])
                             {
                                 clearTimeout(beginTimer); //clear timeout because first person has been replaced
                                 sayOnce = true;
                             }
 
-                            queueName.splice(areTheyInTheQueue, 1); //remove them
-                            queueList.splice(areTheyInTheQueueList, 2); //remove them                       
-                            queueName.splice((Math.round(tempName[2]) - 1), 0, whatIsTheirName); //add them to given position shift left 1 because array starts at 0
-                            queueList.splice(((Math.round(tempName[2]) - 1) * 2), 0, whatIsTheirName, theUsersList[whatIsTheirUserid2 - 1]); //same as above
+                            userModule.queueName.splice(areTheyInTheQueue, 1); //remove them
+                            userModule.queueList.splice(areTheyInTheQueueList, 2); //remove them                       
+                            userModule.queueName.splice((Math.round(tempName[2]) - 1), 0, whatIsTheirName); //add them to given position shift left 1 because array starts at 0
+                            userModule.queueList.splice(((Math.round(tempName[2]) - 1) * 2), 0, whatIsTheirName, userModule.theUsersList[whatIsTheirUserid2 - 1]); //same as above
 
 
                             bot.speak(whatIsTheirName + ' has been moved to position ' + Math.round(tempName[2]) + ' in the queue');
@@ -2104,18 +2100,18 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/queuewithnumbers$/))
     {
-        if (queue === true && roomDefaults.queueName.length !== 0)
+        if (queue === true && roomDefaults.userModule.queueName.length !== 0)
         {
             let temp95 = 'The queue is now: ';
-            for (let kl = 0; kl < queueName.length; kl++)
+            for (let kl = 0; kl < userModule.queueName.length; kl++)
             {
-                if (kl !== (queueName.length - 1))
+                if (kl !== (userModule.queueName.length - 1))
                 {
-                    temp95 += queueName[kl] + ' [' + (kl + 1) + ']' + ', ';
+                    temp95 += userModule.queueName[kl] + ' [' + (kl + 1) + ']' + ', ';
                 }
-                else if (kl === (queueName.length - 1))
+                else if (kl === (userModule.queueName.length - 1))
                 {
-                    temp95 += queueName[kl] + ' [' + (kl + 1) + ']';
+                    temp95 += userModule.queueName[kl] + ' [' + (kl + 1) + ']';
                 }
             }
             bot.speak(temp95);
@@ -2131,18 +2127,18 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/queue$/))
     {
-        if (roomDefaults.queue === true && queueName.length !== 0)
+        if (roomDefaults.queue === true && userModule.queueName.length !== 0)
         {
             let temp95 = 'The queue is now: ';
-            for (let kl = 0; kl < queueName.length; kl++)
+            for (let kl = 0; kl < userModule.queueName.length; kl++)
             {
-                if (kl !== (queueName.length - 1))
+                if (kl !== (userModule.queueName.length - 1))
                 {
-                    temp95 += queueName[kl] + ', ';
+                    temp95 += userModule.queueName[kl] + ', ';
                 }
-                else if (kl === (queueName.length - 1))
+                else if (kl === (userModule.queueName.length - 1))
                 {
-                    temp95 += queueName[kl];
+                    temp95 += userModule.queueName[kl];
                 }
             }
             bot.speak(temp95);
@@ -2162,19 +2158,19 @@ bot.on('speak', function (data)
         if (musicDefaults.PLAYLIMIT === true) //is the play limit on?
         {
             let playMinus = data.text.slice(12);
-            let areTheyInRoom = theUsersList.indexOf(playMinus);
-            let areTheyDj = currentDjs.indexOf(theUsersList[areTheyInRoom - 1]);
+            let areTheyInRoom = userModule.theUsersList.indexOf(playMinus);
+            let areTheyDj = currentDjs.indexOf(userModule.theUsersList[areTheyInRoom - 1]);
 
             if (areTheyInRoom !== -1) //are they in the room?
             {
                 if (areTheyDj !== -1) //are they a dj?
                 {
-                    if (typeof djs20[theUsersList[areTheyInRoom - 1]] != 'undefined')
+                    if (typeof djs20[userModule.theUsersList[areTheyInRoom - 1]] != 'undefined')
                     {
-                        if (!djs20[theUsersList[areTheyInRoom - 1]].nbSong <= 0) //is their play count already 0 or lower?
+                        if (!djs20[userModule.theUsersList[areTheyInRoom - 1]].nbSong <= 0) //is their play count already 0 or lower?
                         {
-                            --djs20[theUsersList[areTheyInRoom - 1]].nbSong;
-                            bot.speak(theUsersList[areTheyInRoom] + '\'s play count has been reduced by one');
+                            --djs20[userModule.theUsersList[areTheyInRoom - 1]].nbSong;
+                            bot.speak(userModule.theUsersList[areTheyInRoom] + '\'s play count has been reduced by one');
                         }
                         else
                         {
@@ -2184,10 +2180,10 @@ bot.on('speak', function (data)
                     else
                     {
                         bot.pm('something weird happened!, attemping to recover now', data.userid);
-                        if (typeof theUsersList[areTheyInRoom - 1] != 'undefined')
+                        if (typeof userModule.theUsersList[areTheyInRoom - 1] != 'undefined')
                         {
                             //recover here
-                            djs20[theUsersList[areTheyInRoom - 1]] = {
+                            djs20[userModule.theUsersList[areTheyInRoom - 1]] = {
                                 nbSong: 0
                             };
                         }
@@ -2235,30 +2231,30 @@ bot.on('speak', function (data)
         if (condition === true)
         {
             let removeFromQueue = data.text.slice(18);
-            let index5 = queueList.indexOf(removeFromQueue);
-            let index6 = queueName.indexOf(removeFromQueue);
+            let index5 = userModule.queueList.indexOf(removeFromQueue);
+            let index6 = userModule.queueName.indexOf(removeFromQueue);
             if (index5 !== -1)
             {
-                if (queueName[index6] === queueName[0])
+                if (userModule.queueName[index6] === userModule.queueName[0])
                 {
                     clearTimeout(beginTimer);
                     sayOnce = true;
                 }
-                queueList.splice(index5, 2);
-                queueName.splice(index6, 1);
+                userModule.queueList.splice(index5, 2);
+                userModule.queueName.splice(index6, 1);
 
-                if (queueName.length !== 0)
+                if (userModule.queueName.length !== 0)
                 {
                     let temp89 = 'The queue is now: ';
-                    for (let jk = 0; jk < queueName.length; jk++)
+                    for (let jk = 0; jk < userModule.queueName.length; jk++)
                     {
-                        if (jk !== (queueName.length - 1))
+                        if (jk !== (userModule.queueName.length - 1))
                         {
-                            temp89 += queueName[jk] + ', ';
+                            temp89 += userModule.queueName[jk] + ', ';
                         }
-                        else if (jk === (queueName.length - 1))
+                        else if (jk === (userModule.queueName.length - 1))
                         {
-                            temp89 += queueName[jk];
+                            temp89 += userModule.queueName[jk];
                         }
                     }
                     bot.speak(temp89);
@@ -2289,33 +2285,33 @@ bot.on('speak', function (data)
         }
         else
         {
-            let list1 = queueList.indexOf(data.name);
-            let list2 = queueName.indexOf(data.name);
+            let list1 = userModule.queueList.indexOf(data.name);
+            let list2 = userModule.queueName.indexOf(data.name);
 
             if (list2 !== -1 && list1 !== -1)
             {
-                queueList.splice(list1, 2);
+                userModule.queueList.splice(list1, 2);
 
-                if (data.name === queueName[0])
+                if (data.name === userModule.queueName[0])
                 {
                     clearTimeout(beginTimer);
                     sayOnce = true;
                 }
 
-                queueName.splice(list2, 1);
+                userModule.queueName.splice(list2, 1);
 
-                if (queueName.length !== 0)
+                if (userModule.queueName.length !== 0)
                 {
                     let temp90 = 'The queue is now: ';
-                    for (let kj = 0; kj < queueName.length; kj++)
+                    for (let kj = 0; kj < userModule.queueName.length; kj++)
                     {
-                        if (kj !== (queueName.length - 1))
+                        if (kj !== (userModule.queueName.length - 1))
                         {
-                            temp90 += queueName[kj] + ', ';
+                            temp90 += userModule.queueName[kj] + ', ';
                         }
-                        else if (kj === (queueName.length - 1))
+                        else if (kj === (userModule.queueName.length - 1))
                         {
-                            temp90 += queueName[kj];
+                            temp90 += userModule.queueName[kj];
                         }
                     }
                     bot.speak(temp90);
@@ -2339,33 +2335,33 @@ bot.on('speak', function (data)
         }
         else
         {
-            let indexInUsersList = theUsersList.indexOf(data.userid) + 1;
+            let indexInUsersList = userModule.theUsersList.indexOf(data.userid) + 1;
 
-            if (typeof theUsersList[indexInUsersList] == 'undefined')
+            if (typeof userModule.theUsersList[indexInUsersList] == 'undefined')
             {
                 bot.pm('failed to add to queue, please try the command again', data.userid);
             }
             else
             {
-                let list3 = queueList.indexOf(theUsersList[indexInUsersList]);
+                let list3 = userModule.queueList.indexOf(userModule.theUsersList[indexInUsersList]);
                 let list10 = currentDjs.indexOf(data.userid)
                 let checkStageList = stageList.indexOf(data.userid);
-                let checkManualStageList = userDefaults.bannedFromStage.indexOf(data.userid);
+                let checkManualStageList = userModule.bannedFromStage.indexOf(data.userid);
                 //if not in the queue already, not already a dj, not banned from stage
                 if (list3 === -1 && list10 === -1 && checkStageList === -1 && checkManualStageList === -1)
                 {
-                    queueList.push(theUsersList[indexInUsersList], data.userid);
-                    queueName.push(theUsersList[indexInUsersList]);
+                    userModule.queueList.push(userModule.theUsersList[indexInUsersList], data.userid);
+                    userModule.queueName.push(userModule.theUsersList[indexInUsersList]);
                     let temp91 = 'The queue is now: ';
-                    for (let hj = 0; hj < queueName.length; hj++)
+                    for (let hj = 0; hj < userModule.queueName.length; hj++)
                     {
-                        if (hj !== (queueName.length - 1))
+                        if (hj !== (userModule.queueName.length - 1))
                         {
-                            temp91 += queueName[hj] + ', ';
+                            temp91 += userModule.queueName[hj] + ', ';
                         }
-                        else if (hj === (queueName.length - 1))
+                        else if (hj === (userModule.queueName.length - 1))
                         {
-                            temp91 += queueName[hj];
+                            temp91 += userModule.queueName[hj];
                         }
                     }
                     bot.speak(temp91);
@@ -2387,8 +2383,8 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/queueOn$/) && condition === true)
     {
-        queueList = [];
-        queueName = [];
+        userModule.resetQueueList(bot);
+        userModule.resetQueueNames(bot);
         bot.speak('the queue is now active.');
         roomDefaults.queue = true;
         clearTimeout(beginTimer); //if queue is turned on again while somebody was on timeout to get on stage, then clear it
@@ -2514,11 +2510,11 @@ bot.on('speak', function (data)
     {
         let ban = data.text.slice(11);
         let checkBan = stageList.indexOf(ban);
-        let checkUser = theUsersList.indexOf(ban);
+        let checkUser = userModule.theUsersList.indexOf(ban);
         if (checkBan === -1 && checkUser !== -1)
         {
-            stageList.push(theUsersList[checkUser - 1], theUsersList[checkUser]);
-            bot.remDj(theUsersList[checkUser - 1]);
+            stageList.push(userModule.theUsersList[checkUser - 1], userModule.theUsersList[checkUser]);
+            bot.remDj(userModule.theUsersList[checkUser - 1]);
             condition = false;
         }
         else
@@ -2545,11 +2541,11 @@ bot.on('speak', function (data)
     {
         let ban3 = data.text.slice(6);
         let checkBan5 = blackList.indexOf(ban3);
-        let checkUser3 = theUsersList.indexOf(ban3);
+        let checkUser3 = userModule.theUsersList.indexOf(ban3);
         if (checkBan5 === -1 && checkUser3 !== -1)
         {
-            blackList.push(theUsersList[checkUser3 - 1], theUsersList[checkUser3]);
-            bot.boot(theUsersList[checkUser3 - 1]);
+            blackList.push(userModule.theUsersList[checkUser3 - 1], userModule.theUsersList[checkUser3]);
+            bot.boot(userModule.theUsersList[checkUser3 - 1]);
             condition = false;
         }
         else
@@ -2599,7 +2595,7 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/afk/))
     {
-        let isAlreadyAfk = afkPeople.indexOf(data.name);
+        let isAlreadyAfk = userModule.afkPeople.indexOf(data.name);
         if (isAlreadyAfk === -1)
         {
             if (typeof data.name == 'undefined')
@@ -2609,13 +2605,13 @@ bot.on('speak', function (data)
             else
             {
                 bot.speak('@' + name + ' you are marked as afk');
-                afkPeople.push(data.name);
+                userModule.afkPeople.push(data.name);
             }
         }
         else if (isAlreadyAfk !== -1)
         {
             bot.speak('@' + name + ' you are no longer afk');
-            afkPeople.splice(isAlreadyAfk, 1);
+            userModule.afkPeople.splice(isAlreadyAfk, 1);
         }
     }
     else if (text === '/up?') //works for djs on stage
@@ -2632,18 +2628,18 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/whosafk/))
     {
-        if (afkPeople.length !== 0)
+        if (userModule.afkPeople.length !== 0)
         {
             let whosAfk = 'marked as afk: ';
-            for (let f = 0; f < afkPeople.length; f++)
+            for (let f = 0; f < userModule.afkPeople.length; f++)
             {
-                if (f !== (afkPeople.length - 1))
+                if (f !== (userModule.afkPeople.length - 1))
                 {
-                    whosAfk = whosAfk + afkPeople[f] + ', ';
+                    whosAfk = whosAfk + userModule.afkPeople[f] + ', ';
                 }
                 else
                 {
-                    whosAfk = whosAfk + afkPeople[f];
+                    whosAfk = whosAfk + userModule.afkPeople[f];
                 }
             }
             bot.speak(whosAfk);
@@ -2656,17 +2652,17 @@ bot.on('speak', function (data)
 
 
     //checks to see if someone is trying to speak to an afk person or not.  
-    if (afkPeople.length !== 0 && data.userid !== authModule.USERID)
+    if (userModule.afkPeople.length !== 0 && data.userid !== authModule.USERID)
     {
-        for (let j = 0; j < afkPeople.length; j++) //loop through afk people array
+        for (let j = 0; j < userModule.afkPeople.length; j++) //loop through afk people array
         {
-            if (typeof (afkPeople[j] !== 'undefined'))
+            if (typeof (userModule.afkPeople[j] !== 'undefined'))
             {
-                let areTheyAfk56 = data.text.toLowerCase().indexOf(afkPeople[j].toLowerCase()); //is an afk persons name being called   
+                let areTheyAfk56 = data.text.toLowerCase().indexOf(userModule.afkPeople[j].toLowerCase()); //is an afk persons name being called
 
                 if (areTheyAfk56 !== -1)
                 {
-                    bot.speak(afkPeople[j] + ' is afk');
+                    bot.speak(userModule.afkPeople[j] + ' is afk');
                 }
             }
         }
@@ -2714,8 +2710,8 @@ bot.on('add_dj', function (data)
 {
     //removes dj when they try to join the stage if the vip list has members in it.
     //does not remove the bot
-    let checkVip = userDefaults.vipList.indexOf(data.user[0].userid);
-    if (userDefaults.vipList.length !== 0 && checkVip === -1 && data.user[0].userid !== authModule.USERID)
+    let checkVip = userModule.vipList.indexOf(data.user[0].userid);
+    if (userModule.vipList.length !== 0 && checkVip === -1 && data.user[0].userid !== authModule.USERID)
     {
         bot.remDj(data.user[0].userid);
         bot.pm('The vip list is currently active, only the vips may dj at this time', data.user[0].userid);
@@ -2762,15 +2758,15 @@ bot.on('add_dj', function (data)
         if (refreshList.indexOf(data.user[0].userid) === -1) //don't show these messages to people on the refresh list
         {
             //tells a dj trying to get on stage how to add themselves to the queuelist
-            let ifUser2 = queueList.indexOf(data.user[0].userid);
+            let ifUser2 = userModule.queueList.indexOf(data.user[0].userid);
             if (roomDefaults.queue === true && ifUser2 === -1)
             {
-                if (queueList.length !== 0)
+                if (userModule.queueList.length !== 0)
                 {
                     bot.pm('The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.', data.user[0].userid);
                 }
             }
-            else if (roomDefaults.queue === true && ifUser2 !== -1 && data.user[0].name !== queueName[0])
+            else if (roomDefaults.queue === true && ifUser2 !== -1 && data.user[0].name !== userModule.queueName[0])
             {
                 bot.pm('sorry, but you are not first in queue. please wait your turn.', data.user[0].userid);
             }
@@ -2791,8 +2787,8 @@ bot.on('add_dj', function (data)
             //removes a user from the queue list when they join the stage.
             if (roomDefaults.queue === true)
             {
-                let firstOnly = queueList.indexOf(data.user[0].userid);
-                let queueListLength = queueList.length;
+                let firstOnly = userModule.queueList.indexOf(data.user[0].userid);
+                let queueListLength = userModule.queueList.length;
                 if (firstOnly !== 1 && queueListLength !== 0)
                 {
                     bot.remDj(data.user[0].userid);
@@ -2802,14 +2798,14 @@ bot.on('add_dj', function (data)
             }
             if (roomDefaults.queue === true)
             {
-                let checkQueue = queueList.indexOf(data.user[0].name);
-                let checkName2 = queueName.indexOf(data.user[0].name);
+                let checkQueue = userModule.queueList.indexOf(data.user[0].name);
+                let checkName2 = userModule.queueName.indexOf(data.user[0].name);
                 if (checkQueue !== -1 && checkQueue === 0)
                 {
                     clearTimeout(beginTimer);
                     sayOnce = true;
-                    queueList.splice(checkQueue, 2);
-                    queueName.splice(checkName2, 1);
+                    userModule.queueList.splice(checkQueue, 2);
+                    userModule.queueName.splice(checkName2, 1);
                 }
             }
         }
@@ -2858,9 +2854,9 @@ bot.on('add_dj', function (data)
 
 
     //checks to see if user is on the manually added banned from stage list, if they are they are removed from stage
-    for (let z = 0; z < userDefaults.bannedFromStage.length; z++)
+    for (let z = 0; z < userModule.bannedFromStage.length; z++)
     {
-        if (userDefaults.bannedFromStage[z].match(data.user[0].userid)) //== userDefaults.bannedFromStage[z])
+        if (userModule.bannedFromStage[z].match(data.user[0].userid)) //== userModule.bannedFromStage[z])
         {
             bot.remDj(data.user[0].userid);
             bot.speak('@' + data.user[0].name + ' you are banned from djing');
@@ -2950,7 +2946,7 @@ bot.on('pmmed', function (data)
 {
     let senderid = data.senderid; //the userid of the person who just pmmed the bot
     let text = data.text; //the text sent to the bot in a pm    
-    let name1 = theUsersList.indexOf(data.senderid) + 1; //the name of the person who sent the bot a pm
+    let name1 = userModule.theUsersList.indexOf(data.senderid) + 1; //the name of the person who sent the bot a pm
     let isInRoom = checkToseeIfPmmerIsInRoom(senderid); //check to see whether pmmer is in the same room as the bot
 
     checkIfUserIsMod(data.senderid); //check to see if person pming the bot a command is a moderator or not
@@ -2966,7 +2962,7 @@ bot.on('pmmed', function (data)
             {
                 if (modpm[jhg] !== data.senderid && modpm[jhg] !== authModule.USERID) //this will prevent you from messaging yourself
                 {
-                    bot.pm(theUsersList[name1] + ' said: ' + data.text, modpm[jhg]);
+                    bot.pm(userModule.theUsersList[name1] + ' said: ' + data.text, modpm[jhg]);
                 }
             }
         }
@@ -2986,7 +2982,7 @@ bot.on('pmmed', function (data)
                 {
                     if (modpm[jk] !== data.senderid)
                     {
-                        bot.pm(theUsersList[name1] + ' has entered the modpm chat', modpm[jk]); //declare user has entered chat
+                        bot.pm(userModule.theUsersList[name1] + ' has entered the modpm chat', modpm[jk]); //declare user has entered chat
                     }
                 }
             }
@@ -2999,7 +2995,7 @@ bot.on('pmmed', function (data)
             {
                 for (let jk = 0; jk < modpm.length; jk++)
                 {
-                    bot.pm(theUsersList[name1] + ' has left the modpm chat', modpm[jk]); //declare user has entered chat
+                    bot.pm(userModule.theUsersList[name1] + ' has left the modpm chat', modpm[jk]); //declare user has entered chat
                 }
             }
         }
@@ -3013,15 +3009,15 @@ bot.on('pmmed', function (data)
 
             for (let i = 0; i < refreshList.length; i++)
             {
-                namesOfRefresher = theUsersList.indexOf(data.senderid) + 1;
+                namesOfRefresher = userModule.theUsersList.indexOf(data.senderid) + 1;
 
                 if (i < refreshList.length - 1)
                 {
-                    whosRefreshing += theUsersList[namesOfRefresher] + ', ';
+                    whosRefreshing += userModule.theUsersList[namesOfRefresher] + ', ';
                 }
                 else
                 {
-                    whosRefreshing += theUsersList[namesOfRefresher];
+                    whosRefreshing += userModule.theUsersList[namesOfRefresher];
                 }
             }
 
@@ -3050,16 +3046,16 @@ bot.on('pmmed', function (data)
 
             for (let gfh = 0; gfh < modpm.length; gfh++)
             {
-                let whatAreTheirNames = theUsersList.indexOf(modpm[gfh]) + 1;
+                let whatAreTheirNames = userModule.theUsersList.indexOf(modpm[gfh]) + 1;
 
                 if (gfh !== (modpm.length - 1))
                 {
-                    temper += theUsersList[whatAreTheirNames] + ', ';
+                    temper += userModule.theUsersList[whatAreTheirNames] + ', ';
 
                 }
                 else
                 {
-                    temper += theUsersList[whatAreTheirNames];
+                    temper += userModule.theUsersList[whatAreTheirNames];
                 }
             }
             bot.pm(temper, data.senderid);
@@ -3117,16 +3113,16 @@ bot.on('pmmed', function (data)
     {
         let moveName = data.text.slice(5);
         let tempName = moveName.split(" ");
-        let areTheyInTheQueue = queueName.indexOf(tempName[1]); //name in queueName
-        let areTheyInTheQueueList = queueList.indexOf(tempName[1]); //name in queuList
-        let whatIsTheirUserid2 = theUsersList.indexOf(tempName[1]); //userid
+        let areTheyInTheQueue = userModule.queueName.indexOf(tempName[1]); //name in queueName
+        let areTheyInTheQueueList = userModule.queueList.indexOf(tempName[1]); //name in queuList
+        let whatIsTheirUserid2 = userModule.theUsersList.indexOf(tempName[1]); //userid
 
         //if either name or userid is undefined, do not perform a move operation        
-        if (typeof theUsersList[whatIsTheirUserid2 - 1] == 'undefined' || typeof tempName[1] == 'undefined')
+        if (typeof userModule.theUsersList[whatIsTheirUserid2 - 1] == 'undefined' || typeof tempName[1] == 'undefined')
         {
-            if (typeof theUsersList[whatIsTheirUserid2 - 1] != 'undefined')
+            if (typeof userModule.theUsersList[whatIsTheirUserid2 - 1] != 'undefined')
             {
-                bot.pm('failed to perform move operation, please try the command again', theUsersList[whatIsTheirUserid2 - 1]);
+                bot.pm('failed to perform move operation, please try the command again', userModule.theUsersList[whatIsTheirUserid2 - 1]);
             }
             else
             {
@@ -3143,40 +3139,40 @@ bot.on('pmmed', function (data)
                     {
                         if (tempName[2] <= 1)
                         {
-                            queueName.splice(areTheyInTheQueue, 1); //remove them
-                            queueList.splice(areTheyInTheQueueList, 2); //remove them
-                            queueName.splice(0, 0, tempName[1]); //add them to beggining
-                            queueList.splice(0, 0, tempName[1], theUsersList[whatIsTheirUserid2 - 1]); //add them to beggining
+                            userModule.queueName.splice(areTheyInTheQueue, 1); //remove them
+                            userModule.queueList.splice(areTheyInTheQueueList, 2); //remove them
+                            userModule.queueName.splice(0, 0, tempName[1]); //add them to beggining
+                            userModule.queueList.splice(0, 0, tempName[1], userModule.theUsersList[whatIsTheirUserid2 - 1]); //add them to beggining
                             clearTimeout(beginTimer); //clear timeout because first person has been replaced
                             sayOnce = true;
                             bot.pm(tempName[1] + ' has been moved to position 1 in the queue', data.senderid);
                         }
-                        else if (tempName[2] >= queueName.length)
+                        else if (tempName[2] >= userModule.queueName.length)
                         {
-                            if (queueName[areTheyInTheQueue] === queueName[0])
+                            if (userModule.queueName[areTheyInTheQueue] === userModule.queueName[0])
                             {
                                 clearTimeout(beginTimer); //clear timeout because first person has been replaced
                                 sayOnce = true;
                             }
-                            queueName.splice(areTheyInTheQueue, 1); //remove them
-                            queueList.splice(areTheyInTheQueueList, 2); //remove them
-                            queueName.splice(queueName.length + 1, 0, tempName[1]); //add them to end
-                            queueList.splice(queueName.length + 1, 0, tempName[1], theUsersList[whatIsTheirUserid2 - 1]); //add them to end
+                            userModule.queueName.splice(areTheyInTheQueue, 1); //remove them
+                            userModule.queueList.splice(areTheyInTheQueueList, 2); //remove them
+                            userModule.queueName.splice(userModule.queueName.length + 1, 0, tempName[1]); //add them to end
+                            userModule.queueList.splice(userModule.queueName.length + 1, 0, tempName[1], userModule.theUsersList[whatIsTheirUserid2 - 1]); //add them to end
 
-                            bot.pm(tempName[1] + ' has been moved to position ' + queueName.length + ' in the queue', data.senderid);
+                            bot.pm(tempName[1] + ' has been moved to position ' + userModule.queueName.length + ' in the queue', data.senderid);
                         }
                         else
                         {
-                            if (queueName[areTheyInTheQueue] === queueName[0])
+                            if (userModule.queueName[areTheyInTheQueue] === userModule.queueName[0])
                             {
                                 clearTimeout(beginTimer); //clear timeout because first person has been replaced
                                 sayOnce = true;
                             }
 
-                            queueName.splice(areTheyInTheQueue, 1); //remove them
-                            queueList.splice(areTheyInTheQueueList, 2); //remove them                      
-                            queueName.splice((Math.round(tempName[2]) - 1), 0, tempName[1]); //add them to given position shift left 1 because array starts at 0
-                            queueList.splice(((Math.round(tempName[2]) - 1) * 2), 0, tempName[1], theUsersList[whatIsTheirUserid2 - 1]); //same as above                        
+                            userModule.queueName.splice(areTheyInTheQueue, 1); //remove them
+                            userModule.queueList.splice(areTheyInTheQueueList, 2); //remove them                      
+                            userModule.queueName.splice((Math.round(tempName[2]) - 1), 0, tempName[1]); //add them to given position shift left 1 because array starts at 0
+                            userModule.queueList.splice(((Math.round(tempName[2]) - 1) * 2), 0, tempName[1], userModule.theUsersList[whatIsTheirUserid2 - 1]); //same as above
 
                             bot.pm(tempName[1] + ' has been moved to position ' + Math.round(tempName[2]) + ' in the queue', data.senderid);
                         }
@@ -3203,7 +3199,7 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/position/)) //tells you your position in the queue, if there is one
     {
-        let checkPosition = queueName.indexOf(theUsersList[name1]);
+        let checkPosition = userModule.queueName.indexOf(userModule.theUsersList[name1]);
 
         if (checkPosition !== -1 && roomDefaults.queue === true) //if person is in the queue and queue is active
         {
@@ -3229,15 +3225,15 @@ bot.on('pmmed', function (data)
                 for (let ijhp = 0; ijhp < currentDjs.length; ijhp++)
                 {
                     let lastUpdate = Math.floor((Date.now() - lastSeen[currentDjs[ijhp]]) / 1000 / 60); //their afk time in minutes
-                    let whatIsTheName = theUsersList.indexOf(currentDjs[ijhp]); //their name
+                    let whatIsTheName = userModule.theUsersList.indexOf(currentDjs[ijhp]); //their name
 
                     if (currentDjs[ijhp] !== currentDjs[currentDjs.length - 1])
                     {
-                        afkDjs += theUsersList[whatIsTheName + 1] + ': ' + lastUpdate + ' mins, ';
+                        afkDjs += userModule.theUsersList[whatIsTheName + 1] + ': ' + lastUpdate + ' mins, ';
                     }
                     else
                     {
-                        afkDjs += theUsersList[whatIsTheName + 1] + ': ' + lastUpdate + ' mins';
+                        afkDjs += userModule.theUsersList[whatIsTheName + 1] + ': ' + lastUpdate + ' mins';
                     }
                 }
                 bot.pm(afkDjs, data.senderid);
@@ -3257,19 +3253,19 @@ bot.on('pmmed', function (data)
         if (musicDefaults.PLAYLIMIT === true) //is the play limit on?
         {
             let playMinus = data.text.slice(12);
-            let areTheyInRoom = theUsersList.indexOf(playMinus);
-            let areTheyDj = currentDjs.indexOf(theUsersList[areTheyInRoom - 1]);
+            let areTheyInRoom = userModule.theUsersList.indexOf(playMinus);
+            let areTheyDj = currentDjs.indexOf(userModule.theUsersList[areTheyInRoom - 1]);
             if (areTheyInRoom !== -1) //are they in the room?
             {
                 if (areTheyDj !== -1) //are they a dj?
                 {
-                    if (typeof djs20[theUsersList[areTheyInRoom - 1]] != 'undefined')
+                    if (typeof djs20[userModule.theUsersList[areTheyInRoom - 1]] != 'undefined')
                     {
 
-                        if (!djs20[theUsersList[areTheyInRoom - 1]].nbSong <= 0) //is their play count already 0 or lower?
+                        if (!djs20[userModule.theUsersList[areTheyInRoom - 1]].nbSong <= 0) //is their play count already 0 or lower?
                         {
-                            --djs20[theUsersList[areTheyInRoom - 1]].nbSong;
-                            bot.pm(theUsersList[areTheyInRoom] + '\'s play count has been reduced by one', data.senderid);
+                            --djs20[userModule.theUsersList[areTheyInRoom - 1]].nbSong;
+                            bot.pm(userModule.theUsersList[areTheyInRoom] + '\'s play count has been reduced by one', data.senderid);
                         }
                         else
                         {
@@ -3280,10 +3276,10 @@ bot.on('pmmed', function (data)
                     {
                         bot.pm('something weird happened!, attemping to recover now', data.senderid);
 
-                        if (theUsersList[areTheyInRoom - 1] !== 'undefined') //only recover if userid given is not undefined
+                        if (userModule.theUsersList[areTheyInRoom - 1] !== 'undefined') //only recover if userid given is not undefined
                         {
                             //recover here
-                            djs20[theUsersList[areTheyInRoom - 1]] = {
+                            djs20[userModule.theUsersList[areTheyInRoom - 1]] = {
                                 nbSong: 0
                             };
                         }
@@ -3369,8 +3365,8 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/queueOn$/) && condition === true && isInRoom === true)
     {
-        queueList = [];
-        queueName = [];
+        userModule.resetQueueList(bot);
+        userModule.resetQueueNames(bot);
         bot.pm('the queue is now active.', data.senderid);
         roomDefaults.queue = true;
         clearTimeout(beginTimer); //if queue is turned on again while somebody was on timeout to get on stage, then clear it
@@ -3383,7 +3379,7 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/addme$/) && roomDefaults.queue === true && isInRoom === true)
     {
-        if (typeof data.senderid == 'undefined' || typeof theUsersList[name1] == 'undefined')
+        if (typeof data.senderid == 'undefined' || typeof userModule.theUsersList[name1] == 'undefined')
         {
             if (typeof data.senderid != 'undefined')
             {
@@ -3396,24 +3392,24 @@ bot.on('pmmed', function (data)
         }
         else
         {
-            let list3 = queueList.indexOf(theUsersList[name1]);
+            let list3 = userModule.queueList.indexOf(userModule.theUsersList[name1]);
             let list10 = currentDjs.indexOf(data.senderid)
             let checkStageList = stageList.indexOf(data.senderid);
-            let checkManualStageList = userDefaults.bannedFromStage.indexOf(data.senderid);
+            let checkManualStageList = userModule.bannedFromStage.indexOf(data.senderid);
             if (list3 === -1 && list10 === -1 && checkStageList === -1 && checkManualStageList === -1)
             {
-                queueList.push(theUsersList[name1], data.senderid);
-                queueName.push(theUsersList[name1]);
+                userModule.queueList.push(userModule.theUsersList[name1], data.senderid);
+                userModule.queueName.push(userModule.theUsersList[name1]);
                 let temp91 = 'The queue is now: ';
-                for (let hj = 0; hj < queueName.length; hj++)
+                for (let hj = 0; hj < userModule.queueName.length; hj++)
                 {
-                    if (hj !== (queueName.length - 1))
+                    if (hj !== (userModule.queueName.length - 1))
                     {
-                        temp91 += queueName[hj] + ', ';
+                        temp91 += userModule.queueName[hj] + ', ';
                     }
-                    else if (hj === (queueName.length - 1))
+                    else if (hj === (userModule.queueName.length - 1))
                     {
-                        temp91 += queueName[hj];
+                        temp91 += userModule.queueName[hj];
                     }
                 }
                 bot.speak(temp91);
@@ -3434,7 +3430,7 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/removeme$/) && roomDefaults.queue === true && isInRoom === true)
     {
-        if (typeof theUsersList[name1] == 'undefined')
+        if (typeof userModule.theUsersList[name1] == 'undefined')
         {
             if (typeof data.senderid != 'undefined')
             {
@@ -3447,32 +3443,32 @@ bot.on('pmmed', function (data)
         }
         else
         {
-            let list1 = queueList.indexOf(theUsersList[name1]);
-            let list2 = queueName.indexOf(theUsersList[name1]);
+            let list1 = userModule.queueList.indexOf(userModule.theUsersList[name1]);
+            let list2 = userModule.queueName.indexOf(userModule.theUsersList[name1]);
 
             if (list2 !== -1 && list1 !== -1)
             {
-                queueList.splice(list1, 2);
+                userModule.queueList.splice(list1, 2);
 
-                if (theUsersList[name1] === queueName[0])
+                if (userModule.theUsersList[name1] === userModule.queueName[0])
                 {
                     clearTimeout(beginTimer);
                     sayOnce = true;
                 }
-                queueName.splice(list2, 1);
+                userModule.queueName.splice(list2, 1);
 
-                if (queueName.length !== 0)
+                if (userModule.queueName.length !== 0)
                 {
                     let temp90 = 'The queue is now: ';
-                    for (let kj = 0; kj < queueName.length; kj++)
+                    for (let kj = 0; kj < userModule.queueName.length; kj++)
                     {
-                        if (kj !== (queueName.length - 1))
+                        if (kj !== (userModule.queueName.length - 1))
                         {
-                            temp90 += queueName[kj] + ', ';
+                            temp90 += userModule.queueName[kj] + ', ';
                         }
-                        else if (kj === (queueName.length - 1))
+                        else if (kj === (userModule.queueName.length - 1))
                         {
-                            temp90 += queueName[kj];
+                            temp90 += userModule.queueName[kj];
                         }
                     }
                     bot.speak(temp90);
@@ -3493,30 +3489,30 @@ bot.on('pmmed', function (data)
         if (condition === true)
         {
             let removeFromQueue = data.text.slice(18);
-            let index5 = queueList.indexOf(removeFromQueue);
-            let index6 = queueName.indexOf(removeFromQueue);
+            let index5 = userModule.queueList.indexOf(removeFromQueue);
+            let index6 = userModule.queueName.indexOf(removeFromQueue);
             if (index5 !== -1)
             {
-                if (queueName[index6] === queueName[0])
+                if (userModule.queueName[index6] === userModule.queueName[0])
                 {
                     clearTimeout(beginTimer);
                     sayOnce = true;
                 }
-                queueList.splice(index5, 2);
-                queueName.splice(index6, 1);
+                userModule.queueList.splice(index5, 2);
+                userModule.queueName.splice(index6, 1);
 
-                if (queueName.length !== 0)
+                if (userModule.queueName.length !== 0)
                 {
                     let temp89 = 'The queue is now: ';
-                    for (let jk = 0; jk < queueName.length; jk++)
+                    for (let jk = 0; jk < userModule.queueName.length; jk++)
                     {
-                        if (jk !== (queueName.length - 1))
+                        if (jk !== (userModule.queueName.length - 1))
                         {
-                            temp89 += queueName[jk] + ', ';
+                            temp89 += userModule.queueName[jk] + ', ';
                         }
-                        else if (jk === (queueName.length - 1))
+                        else if (jk === (userModule.queueName.length - 1))
                         {
-                            temp89 += queueName[jk];
+                            temp89 += userModule.queueName[jk];
                         }
                     }
                     bot.speak(temp89);
@@ -3804,18 +3800,18 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/queuewithnumbers$/) && isInRoom === true)
     {
-        if (roomDefaults.queue === true && queueName.length !== 0)
+        if (roomDefaults.queue === true && userModule.queueName.length !== 0)
         {
             let temp95 = 'The queue is now: ';
-            for (let kl = 0; kl < queueName.length; kl++)
+            for (let kl = 0; kl < userModule.queueName.length; kl++)
             {
-                if (kl !== (queueName.length - 1))
+                if (kl !== (userModule.queueName.length - 1))
                 {
-                    temp95 += queueName[kl] + ' [' + (kl + 1) + ']' + ', ';
+                    temp95 += userModule.queueName[kl] + ' [' + (kl + 1) + ']' + ', ';
                 }
-                else if (kl === (queueName.length - 1))
+                else if (kl === (userModule.queueName.length - 1))
                 {
-                    temp95 += queueName[kl] + ' [' + (kl + 1) + ']';
+                    temp95 += userModule.queueName[kl] + ' [' + (kl + 1) + ']';
                 }
             }
             bot.pm(temp95, data.senderid);
@@ -3832,18 +3828,18 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/queue$/) && isInRoom === true)
     {
-        if (roomDefaults.queue === true && queueName.length !== 0)
+        if (roomDefaults.queue === true && userModule.queueName.length !== 0)
         {
             let temp95 = 'The queue is now: ';
-            for (let kl = 0; kl < queueName.length; kl++)
+            for (let kl = 0; kl < userModule.queueName.length; kl++)
             {
-                if (kl !== (queueName.length - 1))
+                if (kl !== (userModule.queueName.length - 1))
                 {
-                    temp95 += queueName[kl] + ', ';
+                    temp95 += userModule.queueName[kl] + ', ';
                 }
-                else if (kl === (queueName.length - 1))
+                else if (kl === (userModule.queueName.length - 1))
                 {
-                    temp95 += queueName[kl];
+                    temp95 += userModule.queueName[kl];
                 }
             }
             bot.pm(temp95, data.senderid);
@@ -3893,29 +3889,29 @@ bot.on('pmmed', function (data)
         if (roomDefaults.queue === true)
         {
             let topOfQueue = data.text.slice(10);
-            let index35 = queueList.indexOf(topOfQueue);
-            let index46 = queueName.indexOf(topOfQueue);
-            let index80 = theUsersList.indexOf(topOfQueue);
-            let index81 = theUsersList[index80];
-            let index82 = theUsersList[index80 - 1];
+            let index35 = userModule.queueList.indexOf(topOfQueue);
+            let index46 = userModule.queueName.indexOf(topOfQueue);
+            let index80 = userModule.theUsersList.indexOf(topOfQueue);
+            let index81 = userModule.theUsersList[index80];
+            let index82 = userModule.theUsersList[index80 - 1];
             if (index35 !== -1 && index80 !== -1)
             {
                 clearTimeout(beginTimer);
                 sayOnce = true;
-                queueList.splice(index35, 2);
-                queueList.unshift(index81, index82);
-                queueName.splice(index46, 1);
-                queueName.unshift(index81);
+                userModule.queueList.splice(index35, 2);
+                userModule.queueList.unshift(index81, index82);
+                userModule.queueName.splice(index46, 1);
+                userModule.queueName.unshift(index81);
                 let temp92 = 'The queue is now: ';
-                for (let po = 0; po < queueName.length; po++)
+                for (let po = 0; po < userModule.queueName.length; po++)
                 {
-                    if (po !== (queueName.length - 1))
+                    if (po !== (userModule.queueName.length - 1))
                     {
-                        temp92 += queueName[po] + ', ';
+                        temp92 += userModule.queueName[po] + ', ';
                     }
-                    else if (po === (queueName.length - 1))
+                    else if (po === (userModule.queueName.length - 1))
                     {
-                        temp92 += queueName[po];
+                        temp92 += userModule.queueName[po];
                     }
                 }
                 bot.speak(temp92);
@@ -3942,10 +3938,10 @@ bot.on('pmmed', function (data)
     else if (text.match(/^\/stage/) && condition === true && isInRoom === true)
     {
         let ban = data.text.slice(8);
-        let checkUser = theUsersList.indexOf(ban) - 1;
+        let checkUser = userModule.theUsersList.indexOf(ban) - 1;
         if (checkUser !== -1)
         {
-            bot.remDj(theUsersList[checkUser]);
+            bot.remDj(userModule.theUsersList[checkUser]);
             condition = false;
         }
     }
@@ -4100,8 +4096,8 @@ bot.on('pmmed', function (data)
             let djplays = 'dj plays: ';
             for (let i = 0; i < currentDjs.length; i++)
             {
-                let djname = theUsersList.indexOf(currentDjs[i]) + 1;
-                djsnames.push(theUsersList[djname]);
+                let djname = userModule.theUsersList.indexOf(currentDjs[i]) + 1;
+                djsnames.push(userModule.theUsersList[djname]);
 
                 if (typeof djs20[currentDjs[i]] == 'undefined' && typeof currentDjs[i] != 'undefined') //if doesn't exist at this point, create it
                 {
@@ -4137,11 +4133,11 @@ bot.on('pmmed', function (data)
     {
         let ban12 = data.text.slice(11);
         let checkBan = stageList.indexOf(ban12);
-        let checkUser12 = theUsersList.indexOf(ban12);
+        let checkUser12 = userModule.theUsersList.indexOf(ban12);
         if (checkBan === -1 && checkUser12 !== -1)
         {
-            stageList.push(theUsersList[checkUser12 - 1], theUsersList[checkUser12]);
-            bot.remDj(theUsersList[checkUser12 - 1]);
+            stageList.push(userModule.theUsersList[checkUser12 - 1], userModule.theUsersList[checkUser12]);
+            bot.remDj(userModule.theUsersList[checkUser12 - 1]);
             condition = false;
         }
     }
@@ -4177,11 +4173,11 @@ bot.on('pmmed', function (data)
     {
         let ban17 = data.text.slice(6);
         let checkBan17 = blackList.indexOf(ban17);
-        let checkUser17 = theUsersList.indexOf(ban17);
+        let checkUser17 = userModule.theUsersList.indexOf(ban17);
         if (checkBan17 === -1 && checkUser17 !== -1)
         {
-            blackList.push(theUsersList[checkUser17 - 1], theUsersList[checkUser17]);
-            bot.boot(theUsersList[checkUser17 - 1]);
+            blackList.push(userModule.theUsersList[checkUser17 - 1], userModule.theUsersList[checkUser17]);
+            bot.boot(userModule.theUsersList[checkUser17 - 1]);
             condition = false;
         }
     }
@@ -4290,8 +4286,8 @@ bot.on('pmmed', function (data)
         {
             if (informTimer === null)
             {
-                let checkDjsName = theUsersList.indexOf(lastdj) + 1;
-                bot.speak('@' + theUsersList[checkDjsName] + ' your song is not the appropriate genre for this room, please skip or you will be removed in 20 seconds');
+                let checkDjsName = userModule.theUsersList.indexOf(lastdj) + 1;
+                bot.speak('@' + userModule.theUsersList[checkDjsName] + ' your song is not the appropriate genre for this room, please skip or you will be removed in 20 seconds');
                 informTimer = setTimeout(function ()
                 {
                     bot.pm('you took too long to skip your song', lastdj);
@@ -4338,7 +4334,7 @@ bot.on('pmmed', function (data)
         let bootName = data.text.slice(5); //holds their name
         let tempArray = bootName.split(" ");
         let reason = "";
-        let whatIsTheirUserid = theUsersList.indexOf(tempArray[1]);
+        let whatIsTheirUserid = userModule.theUsersList.indexOf(tempArray[1]);
         let theirName = ""; //holds the person's name
         let isNameValid; //if second param is int value this is used to hold name index        
 
@@ -4356,7 +4352,7 @@ bot.on('pmmed', function (data)
                     theirName += tempArray[gj] + " ";
                 }
 
-                isNameValid = theUsersList.indexOf(theirName.trim()); //find the index
+                isNameValid = userModule.theUsersList.indexOf(theirName.trim()); //find the index
 
                 //if the name you provided was valid
                 if (isNameValid !== -1)
@@ -4374,11 +4370,11 @@ bot.on('pmmed', function (data)
                     //in which case there would be no reason parameter                   
                     if (reason !== "")
                     {
-                        bot.boot(theUsersList[isNameValid - 1], reason);
+                        bot.boot(userModule.theUsersList[isNameValid - 1], reason);
                     }
                     else
                     {
-                        bot.boot(theUsersList[isNameValid - 1]);
+                        bot.boot(userModule.theUsersList[isNameValid - 1]);
                     }
                 }
                 else
@@ -4399,12 +4395,12 @@ bot.on('pmmed', function (data)
                 reason += tempArray[ikp] + " ";
             }
 
-            bot.boot(theUsersList[whatIsTheirUserid - 1], reason);
+            bot.boot(userModule.theUsersList[whatIsTheirUserid - 1], reason);
         }
         //if their name is a single word and no message is given it comes to here
         else if (whatIsTheirUserid !== -1)
         {
-            bot.boot(theUsersList[whatIsTheirUserid - 1]);
+            bot.boot(userModule.theUsersList[whatIsTheirUserid - 1]);
         }
         else
         {
@@ -4414,40 +4410,40 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/afk/) && isInRoom === true)
     {
-        let isUserAfk = theUsersList.indexOf(data.senderid) + 1;
-        let isAlreadyAfk = afkPeople.indexOf(theUsersList[isUserAfk]);
+        let isUserAfk = userModule.theUsersList.indexOf(data.senderid) + 1;
+        let isAlreadyAfk = userModule.afkPeople.indexOf(userModule.theUsersList[isUserAfk]);
         if (isAlreadyAfk === -1)
         {
-            if (typeof theUsersList[isUserAfk] == 'undefined')
+            if (typeof userModule.theUsersList[isUserAfk] == 'undefined')
             {
                 bot.pm('failed to add to the afk list, please try the command again', data.senderid);
             }
             else
             {
                 bot.pm('you are marked as afk', data.senderid);
-                afkPeople.push(theUsersList[isUserAfk]);
+                userModule.afkPeople.push(userModule.theUsersList[isUserAfk]);
             }
         }
         else if (isAlreadyAfk !== -1)
         {
             bot.pm('you are no longer afk', data.senderid);
-            afkPeople.splice(isAlreadyAfk, 1);
+            userModule.afkPeople.splice(isAlreadyAfk, 1);
         }
     }
     else if (text.match(/^\/whosafk/) && isInRoom === true)
     {
-        if (afkPeople.length !== 0)
+        if (userModule.afkPeople.length !== 0)
         {
             let whosAfk = 'marked as afk: ';
-            for (let f = 0; f < afkPeople.length; f++)
+            for (let f = 0; f < userModule.afkPeople.length; f++)
             {
-                if (f !== (afkPeople.length - 1))
+                if (f !== (userModule.afkPeople.length - 1))
                 {
-                    whosAfk = whosAfk + afkPeople[f] + ', ';
+                    whosAfk = whosAfk + userModule.afkPeople[f] + ', ';
                 }
                 else
                 {
-                    whosAfk = whosAfk + afkPeople[f];
+                    whosAfk = whosAfk + userModule.afkPeople[f];
                 }
             }
             bot.pm(whosAfk, data.senderid);
@@ -4495,15 +4491,15 @@ bot.on('roomChanged', function (data)
     {
         //reset arrays in case this was triggered by the bot restarting   
         escortList = [];
-        theUsersList = [];
+        userModule.resetUsersList(bot);
         moderatorModule.resetModList(bot);
         currentDjs = [];
         userIds = [];
-        queueList = [];
-        queueName = [];
+        userModule.resetQueueList(bot);
+        userModule.resetQueueNames(bot);
         people = [];
         myTime = [];
-        afkPeople = [];
+        userModule.resetAFKPeople(bot);
         lastSeen = {};
         lastSeen1 = {};
         lastSeen2 = {};
@@ -4563,7 +4559,7 @@ bot.on('roomChanged', function (data)
         {
             if (typeof data.users[i] !== 'undefined')
             {
-                theUsersList.push(data.users[i].userid, data.users[i].name);
+                userModule.theUsersList.push(data.users[i].userid, data.users[i].name);
                 userIds.push(data.users[i].userid);
             }
         }
@@ -4621,7 +4617,7 @@ bot.on('registered', function (data)
     //gets newest user and prints greeting, does not greet the bot or the ttstats bot, or banned users
     let roomjoin = data.user[0];
     let areTheyBanned = blackList.indexOf(data.user[0].userid);
-    let areTheyBanned2 = userDefaults.bannedUsers.indexOf(data.user[0].userid);
+    let areTheyBanned2 = userModule.bannedUsers.indexOf(data.user[0].userid);
     if (roomDefaults.GREET === true && data.user[0].userid !== authModule.USERID && !data.user[0].name.match('@ttstat'))
     {
         if (areTheyBanned === -1 && areTheyBanned2 === -1)
@@ -4701,12 +4697,12 @@ bot.on('registered', function (data)
 
 
     //adds users who join the room to the user list if their not already on the list
-    let checkList = theUsersList.indexOf(data.user[0].userid);
+    let checkList = userModule.theUsersList.indexOf(data.user[0].userid);
     if (checkList === -1)
     {
         if (typeof data.user[0] !== 'undefined')
         {
-            theUsersList.push(data.user[0].userid, data.user[0].name);
+            userModule.theUsersList.push(data.user[0].userid, data.user[0].name);
         }
     }
 
@@ -4723,9 +4719,9 @@ bot.on('registered', function (data)
 
 
     //checks manually added users
-    for (let z = 0; z < userDefaults.bannedUsers.length; z++)
+    for (let z = 0; z < userModule.bannedUsers.length; z++)
     {
-        if (userDefaults.bannedUsers[z].match(roomjoin.userid))
+        if (userModule.bannedUsers[z].match(roomjoin.userid))
         {
             bot.bootUser(roomjoin.userid, 'You are on the banlist.');
             break;
@@ -4752,52 +4748,8 @@ bot.on('registered', function (data)
 });
 
 
-
-bot.on('update_user', function (data)
-{
-    if (typeof data.name === 'string')
-    {
-        let oldname = ''; //holds users old name if exists
-        let queueNamePosition;
-        let queueListPosition;
-        let afkPeoplePosition;
-
-        //when when person updates their profile
-        //and their name is not found in the users list then they must have changed
-        //their name   
-        if (theUsersList.indexOf(data.name) === -1)
-        {
-            let nameIndex = theUsersList.indexOf(data.userid);
-            if (nameIndex !== -1) //if their userid was found in theUsersList
-            {
-                oldname = theUsersList[nameIndex + 1];
-                theUsersList[nameIndex + 1] = data.name;
-
-                if (typeof oldname !== 'undefined')
-                {
-                    queueNamePosition = queueName.indexOf(oldname);
-                    queueListPosition = queueList.indexOf(oldname);
-                    afkPeoplePosition = afkPeople.indexOf(oldname);
-
-
-                    if (queueNamePosition !== -1) //if they were in the queue when they changed their name, then replace their name
-                    {
-                        queueName[queueNamePosition] = data.name;
-                    }
-
-                    if (queueListPosition !== -1) //this is also for the queue
-                    {
-                        queueList[queueListPosition] = data.name;
-                    }
-
-                    if (afkPeoplePosition !== -1) //this checks the afk list
-                    {
-                        afkPeople[afkPeoplePosition] = data.name;
-                    }
-                }
-            }
-        }
-    }
+bot.on('update_user', function (data) {
+    userModule.updateUser(data);
 })
 
 //updates the moderator list when a moderator is added.
@@ -4836,13 +4788,13 @@ bot.on('deregistered', function (data)
 
 
     //removes people who leave the room from the afk list
-    if (afkPeople.length !== 0)
+    if (userModule.afkPeople.length !== 0)
     {
         let userName = data.user[0].name;
-        let checkUserName = afkPeople.indexOf(data.user[0].name);
+        let checkUserName = userModule.afkPeople.indexOf(data.user[0].name);
         if (checkUserName !== -1)
         {
-            afkPeople.splice(checkUserName, 1);
+            userModule.afkPeople.splice(checkUserName, 1);
         }
     }
 
@@ -4854,7 +4806,7 @@ bot.on('deregistered', function (data)
 
         if (areTheyStillInModpm !== -1)
         {
-            let whatIsTheirName = theUsersList.indexOf(data.user[0].userid);
+            let whatIsTheirName = userModule.theUsersList.indexOf(data.user[0].userid);
             modpm.splice(areTheyStillInModpm, 1);
 
             if (whatIsTheirName !== -1)
@@ -4863,7 +4815,7 @@ bot.on('deregistered', function (data)
                 {
                     if (typeof modpm[hg] !== 'undefined' && modpm[hg] !== data.user[0].userid)
                     {
-                        bot.pm(theUsersList[whatIsTheirName + 1] + ' has left the modpm chat', modpm[hg]);
+                        bot.pm(userModule.theUsersList[whatIsTheirName + 1] + ' has left the modpm chat', modpm[hg]);
                     }
                 }
             }
@@ -4873,12 +4825,12 @@ bot.on('deregistered', function (data)
 
     //updates the users list when a user leaves the room.
     let user = data.user[0].userid;
-    let checkLeave = theUsersList.indexOf(data.user[0].userid);
+    let checkLeave = userModule.theUsersList.indexOf(data.user[0].userid);
     let checkUserIds = userIds.indexOf(data.user[0].userid);
 
     if (checkLeave !== -1 && checkUserIds !== -1)
     {
-        theUsersList.splice(checkLeave, 2);
+        userModule.theUsersList.splice(checkLeave, 2);
         userIds.splice(checkUserIds, 1);
     }
 })
@@ -4907,22 +4859,22 @@ bot.on('endsong', function (data)
             {
                 if (djId === currentDjs[0] && roomDefaults.playLimit === 1) //if person is in the far left seat and limit is set to one
                 {
-                    let checklist33 = theUsersList.indexOf(djId) + 1;
+                    let checklist33 = userModule.theUsersList.indexOf(djId) + 1;
 
                     if (checklist33 !== -1)
                     {
-                        bot.speak('@' + theUsersList[checklist33] + ' you are over the playlimit of ' + roomDefaults.playLimit + ' song');
+                        bot.speak('@' + userModule.theUsersList[checklist33] + ' you are over the playlimit of ' + roomDefaults.playLimit + ' song');
                     }
 
                     bot.remDj(djId);
                 }
                 else if (djId !== authModule.USERID && roomDefaults.playLimit !== 1) //if limit is more than one
                 {
-                    let checklist33 = theUsersList.indexOf(djId) + 1;
+                    let checklist33 = userModule.theUsersList.indexOf(djId) + 1;
 
                     if (checklist33 !== -1)
                     {
-                        bot.speak('@' + theUsersList[checklist33] + ' you are over the playlimit of ' + roomDefaults.playLimit + ' songs');
+                        bot.speak('@' + userModule.theUsersList[checklist33] + ' you are over the playlimit of ' + roomDefaults.playLimit + ' songs');
                     }
 
                     bot.remDj(djId);
@@ -4937,12 +4889,12 @@ bot.on('endsong', function (data)
     {
         if (typeof escortList[i] !== 'undefined' && data.room.metadata.current_dj === escortList[i])
         {
-            let lookname = theUsersList.indexOf(data.room.metadata.current_dj) + 1;
+            let lookname = userModule.theUsersList.indexOf(data.room.metadata.current_dj) + 1;
             bot.remDj(escortList[i]);
 
             if (lookname !== -1)
             {
-                bot.speak('@' + theUsersList[lookname] + ' had enabled escortme');
+                bot.speak('@' + userModule.theUsersList[lookname] + ' had enabled escortme');
             }
 
             let removeFromList = escortList.indexOf(escortList[i]);
