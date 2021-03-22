@@ -20,7 +20,7 @@ module.exports = {
     whatIsTheme: null, //this holds a string which is set by the /setTheme command
 
 
-    joinRoom: function (data, bot) {
+    userJoinsRoom: function (data, bot) {
         //if there are 5 dj's on stage and the queue is turned on when a user enters the room
         if (this.queue === true && userModule.currentDJs.length === 5) {
             bot.pm('The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.', data.user[0].userid);

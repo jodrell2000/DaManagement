@@ -1,7 +1,8 @@
+let responseModule = require('../chatbot/responseModule.js');
 let thisMsgText = 'Hey! How are you @';
 
 module.exports = {
-    buildMessage: function(count) {
-        return count+': '+thisMsgText;
+    buildMessage: function() {
+        return responseModule.responseCount+': '+thisMsgText;
     }
 }

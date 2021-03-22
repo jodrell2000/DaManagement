@@ -15,6 +15,6 @@ bot.on('speak', function (data) {
   // Respond to "/hello" command
   if (text.match(/^\/hello$/)) {
     responseModule.responseCount ++;
-    bot.speak(chatModule.buildMessage(responseModule.responseCount)+name);
+    bot.speak(chatModule.buildMessage()+name);
   }
 });
