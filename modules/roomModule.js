@@ -1,6 +1,7 @@
 let afkModule = require('../modules/afkModule.js');
 let userModule = require('../modules/userModule.js');
 let authModule = require('../auth.js');
+let chatModule = require('../modules/chatModule.js');
 
 module.exports = {
     roomName: null, //the name of the room, example "straight chillin" would be the format for the straight chillin room...
@@ -27,7 +28,6 @@ module.exports = {
         }
         
         //gets newest user and prints greeting, does not greet the bot or the ttstats bot, or banned users
-        bot.speak("debug+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
         let roomjoin = data.user[0];
         let areTheyBanned = this.blackList.indexOf(data.user[0].userid);
         let areTheyBanned2 = userModule.bannedUsers.indexOf(data.user[0].userid);
@@ -37,46 +37,14 @@ module.exports = {
                     clearTimeout(this.greetingTimer[data.user[0].userid]);
                     this.greetingTimer[data.user[0].userid] = null;
                 }
-                this.greetingTimer[data.user[0].userid] = setTimeout(function () {
+                this.greetingTimer[data.user[0].userid] = setTimeout(function() {
                     this.greetingTimer[data.user[0].userid] = null;
-                    if (this.roomJoinMessage !== '') //if your not using the default greeting
-                    {
-                        if (this.theme === false) //if theres no theme this is the message.
-                        {
-                            if (this.greetThroughPm === false) //if your not sending the message through the pm
-                            {
-                                bot.speak('@' + roomjoin.name + ', ' + this.roomJoinMessage);
-                            } else {
-                                bot.pm(this.roomJoinMessage, roomjoin.userid);
-                            }
-                        } else {
-                            if (this.greetThroughPm === false) {
-                                bot.speak('@' + roomjoin.name + ', ' + this.roomJoinMessage + '; The theme is currently set to: ' + this.whatIsTheme);
-                            } else {
-                                bot.pm(this.roomJoinMessage + '; The theme is currently set to: ' + this.whatIsTheme, roomjoin.userid);
-                            }
-                        }
-                    } else {
-                        if (this.theme === false) //if theres no theme this is the message.
-                        {
-                            if (this.greetThroughPm === false) {
-                                bot.speak('Welcome to ' + this.roomName + ' @' + roomjoin.name + ', enjoy your stay!');
-                            } else {
-                                bot.pm('Welcome to ' + this.roomName + ' @' + roomjoin.name + ', enjoy your stay!', roomjoin.userid);
-                            }
-                        } else {
-                            if (this.greetThroughPm === false) {
-                                bot.speak('Welcome to ' + this.roomName + ' @' + roomjoin.name + ', the theme is currently set to: ' + this.whatIsTheme);
-                            } else {
-                                bot.pm('Welcome to ' + this.roomName + ' @' + roomjoin.name + ', the theme is currently set to: ' + this.whatIsTheme, roomjoin.userid);
-                            }
-                        }
-                    }
+                    chatModule.userGreeting(bot, data)
                     delete this.greetingTimer[data.user[0].userid];
                 }, 3 * 1000);
             }
         }
-        
+
         //starts time for everyone that joins the room
         userModule.myTime[data.user[0].userid] = Date.now();
         
