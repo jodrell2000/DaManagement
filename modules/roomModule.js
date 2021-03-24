@@ -33,14 +33,21 @@ module.exports = {
         let areTheyBanned2 = userModule.bannedUsers.indexOf(data.user[0].userid);
         if (this.greet === true && data.user[0].userid !== authModule.USERID && !data.user[0].name.match('@ttstat')) {
             if (areTheyBanned === -1 && areTheyBanned2 === -1) {
-                if (this.greetingTimer[data.user[0].userid] !== null) {
-                    clearTimeout(this.greetingTimer[data.user[0].userid]);
-                    this.greetingTimer[data.user[0].userid] = null;
+                const greetingTimers = this.greetingTimer;
+                const userId = data.user[0].userid;
+                
+                // if there's a timeout function waiting to be called for 
+                // this user, cancel it.
+                if (greetingTimers[userId] !== null) {
+                    clearTimeout(greetingTimers[userId]);
+                    delete greetingTimers[userId];
                 }
-                this.greetingTimer[data.user[0].userid] = setTimeout(function() {
-                    this.greetingTimer[data.user[0].userid] = null;
+                
+                greetingTimers[userId] = setTimeout(function() {
                     chatModule.userGreeting(bot, data)
-                    delete this.greetingTimer[data.user[0].userid];
+         
+                    // remove timeout function from the list of timeout functions
+                    delete greetingTimers[userId];
                 }, 3 * 1000);
             }
         }
