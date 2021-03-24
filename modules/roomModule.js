@@ -27,6 +27,7 @@ module.exports = {
         }
         
         //gets newest user and prints greeting, does not greet the bot or the ttstats bot, or banned users
+        bot.speak("debug+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
         let roomjoin = data.user[0];
         let areTheyBanned = this.blackList.indexOf(data.user[0].userid);
         let areTheyBanned2 = userModule.bannedUsers.indexOf(data.user[0].userid);

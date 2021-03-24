@@ -4593,7 +4593,7 @@ bot.on('roomChanged', function (data)
 
 //starts up when a new person joins the room
 bot.on('registered', function (data) {
-    roomModule.joinRoom(data, bot)
+    roomModule.userJoinsRoom(data, bot)
 });
 
 

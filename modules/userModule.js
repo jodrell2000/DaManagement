@@ -174,7 +174,7 @@ module.exports = {
         //updates the users list when a user leaves the room.
         let user = data.user[0].userid;
         let checkLeave = this.theUsersList.indexOf(data.user[0].userid);
-        let checkUserIds = this.userIds.indexOf(data.user[0].userid);
+        let checkUserIds = this.userIDs.indexOf(data.user[0].userid);
 
         if (checkLeave !== -1 && checkUserIds !== -1)
         {
