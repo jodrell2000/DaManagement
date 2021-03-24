@@ -1,38 +1,38 @@
-let roomModule = require('../modules/roomModule.js')
+let roomDefaults = require('../defaultSettings/roomDefaults.js');
 
 module.exports = {
     userGreeting: function (bot, data) {
         let roomjoin = data.user[0];
-        if (roomModule.roomJoinMessage !== '') //if your not using the default greeting
+        if (roomDefaults.roomJoinMessage !== '') //if your not using the default greeting
         {
-            if (roomModule.theme === false) //if theres no theme this is the message.
+            if (roomDefaults.theme === false) //if theres no theme this is the message.
             {
-                if (roomModule.greetThroughPm === false) //if your not sending the message through the pm
+                if (roomDefaults.greetThroughPm === false) //if your not sending the message through the pm
                 {
-                    bot.speak('@' + roomjoin.name + ', ' + roomModule.roomJoinMessage);
+                    bot.speak('@' + roomjoin.name + ', ' + roomDefaults.roomJoinMessage);
                 } else {
-                    bot.pm(roomModule.roomJoinMessage, roomjoin.userid);
+                    bot.pm(roomDefaults.roomJoinMessage, roomjoin.userid);
                 }
             } else {
                 if (this.greetThroughPm === false) {
-                    bot.speak('@' + roomjoin.name + ', ' + roomModule.roomJoinMessage + '; The theme is currently set to: ' + roomModule.whatIsTheme);
+                    bot.speak('@' + roomjoin.name + ', ' + roomDefaults.roomJoinMessage + '; The theme is currently set to: ' + roomDefaults.whatIsTheme);
                 } else {
-                    bot.pm(roomModule.roomJoinMessage + '; The theme is currently set to: ' + roomModule.whatIsTheme, roomjoin.userid);
+                    bot.pm(roomDefaults.roomJoinMessage + '; The theme is currently set to: ' + roomDefaults.whatIsTheme, roomjoin.userid);
                 }
             }
         } else {
             if (this.theme === false) //if theres no theme this is the message.
             {
-                if (roomModule.greetThroughPm === false) {
-                    bot.speak('Welcome to ' + roomModule.roomName + ' @' + roomjoin.name + ', enjoy your stay!');
+                if (roomDefaults.greetThroughPm === false) {
+                    bot.speak('Welcome to ' + roomDefaults.roomName + ' @' + roomjoin.name + ', enjoy your stay!');
                 } else {
-                    bot.pm('Welcome to ' + roomModule.roomName + ' @' + roomjoin.name + ', enjoy your stay!', roomjoin.userid);
+                    bot.pm('Welcome to ' + roomDefaults.roomName + ' @' + roomjoin.name + ', enjoy your stay!', roomjoin.userid);
                 }
             } else {
-                if (roomModule.greetThroughPm === false) {
-                    bot.speak('Welcome to ' + roomModule.roomName + ' @' + roomjoin.name + ', the theme is currently set to: ' + roomModule.whatIsTheme);
+                if (roomDefaults.greetThroughPm === false) {
+                    bot.speak('Welcome to ' + roomDefaults.roomName + ' @' + roomjoin.name + ', the theme is currently set to: ' + roomDefaults.whatIsTheme);
                 } else {
-                    bot.pm('Welcome to ' + roomModule.roomName + ' @' + roomjoin.name + ', the theme is currently set to: ' + roomModule.whatIsTheme, roomjoin.userid);
+                    bot.pm('Welcome to ' + roomDefaults.roomName + ' @' + roomjoin.name + ', the theme is currently set to: ' + roomDefaults.whatIsTheme, roomjoin.userid);
                 }
             }
         }

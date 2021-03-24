@@ -1,51 +1,36 @@
+let roomDefaults = require('../defaultSettings/roomDefaults.js');
+
 let afkModule = require('../modules/afkModule.js');
 let userModule = require('../modules/userModule.js');
 let authModule = require('../auth.js');
 let chatModule = require('../modules/chatModule.js');
 
 module.exports = {
-    roomName: null, //the name of the room, example "straight chillin" would be the format for the straight chillin room...
-
-    queue: true, //queue(on by default)
-    
-    greet: true, //room greeting when someone joins the room(on by default)
-    greetThroughPm: false, //choose whether greeting message is through the pm or the chatbox(false = chatbox, true = pm), (only works when greeting message is turned on) (off by default)
-    greetingTimer: [], //holds the timeout for people that join the room, if someone rejoins before their timeout completes their timer is reset
-    roomJoinMessage: '', //the message users will see when they join the room, leave it empty for the default message (only works when greet is turned on)
-
-    blackList: [], //holds the userid of everyone who is in the command based banned from the room list
-
-    kickTTSTAT: false, //kicks the ttstats bot when it tries to join the room(off by default)
-
-    theme: false, //has a current theme been set? true or false. handled by commands
-    whatIsTheme: null, //this holds a string which is set by the /setTheme command
-
-
     userJoinsRoom: function (data, bot) {
         //if there are 5 dj's on stage and the queue is turned on when a user enters the room
-        if (this.queue === true && userModule.currentDJs.length === 5) {
+        if (roomDefaults.queue === true && userModule.currentDJs.length === 5) {
             bot.pm('The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.', data.user[0].userid);
         }
         
         //gets newest user and prints greeting, does not greet the bot or the ttstats bot, or banned users
         let roomjoin = data.user[0];
-        let areTheyBanned = this.blackList.indexOf(data.user[0].userid);
+        let areTheyBanned = roomDefaults.blackList.indexOf(data.user[0].userid);
         let areTheyBanned2 = userModule.bannedUsers.indexOf(data.user[0].userid);
-        if (this.greet === true && data.user[0].userid !== authModule.USERID && !data.user[0].name.match('@ttstat')) {
+        if (roomDefaults.greet === true && data.user[0].userid !== authModule.USERID && !data.user[0].name.match('@ttstat')) {
             if (areTheyBanned === -1 && areTheyBanned2 === -1) {
-                const greetingTimers = this.greetingTimer;
+                const greetingTimers = roomDefaults.greetingTimer;
                 const userId = data.user[0].userid;
-                
-                // if there's a timeout function waiting to be called for 
+
+                // if there's a timeout function waiting to be called for
                 // this user, cancel it.
                 if (greetingTimers[userId] !== null) {
                     clearTimeout(greetingTimers[userId]);
                     delete greetingTimers[userId];
                 }
-                
+
                 greetingTimers[userId] = setTimeout(function() {
                     chatModule.userGreeting(bot, data)
-         
+
                     // remove timeout function from the list of timeout functions
                     delete greetingTimers[userId];
                 }, 3 * 1000);
@@ -69,8 +54,8 @@ module.exports = {
         }
         
         //checks to see if user is on the banlist, if they are they are booted from the room.
-        for (let i = 0; i < this.blackList.length; i++) {
-            if (roomjoin.userid === this.blackList[i]) {
+        for (let i = 0; i < roomDefaults.blackList.length; i++) {
+            if (roomjoin.userid === roomDefaults.blackList[i]) {
                 bot.bootUser(roomjoin.userid, 'You are on the banlist.');
                 break;
             }
@@ -91,7 +76,7 @@ module.exports = {
         }
         
         //this kicks the ttstats bot
-        if (this.kickTTSTAT === true) {
+        if (roomDefaults.kickTTSTAT === true) {
             if (data.user[0].name.match('@ttstat')) {
                 bot.boot(data.user[0].userid);
             }
