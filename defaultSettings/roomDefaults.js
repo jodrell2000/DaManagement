@@ -61,4 +61,6 @@ module.exports = {
     theme: false, //has a current theme been set? true or false. handled by commands
     whatIsTheme: null, //this holds a string which is set by the /setTheme command
 
+    errorMessage: null, //the error message you get when trying to connect to the room
+
 }

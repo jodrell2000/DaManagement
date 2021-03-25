@@ -13,6 +13,7 @@ let botDefaults = require('./defaultSettings/botDefaults.js');
 let roomDefaults = require('./defaultSettings/roomDefaults.js');
 let musicDefaults = require('./defaultSettings/musicDefaults.js');
 
+let botModule = require('./modules/botModule.js');
 let afkModule = require('./modules/afkModule.js');
 let moderatorModule = require('./modules/moderatorModule.js');
 let userModule = require('./modules/userModule.js');
@@ -33,20 +34,15 @@ let index = null; //the index returned when using unban commands
 let skipOn = null; //if true causes the bot to skip every song it plays, toggled on and off by commands
 let checkWhoIsDj = null; //the userid of the currently playing dj
 let randomOnce = 0; //a flag used to check if the /randomSong command has already been activated, 0 is no, 1 is yes
-let voteCountSkip = 0; //the current amount of votes for a song skip, gets reset every song
-let votesLeft = roomDefaults.HowManyVotesToSkip; //a countdown of the amount of votes needed till a song gets skipped
 let sayOnce = true; //makes it so that the queue timeout can only be used once per per person, stops the bot from spamming
 let informTimer = null; //holds the timeout for the /inform command, null lets it know that it hasn't already been set
 let beginTime = null; //the current time in milliseconds when the bot has started, used for the /uptime
 let endTime = null; //the current time in milliseconds when the /uptime is actually used
 let messageCounter = 0; //this is for the array of messages, it lets it know which message it is currently on, resets to 0 after cycling through all of them
-let ALLREADYCALLED = false; //resets votesnagging so that it can be called again
 let netwatchdogTimer = null; // Used to detect internet connection dropping out
-let checkActivity = Date.now();
 let attemptToReconnect = null; //used for reconnecting to the bots room if its not in there (only works if internet connection is working)
 let returnToRoom = true; //used to toggle on and off the bot reconnecting to its room(it toggles off when theres no internet connection because it only works when its connected to turntable.fm)
 let wserrorTimeout = null; //this is for the setTimeout in ws error
-let errorMessage = null; //the error message you get when trying to connect to the room
 let bannedArtistsMatcher; //holds the regular expression for banned artist / song matching
 let autoDjingTimer = null; //governs the timer for the bot's auto djing
 
@@ -73,85 +69,7 @@ bot.on('disconnected', function (data) {
 
 });
 
-
-
-let checkIfConnected = function ()
-{
-    if (attemptToReconnect === null) //if a reconnection attempt is already in progress, do not attempt it
-    {
-        if (bot._isAuthenticated) // if bot is actually connected to turntable use the speaking method
-        {
-            let currentActivity = (Date.now() - checkActivity) / 1000 / 60;
-
-            if (currentActivity > 30) //if greater than 30 minutes of no talking
-            {
-                bot.speak('ping', function (callback) //attempt to talk
-                    {
-                        if (callback.success === false) //if it fails
-                        {
-                            attempToReconnect();
-                        }
-                    });
-            }
-        }
-        else //else attempt to reconnect right away
-        {
-            attempToReconnect();
-        }
-    }
-};
-
-setInterval(checkIfConnected, 5000);
-
-
-
-//makes the bot attempt to reconnect to the room
-
-function attempToReconnect()
-{
-    attemptToReconnect = setInterval(function ()
-    {
-        if (bot._isAuthenticated)
-        {
-            whichMessage = true;
-            console.log('it looks like your bot is not in it\'s room. attempting to reconnect now....');
-        }
-        else
-        {
-            whichMessage = false;
-            console.log('connection with turntable lost, waiting for connection to come back...');
-        }
-
-        bot.roomRegister(authModule.ROOMID, function (data)
-        {
-            if (data.success === true)
-            {
-                errorMessage = null;
-                clearInterval(attemptToReconnect);
-                attemptToReconnect = null;
-                checkActivity = Date.now();
-
-                if (whichMessage)
-                {
-                    console.log('the bot has reconnected to the room ' +
-                        'specified by your choosen roomid');
-                }
-                else
-                {
-                    console.log('connection with turntable is back!');
-                }
-            }
-            else
-            {
-                if (errorMessage === null && typeof data.err === 'string')
-                {
-                    errorMessage = data.err;
-                }
-            }
-        });
-    }, 1000 * 10);
-}
-
+setInterval(botModule.checkIfConnected(bot), 5000);
 
 //whichFunction represents which justSaw object do you want to access
 //num is the time in minutes till afk timeout
@@ -799,13 +717,13 @@ bot.on('newsong', function (data)
     // bot.speak("entered newsong");
 
     //resets counters and array for vote skipping
-    checkVotes = [];
-    voteCountSkip = 0;
-    votesLeft = roomDefaults.HowManyVotesToSkip;
-    songModule.resetWhoSnagged(data);
-    songModule.resetUpVotes(data);
-    songModule.resetDownVotes(data);
-    ALLREADYCALLED = false; //resets votesnagging so that it can be called again
+    songModule.resetCheckVotes();
+    songModule.resetVoteCountSkip();
+    songModule.resetVotesLeft(roomDefaults.HowManyVotesToSkip);
+    songModule.resetWhoSnagged();
+    songModule.resetUpVotes();
+    songModule.resetDownVotes();
+    songModule.resetVoteSnagging();
 
 
     //procedure for getting song tags
@@ -957,7 +875,7 @@ bot.on('speak', function (data)
 {
     let text = data.text; //the most recent text in the chatbox on turntable
     name = data.name; //name of latest person to say something
-    checkActivity = Date.now(); //update when someone says something
+    botModule.recordActivity();
 
     checkIfUserIsMod(data.userid); //check to see if speaker is a moderator or not
 
@@ -1288,8 +1206,8 @@ bot.on('speak', function (data)
         {
             bot.speak("vote skipping is now active, current votes needed to pass " + "the vote is " + roomDefaults.HowManyVotesToSkip);
             musicDefaults.voteSkip = true;
-            voteCountSkip = 0;
-            votesLeft = roomDefaults.HowManyVotesToSkip;
+            songModule.resetVoteCountSkip();
+            songModule.votesLeft = roomDefaults.HowManyVotesToSkip;
         }
     }
     else if (text.match(/^\/noTheme/) && condition === true)
@@ -1318,8 +1236,8 @@ bot.on('speak', function (data)
     {
         bot.speak("vote skipping is now inactive");
         musicDefaults.voteSkip = false;
-        voteCountSkip = 0;
-        votesLeft = roomDefaults.HowManyVotesToSkip;
+        songModule.resetVoteCountSkip();
+        songModule.votesLeft = roomDefaults.HowManyVotesToSkip;
     }
     else if (text.match(/^\/skip$/) && musicDefaults.voteSkip === true) //if command matches and voteskipping is enabled
     {
@@ -1329,18 +1247,18 @@ bot.on('speak', function (data)
 
         if ((checkIfOnList === -1 || isMaster) && data.userid !== authModule.USERID) //if command user has not voted and command user is not the bot
         {
-            voteCountSkip += 1; //add one to the total count of votes for the current song to be skipped
-            votesLeft -= 1; //decrement votes left by one (the votes remaining till the song will be skipped)
+            songModule.addToVoteCountSkip(); //add one to the total count of votes for the current song to be skipped
+            songModule.votesLeft -= 1; //decrement votes left by one (the votes remaining till the song will be skipped)
             checkVotes.unshift(data.userid); //add them to an array to make sure that they can't vote again this song
 
             let findLastDj = userModule.theUsersList.indexOf(lastdj); //the index of the currently playing dj's userid in the theUser's list
-            if (votesLeft !== 0 && checkIfMaster === -1) //if votesLeft has not reached zero and the current dj is not on the master id's list
+            if (songModule.votesLeft !== 0 && checkIfMaster === -1) //if votesLeft has not reached zero and the current dj is not on the master id's list
             {
                 //the bot will say the following
-                bot.speak("Current Votes for a song skip: " + voteCountSkip +
+                bot.speak("Current Votes for a song skip: " + songModule.voteCountSkip +
                     " Votes needed to skip the song: " + roomDefaults.HowManyVotesToSkip);
             }
-            if (votesLeft === 0 && checkIfMaster === -1 && !isNaN(roomDefaults.HowManyVotesToSkip)) //if there are no votes left and the current dj is not on the master list and the
+            if (songModule.votesLeft === 0 && checkIfMaster === -1 && !isNaN(roomDefaults.HowManyVotesToSkip)) //if there are no votes left and the current dj is not on the master list and the
             { //the amount of votes set was a valid number
                 bot.speak("@" + userModule.theUsersList[findLastDj + 1] + " you have been voted off stage");
                 bot.remDj(lastdj); //remove the current dj and display the above message
@@ -2643,34 +2561,25 @@ bot.on('speak', function (data)
     }
 });
 
-
-
 //checks who voted and updates their position on the afk list.
 bot.on('update_votes', function (data)
 {
     songModule.recordUpVotes(data);
     songModule.recordDownVotes(data);
-
     afkModule.updateAfkPostionOfUser(data.room.metadata.votelog[0][0]); //update the afk position of people who vote for a song
 
-
     //this is for /autosnag, automatically adds songs that get over the awesome threshold
-    //thanks to alain gilbert for playlist pre - testing, snag animation only when song not
-    //already in playlist
-    if (botDefaults.autoSnag === true && songModule.snagSong === false && upVotes >=  botDefaults.howManyVotes && ALLREADYCALLED === false)
+    if (botDefaults.autoSnag === true && songModule.snagSong === false && songModule.upVotes >=  botDefaults.howManyVotes && songModule.ALLREADYCALLED === false)
     {
-        ALLREADYCALLED = true; //this makes it so that it can only be called once per song
-
+        songModule.voteSnagged();
         addSongIfNotAlreadyInPlaylist(true);
     }
 })
 
-
-
 //checks who added a song and updates their position on the afk list.
 bot.on('snagged', function (data)
 {
-    songModule.voteSnagged(data);
+    songModule.voteSnagged();
     afkModule.updateAfkPostionOfUser(data.userid); //update the afk position of people who add a song to their queue
 })
 
@@ -3711,8 +3620,8 @@ bot.on('pmmed', function (data)
     {
         bot.pm("vote skipping is now inactive", data.senderid);
         musicDefaults.voteSkip = false;
-        voteCountSkip = 0;
-        votesLeft = roomDefaults.HowManyVotesToSkip;
+        songModule.resetVoteCountSkip();
+        songModule.votesLeft = roomDefaults.HowManyVotesToSkip;
     }
     else if (text.match(/^\/mytime/) && isInRoom === true)
     {
@@ -3765,8 +3674,8 @@ bot.on('pmmed', function (data)
         {
             bot.pm("vote skipping is now active, current votes needed to pass " + "the vote is " + roomDefaults.HowManyVotesToSkip, data.senderid);
             musicDefaults.voteSkip = true;
-            voteCountSkip = 0;
-            votesLeft = roomDefaults.HowManyVotesToSkip;
+            songModule.resetVoteCountSkip();
+            songModule.votesLeft = roomDefaults.HowManyVotesToSkip;
         }
     }
     else if (text.match(/^\/queuewithnumbers$/) && isInRoom === true)
