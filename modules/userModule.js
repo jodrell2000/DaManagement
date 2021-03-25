@@ -11,12 +11,6 @@ module.exports = {
     timer: [], //holds the timeout of everyone who has been spamming the stage, resets their spam count if their timer completes
     myID: null, //the userid of the person using the /fanme command, speak event only
 
-    lastSeen: {}, //holds a date object to be used for the dj afk timer, there are different ones because they have different timeouts
-    lastSeen1: {}, //holds a date object to be used for the dj afk timer
-    lastSeen2: {}, //holds a date object to be used for the dj afk timer
-    lastSeen3: {}, //holds a date object to be used for the audience afk limit
-    lastSeen4: {}, //holds a date object to be used for the audience afk limit
-
     bannedUsers: ['636473737373', 'bob', '535253533353', 'joe'], //banned users list, put userids in string form here for permanent banning(put their name after their userid to tell who is banned).
     bannedFromStage: ['636473737373', 'bob', '535253533353', 'joe'], //put userids in here to ban from djing permanently(put their name after their userid to tell who is banned)
     vipList: [],
@@ -97,15 +91,6 @@ module.exports = {
         bot.speak("I've reset the DJ Song count");
     },
 
-    resetLastSeen: function () {
-        this.lastSeen = {};
-        this.lastSeen1 = {};
-        this.lastSeen2 = {};
-        this.lastSeen3 = {};
-        this.lastSeen4 = {};
-    },
-
-
     updateUser: function (data) {
         if (typeof data.name === 'string') {
             let oldname = ''; //holds users old name if exists
@@ -172,7 +157,6 @@ module.exports = {
         //removes people who leave the room from the afk list
         if (this.afkPeople.length !== 0)
         {
-            let userName = data.user[0].name;
             let checkUserName = this.afkPeople.indexOf(data.user[0].name);
             if (checkUserName !== -1)
             {
@@ -204,7 +188,6 @@ module.exports = {
         }
 
         //updates the users list when a user leaves the room.
-        let user = data.user[0].userid;
         let checkLeave = this.theUsersList.indexOf(data.user[0].userid);
         let checkUserIds = this.userIDs.indexOf(data.user[0].userid);
 
