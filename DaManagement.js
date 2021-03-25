@@ -32,142 +32,9 @@ bot.on('disconnected', function (data) {
 
 setInterval(function() { botModule.checkIfConnected(bot) }, 5000);
 
-//whichFunction represents which justSaw object do you want to access
-//num is the time in minutes till afk timeout
-//userid is the person's userid
-global.isAfk = function (userId, num, whichFunction)
-{
-    let last;
-//which last seen object to use?
-    switch (whichFunction)
-    {
-    case 'isAfk':
-        last = userModule.lastSeen[userId];
-        break;
-    case 'isAfk1':
-        last = userModule.lastSeen1[userId];
-        break;
-    case 'isAfk2':
-        last = userModule.lastSeen2[userId];
-        break;
-    case 'isAfk3':
-        last = userModule.lastSeen3[userId];
-        break;
-    case 'isAfk4':
-        last = userModule.lastSeen4[userId];
-        break;
-    }
+setInterval( function() { afkModule.afkCheck(bot) }, 5000); //This repeats the check every five seconds.
 
-    let age_ms = Date.now() - last;
-    let age_m = Math.floor(age_ms / 1000 / 60);
-    return age_m >= num;
-
-};
-
-
-
-//removes afk dj's after roomDefaultsModule.afkLimit is up.
-global.afkCheck = function ()
-{
-    for (let i = 0; i < userModule.currentDJs.length; i++)
-    {
-        afker = userModule.currentDJs[i]; //Pick a DJ
-        let isAfkMaster = userModule.masterIds.indexOf(afker); //master ids check
-        let whatIsAfkerName = userModule.theUsersList.indexOf(afker) + 1;
-        if ((isAfk(afker, (afkModule.afkLimit - 5), 'isAfk1')) && afkModule.AFK === true)
-        {
-            if (afker !== authModule.USERID && isAfkMaster === -1)
-            {
-                if (roomDefaults.afkThroughPm === false)
-                {
-                    bot.speak('@' + userModule.theUsersList[whatIsAfkerName] + ' you have 5 minutes left of afk, chat or awesome please.');
-                }
-                else
-                {
-                    bot.pm('you have 5 minutes left of afk, chat or awesome please.', afker);
-                }
-                afkModule.justSaw(afker, 'justSaw1');
-            }
-        }
-        if ((isAfk(afker, (afkModule.afkLimit - 1), 'isAfk2')) && afkModule.AFK === true)
-        {
-            if (afker !== authModule.USERID && isAfkMaster === -1)
-            {
-                if (roomDefaults.afkThroughPm === false)
-                {
-                    bot.speak('@' + theUsersList[whatIsAfkerName] + ' you have 1 minute left of afk, chat or awesome please.');
-                }
-                else
-                {
-                    bot.pm('you have 1 minute left of afk, chat or awesome please.', afker);
-                }
-                afkModule.justSaw(afker, 'justSaw2');
-            }
-        }
-        if ((isAfk(afker, afkModule.afkLimit, 'isAfk')) && afkModule.AFK === true)
-        { //if Dj is afk then
-            if (afker !== authModule.USERID && isAfkMaster === -1) //checks to see if afker is a mod or a bot or the current dj, if they are is does not kick them.
-            {
-                if (afker !== roomModule.checkWhoIsDj)
-                {
-                    if (roomDefaults.afkThroughPm === false)
-                    {
-                        bot.speak('@' + theUsersList[whatIsAfkerName] + ' you are over the afk limit of ' + afkModule.afkLimit + ' minutes.');
-                    }
-                    else
-                    {
-                        bot.pm('you are over the afk limit of ' + afkModule.afkLimit + ' minutes.', afker);
-                    }
-                    afkModule.justSaw(afker, 'justSaw1');
-                    afkModule.justSaw(afker, 'justSaw2');
-                    afkModule.justSaw(afker, 'justSaw');
-                    bot.remDj(afker); //remove them
-                }
-            }
-        }
-    }
-};
-
-setInterval(afkCheck, 5000); //This repeats the check every five seconds.
-
-
-
-//this removes people on the floor, not the djs
-roomAfkCheck = function ()
-{
-    for (let i = 0; i < userModule.userIDs.length; i++)
-    {
-        let afker2 = userModule.userIDs[i]; //Pick a DJ
-        let isAfkMod = moderatorModule.modList.indexOf(afker2);
-        let isDj = userModule.currentDJs.indexOf(afker2);
-        if ((isAfk(afker2, ( afkModule.roomafkLimit - 1), 'isAfk3')) && afkModule.roomAFK === true)
-        {
-
-            if (afker2 !== authModule.USERID && isDj === -1 && isAfkMod === -1)
-            {
-                bot.pm('you have 1 minute left of afk, chat or awesome please.', afker2);
-                afkModule.justSaw(afker2, 'justSaw3');
-            }
-        }
-        if ((isAfk(afker2,  afkModule.roomafkLimit, 'isAfk4')) && afkModule.roomAFK === true)
-        { //if person is afk then
-            if (afker2 !== authModule.USERID && isAfkMod === -1) //checks to see if afker is a mod or a bot or a dj, if they are is does not kick them.
-            {
-                if (isDj === -1)
-                {
-                    bot.pm('you are over the afk limit of ' +  afkModule.roomafkLimit + ' minutes.', afker2);
-                    bot.boot(afker2, 'you are over the afk limit');
-                    afkModule.justSaw(afker2, 'justSaw3');
-                    afkModule.justSaw(afker2, 'justSaw4');
-                }
-            }
-        }
-    }
-};
-
-setInterval(roomAfkCheck, 5000) //This repeats the check every five seconds.
-
-
+setInterval( function() { afkModule.roomAFKCheck(bot) }, 5000) //This repeats the check every five seconds.
 
 //this function handles removing people from the queue after holding their spot open for a certain amount of time
 queueCheck15 = function ()
@@ -949,7 +816,7 @@ bot.on('speak', function (data)
 
                 for (let ijhp = 0; ijhp < userModule.currentDJs.length; ijhp++)
                 {
-                    let lastUpdate = Math.floor((Date.now() - userModule.lastSeen[userModule.currentDJs[ijhp]]) / 1000 / 60); //their afk time in minutes
+                    let lastUpdate = Math.floor((Date.now() - afkModule.lastSeen[userModule.currentDJs[ijhp]]) / 1000 / 60); //their afk time in minutes
                     let whatIsTheName = userModule.theUsersList.indexOf(userModule.currentDJs[ijhp]); //their name
 
                     if (userModule.currentDJs[ijhp] !== userModule.currentDJs[userModule.currentDJs.length - 1])
@@ -3065,7 +2932,7 @@ bot.on('pmmed', function (data)
 
                 for (let ijhp = 0; ijhp < userModule.currentDJs.length; ijhp++)
                 {
-                    let lastUpdate = Math.floor((Date.now() - userModule.lastSeen[userModule.currentDJs[ijhp]]) / 1000 / 60); //their afk time in minutes
+                    let lastUpdate = Math.floor((Date.now() - afkModule.lastSeen[userModule.currentDJs[ijhp]]) / 1000 / 60); //their afk time in minutes
                     let whatIsTheName = userModule.theUsersList.indexOf(userModule.currentDJs[ijhp]); //their name
 
                     if (userModule.currentDJs[ijhp] !== userModule.currentDJs[userModule.currentDJs.length - 1])
@@ -4341,7 +4208,7 @@ bot.on('roomChanged', function (data)
         userModule.resetPeople(bot);
         userModule.resetMyTime(bot);
         userModule.resetAFKPeople(bot);
-        userModule.resetLastSeen();
+        afkModule.resetLastSeen();
         userModule.resetDJSongCount();
         userModule.resetWarnMe(bot);
         userModule.resetModPM(bot);
