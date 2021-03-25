@@ -81,19 +81,19 @@ global.isAfk = function (userId, num, whichFunction)
     switch (whichFunction)
     {
     case 'isAfk':
-        last = lastSeen[userId];
+        last = userModule.lastSeen[userId];
         break;
     case 'isAfk1':
-        last = lastSeen1[userId];
+        last = userModule.lastSeen1[userId];
         break;
     case 'isAfk2':
-        last = lastSeen2[userId];
+        last = userModule.lastSeen2[userId];
         break;
     case 'isAfk3':
-        last = lastSeen3[userId];
+        last = userModule.lastSeen3[userId];
         break;
     case 'isAfk4':
-        last = lastSeen4[userId];
+        last = userModule.lastSeen4[userId];
         break;
     }
 
@@ -988,7 +988,7 @@ bot.on('speak', function (data)
 
                 for (let ijhp = 0; ijhp < userModule.currentDJs.length; ijhp++)
                 {
-                    let lastUpdate = Math.floor((Date.now() - lastSeen[userModule.currentDJs[ijhp]]) / 1000 / 60); //their afk time in minutes
+                    let lastUpdate = Math.floor((Date.now() - userModule.lastSeen[userModule.currentDJs[ijhp]]) / 1000 / 60); //their afk time in minutes
                     let whatIsTheName = userModule.theUsersList.indexOf(userModule.currentDJs[ijhp]); //their name
 
                     if (userModule.currentDJs[ijhp] !== userModule.currentDJs[userModule.currentDJs.length - 1])
@@ -3104,7 +3104,7 @@ bot.on('pmmed', function (data)
 
                 for (let ijhp = 0; ijhp < userModule.currentDJs.length; ijhp++)
                 {
-                    let lastUpdate = Math.floor((Date.now() - lastSeen[userModule.currentDJs[ijhp]]) / 1000 / 60); //their afk time in minutes
+                    let lastUpdate = Math.floor((Date.now() - userModule.lastSeen[userModule.currentDJs[ijhp]]) / 1000 / 60); //their afk time in minutes
                     let whatIsTheName = userModule.theUsersList.indexOf(userModule.currentDJs[ijhp]); //their name
 
                     if (userModule.currentDJs[ijhp] !== userModule.currentDJs[userModule.currentDJs.length - 1])
@@ -4380,11 +4380,7 @@ bot.on('roomChanged', function (data)
         userModule.resetPeople(bot);
         userModule.resetMyTime(bot);
         userModule.resetAFKPeople(bot);
-        lastSeen = {};
-        lastSeen1 = {};
-        lastSeen2 = {};
-        lastSeen3 = {};
-        lastSeen4 = {};
+        userModule.resetLastSeen();
         djs20 = [];
         warnme = [];
         userModule.resetModPM(bot);
