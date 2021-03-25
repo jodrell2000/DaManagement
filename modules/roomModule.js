@@ -6,6 +6,19 @@ let authModule = require('../auth.js');
 let chatModule = require('../modules/chatModule.js');
 
 module.exports = {
+    djCount: null, //the number of dj's on stage, gets reset every song
+    checkWhoIsDj: null, //the userid of the currently playing dj
+    bannedArtistsMatcher: '', //holds the regular expression for banned artist / song matching
+    stageBannedList: [], //holds the userid of everyone who is in the command based banned from stage list
+    skipVoteUsers: [], //holds the userid's of everyone who has voted for the currently playing song to be skipped, is cleared every song
+    lastdj: null, //holds the userid of the currently playing dj
+    songLimitTimer: null, //holds the timer used to remove a dj off stage if they don't skip their song in time, and their song has exceeded the max allowed song time
+
+    resetSkipVoteUsers: function (bot) {
+        this.skipVoteUsers = []
+        bot.speak("I've reset the Users who skipped");
+    },
+
     userJoinsRoom: function (data, bot) {
         //if there are 5 dj's on stage and the queue is turned on when a user enters the room
         if (roomDefaults.queue === true && userModule.currentDJs.length === 5) {

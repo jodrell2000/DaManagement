@@ -63,4 +63,8 @@ module.exports = {
 
     errorMessage: null, //the error message you get when trying to connect to the room
 
+    spamLimit: 3, //number of times a user can spam being kicked off the stage within 10 secs
+
+    detail: null, //the discription given in the "room" tab of the room that the bot is in
+
 }

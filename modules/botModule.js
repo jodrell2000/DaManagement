@@ -2,8 +2,25 @@ let roomDefaults = require('../defaultSettings/roomDefaults.js');
 let authModule = require('../auth.js');
 
 module.exports = {
-    attemptToReconnect: null, //used for reconnecting to the bots room if its not in there (only works if internet connection is working)
     checkActivity: Date.now(),
+    skipOn: null, //if true causes the bot to skip every song it plays, toggled on and off by commands
+    randomOnce: 0, //a flag used to check if the /randomSong command has already been activated, 0 is no, 1 is yes
+    sayOnce: true, //makes it so that the queue timeout can only be used once per per person, stops the bot from spamming
+    botStartTime: null, //the current time in milliseconds when the bot has started, used for the /uptime
+    uptimeTime: null, //the current time in milliseconds when the /uptime is actually used
+    messageCounter: 0, //this is for the array of messages, it lets it know which message it is currently on, resets to 0 after cycling through all of them
+    netwatchdogTimer: null, // Used to detect internet connection dropping out
+    attemptToReconnect: null, //used for reconnecting to the bots room if its not in there (only works if internet connection is working)
+    returnToRoom: true, //used to toggle on and off the bot reconnecting to its room(it toggles off when theres no internet connection because it only works when its connected to turntable.fm)
+    wserrorTimeout: null, //this is for the setTimeout in ws error
+    autoDjingTimer: null, //governs the timer for the bot's auto djing
+    escortMeList: [], //holds the userid of everyone who has used the /escortme command, auto removed when the person leaves the stage
+    beginTimer: null, //holds the timer the auto removes dj's from the queue if they do not get on stage within the allowed time period
+
+    resetEscortMeList: function (bot) {
+        this.escortMeList = []
+        bot.speak("I've reset the Escort Users list");
+    },
 
     checkIfConnected: function (bot) {
         {
