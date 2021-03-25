@@ -52,7 +52,7 @@ module.exports = {
             afker = userModule.currentDJs[i]; //Pick a DJ
             let isAfkMaster = userModule.masterIds.indexOf(afker); //master ids check
             let whatIsAfkerName = userModule.theUsersList.indexOf(afker) + 1;
-            if ((this.isAFK(afker, (this.afkLimit - 5), 'isAfk1')) && afkModule.AFK === true) {
+            if ((this.isAFK(afker, (this.afkLimit - 5), 'isAfk1')) && this.AFK === true) {
                 if (afker !== authModule.USERID && isAfkMaster === -1) {
                     if (roomDefaults.afkThroughPm === false) {
                         bot.speak('@' + userModule.theUsersList[whatIsAfkerName] + ' you have 5 minutes left of afk, chat or awesome please.');
