@@ -1,19 +1,16 @@
 module.exports = {
     // chat and messages stuff
-    roomJoinMessage: '', //the message users will see when they join the room, leave it empty for the default message (only works when greet is turned on)
     MESSAGE: true, //room message(on by default), the bot says your room info in intervals of whatever the howOftenToRepeatMessage variable is set to in minutes
     howOftenToRepeatMessage: 15, //how often (in minutes) to repeat the room message (only works when MESSAGE = true;)
     defaultMessage: true,
     /*  This corresponds to the MESSAGE variable directly above, if true it will give you the default repeat message along with your room info, if false it will only say your room info.
         (only works when MESSAGE = true) (this feature is on by default)
     */
-    GREET: true, //room greeting when someone joins the room(on by default)
 
     SONGSTATS: true, //song stats after each song(on by default)
 
 
     afkThroughPm: true, //choose whether afk warnings(for dj's on stage) will be given through the pm or the chatbox (false = chatbox, true = pm message)
-    greetThroughPm: false, //choose whether greeting message is through the pm or the chatbox(false = chatbox, true = pm), (only works when greeting message is turned on) (off by default)
     repeatMessageThroughPm: false,
     /*choose whether the repeating room message(the one corresponding to MESSAGE up above) will be through the chatbox or the pm,
                                           (false = through the chatbox, true = through the pm) (MESSAGE must equal true for this to work) (this feature is off by default)
@@ -42,16 +39,28 @@ module.exports = {
 
     HowManyVotesToSkip: 2, //how many votes for a song to get skipped(default value, only works if voteSkip = true)
 
+    AFK: true, //afk limit(on by default), this is for the dj's on stage
+
+    // declarations, DO NOT SET
+    ttRoomName: null, //the url extension of the room name, example "straight_chillin16" would be the format
+    thisHoldsThePlaylist: null, //holds a copy of the playlist
+
+    roomName: null, //the name of the room, example "straight chillin" would be the format for the straight chillin room...
+
     queue: true, //queue(on by default)
 
-    AFK: true, //afk limit(on by default), this is for the dj's on stage
+    greet: true, //room greeting when someone joins the room(on by default)
+    greetThroughPm: false, //choose whether greeting message is through the pm or the chatbox(false = chatbox, true = pm), (only works when greeting message is turned on) (off by default)
+    greetingTimer: [], //holds the timeout for people that join the room, if someone rejoins before their timeout completes their timer is reset
+    roomJoinMessage: '', //the message users will see when they join the room, leave it empty for the default message (only works when greet is turned on)
+
+    blackList: [], //holds the userid of everyone who is in the command based banned from the room list
 
     kickTTSTAT: false, //kicks the ttstats bot when it tries to join the room(off by default)
 
-    // declarations, DO NOT SET
-    roomName: null, //the name of the room, example "straight chillin" would be the format for the straight chillin room...
-    ttRoomName: null, //the url extension of the room name, example "straight_chillin16" would be the format
-    THEME: false, //has a current theme been set? true or false. handled by commands
-    thisHoldsThePlaylist: null, //holds a copy of the playlist
+    theme: false, //has a current theme been set? true or false. handled by commands
+    whatIsTheme: null, //this holds a string which is set by the /setTheme command
+
+    errorMessage: null, //the error message you get when trying to connect to the room
 
 }

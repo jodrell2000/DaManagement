@@ -74,6 +74,15 @@ module.exports = {
         bot.speak("I've reset the People");
     },
 
+    resetLastSeen: function () {
+        this.lastSeen = {};
+        this.lastSeen1 = {};
+        this.lastSeen2 = {};
+        this.lastSeen3 = {};
+        this.lastSeen4 = {};
+    },
+
+
     updateUser: function (data) {
         if (typeof data.name === 'string') {
             let oldname = ''; //holds users old name if exists
