@@ -45,8 +45,6 @@ module.exports = {
     ttRoomName: null, //the url extension of the room name, example "straight_chillin16" would be the format
     thisHoldsThePlaylist: null, //holds a copy of the playlist
 
-
-
     roomName: null, //the name of the room, example "straight chillin" would be the format for the straight chillin room...
 
     queue: true, //queue(on by default)

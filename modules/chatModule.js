@@ -1,4 +1,5 @@
 let roomDefaults = require('../defaultSettings/roomDefaults.js');
+let songModule = require('../modules/songModule.js');
 
 module.exports = {
     userGreeting: function (bot, data) {
@@ -36,5 +37,16 @@ module.exports = {
                 }
             }
         }
+    },
+
+    readSongStats: function (bot) {
+        if (roomDefaults.SONGSTATS === true)
+        {
+            bot.speak('Stats for ' + songModule.song + ' by ' + songModule.artist + ': ' + ':thumbsup:' + songModule.upVotes + ':thumbsdown:' + songModule.downVotes + ':heart:' + songModule.whoSnagged);
+        }
+    },
+
+    overPlayLimit: function (bot, username, playLimit) {
+        bot.speak('@' + username + ' you are over the playlimit of ' + playLimit + ' song');
     }
 }
