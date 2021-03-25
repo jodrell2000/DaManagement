@@ -69,7 +69,7 @@ bot.on('disconnected', function (data) {
 
 });
 
-setInterval(botModule.checkIfConnected(bot), 5000);
+setInterval(function() { botModule.checkIfConnected(bot) }, 5000);
 
 //whichFunction represents which justSaw object do you want to access
 //num is the time in minutes till afk timeout
