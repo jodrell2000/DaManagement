@@ -1,10 +1,10 @@
+*Bot to manage queues, and give info for Turntable.fm.*
 
+The intention for this fork is to modularise the code to make it easier to configure and be more maintainable
 
- ![alt text](https://s3.amazonaws.com/assets.turntable.fm/images/about2/icon_hangout.png) 
-# **Mr. Roboto**
+Forked from Mr. Roboto https://github.com/jakewillsmith/roboto
 
-
-*Bot for the I ❤️ The 80's room on Turntable.fm. Forked from chillybot: https://github.com/samuri51/chillybot*
+Forked from chillybot: https://github.com/samuri51/chillybot
 
 
 ## Command List
