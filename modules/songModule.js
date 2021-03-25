@@ -17,7 +17,8 @@ module.exports = {
     voteCountSkip: 0,
     votesLeft: roomDefaults.HowManyVotesToSkip,
     ALLREADYCALLED: false, //resets votesnagging so that it can be called again
-
+    curSongWatchdog: null, //used to hold the timer for stuck songs
+    takedownTimer: null, //used to hold the timer that fires after curSongWatchDog which represents the time a person with a stuck song has left to skip their song
 
     getSongTags: function (current_song) {
         this.song = current_song.metadata.song;

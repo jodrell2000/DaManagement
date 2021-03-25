@@ -9,6 +9,7 @@ module.exports = {
     people: [], //holds the userid's of everyone who is kicked off stage for the spam limit
     myTime: [], //holds a date object for everyone in the room, which represents the time when they joined the room, resets every time the person rejoins
     timer: [], //holds the timeout of everyone who has been spamming the stage, resets their spam count if their timer completes
+    myID: null, //the userid of the person using the /fanme command, speak event only
 
     lastSeen: {}, //holds a date object to be used for the dj afk timer, there are different ones because they have different timeouts
     lastSeen1: {}, //holds a date object to be used for the dj afk timer
@@ -28,6 +29,18 @@ module.exports = {
         This is meant to explicitly give extra privileges to yourself and anyone else you want to put in here. It takes userid's as input in string format separated by commas.
         You can put the person's name in the array either before or after a userid to tell who it belongs to, it will not affect its ability to function.
     */
+
+    name: null, //the name of the person using the person who activated the speak event
+    isModerator: null, //is the person using a command a moderator? true or false
+    index: null, //the index returned when using unban commands
+    informTimer: null, //holds the timeout for the /inform command, null lets it know that it hasn't already been set
+    playLimitOfRefresher: [], //holds a copy of the number of plays for people who have used the /refresh command
+    refreshList: [], //this holds the userid's of people who have used the /refresh command
+    refreshTimer: [], //this holds the timers of people who have used the /refresh command
+    warnme: [], //holds the userid's of everyone using the /warnme feature
+
+    djSongCount: [], //holds the song count that each of the dj's on stage have played
+
 
     resetUsersList: function (bot) {
         this.theUsersList = []
@@ -72,6 +85,16 @@ module.exports = {
     resetPeople: function (bot) {
         this.people = []
         bot.speak("I've reset the People");
+    },
+
+    resetWarnMe: function (bot) {
+        this.warnme = [];
+        bot.speak("I've reset the Warn Me list");
+    },
+
+    resetDJSongCount: function (bot) {
+        this.djSongCount = [];
+        bot.speak("I've reset the DJ Song count");
     },
 
     resetLastSeen: function () {
