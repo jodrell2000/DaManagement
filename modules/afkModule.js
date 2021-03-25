@@ -108,7 +108,7 @@ module.exports = {
             }
             if ((this.isAFK(afker2,  this.roomafkLimit, 'isAfk4')) && this.roomAFK === true)
             { //if person is afk then
-                if (afker2 !== authModule.USERID && isAfkMod === -1) //checks to see if afker is a mod or a bot or a dj, if they are is does not kick them.
+                if (afker2 !== authModule.USERID && isAfkMod === -1) //checks to see if afker is a mod or this, if they are is does not kick them.
                 {
                     if (isDj === -1)
                     {
