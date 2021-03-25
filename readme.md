@@ -1,4 +1,4 @@
-*Bot for Turntable.fm.*
+*Bot to manage queues, and give info for Turntable.fm.*
 
 The intention for this fork is to modularise the code to make it easier to configure and be more maintainable
 
