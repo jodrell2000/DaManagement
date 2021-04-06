@@ -5,7 +5,7 @@ let chatModule = require('./chatbot/chatModule.js');
 let responseModule = require('./chatbot/responseModule.js');
 let bot = new Bot(authModule.AUTH, authModule.USERID, authModule.ROOMID);
 
-bot.debug = false;
+bot.debug = true;
 
 bot.on('newsong', function (data) {
   bot.bop();
