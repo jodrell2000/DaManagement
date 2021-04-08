@@ -1,8 +1,7 @@
-let Bot = require('ttapi');
-let thisBot = require('./chatbot/botModule.js');
-
 let authModule = require('./authChat.js');
 let chatModule = require('./chatbot/chatModule.js');
+
+let Bot = require('ttapi');
 let bot = new Bot(authModule.AUTH, authModule.USERID, authModule.ROOMID);
 
 bot.debug = true;
