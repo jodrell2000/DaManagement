@@ -2,6 +2,6 @@
 	"name": "Da_Management",
 	"private": true,
 	"dependencies": {
-		"ttapi": "^4.0.1"
+		"ttapi": "^4.0.2"
 	}
 }

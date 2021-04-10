@@ -1,24 +1,24 @@
-let Bot = require('ttapi');
-
-let authModule = require('./authChat.js');
-let chatModule = require('./chatbot/chatModule.js');
-let responseModule = require('./chatbot/responseModule.js');
+let authModule = require("./authChat.js");
+let Bot = require("ttapi");
 let bot = new Bot(authModule.AUTH, authModule.USERID, authModule.ROOMID);
+
+let botModule = require("./chatbot/botModule.js")
+const botFunctions = botModule(bot);
 
 bot.debug = true;
 
-bot.on('newsong', function (data) {
+bot.roomRegister(authModule.ROOMID, function() {
+  bot.setAsBot();
+});
+
+bot.on("newsong", function () {
   bot.bop();
 });
 
-bot.on('speak', function (data) {
-  // Get the data
-  let name = data.name;
-  let text = data.text;
-
-  // Respond to "/hello" command
-  if (text.match(/^\/hello$/)) {
-    responseModule.responseCount ++;
-    bot.speak(chatModule.buildMessage()+name);
+bot.on("speak", function (data) {
+  if (botFunctions.wasThisACommand(data)) {
+    botFunctions.parseCommand(data);
   }
 });
+
+setInterval(botFunctions.tikTok, 5000);
