@@ -67,4 +67,11 @@ module.exports = {
 
     detail: null, //the discription given in the "room" tab of the room that the bot is in
 
+    queueWaitTime: 60, /*how many second's does a dj have to get on stage when it's their turn to dj after waiting in the queue.
+						 The value must be entered in seconds in order to display the correct message, i.e 3 mins = 180 seconds.
+						 Note that people are not removed from the queue when they leave the room so a lower number is preferable in high pop rooms to avoid backup.
+						 (only work when queue = true)
+						*/
+
+
 }

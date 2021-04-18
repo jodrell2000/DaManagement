@@ -1,52 +1,114 @@
-let roomDefaults = require('../defaultSettings/roomDefaults.js');
-let songModule = require('../modules/songModule.js');
+const chatFunctions = (bot, roomDefaults) => {
+    return {
+        botMessage: function () {
 
-module.exports = {
-    userGreeting: function (bot, data) {
-        let roomjoin = data.user[0];
-        if (roomDefaults.roomJoinMessage !== '') //if your not using the default greeting
-        {
-            if (roomDefaults.theme === false) //if theres no theme this is the message.
+        },
+
+        botChat: function () {
+
+        },
+
+        userGreeting: function (userID, username) {
+            this.message = '';
+
+            if (roomDefaults.roomJoinMessage !== '') //if your not using the default greeting
             {
-                if (roomDefaults.greetThroughPm === false) //if your not sending the message through the pm
+                if (roomDefaults.theme === false) //if theres no theme this is the message.
                 {
-                    bot.speak('@' + roomjoin.name + ', ' + roomDefaults.roomJoinMessage);
+                    this.message = roomDefaults.roomJoinMessage;
                 } else {
-                    bot.pm(roomDefaults.roomJoinMessage, roomjoin.userid);
+                    this.message = roomDefaults.roomJoinMessage + '; The theme is currently set to: ' + roomDefaults.whatIsTheme;
                 }
             } else {
-                if (this.greetThroughPm === false) {
-                    bot.speak('@' + roomjoin.name + ', ' + roomDefaults.roomJoinMessage + '; The theme is currently set to: ' + roomDefaults.whatIsTheme);
+                if (roomDefaults.theme === false) //if theres no theme this is the message.
+                {
+                    this.message = 'Welcome to ' + roomDefaults.roomName + ' @' + username + ', enjoy your stay!';
                 } else {
-                    bot.pm(roomDefaults.roomJoinMessage + '; The theme is currently set to: ' + roomDefaults.whatIsTheme, roomjoin.userid);
+                    this.message = 'Welcome to ' + roomDefaults.roomName + ' @' + username + ', the theme is currently set to: ' + roomDefaults.whatIsTheme;
                 }
             }
-        } else {
-            if (this.theme === false) //if theres no theme this is the message.
+            this.greetMessage(userID, username, this.message)
+        },
+
+        greetMessage: function (userID, username, message) {
+            if (roomDefaults.greetThroughPm === false) //if your not sending the message through the pm
             {
-                if (roomDefaults.greetThroughPm === false) {
-                    bot.speak('Welcome to ' + roomDefaults.roomName + ' @' + roomjoin.name + ', enjoy your stay!');
-                } else {
-                    bot.pm('Welcome to ' + roomDefaults.roomName + ' @' + roomjoin.name + ', enjoy your stay!', roomjoin.userid);
-                }
+                bot.speak('@' + username + ', ' + message);
             } else {
-                if (roomDefaults.greetThroughPm === false) {
-                    bot.speak('Welcome to ' + roomDefaults.roomName + ' @' + roomjoin.name + ', the theme is currently set to: ' + roomDefaults.whatIsTheme);
-                } else {
-                    bot.pm('Welcome to ' + roomDefaults.roomName + ' @' + roomjoin.name + ', the theme is currently set to: ' + roomDefaults.whatIsTheme, roomjoin.userid);
+                bot.pm(message, userID);
+            }
+        },
+
+
+        readSongStats: function (songFunctions, roomDefaults) {
+            if (roomDefaults.SONGSTATS) {
+                bot.speak('Stats for ' + songFunctions.song + ' by ' + songFunctions.artist + ': ' + ':thumbsup:' + songFunctions.upVotes + ':thumbsdown:' + songFunctions.downVotes + ':heart:' + songFunctions.whoSnagged);
+            }
+        },
+
+        overPlayLimit: function (username, playLimit) {
+            bot.speak('@' + username + ' you are over the playlimit of ' + playLimit + ' song');
+        },
+
+        eventMessageIterator: function (botFunctions, userFunctions) {
+            if (roomDefaults.EVENTMESSAGE === true && roomDefaults.eventMessages.length !== 0)
+            {
+                if (botFunctions.messageCounter === roomDefaults.eventMessages.length)
+                {
+                    botFunctions.messageCounter = 0; //if end of event messages array reached, reset counter
+                }
+
+                if (roomDefaults.eventMessageThroughPm === false) //if set to send messages through chatbox, do so
+                {
+                    bot.speak(roomDefaults.eventMessages[botFunctions.messageCounter] + "");
+                }
+                else //else send message through pm
+                {
+                    for (let jio = 0; jio < userFunctions.userIDs.length; jio++)
+                    {
+                        bot.pm(roomDefaults.eventMessages[botFunctions.messageCounter] + "", userFunctions.userIDs[jio]);
+                    }
+                }
+
+                ++botFunctions.messageCounter; //increment message counter
+            }
+        },
+
+        repeatWelcomeMessage: function (userFunctions) {
+            if (roomDefaults.MESSAGE === true && typeof roomDefaults.detail !== 'undefined')
+            {
+                if (roomDefaults.repeatMessageThroughPm === false) //if not doing through the pm
+                {
+                    if (roomDefaults.defaultMessage === true) //if using default message
+                    {
+                        bot.speak('Welcome to ' + roomDefaults.roomName + ', ' + roomDefaults.detail); //set the message you wish the bot to repeat here i.e rules and such.
+                    }
+                    else
+                    {
+                        bot.speak('' + roomDefaults.detail);
+                    }
+                }
+                else
+                {
+                    if (roomDefaults.defaultMessage === true)
+                    {
+                        for (let jkl = 0; jkl < userFunctions.userIDs.length; jkl++)
+                        {
+                            bot.pm('Welcome to ' + roomDefaults.roomName + ', ' + roomDefaults.detail, userFunctions.userIDs[jkl]); //set the message you wish the bot to repeat here i.e rules and such.
+                        }
+                    }
+                    else
+                    {
+                        for (let lkj = 0; lkj < userFunctions.userIDs.length; lkj++)
+                        {
+                            bot.pm('' + roomDefaults.detail, userFunctions.userIDs[lkj]); //set the message you wish the bot to repeat here i.e rules and such.
+                        }
+                    }
                 }
             }
-        }
-    },
 
-    readSongStats: function (bot) {
-        if (roomDefaults.SONGSTATS === true)
-        {
-            bot.speak('Stats for ' + songModule.song + ' by ' + songModule.artist + ': ' + ':thumbsup:' + songModule.upVotes + ':thumbsdown:' + songModule.downVotes + ':heart:' + songModule.whoSnagged);
         }
-    },
-
-    overPlayLimit: function (bot, username, playLimit) {
-        bot.speak('@' + username + ' you are over the playlimit of ' + playLimit + ' song');
     }
 }
+
+module.exports = chatFunctions;
