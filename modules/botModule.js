@@ -1,7 +1,18 @@
 let roomDefaults = require('../defaultSettings/roomDefaults.js');
+
 let authModule = require('../auth.js');
 
 const botFunctions = (bot) => {
+    function logMe(logLevel, message) {
+        if (logLevel==='error') {
+            console.log("botFunctions:" + logLevel + "->" + message + "\n");
+        } else {
+            if (bot.debug) {
+                console.log("botFunctions:" + logLevel + "->" + message + "\n");
+            }
+        }
+    }
+
     return {
         checkActivity: Date.now(),
         skipOn: null, //if true causes the bot to skip every song it plays, toggled on and off by commands
@@ -45,17 +56,16 @@ const botFunctions = (bot) => {
         },
 
         reconnect: function () {
-            console.log("=+++++++++++++++++++++=" + "======");
             const attemptToReconnect = this.attemptToReconnect;
 
             this.attemptToReconnect = setInterval(function () {
                 let whichMessage;
                 if (bot._isAuthenticated) {
                     whichMessage = true;
-                    console.log('it looks like your bot is not in it\'s room. attempting to reconnect now....');
+                    logMe('error', 'it looks like your bot is not in it\'s room. attempting to reconnect now....');
                 } else {
                     whichMessage = false;
-                    console.log('connection with turntable lost, waiting for connection to come back...');
+                    logMe('error', 'connection with turntable lost, waiting for connection to come back...');
                 }
 
                 bot.roomRegister(authModule.ROOMID, function (data) {
@@ -66,10 +76,10 @@ const botFunctions = (bot) => {
                         this.checkActivity = Date.now();
 
                         if (whichMessage) {
-                            console.log('the bot has reconnected to the room ' +
+                            logMe('the bot has reconnected to the room ' +
                                 'specified by your choosen roomid');
                         } else {
-                            console.log('connection with turntable is back!');
+                            logMe('connection with turntable is back!');
                         }
                     } else {
                         if (roomDefaults.errorMessage === null && typeof data.err === 'string') {
@@ -82,7 +92,7 @@ const botFunctions = (bot) => {
 
         recordActivity: function () {
             this.checkActivity = Date.now(); //update when someone says something
-        }
+        },
     }
 }
 

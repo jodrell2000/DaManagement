@@ -13,7 +13,6 @@ let roomDefaults    = require('./defaultSettings/roomDefaults.js');
 let musicDefaults   = require('./defaultSettings/musicDefaults.js');
 
 let botModule       = require('./modules/botModule.js');
-let moderatorModule = require('./modules/moderatorModule.js');
 let userModule      = require('./modules/userModule.js');
 let roomModule      = require('./modules/roomModule.js');
 let chatModule      = require('./modules/chatModule.js');
@@ -27,7 +26,6 @@ bot.listen(process.env.PORT,process.env.IP); //needed for running the bot on a s
 const botFunctions          = botModule(bot);
 const userFunctions         = userModule(bot, roomDefaults);
 const chatFunctions         = chatModule(bot, roomDefaults);
-const moderatorFunctions    = moderatorModule(bot);
 const songFunctions         = songModule();
 const roomFunctions         = roomModule(bot);
 
@@ -45,7 +43,7 @@ setInterval(function() {
 setInterval( function() { userFunctions.afkCheck(roomFunctions, roomDefaults) }, 5 * 1000);
 
 // check if the moderators are idle every 5 seconds
-setInterval( function() { userFunctions.roomAFKCheck(moderatorFunctions) }, 5 * 1000)
+setInterval( function() { userFunctions.roomAFKCheck() }, 5 * 1000)
 
 // every 5 seconds, check if the there's an empty DJ slot, and promt the next in the queue to join the decks, remove them if they don't
 setInterval(function () {
@@ -74,10 +72,7 @@ setInterval( function() {
 },  roomDefaults.howOftenToRepeatMessage * 60 * 1000)
 
 
-setInterval( function() {
-    console.log("Verify userlist");
-    userFunctions.verifyUsersList(bot.data);
-}, 1000 * 60 * 1); //check every 15 minutes
+setInterval( userFunctions.verifyUsersList,1000 * 60 * 15); //check every 15 minutes
 
 
 
@@ -182,7 +177,7 @@ global.warnMeCall = function ()
 //checks to see if a command user is contained within the moderator list or not
 global.checkIfUserIsMod = function (userid)
 {
-    let modIndex = moderatorFunctions.modList.indexOf(userid);
+    let modIndex = userFunctions.modList.indexOf(userid);
 
     userFunctions.isModerator = modIndex !== -1;
 };
@@ -223,42 +218,6 @@ global.incrementSpamCounter = function (userid)
         };
     }, 10 * 1000);
 };
-
-
-
-//formats the banned artist array to be used in a regex expression
-global.formatBannedArtists = function ()
-{
-    if (musicDefaults.bannedArtists.length !== 0)
-    {
-        let tempArray = [];
-        let tempString = '(';
-
-        //add a backslash in front of all special characters
-        for (let i = 0; i < musicDefaults.bannedArtists.length; i++)
-        {
-            tempArray.push(musicDefaults.bannedArtists[i].replace(/([-[\]{}()*^=!:+?.,\\$|#\s])/g, "\\$1"));
-        }
-
-        //join everything into one string
-        for (let i = 0; i < musicDefaults.bannedArtists.length; i++)
-        {
-            if (i < musicDefaults.bannedArtists.length - 1)
-            {
-                tempString += tempArray[i] + '|';
-            }
-            else
-            {
-                tempString += tempArray[i] + ')';
-            }
-        }
-
-        //create regular expression
-        roomFunctions.bannedArtistsMatcher = new RegExp('\\b' + tempString + '\\b', 'i');
-    }
-}
-
-
 
 global.clearTimers = function ()
 {
@@ -396,7 +355,7 @@ global.checkOnNewSong = function (data)
 bot.on('ready', function ()
 {
     //format the musicDefaults.bannedArtists list at runtime
-    formatBannedArtists();
+    roomFunctions.formatBannedArtists();
 });
 
 
@@ -4041,31 +4000,15 @@ bot.on('roomChanged', function (data)
     try
     {
         //reset arrays in case this was triggered by the bot restarting
-        userFunctions.resetEscortMeList(bot);
-        userFunctions.resetUsersList();
-        moderatorFunctions.resetModList(bot);
-        userFunctions.resetCurrentDJs();
-        userFunctions.resetUserIDs();
-        userFunctions.resetQueueList();
-        userFunctions.resetQueueNames();
-        userFunctions.resetPeople();
-        userFunctions.resetMyTime();
-        userFunctions.resetAFKPeople();
-        userFunctions.resetLastSeen();
-        userFunctions.resetDJSongCount();
-        userFunctions.resetWarnMe();
-        userFunctions.resetModPM();
-
+        userFunctions.botStartReset();
 
         //set information
         roomDefaults.detail = data.room.description; //used to get room description
         roomDefaults.roomName = data.room.name; //gets your rooms name
         roomDefaults.ttRoomName = data.room.shortcut; //gets room shortcut
 
-
         //load the playlist into memory
-        bot.playlistAll(function (callback)
-        {
+        bot.playlistAll(function (callback) {
             roomDefaults.thisHoldsThePlaylist = callback.list;
         });
 
@@ -4097,7 +4040,7 @@ bot.on('roomChanged', function (data)
         //modList = data.room.metadata.moderator_id;
         for (let ihp = 0; ihp < data.room.metadata.moderator_id.length; ihp++)
         {
-            moderatorFunctions.modList.push(data.room.metadata.moderator_id[ihp]);
+            userFunctions.modList.push(data.room.metadata.moderator_id[ihp]);
         }
 
 
@@ -4188,13 +4131,13 @@ bot.on('update_user', function (data) {
 //updates the moderator list when a moderator is added.
 bot.on('new_moderator', function (data)
 {
-    moderatorFunctions.newModerator(data, bot)
+    userFunctions.newModerator(data, bot)
 })
 
 //updates the moderator list when a moderator is removed.
 bot.on('rem_moderator', function (data)
 {
-    moderatorFunctions.updateModeratorList(data, bot)
+    userFunctions.updateModeratorList(data, bot)
 })
 
 //starts up when a user leaves the room

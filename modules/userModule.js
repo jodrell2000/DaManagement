@@ -1,6 +1,15 @@
 let authModule = require('../auth.js');
 
 const userFunctions = (bot, roomDefaults) => {
+    function logMe(logLevel, message) {
+        if (logLevel==='error') {
+            console.log("botFunctions:" + logLevel + "->" + message + "\n");
+        } else {
+            if (bot.debug) {
+                console.log("botFunctions:" + logLevel + "->" + message + "\n");
+            }
+        }
+    }
     return {
         theUsersList: [], //holds the name and userid of everyone in the room
         afkPeople: [], //holds the userid of everyone who has used the /afk command
@@ -46,69 +55,93 @@ const userFunctions = (bot, roomDefaults) => {
         lastSeen3: {}, //holds a date object to be used for the audience afk limit
         lastSeen4: {}, //holds a date object to be used for the audience afk limit
 
-        resetUsersList: function () {
-            this.theUsersList = []
-            if (bot.debug) { console.log("userFunctions: I've reset the Users list") }
+        modList: [], //set the afk limit in minutes here
+
+        botStartReset: function () {
+            userFunctions.resetEscortMeList(bot);
+            userFunctions.resetUsersList();
+            userFunctions.resetModList(bot);
+            userFunctions.resetCurrentDJs();
+            userFunctions.resetUserIDs();
+            userFunctions.resetQueueList();
+            userFunctions.resetQueueNames();
+            userFunctions.resetPeople();
+            userFunctions.resetMyTime();
+            userFunctions.resetAFKPeople();
+            userFunctions.resetLastSeen();
+            userFunctions.resetDJSongCount();
+            userFunctions.resetWarnMe();
+            userFunctions.resetModPM();
         },
 
-        resetEscortMeList: function (bot) {
+        resetUsersList: function () {
+            this.theUsersList = []
+            logMe("debug", "resetUsersList: I've reset the Users list")
+        },
+
+        resetEscortMeList: function () {
             this.escortMeList = []
-            if (bot.debug) { console.log("botFunctions: I've reset the Escort Users list") }
+            logMe("debug", "resetEscortMeList: I've reset the Escort Users list")
         },
 
         resetQueueNames: function () {
             this.queueName = []
-            if (bot.debug) { console.log("userFunctions: I've reset the Queue Names") }
+            logMe("debug", "resetQueueNames: I've reset the Queue Names")
         },
 
         resetQueueList: function () {
             this.queueList = []
-            if (bot.debug) { console.log("userFunctions: I've reset the Queue List") }
+            logMe("debug", "resetQueueList: I've reset the Queue List")
         },
 
         resetAFKPeople: function () {
             this.afkPeople = []
-            if (bot.debug) { console.log("userFunctions: I've reset the AFK List") }
+            logMe("debug", "resetAFKPeople: I've reset the AFK List")
         },
 
         resetModPM: function () {
             this.modPM = []
-            if (bot.debug) { console.log("userFunctions: I've reset the ModPM List") }
+            logMe("debug", "resetModPM: I've reset the ModPM List")
         },
 
         resetCurrentDJs: function () {
             this.currentDJs = []
-            if (bot.debug) { console.log("userFunctions: I've reset the Current DJs List") }
+            logMe("debug", "resetCurrentDJs: I've reset the Current DJs List")
         },
 
         resetUserIDs: function () {
             this.userIDs = []
-            if (bot.debug) { console.log("userFunctions: I've reset the UserIDs") }
+            logMe("debug", "resetUserIDs: I've reset the UserIDs")
         },
 
         resetMyTime: function () {
             this.myTime = []
-            if (bot.debug) { console.log("userFunctions: I've reset My Time") }
+            logMe("debug", "resetMyTime: I've reset My Time")
         },
 
         resetPeople: function () {
             this.people = []
-            if (bot.debug) { console.log("userFunctions: I've reset the People") }
+            logMe("debug", "resetPeople: I've reset the People")
         },
 
         resetWarnMe: function () {
             this.warnme = [];
-            if (bot.debug) { console.log("userFunctions: I've reset the Warn Me list") }
+            logMe("debug", "resetWarnMe: I've reset the Warn Me list")
         },
 
         resetDJSongCount: function () {
             this.djSongCount = [];
-            if (bot.debug) { console.log("userFunctions: I've reset the DJ Song count") }
+            logMe("debug", "resetDJSongCount: I've reset the DJ Song count")
         },
 
         resetSkipVoteUsers: function () {
             this.skipVoteUsers = []
-            if (bot.debug) { console.log("userFunctions: I've reset the Users who skipped") }
+            logMe("debug", "resetSkipVoteUsers: I've reset the Users who skipped")
+        },
+
+        resetModList: function () {
+            this.modList = []
+            // bot.speak("I've reset the Mod list: " + this.modList);
         },
 
         updateUser: function () {
@@ -228,12 +261,17 @@ const userFunctions = (bot, roomDefaults) => {
             }
 
             //checks if user is on the banned list
-            for (let z = 0; z < userFunctions.bannedUsers.length; z++) {
-                if (userFunctions.bannedUsers[z].match(user.userid)) {
+            for (let z = 0; z < this.bannedUsers.length; z++) {
+                if (this.bannedUsers[z].match(user.userid)) {
                     bootUser = true;
                     bootMessage = 'You are on the banned user list.';
                     break;
                 }
+            }
+
+            // don't let the bot boot itself!
+            if (user.userid === authModule.USERID) {
+                bootUser = false;
             }
 
             return [bootUser, bootMessage];
@@ -241,11 +279,11 @@ const userFunctions = (bot, roomDefaults) => {
 
         bootThisUser: function (userID, bootMessage) {
             if (bootMessage == null) {
-                console.log("Boot userID: ====" + userID + "++++++")
-                // bot.boot(user.userid)
+                logMe("debug","Boot userID: ====" + userID + "++++++")
+                bot.boot(userID)
             } else {
-                console.log("Boot userID: ====" + userID + "++++++ with message ====" + bootMessage + "+++++++")
-                // bot.bootUser(user.userid, bootMessage);
+                logMe("debug","Boot userID: ====" + userID + "++++++ with message ====" + bootMessage + "+++++++")
+                bot.bootUser(userID, bootMessage);
             }
         },
 
@@ -365,10 +403,10 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         //this removes people on the floor, not the djs
-        roomAFKCheck: function (moderatorFunctions) {
+        roomAFKCheck: function () {
             for (let i = 0; i < this.userIDs.length; i++) {
                 let afker2 = this.userIDs[i]; //Pick a DJ
-                let isAfkMod = moderatorFunctions.modList.indexOf(afker2);
+                let isAfkMod = this.modList.indexOf(afker2);
                 let isDj = this.currentDJs.indexOf(afker2);
                 if ((this.isAFK(afker2, (this.roomafkLimit - 1), 'isAfk3')) && this.roomAFK === true) {
                     if (afker2 !== authModule.USERID && isDj === -1 && isAfkMod === -1) {
@@ -424,35 +462,40 @@ const userFunctions = (bot, roomDefaults) => {
             this.lastSeen4 = {};
         },
 
-        verifyUsersList: function (data) {
+        verifyUsersList: function () {
+            logMe("debug", "verifyUsersList: Started verifying the user list")
+
             //only execute when not disconnected
             if (bot._isAuthenticated) {
                 bot.roomInfo(false, function (data) {
-                    if (typeof data.users === 'object') {
-                        let theUsersListOkay = true; //assume it will not need to be rebuilt
+                    let theUsersListOkay;
+                    if (data.user === 'object') {
+                        theUsersListOkay = true; //assume it will not need to be rebuilt
 
                         //if the length of the users list does not match
                         //the amount of people in the room
-                        if (userFunctions.theUsersList.length !== (data.users.length * 2)) {
+                        if (this.theUsersList.length !== (data.users.length * 2)) {
                             theUsersListOkay = false;
                         }
 
                         //only run this test if it passed the first one
-                        theUsersListOkay = userFunctions.allusersAreDefined(userFunctions);
+                        theUsersListOkay = this.allusersAreDefined();
 
                         //if data got corrupted then rebuild theUsersList array
                         if (!theUsersListOkay) {
-                            userFunctions.rebuildUserList(data);
+                            logMe("debug", "verifyUsersList: need to rebuild the user list")
+                            this.rebuildUserList(data);
                         }
                     }
                 });
             }
         },
 
-        allusersAreDefined: function (userFunctions) {
+        allusersAreDefined: function () {
+            logMe("debug", "allusersAreDefined: checking users are all defined correctly")
             let allUsersOK = true;
-            for (let i = 0; i < userFunctions.theUsersList.length; i++) {
-                if (typeof userFunctions.theUsersList[i] === 'undefined') {
+            for (let i = 0; i < this.theUsersList.length; i++) {
+                if (typeof this.theUsersList[i] === 'undefined') {
                     allUsersOK = false;
                 }
             }
@@ -460,15 +503,29 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         rebuildUserList: function (data) {
-            userFunctions.theUsersList = [];
+            this.theUsersList = [];
 
             for (let i = 0; i < data.users.length; i++) {
                 if (typeof data.users[i] !== 'undefined') {
                     //userid then the name
-                    userFunctions.theUsersList.push(data.users[i].userid, data.users[i].name);
+                    this.theUsersList.push(data.users[i].userid, data.users[i].name);
                 }
             }
-        }
+        },
+
+        newModerator:function (data, bot) {
+            if (this.modList.indexOf(data.userid) === -1)
+            {
+                this.modList.push(data.userid);
+                // bot.speak("I've reset the Mod list: " + this.modList);
+            }
+        },
+
+        updateModeratorList: function (data, bot) {
+            this.modList.splice(this.modList.indexOf(data.userid), 1);
+            // bot.speak("I've reset the Mod list: " + this.modList);
+        },
+
     }
 }
 

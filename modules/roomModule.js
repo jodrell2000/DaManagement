@@ -1,4 +1,5 @@
 let roomDefaults = require('../defaultSettings/roomDefaults.js');
+let musicDefaults   = require('../defaultSettings/musicDefaults.js');
 
 const roomFunctions = (bot) => {
     return {
@@ -33,6 +34,7 @@ const roomFunctions = (bot) => {
         },
 
         removeFirstDJFromQueue: function (botFunctions) {
+            bot.speak('Sorry @' + this.queueName[0] + ' you have run out of time.');
             this.queueList.splice(0, 2);
             this.queueName.splice(0, 1);
             botFunctions.sayOnce = true;
@@ -40,7 +42,7 @@ const roomFunctions = (bot) => {
 
         readQueueMembers: function () {
             let queueMessage = '';
-            if (roomFunctions.queueName.length !== 0) {
+            if (this.queueName.length !== 0) {
                 let queueMessage = 'The queue is now: ';
                 for (let kj = 0; kj < this.queueName.length; kj++) {
                     if (kj !== (this.queueName.length - 1)) {
@@ -67,7 +69,33 @@ const roomFunctions = (bot) => {
                     }
                 }
             }
+        },
+
+
+        formatBannedArtists: function () {
+            if (musicDefaults.bannedArtists.length !== 0) {
+                let tempArray = [];
+                let tempString = '(';
+
+                //add a backslash in front of all special characters
+                for (let i = 0; i < musicDefaults.bannedArtists.length; i++) {
+                    tempArray.push(musicDefaults.bannedArtists[i].replace(/([-[\]{}()*^=!:+?.,\\$|#\s])/g, "\\$1"));
+                }
+
+                //join everything into one string
+                for (let i = 0; i < musicDefaults.bannedArtists.length; i++) {
+                    if (i < musicDefaults.bannedArtists.length - 1) {
+                        tempString += tempArray[i] + '|';
+                    } else {
+                        tempString += tempArray[i] + ')';
+                    }
+                }
+
+                //create regular expression
+                this.bannedArtistsMatcher = new RegExp('\\b' + tempString + '\\b', 'i');
+            }
         }
+
 
     }
 }
