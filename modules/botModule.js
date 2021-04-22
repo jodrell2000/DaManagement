@@ -93,6 +93,24 @@ const botFunctions = (bot) => {
         recordActivity: function () {
             this.checkActivity = Date.now(); //update when someone says something
         },
+
+        botSpeak: function (pm, user, message) {
+            if (pm === true) {
+                this.botPM(user, message);
+            } else {
+                this.botChat(message);
+            }
+        },
+
+        botChat: function (message) {
+            bot.speak(message);
+        },
+
+        botPM: function (user, message) {
+            bot.speak(user, message);
+        }
+
+
     }
 }
 

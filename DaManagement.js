@@ -4152,67 +4152,19 @@ bot.on('deregistered', function (data)
 //activates at the end of a song.
 bot.on('endsong', function (data)
 {
+    const djID = data.room.metadata.current_dj;
+
+    if (typeof (userFunctions.djSongCount[djID]) !== 'undefined' && typeof djID != 'undefined') {
+        // increase the playcount for the current DJ
+        userFunctions.incrementDJPlayCount(djID);
+
+        // check the playlimit and remove the current DJ if they've reached it
+        userFunctions.removeDJsOverPlaylimit(chatFunctions, djID);
+    }
+
     //bot says song stats for each song
     chatFunctions.readSongStats(songFunctions, roomDefaults)
 
+    roomFunctions.escortDJsDown(djID, botFunctions, userFunctions);
 
-    //iterates through the dj list incrementing dj song counts and
-    //removing them if they are over the limit.
-    let djId = data.room.metadata.current_dj;
-
-    if (typeof (userFunctions.djSongCount[djId]) !== 'undefined' && typeof djId != 'undefined')
-    {
-        if (++userFunctions.djSongCount[djId].nbSong >= roomDefaults.playLimit)
-        {
-            if (musicDefaults.PLAYLIMIT === true) //is playlimit on?
-            {
-                if (djId === userFunctions.currentDJs[0] && roomDefaults.playLimit === 1) //if person is in the far left seat and limit is set to one
-                {
-                    let checklist33 = userFunctions.theUsersList.indexOf(djId) + 1;
-
-                    if (checklist33 !== -1)
-                    {
-                        chatFunctions.overPlayLimit(userFunctions.theUsersList[checklist33], roomDefaults.playLimit)
-                        bot.speak('@' + userFunctions.theUsersList[checklist33] + ' you are over the playlimit of ' + roomDefaults.playLimit + ' song');
-                    }
-
-                    bot.remDj(djId);
-                }
-                else if (djId !== authModule.USERID && roomDefaults.playLimit !== 1) //if limit is more than one
-                {
-                    let checklist33 = userFunctions.theUsersList.indexOf(djId) + 1;
-
-                    if (checklist33 !== -1)
-                    {
-                        bot.speak('@' + userFunctions.theUsersList[checklist33] + ' you are over the playlimit of ' + roomDefaults.playLimit + ' songs');
-                    }
-
-                    bot.remDj(djId);
-                }
-            }
-        }
-    }
-
-
-    //iterates through the escort list and escorts all djs on the list off the stage.
-    for (let i = 0; i < botFunctions.escortMeList.length; i++)
-    {
-        if (typeof botFunctions.escortMeList[i] !== 'undefined' && data.room.metadata.current_dj === botFunctions.escortMeList[i])
-        {
-            let lookname = userFunctions.theUsersList.indexOf(data.room.metadata.current_dj) + 1;
-            bot.remDj(botFunctions.escortMeList[i]);
-
-            if (lookname !== -1)
-            {
-                bot.speak('@' + userFunctions.theUsersList[lookname] + ' had enabled escortme');
-            }
-
-            let removeFromList = botFunctions.escortMeList.indexOf(botFunctions.escortMeList[i]);
-
-            if (removeFromList !== -1)
-            {
-                botFunctions.escortMeList.splice(removeFromList, 1);
-            }
-        }
-    }
 });

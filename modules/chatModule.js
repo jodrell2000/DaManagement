@@ -47,7 +47,7 @@ const chatFunctions = (bot, roomDefaults) => {
         },
 
         overPlayLimit: function (username, playLimit) {
-            bot.speak('@' + username + ' you are over the playlimit of ' + playLimit + ' song');
+            bot.speak('@' + username + ' the  playlimit is currently ' + playLimit + '. Time for another DJ.');
         },
 
         eventMessageIterator: function (botFunctions, userFunctions) {
