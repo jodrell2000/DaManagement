@@ -2,6 +2,15 @@ let roomDefaults = require('../defaultSettings/roomDefaults.js');
 let musicDefaults   = require('../defaultSettings/musicDefaults.js');
 
 const roomFunctions = (bot) => {
+    function logMe(logLevel, message) {
+        if (logLevel==='error') {
+            console.log("roomFunctions:" + logLevel + "->" + message + "\n");
+        } else {
+            if (bot.debug) {
+                console.log("roomFunctions:" + logLevel + "->" + message + "\n");
+            }
+        }
+    }
     return {
         djCount: null, //the number of dj's on stage, gets reset every song
         checkWhoIsDj: null, //the userid of the currently playing dj
@@ -94,9 +103,29 @@ const roomFunctions = (bot) => {
                 //create regular expression
                 this.bannedArtistsMatcher = new RegExp('\\b' + tempString + '\\b', 'i');
             }
-        }
+        },
 
+        escortDJsDown: function (currentDJ, botFunctions, userFunctions) {
+            //iterates through the escort list and escorts all djs on the list off the stage.
+            for (let i = 0; i < botFunctions.escortMeList.length; i++) {
+                logMe("debug", "DJ to be escorted:" + currentDJ);
+                if (typeof botFunctions.escortMeList[i] !== 'undefined' && currentDJ === botFunctions.escortMeList[i]) {
+                    let lookname = userFunctions.theUsersList.indexOf(currentDJ) + 1;
+                    bot.remDj(botFunctions.escortMeList[i]);
 
+                    if (lookname !== -1) {
+                        const theMessage = '@' + userFunctions.theUsersList[lookname] + ' had enabled escortme';
+                        botFunctions.botSpeak(false, null, theMessage);
+                    }
+
+                    let removeFromList = botFunctions.escortMeList.indexOf(botFunctions.escortMeList[i]);
+
+                    if (removeFromList !== -1) {
+                        botFunctions.escortMeList.splice(removeFromList, 1);
+                    }
+                }
+            }
+        },
     }
 }
 module.exports = roomFunctions;

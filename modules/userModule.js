@@ -1,3 +1,5 @@
+let musicDefaults   = require('../defaultSettings/musicDefaults.js');
+
 let authModule = require('../auth.js');
 
 const userFunctions = (bot, roomDefaults) => {
@@ -56,23 +58,6 @@ const userFunctions = (bot, roomDefaults) => {
         lastSeen4: {}, //holds a date object to be used for the audience afk limit
 
         modList: [], //set the afk limit in minutes here
-
-        botStartReset: function () {
-            userFunctions.resetEscortMeList(bot);
-            userFunctions.resetUsersList();
-            userFunctions.resetModList(bot);
-            userFunctions.resetCurrentDJs();
-            userFunctions.resetUserIDs();
-            userFunctions.resetQueueList();
-            userFunctions.resetQueueNames();
-            userFunctions.resetPeople();
-            userFunctions.resetMyTime();
-            userFunctions.resetAFKPeople();
-            userFunctions.resetLastSeen();
-            userFunctions.resetDJSongCount();
-            userFunctions.resetWarnMe();
-            userFunctions.resetModPM();
-        },
 
         resetUsersList: function () {
             this.theUsersList = []
@@ -141,8 +126,26 @@ const userFunctions = (bot, roomDefaults) => {
 
         resetModList: function () {
             this.modList = []
-            // bot.speak("I've reset the Mod list: " + this.modList);
+            logMe("debug", "I've reset the Mod list: ");
         },
+
+        botStartReset: function () {
+            this.resetEscortMeList(bot);
+            this.resetUsersList();
+            this.resetModList(bot);
+            this.resetCurrentDJs();
+            this.resetUserIDs();
+            this.resetQueueList();
+            this.resetQueueNames();
+            this.resetPeople();
+            this.resetMyTime();
+            this.resetAFKPeople();
+            this.resetLastSeen();
+            this.resetDJSongCount();
+            this.resetWarnMe();
+            this.resetModPM();
+        },
+
 
         updateUser: function () {
             if (typeof bot.data.name === 'string') {
@@ -517,15 +520,36 @@ const userFunctions = (bot, roomDefaults) => {
             if (this.modList.indexOf(data.userid) === -1)
             {
                 this.modList.push(data.userid);
-                // bot.speak("I've reset the Mod list: " + this.modList);
+                logMe("debug","I've reset the Mod list: " + this.modList);
             }
         },
 
         updateModeratorList: function (data, bot) {
             this.modList.splice(this.modList.indexOf(data.userid), 1);
-            // bot.speak("I've reset the Mod list: " + this.modList);
+            logMe("debug","I've reset the Mod list: " + this.modList);
         },
 
+        incrementDJPlayCount(djID) {
+            ++this.djSongCount[djID].nbSong
+        },
+
+        removeDJsOverPlaylimit(chatFunctions, djID) {
+            if (musicDefaults.PLAYLIMIT === true) //is playlimit on?
+            {
+                if (djID !== authModule.USERID && djID === this.currentDJs[0] && roomDefaults.playLimit === 1) //if person is in the far left seat and limit is set to one
+                {
+                    let checklist33 = this.theUsersList.indexOf(djID) + 1;
+
+                    logMe("debug", "--------------------------" + checklist33 + "==============================");
+
+                    if (checklist33 !== -1) {
+                        chatFunctions.overPlayLimit(this.theUsersList[checklist33], roomDefaults.playLimit)
+                    }
+
+                    bot.remDj(djID);
+                }
+            }
+        }
     }
 }
 
