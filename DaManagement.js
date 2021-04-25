@@ -4000,93 +4000,34 @@ bot.on('roomChanged', function (data)
     try
     {
         //reset arrays in case this was triggered by the bot restarting
-        userFunctions.botStartReset();
+        userFunctions.botStartReset(botFunctions);
 
-        //set information
-        roomDefaults.detail = data.room.description; //used to get room description
-        roomDefaults.roomName = data.room.name; //gets your rooms name
-        roomDefaults.ttRoomName = data.room.shortcut; //gets room shortcut
-
-        //load the playlist into memory
-        bot.playlistAll(function (callback) {
-            roomDefaults.thisHoldsThePlaylist = callback.list;
-        });
-
-
-        //only set begintime if it has not already been set
-        if (botFunctions.botStartTime === null)
-        {
-            botFunctions.botStartTime = Date.now(); //the time the bot entered the room at
-        }
-
+        //get & set information
+        roomFunctions.setRoomDefaults(data);
 
         //finds out who the currently playing dj's are.
-        for (let iop = 0; iop < data.room.metadata.djs.length; iop++)
-        {
-            if (typeof data.room.metadata.djs[iop] !== 'undefined')
-            {
+        for (let iop = 0; iop < data.room.metadata.djs.length; iop++) {
+            if (typeof data.room.metadata.djs[iop] !== 'undefined') {
                 userFunctions.currentDJs.push(data.room.metadata.djs[iop]);
                 userFunctions.djSongCount[data.room.metadata.djs[iop]] = { //set dj song play count to zero
                     nbSong: 0
                 };
-                userFunctions.justSaw(data.room.metadata.djs[iop], 'justSaw'); //initialize dj afk count
-                userFunctions.justSaw(data.room.metadata.djs[iop], 'justSaw1');
-                userFunctions.justSaw(data.room.metadata.djs[iop], 'justSaw2');
+                userFunctions.initializeDJAFKCount(data, iop);
             }
         }
 
+        userFunctions.buildModList(data);
 
-        //set modlist to list of moderators
-        //modList = data.room.metadata.moderator_id;
-        for (let ihp = 0; ihp < data.room.metadata.moderator_id.length; ihp++)
-        {
-            userFunctions.modList.push(data.room.metadata.moderator_id[ihp]);
-        }
+        userFunctions.buildUserLists(data);
 
+        userFunctions.resetAllSpamCounts();
 
-        //used to get user names and user id's
-        for (let i = 0; i < data.users.length; i++)
-        {
-            if (typeof data.users[i] !== 'undefined')
-            {
-                userFunctions.theUsersList.push(data.users[i].userid, data.users[i].name);
-                userFunctions.userIDs.push(data.users[i].userid);
-            }
-        }
-
-
-        //sets everyones spam count to zero
-        //puts people on the global afk list when it joins the room
-        for (let z = 0; z < userFunctions.userIDs.length; z++)
-        {
-            if (typeof userFunctions.userIDs[z] !== 'undefined')
-            {
-                userFunctions.people[userFunctions.userIDs[z]] = {
-                    spamCount: 0
-                };
-                userFunctions.justSaw(userFunctions.userIDs[z], 'justSaw3');
-                userFunctions.justSaw(userFunctions.userIDs[z], 'justSaw4');
-            }
-        }
-
-
-        //starts time in room for everyone currently in the room
-        for (let zy = 0; zy < userFunctions.userIDs.length; zy++)
-        {
-            if (typeof userFunctions.userIDs[zy] !== 'undefined')
-            {
-                userFunctions.myTime[userFunctions.userIDs[zy]] = Date.now();
-            }
-        }
+        userFunctions.startAllUserTimers();
     }
-    catch (err)
-    {
-        if (typeof errorMessage === 'string')
-        {
+    catch (err) {
+        if (typeof errorMessage === 'string') {
             console.log('unable to join the room the room due to: ' + errorMessage);
-        }
-        else
-        {
+        } else {
             console.log('unable to join the room the room due to: ' + err);
         }
     }

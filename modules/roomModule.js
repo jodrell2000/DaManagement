@@ -126,6 +126,17 @@ const roomFunctions = (bot) => {
                 }
             }
         },
+
+        setRoomDefaults(data) {
+            roomDefaults.detail = data.room.description; //used to get room description
+            roomDefaults.roomName = data.room.name; //gets your rooms name
+            roomDefaults.ttRoomName = data.room.shortcut; //gets room shortcut
+
+            bot.playlistAll(function (callback) {
+                roomDefaults.thisHoldsThePlaylist = callback.list;
+            });
+
+        },
     }
 }
 module.exports = roomFunctions;

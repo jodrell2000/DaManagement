@@ -129,7 +129,7 @@ const userFunctions = (bot, roomDefaults) => {
             logMe("debug", "I've reset the Mod list: ");
         },
 
-        botStartReset: function () {
+        botStartReset: function (botFunctions) {
             this.resetEscortMeList(bot);
             this.resetUsersList();
             this.resetModList(bot);
@@ -144,6 +144,11 @@ const userFunctions = (bot, roomDefaults) => {
             this.resetDJSongCount();
             this.resetWarnMe();
             this.resetModPM();
+
+            //only set begintime if it has not already been set
+            if (botFunctions.botStartTime === null) {
+                botFunctions.botStartTime = Date.now(); //the time the bot entered the room at
+            }
         },
 
 
@@ -549,6 +554,52 @@ const userFunctions = (bot, roomDefaults) => {
                     bot.remDj(djID);
                 }
             }
+        },
+
+        startAllUserTimers() {
+            //starts time in room for everyone currently in the room
+            for (let zy = 0; zy < this.userIDs.length; zy++) {
+                if (typeof this.userIDs[zy] !== 'undefined') {
+                    this.myTime[this.userIDs[zy]] = Date.now();
+                }
+            }
+        },
+
+        buildUserLists(data) {
+            //used to get user names and user id's
+            for (let i = 0; i < data.users.length; i++) {
+                if (typeof data.users[i] !== 'undefined') {
+                    this.theUsersList.push(data.users[i].userid, data.users[i].name);
+                    this.userIDs.push(data.users[i].userid);
+                }
+            }
+        },
+
+        buildModList(data) {
+            //set modlist to list of moderators
+            //modList = data.room.metadata.moderator_id;
+            for (let ihp = 0; ihp < data.room.metadata.moderator_id.length; ihp++) {
+                userFunctions.modList.push(data.room.metadata.moderator_id[ihp]);
+            }
+        },
+        resetAllSpamCounts() {
+            //sets everyones spam count to zero
+            //puts people on the global afk list when it joins the room
+            for (let z = 0; z < this.userIDs.length; z++) {
+                if (typeof this.userIDs[z] !== 'undefined') {
+                    this.people[this.userIDs[z]] = {
+                        spamCount: 0
+                    };
+                    this.justSaw(this.userIDs[z], 'justSaw3');
+                    this.justSaw(this.userIDs[z], 'justSaw4');
+                }
+            }
+        },
+
+        initializeDJAFKCount(data, dj) {
+            this.justSaw(data.room.metadata.djs[dj], 'justSaw'); //initialize dj afk count
+            this.justSaw(data.room.metadata.djs[dj], 'justSaw1');
+            this.justSaw(data.room.metadata.djs[dj], 'justSaw2');
         }
     }
 }
