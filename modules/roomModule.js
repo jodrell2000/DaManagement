@@ -1,5 +1,6 @@
 let roomDefaults = require('../defaultSettings/roomDefaults.js');
 let musicDefaults   = require('../defaultSettings/musicDefaults.js');
+let botDefaults     = require('../defaultSettings/botDefaults.js');
 
 const roomFunctions = (bot) => {
     function logMe(logLevel, message) {

@@ -521,7 +521,7 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        newModerator:function (data, bot) {
+        newModerator:function (data) {
             if (this.modList.indexOf(data.userid) === -1)
             {
                 this.modList.push(data.userid);
@@ -529,7 +529,7 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        updateModeratorList: function (data, bot) {
+        updateModeratorList: function (data) {
             this.modList.splice(this.modList.indexOf(data.userid), 1);
             logMe("debug","I've reset the Mod list: " + this.modList);
         },

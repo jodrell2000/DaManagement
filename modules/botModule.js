@@ -170,18 +170,19 @@ const botFunctions = (bot) => {
         },
 
         startBotDJing: function () {
-            logMe("debug", "Remove a DJ:" + userID)
+            logMe("debug", "Start the bot DJing")
             bot.addDj(); // start the Bot DJing
         },
 
         isSongInBotPlaylist: function (thisSong) {
+            let foundSong = false;
             for (let listLoop = 0; listLoop < botDefaults.botPlaylist.length; listLoop++) {
                 if (botDefaults.botPlaylist[listLoop]._id === thisSong) {
-                    return true;
-                } else {
-                    return false;
+                    foundSong = true;
                 }
             }
+
+            return foundSong;
         },
 
         addToBotPlaylist: function (thisSong) {

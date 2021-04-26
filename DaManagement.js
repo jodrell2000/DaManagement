@@ -109,7 +109,6 @@ global.warnMeCall = function ()
 global.checkIfUserIsMod = function (userid)
 {
     let modIndex = userFunctions.modList.indexOf(userid);
-
     userFunctions.isModerator = modIndex !== -1;
 };
 
@@ -119,9 +118,7 @@ global.checkIfUserIsMod = function (userid)
 global.checkToseeIfPmmerIsInRoom = function (userid)
 {
     let isInRoom = userFunctions.theUsersList.indexOf(userid);
-
     isInRoom = isInRoom !== -1;
-
     return isInRoom;
 };
 
@@ -3995,13 +3992,13 @@ bot.on('update_user', function () {
 //updates the moderator list when a moderator is added.
 bot.on('new_moderator', function (data)
 {
-    userFunctions.newModerator(data, bot)
+    userFunctions.newModerator(data)
 })
 
 //updates the moderator list when a moderator is removed.
 bot.on('rem_moderator', function (data)
 {
-    userFunctions.updateModeratorList(data, bot)
+    userFunctions.updateModeratorList(data)
 })
 
 //starts up when a user leaves the room
