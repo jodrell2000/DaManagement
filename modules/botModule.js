@@ -1,4 +1,5 @@
 let roomDefaults = require('../defaultSettings/roomDefaults.js');
+let botDefaults     = require('../defaultSettings/botDefaults.js');
 
 let authModule = require('../auth.js');
 
@@ -108,8 +109,99 @@ const botFunctions = (bot) => {
 
         botPM: function (user, message) {
             bot.speak(user, message);
-        }
+        },
 
+        isBotOnStage: function (userFunctions) {
+            logMe("debug", "Check if the bot is already on stage")
+            let isBotAlreadyOnStage = userFunctions.currentDJs.indexOf(authModule.USERID);
+            return isBotAlreadyOnStage !== -1;
+        },
+
+        shouldTheBotDJ: function (userFunctions, roomFunctions) {
+            logMe("debug", "Check if the bot should DJ or not")
+            if (userFunctions.currentDJs.length >= 1 && // is there at least one DJ on stage
+                userFunctions.currentDJs.length <= botDefaults.whenToGetOnStage && // are there fewer than the limit of DJs on stage
+                roomFunctions.queueList.length === 0 && // is the queue empty
+                userFunctions.vipList.length === 0 && // there no VIPs
+                userFunctions.refreshList.length === 0) { // are we waiting for someone who used the refresh command
+                return true; // start the Bot DJing
+            } else {
+                return false
+            }
+        },
+
+        shouldStopBotDJing: function (userFunctions, roomFunctions) {
+            logMe("debug", "Check if the bot stop DJing")
+            if (userFunctions.currentDJs.length >= botDefaults.whenToGetOffStage && // are there enough DJs onstage
+                roomFunctions.checkWhoIsDj !== authModule.USERID) { // is the bot the current DJ
+                return true; // remove the Bot from stage
+            } else {
+                return false;
+            }
+        },
+
+        checkAutoDJing: function (userFunctions, roomFunctions) {
+            logMe("debug", "Check if the bot should DJ and start it, or remove if required")
+            if (this.autoDjingTimer != null)
+            {
+                clearTimeout(this.autoDjingTimer);
+                this.autoDjingTimer = null;
+            }
+
+            if (botDefaults.getonstage === true) {
+
+                this.autoDjingTimer = setTimeout(function () {
+                    if (!this.isBotOnStage) { //if the bot is not already on stage
+                        if (this.shouldTheBotDJ(userFunctions, roomFunctions)) {
+                            this.startBotDJing();
+                        }
+                    } else { //else it is on stage
+                        if (this.shouldStopBotDJing(userFunctions, roomFunctions)) {
+                            this.removeDJ(authModule.USERID); // remove the Bot from stage
+                        }
+                    }
+                }, 1000 * 10); //delay for 10 seconds
+            }
+        },
+
+        removeDJ: function (userID) {
+            logMe("debug", "Remove a DJ:" + userID)
+            bot.remDj(userID); // remove the Bot from stage
+        },
+
+        startBotDJing: function () {
+            logMe("debug", "Remove a DJ:" + userID)
+            bot.addDj(); // start the Bot DJing
+        },
+
+        isSongInBotPlaylist: function (thisSong) {
+            for (let listLoop = 0; listLoop < botDefaults.botPlaylist.length; listLoop++) {
+                if (botDefaults.botPlaylist[listLoop]._id === thisSong) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        },
+
+        addToBotPlaylist: function (thisSong) {
+            bot.playlistAdd(thisSong, -1); //add song to the end of the playlist
+            botDefaults.botPlaylist.push(thisSong);
+
+            if (botDefaults.feart) { //whether the bot will show the heart animation or not
+                bot.snag();
+            }
+        },
+
+        checkAndAddToPlaylist: function (songFunctions) {
+            const thisSong = songFunctions.getSong;
+
+            if (botDefaults.botPlaylist !== null && thisSong !== null) {
+                if (!this.isSongInBotPlaylist(thisSong)) {
+                    this.addToBotPlaylist(thisSong);
+                }
+            }
+        },
 
     }
 }

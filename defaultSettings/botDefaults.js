@@ -8,5 +8,7 @@ module.exports = {
 
     autoBop: true, //choose whether the bot will autobop for each song or not(against the rules but i leave it up to you) (off by default)
     autoSnag: false, //auto song adding(different from every song adding), tied to  botDefaultsModule.howManyVotes up above, (off by default)
+    feart: true,
 
+    botPlaylist: null, //the playlist for the bot
 }

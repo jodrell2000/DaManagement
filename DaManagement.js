@@ -74,75 +74,6 @@ setInterval( function() {
 
 setInterval( userFunctions.verifyUsersList,1000 * 60 * 15); //check every 15 minutes
 
-
-
-//governs whether the bot gets on or off the stage automatically (autodjing)
-global.autoDjing = function ()
-{
-    if (botFunctions.autoDjingTimer != null)
-    {
-        clearTimeout(botFunctions.autoDjingTimer);
-        botFunctions.autoDjingTimer = null;
-    }
-
-    botFunctions.autoDjingTimer = setTimeout(function ()
-    {
-        let isBotAlreadyOnStage = userFunctions.currentDJs.indexOf(authModule.USERID);
-
-        if (isBotAlreadyOnStage === -1) //if the bot is not already on stage
-        {
-            if (userFunctions.currentDJs.length >= 1 && userFunctions.currentDJs.length <=  botDefaults.whenToGetOnStage && roomFunctions.queueList.length === 0)
-            {
-                if (botDefaults.getonstage === true && userFunctions.vipList.length === 0 && userFunctions.refreshList.length === 0)
-                {
-                    bot.addDj();
-                }
-            }
-        }
-        else //else it is on stage
-        {
-            if (userFunctions.currentDJs.length >=  botDefaults.whenToGetOffStage && botDefaults.getonstage === true && roomFunctions.checkWhoIsDj !== authModule.USERID)
-            {
-                bot.remDj();
-            }
-        }
-    }, 1000 * 10); //delay for 10 seconds
-};
-
-
-
-//adds a song to the end of the bots queue if it is not already contained in the bots queue
-global.addSongIfNotAlreadyInPlaylist = function (bool)
-{
-    if (roomDefaults.thisHoldsThePlaylist !== null && songFunctions.getSong !== null)
-    {
-        let found = false;
-        for (let igh = 0; igh < roomDefaults.thisHoldsThePlaylist.length; igh++)
-        {
-            if (roomDefaults.thisHoldsThePlaylist[igh]._id === songFunctions.getSong)
-            {
-                found = true;
-                break;
-            }
-        }
-        if (!found)
-        {
-            bot.playlistAdd(songFunctions.getSong, -1); //add song to the end of the playlist
-            let tempSongHolder = {
-                _id: songFunctions.getSong
-            };
-            roomDefaults.thisHoldsThePlaylist.push(tempSongHolder);
-
-            if (bool) //whether the bot will show the heart animation or not
-            {
-                bot.snag();
-            }
-        }
-    }
-};
-
-
-
 global.warnMeCall = function ()
 {
     if (userFunctions.warnme.length !== 0) //is there anyone in the warnme?
@@ -387,21 +318,18 @@ bot.on('newsong', function (data)
     //adds a song to the end of your bots queue
     if (songFunctions.snagSong === true)
     {
-        addSongIfNotAlreadyInPlaylist(false);
+        botFunctions.checkAndAddToPlaylist(songFunctions);
     }
 
 
     //if true causes the bot to start bopping to the currently playing song
     if (botDefaults.autoBop === true)
     {
-        // bot.speak('autoBop: ' + botDefaults.autoBop);
         bot.bop();
     }
 
-
     //check to see if conditions are met for bot's autodjing feature
-    autoDjing();
-
+    botFunctions.checkAutoDJing(userFunctions, roomFunctions);
 
     //if the bot is the only one on stage and they are skipping their songs
     //they will stop skipping
@@ -409,7 +337,6 @@ bot.on('newsong', function (data)
     {
         botFunctions.skipOn = false;
     }
-
 
     //used to have the bot skip its song if its the current player and skipOn command was used
     if (authModule.USERID === roomFunctions.checkWhoIsDj && botFunctions.skipOn === true)
@@ -536,9 +463,9 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/playlist/))
     {
-        if (roomDefaults.thisHoldsThePlaylist !== null)
+        if (botDefaults.botPlaylist !== null)
         {
-            bot.speak('There are currently ' + roomDefaults.thisHoldsThePlaylist.length + ' songs in my playlist.');
+            bot.speak('There are currently ' + botDefaults.botPlaylist.length + ' songs in my playlist.');
         }
     }
     else if (text.match(/^\/randomSong$/) && userFunctions.isModerator === true)
@@ -550,9 +477,9 @@ bot.on('speak', function (data)
             ++botFunctions.randomOnce;
             let reorder = setInterval(function ()
             {
-                if (ez <= roomDefaults.thisHoldsThePlaylist.length)
+                if (ez <= botDefaults.botPlaylist.length)
                 {
-                    let nextId = Math.ceil(Math.random() * roomDefaults.thisHoldsThePlaylist);
+                    let nextId = Math.ceil(Math.random() * botDefaults.botPlaylist);
                     bot.playlistReorder(ez, nextId);
                     console.log("Song " + ez + " changed.");
                     ez++;
@@ -1596,12 +1523,12 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/snag/) && userFunctions.isModerator === true)
     {
-        if (songFunctions.getSong !== null && roomDefaults.thisHoldsThePlaylist !== null)
+        if (songFunctions.getSong !== null && botDefaults.botPlaylist !== null)
         {
             let found = false;
-            for (let igh = 0; igh < roomDefaults.thisHoldsThePlaylist.length; igh++)
+            for (let igh = 0; igh < botDefaults.botPlaylist.length; igh++)
             {
-                if (roomDefaults.thisHoldsThePlaylist[igh]._id === songFunctions.getSong)
+                if (botDefaults.botPlaylist[igh]._id === songFunctions.getSong)
                 {
                     found = true;
                     bot.speak('I already have that song');
@@ -1615,7 +1542,7 @@ bot.on('speak', function (data)
                 let tempSongHolder = {
                     _id: songFunctions.getSong
                 };
-                roomDefaults.thisHoldsThePlaylist.push(tempSongHolder);
+                botDefaults.botPlaylist.push(tempSongHolder);
             }
         }
         else
@@ -1629,12 +1556,12 @@ bot.on('speak', function (data)
         {
             bot.skip();
             bot.playlistRemove(-1);
-            roomDefaults.thisHoldsThePlaylist.splice(roomDefaults.thisHoldsThePlaylist.length - 1, 1);
+            botDefaults.botPlaylist.splice(botDefaults.botPlaylist.length - 1, 1);
             bot.speak('the last snagged song has been removed.');
         }
         else
         {
-            roomDefaults.thisHoldsThePlaylist.splice(roomDefaults.thisHoldsThePlaylist.length - 1, 1);
+            botDefaults.botPlaylist.splice(botDefaults.botPlaylist.length - 1, 1);
             bot.playlistRemove(-1);
             bot.speak('the last snagged song has been removed.');
         }
@@ -2202,7 +2129,7 @@ bot.on('update_votes', function (data)
     if (botDefaults.autoSnag === true && songFunctions.snagSong === false && songFunctions.upVotes >=  botDefaults.howManyVotes && songFunctions.ALLREADYCALLED === false)
     {
         songFunctions.voteSnagged();
-        addSongIfNotAlreadyInPlaylist(true);
+        botFunctions.checkAndAddToPlaylist(songFunctions);
     }
 })
 
@@ -2376,12 +2303,8 @@ bot.on('add_dj', function (data)
         }
     }
 
-
-
     //check to see if conditions are met for bot's autodjing feature
-    autoDjing();
-
-
+    botFunctions.checkAutoDJing(userFunctions, roomFunctions);
 
     //if person exceeds spam count within 10 seconds they are kicked
     if (typeof userFunctions.people[data.user[0].userid] != 'undefined' && userFunctions.people[data.user[0].userid].spamCount >= roomDefaults.spamLimit)
@@ -2438,7 +2361,7 @@ bot.on('rem_dj', function (data)
 
 
     //check to see if conditions are met for bot's autodjing feature
-    autoDjing();
+    botFunctions.checkAutoDJing(userFunctions, roomFunctions);
 
 
     //takes a user off the escort list if they leave the stage.
@@ -2462,13 +2385,13 @@ bot.on('pmmed', function (data)
     checkIfUserIsMod(data.senderid); //check to see if person pming the bot a command is a moderator or not
 
     //if no commands match, the pmmer is a moderator and theres more than zero people in the modpm chat
-    if (userFunctions.modpm.length !== 0 && data.text.charAt(0) !== '/' && userFunctions.isModerator === true) //if no other commands match, send modpm
+    if (userFunctions.modPM.length !== 0 && data.text.charAt(0) !== '/' && userFunctions.isModerator === true) //if no other commands match, send modpm
     {
-        let areTheyInModPm = userFunctions.modpm.indexOf(data.senderid);
+        let areTheyInModPm = userFunctions.modPM.indexOf(data.senderid);
 
         if (areTheyInModPm !== -1)
         {
-            for (let jhg = 0; jhg < userFunctions.modpm.length; jhg++)
+            for (let jhg = 0; jhg < userFunctions.modPM.length; jhg++)
             {
                 if (modpm[jhg] !== data.senderid && modpm[jhg] !== authModule.USERID) //this will prevent you from messaging yourself
                 {
@@ -2479,16 +2402,16 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/modpm/) && userFunctions.isModerator === true && isInRoom === true)
     {
-        let areTheyInModPm = userFunctions.modpm.indexOf(data.senderid);
+        let areTheyInModPm = userFunctions.modPM.indexOf(data.senderid);
 
         if (areTheyInModPm === -1) //are they already in modpm? no
         {
-            userFunctions.modpm.unshift(data.senderid);
+            userFunctions.modPM.unshift(data.senderid);
             bot.pm('you have now entered into modpm mode, your messages ' +
                 'will go to other moderators currently in the modpm', data.senderid);
-            if (userFunctions.modpm.length !== 0)
+            if (userFunctions.modPM.length !== 0)
             {
-                for (let jk = 0; jk < userFunctions.modpm.length; jk++)
+                for (let jk = 0; jk < userFunctions.modPM.length; jk++)
                 {
                     if (modpm[jk] !== data.senderid)
                     {
@@ -2499,11 +2422,11 @@ bot.on('pmmed', function (data)
         }
         else if (areTheyInModPm !== -1) //yes
         {
-            userFunctions.modpm.splice(areTheyInModPm, 1);
+            userFunctions.modPM.splice(areTheyInModPm, 1);
             bot.pm('you have now left modpm mode', data.senderid);
-            if (userFunctions.modpm.length !== 0)
+            if (userFunctions.modPM.length !== 0)
             {
-                for (let jk = 0; jk < userFunctions.modpm.length; jk++)
+                for (let jk = 0; jk < userFunctions.modPM.length; jk++)
                 {
                     bot.pm(userFunctions.theUsersList[name1] + ' has left the modpm chat', modpm[jk]); //declare user has entered chat
                 }
@@ -2550,15 +2473,15 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/whosinmodpm/) && userFunctions.isModerator === true && isInRoom === true)
     {
-        if (userFunctions.modpm.length !== 0)
+        if (userFunctions.modPM.length !== 0)
         {
             let temper = "Users in modpm: "; //holds names
 
-            for (let gfh = 0; gfh < userFunctions.modpm.length; gfh++)
+            for (let gfh = 0; gfh < userFunctions.modPM.length; gfh++)
             {
                 let whatAreTheirNames = userFunctions.theUsersList.indexOf(modpm[gfh]) + 1;
 
-                if (gfh !== (userFunctions.modpm.length - 1))
+                if (gfh !== (userFunctions.modPM.length - 1))
                 {
                     temper += userFunctions.theUsersList[whatAreTheirNames] + ', ';
 
@@ -3165,9 +3088,9 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/playlist/) && userFunctions.isModerator === true && isInRoom === true)
     {
-        if (roomDefaults.thisHoldsThePlaylist !== null)
+        if (botDefaults.botPlaylist !== null)
         {
-            bot.pm('There are currently ' + roomDefaults.thisHoldsThePlaylist.length + ' songs in my playlist.', data.senderid);
+            bot.pm('There are currently ' + botDefaults.botPlaylist.length + ' songs in my playlist.', data.senderid);
         }
     }
     else if (text.match(/^\/setTheme/) && userFunctions.isModerator === true && isInRoom === true)
@@ -3373,9 +3296,9 @@ bot.on('pmmed', function (data)
             ++botFunctions.randomOnce;
             let reorder = setInterval(function ()
             {
-                if (ez <= roomDefaults.thisHoldsThePlaylist.length)
+                if (ez <= botDefaults.botPlaylist.length)
                 {
-                    let nextId = Math.ceil(Math.random() * roomDefaults.thisHoldsThePlaylist);
+                    let nextId = Math.ceil(Math.random() * botDefaults.botPlaylist);
                     bot.playlistReorder(ez, nextId);
                     console.log("Song " + ez + " changed.");
                     ez++;
@@ -3763,12 +3686,12 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/snag/) && userFunctions.isModerator === true && isInRoom === true)
     {
-        if (songFunctions.getSong !== null && roomDefaults.thisHoldsThePlaylist !== null)
+        if (songFunctions.getSong !== null && botDefaults.botPlaylist !== null)
         {
             let found = false;
-            for (let igh = 0; igh < roomDefaults.thisHoldsThePlaylist.length; igh++)
+            for (let igh = 0; igh < botDefaults.botPlaylist.length; igh++)
             {
-                if (roomDefaults.thisHoldsThePlaylist[igh]._id === songFunctions.getSong)
+                if (botDefaults.botPlaylist[igh]._id === songFunctions.getSong)
                 {
                     found = true;
                     bot.pm('I already have that song', data.senderid);
@@ -3782,7 +3705,7 @@ bot.on('pmmed', function (data)
                 let tempSongHolder = {
                     _id: songFunctions.getSong
                 };
-                roomDefaults.thisHoldsThePlaylist.push(tempSongHolder);
+                botDefaults.botPlaylist.push(tempSongHolder);
             }
         }
         else
@@ -3821,12 +3744,12 @@ bot.on('pmmed', function (data)
         {
             bot.skip();
             bot.playlistRemove(-1);
-            roomDefaults.thisHoldsThePlaylist.splice(roomDefaults.thisHoldsThePlaylist.length - 1, 1);
+            botDefaults.botPlaylist.splice(botDefaults.botPlaylist.length - 1, 1);
             bot.pm('the last snagged song has been removed.', data.senderid);
         }
         else
         {
-            roomDefaults.thisHoldsThePlaylist.splice(roomDefaults.thisHoldsThePlaylist.length - 1, 1);
+            botDefaults.botPlaylist.splice(botDefaults.botPlaylist.length - 1, 1);
             bot.playlistRemove(-1);
             bot.pm('the last snagged song has been removed.', data.senderid);
         }
@@ -4065,7 +3988,7 @@ bot.on('registered', function (data) {
 });
 
 
-bot.on('update_user', function (data) {
+bot.on('update_user', function () {
     userFunctions.updateUser(bot);
 })
 

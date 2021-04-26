@@ -133,7 +133,7 @@ const roomFunctions = (bot) => {
             roomDefaults.ttRoomName = data.room.shortcut; //gets room shortcut
 
             bot.playlistAll(function (callback) {
-                roomDefaults.thisHoldsThePlaylist = callback.list;
+                botDefaults.botPlaylist = callback.list;
             });
 
         },
