@@ -119,25 +119,17 @@ const botFunctions = (bot) => {
 
         shouldTheBotDJ: function (userFunctions, roomFunctions) {
             logMe("debug", "Check if the bot should DJ or not")
-            if (userFunctions.currentDJs.length >= 1 && // is there at least one DJ on stage
+            return userFunctions.currentDJs.length >= 1 && // is there at least one DJ on stage
                 userFunctions.currentDJs.length <= botDefaults.whenToGetOnStage && // are there fewer than the limit of DJs on stage
                 roomFunctions.queueList.length === 0 && // is the queue empty
                 userFunctions.vipList.length === 0 && // there no VIPs
-                userFunctions.refreshList.length === 0) { // are we waiting for someone who used the refresh command
-                return true; // start the Bot DJing
-            } else {
-                return false
-            }
+                userFunctions.refreshList.length === 0; // is there someone currently using the refresh command
         },
 
         shouldStopBotDJing: function (userFunctions, roomFunctions) {
             logMe("debug", "Check if the bot stop DJing")
-            if (userFunctions.currentDJs.length >= botDefaults.whenToGetOffStage && // are there enough DJs onstage
-                roomFunctions.checkWhoIsDj !== authModule.USERID) { // is the bot the current DJ
-                return true; // remove the Bot from stage
-            } else {
-                return false;
-            }
+            return userFunctions.currentDJs.length >= botDefaults.whenToGetOffStage && // are there enough DJs onstage
+                roomFunctions.checkWhoIsDj !== authModule.USERID; // check the Bot isn't currently DJing
         },
 
         checkAutoDJing: function (userFunctions, roomFunctions) {
