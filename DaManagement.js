@@ -3986,7 +3986,7 @@ bot.on('registered', function (data) {
 
 
 bot.on('update_user', function () {
-    userFunctions.updateUser(bot);
+    userFunctions.updateUser(roomFunctions);
 })
 
 //updates the moderator list when a moderator is added.

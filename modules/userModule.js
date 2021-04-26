@@ -152,7 +152,7 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
 
-        updateUser: function () {
+        updateUser: function (roomFunctions) {
             if (typeof bot.data.name === 'string') {
                 let oldname = ''; //holds users old name if exists
                 let queueNamePosition;
@@ -170,19 +170,19 @@ const userFunctions = (bot, roomDefaults) => {
                         this.theUsersList[nameIndex + 1] = bot.data.name;
 
                         if (typeof oldname !== 'undefined') {
-                            queueNamePosition = this.queueName.indexOf(oldname);
-                            queueListPosition = this.queueList.indexOf(oldname);
+                            queueNamePosition = roomFunctions.queueName.indexOf(oldname);
+                            queueListPosition = roomFunctions.queueList.indexOf(oldname);
                             afkPeoplePosition = this.afkPeople.indexOf(oldname);
 
 
                             if (queueNamePosition !== -1) //if they were in the queue when they changed their name, then replace their name
                             {
-                                this.queueName[queueNamePosition] = bot.data.name;
+                                roomFunctions.queueName[queueNamePosition] = bot.data.name;
                             }
 
                             if (queueListPosition !== -1) //this is also for the queue
                             {
-                                this.queueList[queueListPosition] = bot.data.name;
+                                roomFunctions.queueList[queueListPosition] = bot.data.name;
                             }
 
                             if (afkPeoplePosition !== -1) //this checks the afk list
