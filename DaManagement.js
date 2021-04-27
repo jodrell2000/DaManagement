@@ -3937,6 +3937,8 @@ bot.on('roomChanged', function (data)
         //get & set information
         roomFunctions.setRoomDefaults(data);
 
+        userFunctions.buildUserLists(data);
+
         //finds out who the currently playing dj's are.
         for (let iop = 0; iop < data.room.metadata.djs.length; iop++) {
             if (typeof data.room.metadata.djs[iop] !== 'undefined') {
@@ -3953,8 +3955,6 @@ bot.on('roomChanged', function (data)
         }
 
         userFunctions.buildModList(data);
-
-        userFunctions.buildUserLists(data);
 
         userFunctions.resetAllSpamCounts();
 
