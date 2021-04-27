@@ -29,6 +29,17 @@ const chatFunctions         = chatModule(bot, roomDefaults);
 const songFunctions         = songModule();
 const roomFunctions         = roomModule(bot);
 
+function logMe(logLevel, message) {
+    if (logLevel==='error') {
+        console.log("botFunctions:" + logLevel + "->" + message + "\n");
+    } else {
+        if (bot.debug) {
+            console.log("botFunctions:" + logLevel + "->" + message + "\n");
+        }
+    }
+}
+
+
 // do something when the bot disconnects?
 bot.on('disconnected', function (data) { } );
 
@@ -1777,6 +1788,7 @@ bot.on('speak', function (data)
     {
         if (typeof data.userid == 'undefined')
         {
+            logMe("debug", "User is undefined");
             bot.speak('failed to add to queue, please try the command again');
         }
         else
@@ -1785,6 +1797,7 @@ bot.on('speak', function (data)
 
             if (typeof userFunctions.theUsersList[indexInUsersList] == 'undefined')
             {
+                logMe("debug", "Userlist is undefined");
                 bot.pm('failed to add to queue, please try the command again', data.userid);
             }
             else
