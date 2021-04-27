@@ -368,7 +368,7 @@ bot.on('newsong', function (data)
             //if matching is enabled for both songs and artists
             if (musicDefaults.matchArtists && musicDefaults.matchSongs)
             {
-                if (songFunctions.artist.match(roomFunctions.bannedArtistsMatcher) || song.match(roomFunctions.bannedArtistsMatcher))
+                if (songFunctions.artist.match(roomFunctions.bannedArtistsMatcher) || songFunctions.song.match(roomFunctions.bannedArtistsMatcher))
                 {
                     bot.remDj(roomFunctions.checkWhoIsDj);
 
