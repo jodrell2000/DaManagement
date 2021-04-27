@@ -25,7 +25,7 @@ const roomFunctions = (bot) => {
         queueName: [], //holds just the name of everyone who is in the queue
         queueTimer: null, //holds the timer the auto removes dj's from the queue if they do not get on stage within the allowed time period
 
-        queuePromptToDJ: function (botFunctions, userFunctions) {
+        queuePromptToDJ: function () {
             let thisMessage;
             if ((roomDefaults.queueWaitTime / 60) < 1) { //is it seconds
                 thisMessage = ' you have ' + roomDefaults.queueWaitTime + ' seconds to get on stage.';
@@ -125,7 +125,7 @@ const roomFunctions = (bot) => {
             }
         },
 
-        setRoomDefaults(data) {
+        setRoomDefaults: function (data) {
             roomDefaults.detail = data.room.description; //used to get room description
             roomDefaults.roomName = data.room.name; //gets your rooms name
             roomDefaults.ttRoomName = data.room.shortcut; //gets room shortcut
@@ -135,6 +135,21 @@ const roomFunctions = (bot) => {
             });
 
         },
+
+        clearSongLimitTimer(userFunctions, roomFunctions) {
+            //this is for the song length limit
+            if (this.songLimitTimer !== null) {
+                clearTimeout(this.songLimitTimer);
+                this.songLimitTimer = null;
+
+                if (typeof userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj) + 1] !== 'undefined') {
+                    bot.speak("@" + userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj) + 1] + ", Thanks buddy ;-)");
+                } else {
+                    bot.speak('Thanks buddy ;-)');
+                }
+            }
+        }
     }
 }
+
 module.exports = roomFunctions;

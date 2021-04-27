@@ -1,6 +1,6 @@
 let roomDefaults = require('../defaultSettings/roomDefaults.js');
 
-const songFunctions = () => {
+const songFunctions = (bot) => {
     return {
         song: null, // info for the currently playing song, so default to null
         album: null, // info for the currently playing song, so default to null
@@ -76,6 +76,49 @@ const songFunctions = () => {
 
         voteSnagged: function () {
             this.ALLREADYCALLED = true; //this makes it so that it can only be called once per song
+        },
+
+        clearWatchDogTimer() {
+            // If watch dog has been previously set,
+            // clear since we've made it to the next song
+            if (this.curSongWatchdog !== null)
+            {
+                clearTimeout(this.curSongWatchdog);
+                this.curSongWatchdog = null;
+            }
+        },
+
+        clearTakedownTimer(userFunctions, roomFunctions) {
+            // If takedown Timer has been set, clear since we've made it to the next song
+            if (this.takedownTimer !== null) {
+                clearTimeout(this.takedownTimer);
+                this.takedownTimer = null;
+
+                if (typeof userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj) + 1] !== 'undefined') {
+                    bot.speak("@" + userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj) + 1] + ", Thanks buddy ;-)");
+                } else {
+                    bot.speak('Thanks buddy ;-)');
+                }
+            }
+        },
+
+        startSongWatchdog(userFunctions, roomFunctions) {
+            // Set a new watchdog timer for the current song.
+            this.curSongWatchdog = setTimeout(function () {
+                this.curSongWatchdog = null;
+
+                if (typeof userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj) + 1] !== 'undefined') {
+                    bot.speak("@" + userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj) + 1] + ", you have 20 seconds to skip your stuck song before you are removed");
+                } else {
+                    bot.speak("current dj, you have 20 seconds to skip your stuck song before you are removed");
+                }
+
+                //START THE 20 SEC TIMER
+                this.takedownTimer = setTimeout(function () {
+                    this.takedownTimer = null;
+                    bot.remDj(roomFunctions.lastdj); // Remove Saved DJ from last newsong call
+                }, 20 * 1000); // Current DJ has 20 seconds to skip before they are removed
+            }, (length + 10) * 1000); //Timer expires 10 seconds after the end of the song, if not cleared by a newsong
         }
     }
 }

@@ -521,7 +521,7 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        newModerator:function (data) {
+        newModerator: function (data) {
             if (this.modList.indexOf(data.userid) === -1)
             {
                 this.modList.push(data.userid);
@@ -534,11 +534,11 @@ const userFunctions = (bot, roomDefaults) => {
             logMe("debug","I've reset the Mod list: " + this.modList);
         },
 
-        incrementDJPlayCount(djID) {
+        incrementDJPlayCount: function (djID) {
             ++this.djSongCount[djID].nbSong
         },
 
-        removeDJsOverPlaylimit(chatFunctions, djID) {
+        removeDJsOverPlaylimit: function (chatFunctions, djID) {
             if (musicDefaults.PLAYLIMIT === true) //is playlimit on?
             {
                 if (djID !== authModule.USERID && djID === this.currentDJs[0] && roomDefaults.playLimit === 1) //if person is in the far left seat and limit is set to one
@@ -556,7 +556,7 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        startAllUserTimers() {
+        startAllUserTimers: function () {
             //starts time in room for everyone currently in the room
             for (let zy = 0; zy < this.userIDs.length; zy++) {
                 if (typeof this.userIDs[zy] !== 'undefined') {
@@ -565,7 +565,7 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        buildUserLists(data) {
+        buildUserLists: function (data) {
             //used to get user names and user id's
             for (let i = 0; i < data.users.length; i++) {
                 if (typeof data.users[i] !== 'undefined') {
@@ -575,7 +575,7 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        buildModList(data) {
+        buildModList: function (data) {
             //set modlist to list of moderators
             //modList = data.room.metadata.moderator_id;
             logMe('debug', 'Moderator count ->' + data.room.metadata.moderator_id.length + '<-');
@@ -585,7 +585,7 @@ const userFunctions = (bot, roomDefaults) => {
             logMe('debug', 'Build Mod List ->' + this.modList + '<-');
         },
 
-        resetAllSpamCounts() {
+        resetAllSpamCounts: function () {
             //sets everyones spam count to zero
             //puts people on the global afk list when it joins the room
             for (let z = 0; z < this.userIDs.length; z++) {
@@ -599,10 +599,55 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        initializeDJAFKCount(data, dj) {
+        initializeDJAFKCount: function (data, dj) {
             this.justSaw(data.room.metadata.djs[dj], 'justSaw'); //initialize dj afk count
             this.justSaw(data.room.metadata.djs[dj], 'justSaw1');
             this.justSaw(data.room.metadata.djs[dj], 'justSaw2');
+        },
+
+        checkIfUserIsMod: function (userID) {
+            let modIndex = this.modList.indexOf(userID);
+            this.isModerator = modIndex !== -1;
+        },
+
+        isPMerInRoom: function (userID) {
+            let isInRoom = this.theUsersList.indexOf(userID);
+            isInRoom = isInRoom !== -1;
+            return isInRoom;
+        },
+
+        incrementSpamCounter: function (userID) {
+            if (typeof this.people[userID] != 'undefined')
+            {
+                ++this.people[userID].spamCount;
+            }
+
+            if (this.timer[userID] !== null)
+            {
+                clearTimeout(this.timer[userID]);
+                this.timer[userID] = null;
+            }
+
+            this.timer[userID] = setTimeout(function ()
+            {
+                this.people[userID] = {
+                    spamCount: 0
+                };
+            }, 10 * 1000);
+        },
+
+        clearInformTimer(roomFunctions) {
+            //this is for the /inform command
+            if (this.informTimer !== null) {
+                clearTimeout(this.informTimer);
+                this.informTimer = null;
+
+                if (typeof this.theUsersList[this.theUsersList.indexOf(roomFunctions.lastdj) + 1] !== 'undefined') {
+                    bot.speak("@" + this.theUsersList[this.theUsersList.indexOf(roomFunctions.lastdj) + 1] + ", Thanks buddy ;-)");
+                } else {
+                    bot.speak('Thanks buddy ;-)');
+                }
+            }
         }
     }
 }

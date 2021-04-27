@@ -196,6 +196,15 @@ const botFunctions = (bot) => {
             }
         },
 
+        clearAllTimers(userFunctions, roomFunctions, songFunctions) {
+            userFunctions.clearInformTimer(roomFunctions);
+
+            roomFunctions.clearSongLimitTimer(userFunctions, roomFunctions);
+
+            songFunctions.clearWatchDogTimer();
+
+            songFunctions.clearTakedownTimer(userFunctions, roomFunctions);
+        },
     }
 }
 

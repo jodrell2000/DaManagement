@@ -26,7 +26,7 @@ bot.listen(process.env.PORT,process.env.IP); //needed for running the bot on a s
 const botFunctions          = botModule(bot);
 const userFunctions         = userModule(bot, roomDefaults);
 const chatFunctions         = chatModule(bot, roomDefaults);
-const songFunctions         = songModule();
+const songFunctions         = songModule(bot);
 const roomFunctions         = roomModule(bot);
 
 function logMe(logLevel, message) {
@@ -61,7 +61,7 @@ setInterval(function () {
         if (botFunctions.sayOnce === true && (userFunctions.refreshList.length + userFunctions.currentDJs.length) < 5) {
             botFunctions.sayOnce = false;
 
-            roomFunctions.queuePromptToDJ(botFunctions, userFunctions);
+            roomFunctions.queuePromptToDJ();
 
             // start a timer to remove the DJ from the queue if they don't DJ
             roomFunctions.queueTimer = setTimeout(function () {
@@ -117,145 +117,20 @@ global.warnMeCall = function ()
     }
 };
 
-//checks to see if a command user is contained within the moderator list or not
-global.checkIfUserIsMod = function (userid)
-{
-    let modIndex = userFunctions.modList.indexOf(userid);
-    userFunctions.isModerator = modIndex !== -1;
-};
-
-//makes sure the person who pmmed the bot a command is in the room
-global.checkToseeIfPmmerIsInRoom = function (userid)
-{
-    let isInRoom = userFunctions.theUsersList.indexOf(userid);
-    isInRoom = isInRoom !== -1;
-    return isInRoom;
-};
-
-//increments a persons spam counter when they get kicked off stage for some reason
-//after 10 seconds if it has not just been incremented then the counter is reset
-global.incrementSpamCounter = function (userid)
-{
-    if (typeof userFunctions.people[userid] != 'undefined')
-    {
-        ++userFunctions.people[userid].spamCount;
-    }
-
-    if (userFunctions.timer[userid] !== null)
-    {
-        clearTimeout(userFunctions.timer[userid]);
-        userFunctions.timer[userid] = null;
-    }
-
-    userFunctions.timer[userid] = setTimeout(function ()
-    {
-        userFunctions.people[userid] = {
-            spamCount: 0
-        };
-    }, 10 * 1000);
-};
-
-global.clearTimers = function ()
-{
-    //this is for the /inform command
-    if (userFunctions.informTimer !== null)
-    {
-        clearTimeout(userFunctions.informTimer);
-        userFunctions.informTimer = null;
-
-        if (typeof userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj) + 1] !== 'undefined')
-        {
-            bot.speak("@" + userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj) + 1] + ", Thanks buddy ;-)");
-        }
-        else
-        {
-            bot.speak('Thanks buddy ;-)');
-        }
-    }
-
-
-    //this is for the song length limit
-    if (roomFunctions.songLimitTimer !== null)
-    {
-        clearTimeout(roomFunctions.songLimitTimer);
-        roomFunctions.songLimitTimer = null;
-
-        if (typeof userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj) + 1] !== 'undefined')
-        {
-            bot.speak("@" + userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj) + 1] + ", Thanks buddy ;-)");
-        }
-        else
-        {
-            bot.speak('Thanks buddy ;-)');
-        }
-    }
-
-
-    // If watch dog has been previously set,
-    // clear since we've made it to the next song
-    if (songFunctions.curSongWatchdog !== null)
-    {
-        clearTimeout(songFunctions.curSongWatchdog);
-        songFunctions.curSongWatchdog = null;
-    }
-
-
-    // If takedown Timer has been set,
-    // clear since we've made it to the next song
-    if (songFunctions.takedownTimer !== null)
-    {
-        clearTimeout(songFunctions.takedownTimer);
-        songFunctions.takedownTimer = null;
-
-        if (typeof userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj) + 1] !== 'undefined')
-        {
-            bot.speak("@" + userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj) + 1] + ", Thanks buddy ;-)");
-        }
-        else
-        {
-            bot.speak('Thanks buddy ;-)');
-        }
-    }
-};
-
 //stuck song detection, song length limit, /inform command
 global.checkOnNewSong = function (data)
 {
     let length = data.room.metadata.current_song.metadata.length;
     let masterIndex; //used to tell whether current dj is on the master id's list or not
 
-
     //clears timers if previously set
-    clearTimers();
-
+    botFunctions.clearAllTimers(userFunctions, roomFunctions, songFunctions);
 
     // Set this after processing things from last timer calls
     roomFunctions.lastdj = data.room.metadata.current_dj;
     masterIndex = userFunctions.masterIds.indexOf(roomFunctions.lastdj); //master id's check
 
-
-    // Set a new watchdog timer for the current song.
-    songFunctions.curSongWatchdog = setTimeout(function ()
-    {
-        songFunctions.curSongWatchdog = null;
-
-        if (typeof userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj) + 1] !== 'undefined')
-        {
-            bot.speak("@" + userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj) + 1] + ", you have 20 seconds to skip your stuck song before you are removed");
-        }
-        else
-        {
-            bot.speak("current dj, you have 20 seconds to skip your stuck song before you are removed");
-        }
-
-        //START THE 20 SEC TIMER
-        songFunctions.takedownTimer = setTimeout(function ()
-        {
-            songFunctions.takedownTimer = null;
-            bot.remDj(roomFunctions.lastdj); // Remove Saved DJ from last newsong call
-        }, 20 * 1000); // Current DJ has 20 seconds to skip before they are removed
-    }, (length + 10) * 1000); //Timer expires 10 seconds after the end of the song, if not cleared by a newsong
-
+    songFunctions.startSongWatchdog(userFunctions, roomFunctions);
 
     //this boots the user if their song is over the length limit
     if ((length / 60) >=  roomDefaults.songLengthLimit )
@@ -431,7 +306,7 @@ bot.on('nosong', function ()
     }
 
     botFunctions.skipOn = false;
-    clearTimers();
+    botFunctions.clearAllTimers(userFunctions, roomFunctions, songFunctions);
 })
 
 //checks when the bot speaks
@@ -441,7 +316,7 @@ bot.on('speak', function (data)
     userFunctions.name = data.name; //name of latest person to say something
     botFunctions.recordActivity();
 
-    checkIfUserIsMod(data.userid); //check to see if speaker is a moderator or not
+    userFunctions.checkIfUserIsMod(data.userid); //check to see if speaker is a moderator or not
 
     userFunctions.updateAfkPostionOfUser(data.userid); //update the afk position of the speaker
 
@@ -2140,7 +2015,7 @@ bot.on('add_dj', function (data)
         bot.remDj(data.user[0].userid);
         bot.pm('The vip list is currently active, only the vips may dj at this time', data.user[0].userid);
 
-        incrementSpamCounter(data.user[0].userid);
+        userFunctions.incrementSpamCounter(data.user[0].userid);
     }
 
 
@@ -2217,7 +2092,7 @@ bot.on('add_dj', function (data)
                 {
                     bot.remDj(data.user[0].userid);
 
-                    incrementSpamCounter(data.user[0].userid);
+                    userFunctions.incrementSpamCounter(data.user[0].userid);
                 }
             }
             if (roomDefaults.queue === true)
@@ -2245,7 +2120,7 @@ bot.on('add_dj', function (data)
         {
             bot.remDj(data.user[0].userid);
 
-            incrementSpamCounter(data.user[0].userid);
+            userFunctions.incrementSpamCounter(data.user[0].userid);
         }
     }
 
@@ -2270,7 +2145,7 @@ bot.on('add_dj', function (data)
             bot.remDj(data.user[0].userid);
             bot.speak('@' + data.user[0].name + ' you are banned from djing');
 
-            incrementSpamCounter(data.user[0].userid);
+            userFunctions.incrementSpamCounter(data.user[0].userid);
             break;
         }
     }
@@ -2285,7 +2160,7 @@ bot.on('add_dj', function (data)
             bot.remDj(data.user[0].userid);
             bot.speak('@' + data.user[0].name + ' you are banned from djing');
 
-            incrementSpamCounter(data.user[0].userid);
+            userFunctions.incrementSpamCounter(data.user[0].userid);
             break;
         }
     }
@@ -2363,9 +2238,9 @@ bot.on('pmmed', function (data)
     let senderid = data.senderid; //the userid of the person who just pmmed the bot
     let text = data.text; //the text sent to the bot in a pm
     let name1 = userFunctions.theUsersList.indexOf(data.senderid) + 1; //the name of the person who sent the bot a pm
-    let isInRoom = checkToseeIfPmmerIsInRoom(senderid); //check to see whether pmmer is in the same room as the bot
+    let isInRoom = userFunctions.isPMerInRoom(senderid); //check to see whether pmmer is in the same room as the bot
 
-    checkIfUserIsMod(data.senderid); //check to see if person pming the bot a command is a moderator or not
+    userFunctions.checkIfUserIsMod(data.senderid); //check to see if person pming the bot a command is a moderator or not
 
     //if no commands match, the pmmer is a moderator and theres more than zero people in the modpm chat
     if (userFunctions.modPM.length !== 0 && data.text.charAt(0) !== '/' && userFunctions.isModerator === true) //if no other commands match, send modpm
