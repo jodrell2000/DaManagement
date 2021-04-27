@@ -39,7 +39,6 @@ function logMe(logLevel, message) {
     }
 }
 
-
 // do something when the bot disconnects?
 bot.on('disconnected', function (data) { } );
 
@@ -116,9 +115,7 @@ global.warnMeCall = function ()
             }
         }
     }
-}
-
-
+};
 
 //checks to see if a command user is contained within the moderator list or not
 global.checkIfUserIsMod = function (userid)
@@ -127,8 +124,6 @@ global.checkIfUserIsMod = function (userid)
     userFunctions.isModerator = modIndex !== -1;
 };
 
-
-
 //makes sure the person who pmmed the bot a command is in the room
 global.checkToseeIfPmmerIsInRoom = function (userid)
 {
@@ -136,8 +131,6 @@ global.checkToseeIfPmmerIsInRoom = function (userid)
     isInRoom = isInRoom !== -1;
     return isInRoom;
 };
-
-
 
 //increments a persons spam counter when they get kicked off stage for some reason
 //after 10 seconds if it has not just been incremented then the counter is reset
@@ -225,8 +218,6 @@ global.clearTimers = function ()
     }
 };
 
-
-
 //stuck song detection, song length limit, /inform command
 global.checkOnNewSong = function (data)
 {
@@ -293,15 +284,11 @@ global.checkOnNewSong = function (data)
     }
 }
 
-
-
 bot.on('ready', function ()
 {
     //format the musicDefaults.bannedArtists list at runtime
     roomFunctions.formatBannedArtists();
 });
-
-
 
 //checks at the beggining of the song
 bot.on('newsong', function (data)
@@ -317,7 +304,6 @@ bot.on('newsong', function (data)
     songFunctions.resetDownVotes();
     songFunctions.resetVoteSnagging();
 
-
     //procedure for getting song tags
     songFunctions.getSongTags(data.room.metadata.current_song)
 
@@ -326,13 +312,11 @@ bot.on('newsong', function (data)
     roomDefaults.detail = data.room.description; //set room description again in case it was changed
     roomFunctions.checkWhoIsDj = data.room.metadata.current_dj; //used to check who the currently playing dj is.
 
-
     //adds a song to the end of your bots queue
     if (songFunctions.snagSong === true)
     {
         botFunctions.checkAndAddToPlaylist(songFunctions);
     }
-
 
     //if true causes the bot to start bopping to the currently playing song
     if (botDefaults.autoBop === true)
@@ -356,10 +340,8 @@ bot.on('newsong', function (data)
         bot.skip();
     }
 
-
     //this is for /warnme
     warnMeCall();
-
 
     //removes current dj from stage if they play a banned song or artist.
     if (musicDefaults.bannedArtists.length !== 0 && typeof songFunctions.artist !== 'undefined' && typeof songFunctions.song !== 'undefined')
@@ -421,10 +403,8 @@ bot.on('newsong', function (data)
         }
     }
 
-
     //look at function above, /inform, song length limit,stuck song detection
     checkOnNewSong(data);
-
 
     //quality control check, if current dj's information is somehow wrong because
     //of some event not firing, remake currentDj's array
@@ -442,8 +422,6 @@ bot.on('newsong', function (data)
     }
 });
 
-
-
 //bot gets on stage and starts djing if no song is playing.
 bot.on('nosong', function ()
 {
@@ -455,8 +433,6 @@ bot.on('nosong', function ()
     botFunctions.skipOn = false;
     clearTimers();
 })
-
-
 
 //checks when the bot speaks
 bot.on('speak', function (data)
@@ -2153,8 +2129,6 @@ bot.on('snagged', function (data)
     userFunctions.updateAfkPostionOfUser(data.userid); //update the afk position of people who add a song to their queue
 })
 
-
-
 //this activates when a user joins the stage.
 bot.on('add_dj', function (data)
 {
@@ -2332,8 +2306,6 @@ bot.on('add_dj', function (data)
     }
 })
 
-
-
 //checks when a dj leaves the stage
 bot.on('rem_dj', function (data)
 {
@@ -2384,8 +2356,6 @@ bot.on('rem_dj', function (data)
         botFunctions.escortMeList.splice(checkEscort, 1);
     }
 })
-
-
 
 //checks when the bot recieves a pm
 bot.on('pmmed', function (data)
@@ -3928,8 +3898,6 @@ bot.on('pmmed', function (data)
     }
 });
 
-
-
 //starts up when bot first enters the room
 bot.on('roomChanged', function (data)
 {
@@ -3970,8 +3938,6 @@ bot.on('roomChanged', function (data)
         }
     }
 });
-
-
 
 //starts up when a new person joins the room
 bot.on('registered', function (data) {
@@ -4025,8 +3991,6 @@ bot.on('deregistered', function (data)
     const userID = data.user[0].userid;
     userFunctions.deregisterUser(userID)
 })
-
-
 
 //activates at the end of a song.
 bot.on('endsong', function (data)
