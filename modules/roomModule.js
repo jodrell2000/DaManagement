@@ -26,21 +26,18 @@ const roomFunctions = (bot) => {
         queueTimer: null, //holds the timer the auto removes dj's from the queue if they do not get on stage within the allowed time period
 
         queuePromptToDJ: function (botFunctions, userFunctions) {
-            if (botFunctions.sayOnce === true && (userFunctions.refreshList.length + userFunctions.currentDJs.length) < 5) {
-                botFunctions.sayOnce = false;
-                if ((roomDefaults.queueWaitTime / 60) < 1) //is it seconds
-                {
-                    bot.speak('@' + this.queueName[0] + ' you have ' + roomDefaults.queueWaitTime + ' seconds to get on stage.');
-                } else if ((roomDefaults.queueWaitTime / 60) === 1) //is it one minute
-                {
-                    let minute = Math.floor((roomDefaults.queueWaitTime / 60));
-                    bot.speak('@' + this.queueName[0] + ' you have ' + minute + ' minute to get on stage.');
-                } else if ((roomDefaults.queueWaitTime / 60) > 1) //is it more than one minute
-                {
-                    let minutes = Math.floor((roomDefaults.queueWaitTime / 60));
-                    bot.speak('@' + this.queueName[0] + ' you have ' + minutes + ' minutes to get on stage.');
-                }
+            let thisMessage;
+            if ((roomDefaults.queueWaitTime / 60) < 1) { //is it seconds
+                thisMessage = ' you have ' + roomDefaults.queueWaitTime + ' seconds to get on stage.';
+            } else if ((roomDefaults.queueWaitTime / 60) === 1) { //is it one minute
+                let minute = Math.floor((roomDefaults.queueWaitTime / 60));
+                thisMessage = ' you have ' + minute + ' minute to get on stage.';
+            } else if ((roomDefaults.queueWaitTime / 60) > 1) { //is it more than one minute
+                let minutes = Math.floor((roomDefaults.queueWaitTime / 60));
+                thisMessage = ' you have ' + minutes + ' minutes to get on stage.';
             }
+
+            bot.speak('@' + this.queueName[0] + thisMessage);
         },
 
         removeFirstDJFromQueue: function (botFunctions) {

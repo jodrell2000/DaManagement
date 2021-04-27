@@ -152,8 +152,8 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
 
-        updateUser: function (roomFunctions) {
-            if (typeof bot.data.name === 'string') {
+        updateUser: function (data, roomFunctions) {
+            if (typeof data.name === 'string') {
                 let oldname = ''; //holds users old name if exists
                 let queueNamePosition;
                 let queueListPosition;
@@ -162,12 +162,12 @@ const userFunctions = (bot, roomDefaults) => {
                 //when when person updates their profile
                 //and their name is not found in the users list then they must have changed
                 //their name
-                if (this.theUsersList.indexOf(bot.data.name) === -1) {
-                    let nameIndex = this.theUsersList.indexOf(bot.data.userid);
+                if (this.theUsersList.indexOf(data.name) === -1) {
+                    let nameIndex = this.theUsersList.indexOf(data.userid);
                     if (nameIndex !== -1) //if their userid was found in theUsersList
                     {
                         oldname = this.theUsersList[nameIndex + 1];
-                        this.theUsersList[nameIndex + 1] = bot.data.name;
+                        this.theUsersList[nameIndex + 1] = data.name;
 
                         if (typeof oldname !== 'undefined') {
                             queueNamePosition = roomFunctions.queueName.indexOf(oldname);
@@ -177,17 +177,17 @@ const userFunctions = (bot, roomDefaults) => {
 
                             if (queueNamePosition !== -1) //if they were in the queue when they changed their name, then replace their name
                             {
-                                roomFunctions.queueName[queueNamePosition] = bot.data.name;
+                                roomFunctions.queueName[queueNamePosition] = data.name;
                             }
 
                             if (queueListPosition !== -1) //this is also for the queue
                             {
-                                roomFunctions.queueList[queueListPosition] = bot.data.name;
+                                roomFunctions.queueList[queueListPosition] = data.name;
                             }
 
                             if (afkPeoplePosition !== -1) //this checks the afk list
                             {
-                                this.afkPeople[afkPeoplePosition] = bot.data.name;
+                                this.afkPeople[afkPeoplePosition] = data.name;
                             }
                         }
                     }

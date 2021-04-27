@@ -59,12 +59,16 @@ setInterval( function() { userFunctions.roomAFKCheck() }, 5 * 1000)
 // every 5 seconds, check if the there's an empty DJ slot, and promt the next in the queue to join the decks, remove them if they don't
 setInterval(function () {
     if (roomDefaults.queue === true && roomFunctions.queueList.length !== 0) {
-        roomFunctions.queuePromptToDJ(botFunctions, userFunctions);
+        if (botFunctions.sayOnce === true && (userFunctions.refreshList.length + userFunctions.currentDJs.length) < 5) {
+            botFunctions.sayOnce = false;
 
-        // start a timer to remove the DJ from the queue if they don't DJ
-        roomFunctions.queueTimer = setTimeout(function () {
-            roomFunctions.removeFirstDJFromQueue(botFunctions);
-        }, roomDefaults.queueWaitTime * 1000);
+            roomFunctions.queuePromptToDJ(botFunctions, userFunctions);
+
+            // start a timer to remove the DJ from the queue if they don't DJ
+            roomFunctions.queueTimer = setTimeout(function () {
+                roomFunctions.removeFirstDJFromQueue(botFunctions);
+            }, roomDefaults.queueWaitTime * 1000);
+        }
     }
 }, 5 * 1000)
 
@@ -3999,8 +4003,8 @@ bot.on('registered', function (data) {
 });
 
 
-bot.on('update_user', function () {
-    userFunctions.updateUser(roomFunctions);
+bot.on('update_user', function (data) {
+    userFunctions.updateUser(data, roomFunctions);
 })
 
 //updates the moderator list when a moderator is added.
