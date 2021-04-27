@@ -1794,7 +1794,6 @@ bot.on('speak', function (data)
         else
         {
             let indexInUsersList = userFunctions.theUsersList.indexOf(data.userid) + 1;
-
             if (typeof userFunctions.theUsersList[indexInUsersList] == 'undefined')
             {
                 logMe("debug", "Userlist is undefined");
@@ -3959,9 +3958,9 @@ bot.on('roomChanged', function (data)
     }
     catch (err) {
         if (typeof errorMessage === 'string') {
-            console.log('unable to join the room the room due to: ' + errorMessage);
+            logMe('unable to join the room the room due to errormessage: ' + errorMessage);
         } else {
-            console.log('unable to join the room the room due to: ' + err);
+            logMe('unable to join the room the room due to err: ' + err);
         }
     }
 });
