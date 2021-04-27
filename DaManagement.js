@@ -30,11 +30,11 @@ const songFunctions         = songModule();
 const roomFunctions         = roomModule(bot);
 
 function logMe(logLevel, message) {
-    if (logLevel==='error') {
-        console.log("botFunctions:" + logLevel + "->" + message + "\n");
+    if (logLevel === 'error') {
+        console.log("Main File:" + logLevel + "->" + message + "\n");
     } else {
         if (bot.debug) {
-            console.log("botFunctions:" + logLevel + "->" + message + "\n");
+            console.log("Main File:" + logLevel + "->" + message + "\n");
         }
     }
 }
@@ -3943,14 +3943,12 @@ bot.on('roomChanged', function (data)
         for (let iop = 0; iop < data.room.metadata.djs.length; iop++) {
             if (typeof data.room.metadata.djs[iop] !== 'undefined') {
                 userFunctions.currentDJs.push(data.room.metadata.djs[iop]);
+                logMe("debug", "data iop:" + data.room.metadata.djs[iop]);
+                logMe("debug", "current DJs:" + userFunctions.currentDJs);
                 userFunctions.djSongCount[data.room.metadata.djs[iop]] = { //set dj song play count to zero
                     nbSong: 0
                 };
                 userFunctions.initializeDJAFKCount(data, iop);
-                logMe("debug", "iop loop:" + iop);
-                logMe("debug", "something about DJs:" + data.room.metadata.djs[iop]);
-                logMe("debug", "room data:" + data.room);
-                logMe("debug", "User list now:" + userFunctions.theUsersList);
             }
         }
 
@@ -3962,9 +3960,9 @@ bot.on('roomChanged', function (data)
     }
     catch (err) {
         if (typeof errorMessage === 'string') {
-            logMe('unable to join the room the room due to errormessage: ' + errorMessage);
+            logMe('debug', 'unable to join the room the room due to errormessage: ' + errorMessage);
         } else {
-            logMe('unable to join the room the room due to err: ' + err);
+            logMe('debug', 'unable to join the room the room due to err: ' + err);
         }
     }
 });

@@ -126,7 +126,7 @@ const userFunctions = (bot, roomDefaults) => {
 
         resetModList: function () {
             this.modList = []
-            logMe("debug", "I've reset the Mod list: ");
+            logMe("debug", "resetModList: I've reset the Mod list: ");
         },
 
         botStartReset: function (botFunctions) {
@@ -578,10 +578,13 @@ const userFunctions = (bot, roomDefaults) => {
         buildModList(data) {
             //set modlist to list of moderators
             //modList = data.room.metadata.moderator_id;
+            logMe('debug', 'Moderator count ->' + data.room.metadata.moderator_id.length + '<-');
             for (let ihp = 0; ihp < data.room.metadata.moderator_id.length; ihp++) {
-                userFunctions.modList.push(data.room.metadata.moderator_id[ihp]);
+                this.modList.push(data.room.metadata.moderator_id[ihp]);
             }
+            logMe('debug', 'Build Mod List ->' + this.modList + '<-');
         },
+
         resetAllSpamCounts() {
             //sets everyones spam count to zero
             //puts people on the global afk list when it joins the room
