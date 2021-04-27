@@ -3946,6 +3946,8 @@ bot.on('roomChanged', function (data)
                 };
                 userFunctions.initializeDJAFKCount(data, iop);
                 logMe("debug", "iop loop:" + iop);
+                logMe("debug", "something about DJs:" + data.room.metadata.djs[iop]);
+                logMe("debug", "room data:" + data.room);
                 logMe("debug", "User list now:" + userFunctions.theUsersList);
             }
         }
