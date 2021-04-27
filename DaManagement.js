@@ -3945,6 +3945,8 @@ bot.on('roomChanged', function (data)
                     nbSong: 0
                 };
                 userFunctions.initializeDJAFKCount(data, iop);
+                logMe("debug", "iop loop:" + iop);
+                logMe("debug", "User list now:" + userFunctions.theUsersList);
             }
         }
 
