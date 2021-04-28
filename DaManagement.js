@@ -130,7 +130,7 @@ global.checkOnNewSong = function (data)
     roomFunctions.lastdj = data.room.metadata.current_dj;
     masterIndex = userFunctions.masterIds.indexOf(roomFunctions.lastdj); //master id's check
 
-    songFunctions.startSongWatchdog(userFunctions, roomFunctions);
+    songFunctions.startSongWatchdog(data, userFunctions, roomFunctions);
 
     //this boots the user if their song is over the length limit
     if ((length / 60) >=  roomDefaults.songLengthLimit )

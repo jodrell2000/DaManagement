@@ -102,7 +102,8 @@ const songFunctions = (bot) => {
             }
         },
 
-        startSongWatchdog(userFunctions, roomFunctions) {
+        startSongWatchdog(data, userFunctions, roomFunctions) {
+            const length = data.room.metadata.current_song.metadata.length;
             // Set a new watchdog timer for the current song.
             this.curSongWatchdog = setTimeout(function () {
                 this.curSongWatchdog = null;
