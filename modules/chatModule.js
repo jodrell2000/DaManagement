@@ -42,7 +42,7 @@ const chatFunctions = (bot, roomDefaults) => {
 
         readSongStats: function (songFunctions, roomDefaults) {
             if (roomDefaults.SONGSTATS) {
-                bot.speak('Stats for ' + songFunctions.song() + ' by ' + songFunctions.artist + ': ' + ':thumbsup:' + songFunctions.upVotes + ':thumbsdown:' + songFunctions.downVotes + ':heart:' + songFunctions.whoSnagged);
+                bot.speak('Stats for ' + songFunctions.song() + ' by ' + songFunctions.artist() + ': ' + ':thumbsup:' + songFunctions.upVotes() + ':thumbsdown:' + songFunctions.downVotes() + ':heart:' + songFunctions.whoSnagged());
             }
         },
 

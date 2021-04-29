@@ -170,19 +170,19 @@ const userFunctions = (bot, roomDefaults) => {
                         this.theUsersList[nameIndex + 1] = data.name;
 
                         if (typeof oldname !== 'undefined') {
-                            queueNamePosition = roomFunctions.queueName.indexOf(oldname);
-                            queueListPosition = roomFunctions.queueList.indexOf(oldname);
+                            queueNamePosition = roomFunctions.queueName().indexOf(oldname);
+                            queueListPosition = roomFunctions.queueList().indexOf(oldname);
                             afkPeoplePosition = this.afkPeople.indexOf(oldname);
 
 
                             if (queueNamePosition !== -1) //if they were in the queue when they changed their name, then replace their name
                             {
-                                roomFunctions.queueName[queueNamePosition] = data.name;
+                                roomFunctions.queueName()[queueNamePosition] = data.name;
                             }
 
                             if (queueListPosition !== -1) //this is also for the queue
                             {
-                                roomFunctions.queueList[queueListPosition] = data.name;
+                                roomFunctions.queueList()[queueListPosition] = data.name;
                             }
 
                             if (afkPeoplePosition !== -1) //this checks the afk list
@@ -394,7 +394,7 @@ const userFunctions = (bot, roomDefaults) => {
                 if ((this.isAFK(afker, roomDefaults.afkLimit, 'isAfk')) && this.AFK === true) { //if Dj is afk then
                     if (afker !== authModule.USERID && isAfkMaster === -1) //checks to see if afker is a mod or a bot or the current dj, if they are is does not kick them.
                     {
-                        if (afker !== roomFunctions.checkWhoIsDj) {
+                        if (afker !== roomFunctions.checkWhoIsDj()) {
                             if (roomDefaults.afkThroughPm === false) {
                                 bot.speak('@' + this.theUsersList[whatIsAfkerName] + ' you are over the afk limit of ' + roomDefaults.afkLimit + ' minutes.');
                             } else {
@@ -642,8 +642,8 @@ const userFunctions = (bot, roomDefaults) => {
                 clearTimeout(this.informTimer);
                 this.informTimer = null;
 
-                if (typeof this.theUsersList[this.theUsersList.indexOf(roomFunctions.lastdj) + 1] !== 'undefined') {
-                    bot.speak("@" + this.theUsersList[this.theUsersList.indexOf(roomFunctions.lastdj) + 1] + ", Thanks buddy ;-)");
+                if (typeof this.theUsersList[this.theUsersList.indexOf(roomFunctions.lastdj()) + 1] !== 'undefined') {
+                    bot.speak("@" + this.theUsersList[this.theUsersList.indexOf(roomFunctions.lastdj()) + 1] + ", Thanks buddy ;-)");
                 } else {
                     bot.speak('Thanks buddy ;-)');
                 }

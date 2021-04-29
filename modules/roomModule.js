@@ -1,10 +1,22 @@
 let roomDefaults = require('../defaultSettings/roomDefaults.js');
-let musicDefaults   = require('../defaultSettings/musicDefaults.js');
-let botDefaults     = require('../defaultSettings/botDefaults.js');
+let musicDefaults = require('../defaultSettings/musicDefaults.js');
+let botDefaults = require('../defaultSettings/botDefaults.js');
+
+let djCount = null; //the number of dj's on stage, gets reset every song
+let checkWhoIsDj = null; //the userid of the currently playing dj
+let bannedArtistsMatcher = ''; //holds the regular expression for banned artist / song matching
+let stageBannedList = []; //holds the userid of everyone who is in the command based banned from stage list
+let skipVoteUsers = []; //holds the userid's of everyone who has voted for the currently playing song to be skipped, is cleared every song
+let lastdj = null; //holds the userid of the currently playing dj
+let songLimitTimer = null; //holds the timer used to remove a dj off stage if they don't skip their song in time, and their song has exceeded the max allowed song time
+
+let queueList = []; //holds the name and userid of everyone in the queue
+let queueName = []; //holds just the name of everyone who is in the queue
+let queueTimer = null; //holds the timer the auto removes dj's from the queue if they do not get on stage within the allowed time period
 
 const roomFunctions = (bot) => {
     function logMe(logLevel, message) {
-        if (logLevel==='error') {
+        if (logLevel === 'error') {
             console.log("roomFunctions:" + logLevel + "->" + message + "\n");
         } else {
             if (bot.debug) {
@@ -12,18 +24,18 @@ const roomFunctions = (bot) => {
             }
         }
     }
+    
     return {
-        djCount: null, //the number of dj's on stage, gets reset every song
-        checkWhoIsDj: null, //the userid of the currently playing dj
-        bannedArtistsMatcher: '', //holds the regular expression for banned artist / song matching
-        stageBannedList: [], //holds the userid of everyone who is in the command based banned from stage list
-        skipVoteUsers: [], //holds the userid's of everyone who has voted for the currently playing song to be skipped, is cleared every song
-        lastdj: null, //holds the userid of the currently playing dj
-        songLimitTimer: null, //holds the timer used to remove a dj off stage if they don't skip their song in time, and their song has exceeded the max allowed song time
-
-        queueList: [], //holds the name and userid of everyone in the queue
-        queueName: [], //holds just the name of everyone who is in the queue
-        queueTimer: null, //holds the timer the auto removes dj's from the queue if they do not get on stage within the allowed time period
+        djCount: () => djCount,
+        checkWhoIsDj: () => checkWhoIsDj,
+        bannedArtistsMatcher: () => bannedArtistsMatcher,
+        stageBannedList: () => stageBannedList,
+        skipVoteUsers: () => skipVoteUsers,
+        lastdj: () => lastdj,
+        songLimitTimer: () => songLimitTimer,
+        queueList: () => queueList,
+        queueName: () => queueName,
+        queueTimer: () => queueTimer,
 
         queuePromptToDJ: function () {
             let thisMessage;
@@ -37,25 +49,25 @@ const roomFunctions = (bot) => {
                 thisMessage = ' you have ' + minutes + ' minutes to get on stage.';
             }
 
-            bot.speak('@' + this.queueName[0] + thisMessage);
+            bot.speak('@' + queueName[0] + thisMessage);
         },
 
         removeFirstDJFromQueue: function (botFunctions) {
-            bot.speak('Sorry @' + this.queueName[0] + ' you have run out of time.');
-            this.queueList.splice(0, 2);
-            this.queueName.splice(0, 1);
+            bot.speak('Sorry @' + queueName[0] + ' you have run out of time.');
+            queueList.splice(0, 2);
+            queueName.splice(0, 1);
             botFunctions.sayOnce = true;
         },
 
         readQueueMembers: function () {
             let queueMessage = '';
-            if (this.queueName.length !== 0) {
+            if (queueName.length !== 0) {
                 let queueMessage = 'The queue is now: ';
-                for (let kj = 0; kj < this.queueName.length; kj++) {
-                    if (kj !== (this.queueName.length - 1)) {
-                        queueMessage += this.queueName[kj] + ', ';
-                    } else if (kj === (this.queueName.length - 1)) {
-                        queueMessage += this.queueName[kj];
+                for (let kj = 0; kj < queueName.length; kj++) {
+                    if (kj !== (queueName.length - 1)) {
+                        queueMessage += queueName[kj] + ', ';
+                    } else if (kj === (queueName.length - 1)) {
+                        queueMessage += queueName[kj];
                     }
                 }
             } else {
@@ -99,7 +111,7 @@ const roomFunctions = (bot) => {
                 }
 
                 //create regular expression
-                this.bannedArtistsMatcher = new RegExp('\\b' + tempString + '\\b', 'i');
+                bannedArtistsMatcher = new RegExp('\\b' + tempString + '\\b', 'i');
             }
         },
 
@@ -138,12 +150,12 @@ const roomFunctions = (bot) => {
 
         clearSongLimitTimer(userFunctions, roomFunctions) {
             //this is for the song length limit
-            if (this.songLimitTimer !== null) {
-                clearTimeout(this.songLimitTimer);
-                this.songLimitTimer = null;
+            if (songLimitTimer !== null) {
+                clearTimeout(songLimitTimer);
+                songLimitTimer = null;
 
-                if (typeof userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj) + 1] !== 'undefined') {
-                    bot.speak("@" + userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj) + 1] + ", Thanks buddy ;-)");
+                if (typeof userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj()) + 1] !== 'undefined') {
+                    bot.speak("@" + userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj()) + 1] + ", Thanks buddy ;-)");
                 } else {
                     bot.speak('Thanks buddy ;-)');
                 }

@@ -14,10 +14,10 @@ let downVotes = 0;
 let whoSnagged = 0;
 let checkVotes = [];
 let voteCountSkip = 0;
-let votesLeft = roomDefaults.HowManyVotesToSkip;
 let ALLREADYCALLED = false; //resets votesnagging so that it can be called again
 let curSongWatchdog = null; //used to hold the timer for stuck songs
 let takedownTimer = null; //used to hold the timer that fires after curSongWatchDog which represents the time a person with a stuck song has left to skip their song
+let votesLeft = roomDefaults.HowManyVotesToSkip;
 
 const songFunctions = (bot) => {
     function logMe(logLevel, message) {
@@ -32,6 +32,18 @@ const songFunctions = (bot) => {
 
     return {
         song: () => song,
+        album: () => album,
+        genre: () => genre,
+        artist: () => artist,
+        getSong: () => getSong,
+        dj: () => dj,
+
+        snagSong: () => snagSong,
+        upVotes: () => upVotes,
+        downVotes: () => downVotes,
+        whoSnagged: () => whoSnagged,
+        voteCountSkip: () => voteCountSkip,
+        ALLREADYCALLED: () => ALLREADYCALLED,
 
         getSongTags: function (current_song) {
             logMe('debug', "getSongs:" + JSON.stringify(current_song));
@@ -107,8 +119,8 @@ const songFunctions = (bot) => {
                 clearTimeout(takedownTimer);
                 takedownTimer = null;
 
-                if (typeof userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj) + 1] !== 'undefined') {
-                    bot.speak("@" + userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj) + 1] + ", Thanks buddy ;-)");
+                if (typeof userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj()) + 1] !== 'undefined') {
+                    bot.speak("@" + userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj()) + 1] + ", Thanks buddy ;-)");
                 } else {
                     bot.speak('Thanks buddy ;-)');
                 }
@@ -121,8 +133,8 @@ const songFunctions = (bot) => {
             curSongWatchdog = setTimeout(function () {
                 curSongWatchdog = null;
 
-                if (typeof userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj) + 1] !== 'undefined') {
-                    bot.speak("@" + userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj) + 1] + ", you have 20 seconds to skip your stuck song before you are removed");
+                if (typeof userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj()) + 1] !== 'undefined') {
+                    bot.speak("@" + userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj()) + 1] + ", you have 20 seconds to skip your stuck song before you are removed");
                 } else {
                     bot.speak("current dj, you have 20 seconds to skip your stuck song before you are removed");
                 }
@@ -130,7 +142,7 @@ const songFunctions = (bot) => {
                 //START THE 20 SEC TIMER
                 takedownTimer = setTimeout(function () {
                     takedownTimer = null;
-                    bot.remDj(roomFunctions.lastdj); // Remove Saved DJ from last newsong call
+                    bot.remDj(roomFunctions.lastdj()); // Remove Saved DJ from last newsong call
                 }, 20 * 1000); // Current DJ has 20 seconds to skip before they are removed
             }, (length + 10) * 1000); //Timer expires 10 seconds after the end of the song, if not cleared by a newsong
         }
