@@ -233,7 +233,10 @@ bot.on('newsong', function (data)
 //bot gets on stage and starts djing if no song is playing.
 bot.on('nosong', function ()
 {
-    if (botDefaults.getonstage === true && userFunctions.vipList().length === 0 && userFunctions.queueList().length === 0 && userFunctions.refreshList().length === 0)
+    if (botDefaults.getonstage === true &&
+        userFunctions.vipList().length === 0 &&
+        userFunctions.queueList().length === 0 &&
+        userFunctions.refreshList().length === 0)
     {
         bot.addDj();
     }
@@ -570,8 +573,8 @@ bot.on('registered', function (data) {
             bot.pm('The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.', userID);
         }
 
-        if (userFunctions.greetNewuser(userID, username)) {
-            const greetingTimers = roomDefaults.greetingTimer;
+        if (userFunctions.greetNewuser(userID, username, roomFunctions)) {
+            const greetingTimers = roomFunctions.greetingTimer() ;
 
             greetingTimers[userID] = setTimeout(function() {
                 chatFunctions.userGreeting(userID, username)

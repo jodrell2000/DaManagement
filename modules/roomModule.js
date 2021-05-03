@@ -9,8 +9,12 @@ let stageBannedList = []; //holds the userid of everyone who is in the command b
 let skipVoteUsers = []; //holds the userid's of everyone who has voted for the currently playing song to be skipped, is cleared every song
 let lastdj = null; //holds the userid of the currently playing dj
 let songLimitTimer = null; //holds the timer used to remove a dj off stage if they don't skip their song in time, and their song has exceeded the max allowed song time
-
 let queueTimer = null; //holds the timer the auto removes dj's from the queue if they do not get on stage within the allowed time period
+
+let greet = true //room greeting when someone joins the room(on by default)
+let greetThroughPm = false; //choose whether greeting message is through the pm or the chatbox(false = chatbox, true = pm), (only works when greeting message is turned on) (off by default)
+let greetingTimer = []; //holds the timeout for people that join the room, if someone rejoins before their timeout completes their timer is reset
+let roomJoinMessage = ''; //the message users will see when they join the room, leave it empty for the default message (only works when greet is turned on)
 
 const roomFunctions = (bot) => {
     function logMe(logLevel, message) {
@@ -32,6 +36,14 @@ const roomFunctions = (bot) => {
         lastdj: () => lastdj,
         songLimitTimer: () => songLimitTimer,
         queueTimer: () => queueTimer,
+
+        greet: () => greet,
+        enableGreet: function () { greet = true; },
+        disableGreet: function () { greet = false; },
+
+        greetThroughPm: () => greetThroughPm,
+        greetingTimer: () => greetingTimer,
+        roomJoinMessage: () => roomJoinMessage,
 
         resetSkipVoteUsers: function () {
             skipVoteUsers = []

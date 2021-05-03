@@ -48,11 +48,6 @@ module.exports = {
 
     queue: true, //queue(on by default)
 
-    greet: true, //room greeting when someone joins the room(on by default)
-    greetThroughPm: false, //choose whether greeting message is through the pm or the chatbox(false = chatbox, true = pm), (only works when greeting message is turned on) (off by default)
-    greetingTimer: [], //holds the timeout for people that join the room, if someone rejoins before their timeout completes their timer is reset
-    roomJoinMessage: '', //the message users will see when they join the room, leave it empty for the default message (only works when greet is turned on)
-
     blackList: [], //holds the userid of everyone who is in the command based banned from the room list
 
     kickTTSTAT: false, //kicks the ttstats bot when it tries to join the room(off by default)

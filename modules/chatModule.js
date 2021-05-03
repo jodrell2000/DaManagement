@@ -11,13 +11,13 @@ const chatFunctions = (bot, roomDefaults) => {
         userGreeting: function (userID, username) {
             this.message = '';
 
-            if (roomDefaults.roomJoinMessage !== '') //if your not using the default greeting
+            if (roomFunctions.roomJoinMessage()  !== '') //if your not using the default greeting
             {
                 if (roomDefaults.theme === false) //if theres no theme this is the message.
                 {
-                    this.message = roomDefaults.roomJoinMessage;
+                    this.message = roomFunctions.roomJoinMessage() ;
                 } else {
-                    this.message = roomDefaults.roomJoinMessage + '; The theme is currently set to: ' + roomDefaults.whatIsTheme;
+                    this.message = roomFunctions.roomJoinMessage()  + '; The theme is currently set to: ' + roomDefaults.whatIsTheme;
                 }
             } else {
                 if (roomDefaults.theme === false) //if theres no theme this is the message.
@@ -31,7 +31,7 @@ const chatFunctions = (bot, roomDefaults) => {
         },
 
         greetMessage: function (userID, username, message) {
-            if (roomDefaults.greetThroughPm === false) //if your not sending the message through the pm
+            if (roomFunctions.greetThroughPm()  === false) //if your not sending the message through the pm
             {
                 bot.speak('@' + username + ', ' + message);
             } else {

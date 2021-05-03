@@ -86,9 +86,7 @@ const userFunctions = (bot, roomDefaults) => {
 
         djSongCount: (djID) => djSongCount[djID],
 
-        roomAFK: () => roomAFK,
         roomafkLimit: () => roomafkLimit,
-        AFK: () => AFK,
         queueList: () => queueList,
         queueName: () => queueName,
         escortMeList: () => escortMeList,
@@ -104,6 +102,14 @@ const userFunctions = (bot, roomDefaults) => {
         isModerator: () => isModerator,
         setAsModerator: function () { isModerator = true; },
         removeAsModerator: function () { isModerator = false; },
+
+        AFK: () => AFK,
+        enableAFK: function () { AFK = true; },
+        disableAFK: function () { AFK = false; },
+
+        roomAFK: () => roomAFK,
+        enableRoomAFK: function () { roomAFK = true; },
+        disableRoomAFK: function () { roomAFK = false; },
 
         resetUsersList: function () {
             theUsersList = []
@@ -336,10 +342,10 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        greetNewuser: function (userID, username) {
+        greetNewuser: function (userID, username, roomFunctions) {
             //gets newest user and prints greeting, does not greet the bot or the ttstats bot, or banned users
-            if (roomDefaults.greet === true && userID !== authModule.USERID && !username.match('@ttstat')) {
-                const greetingTimers = roomDefaults.greetingTimer;
+            if (roomFunctions.greet() === true && userID !== authModule.USERID && !username.match('@ttstat')) {
+                const greetingTimers = roomFunctions.greetingTimer() ;
 
                 // if there's a timeout function waiting to be called for
                 // this user, cancel it.
