@@ -736,7 +736,20 @@ const userFunctions = (bot, roomDefaults) => {
                     }
                 }
             }
-        }
+        },
+
+        buildDJList(data) {
+            //finds out who the currently playing dj's are.
+            for (let iop = 0; iop < data.room.metadata.djs.length; iop++) {
+                if (typeof data.room.metadata.djs[iop] !== 'undefined') {
+                    this.currentDJs().push(data.room.metadata.djs[iop]);
+                    logMe("debug", "data iop:" + data.room.metadata.djs[iop]);
+                    logMe("debug", "current DJs:" + this.currentDJs());
+                    this.initialiseDJPlayCount(data.room.metadata.djs[iop]);
+                    this.initializeDJAFKCount(data, iop);
+                }
+            }
+        },
     }
 }
 

@@ -538,16 +538,7 @@ bot.on('roomChanged', function (data)
 
         userFunctions.buildUserLists(data);
 
-        //finds out who the currently playing dj's are.
-        for (let iop = 0; iop < data.room.metadata.djs.length; iop++) {
-            if (typeof data.room.metadata.djs[iop] !== 'undefined') {
-                userFunctions.currentDJs().push(data.room.metadata.djs[iop]);
-                logMe("debug", "data iop:" + data.room.metadata.djs[iop]);
-                logMe("debug", "current DJs:" + userFunctions.currentDJs());
-                userFunctions.initialiseDJPlayCount(data.room.metadata.djs[iop]);
-                userFunctions.initializeDJAFKCount(data, iop);
-            }
-        }
+        userFunctions.buildDJList(data);
 
         userFunctions.buildModList(data);
 
