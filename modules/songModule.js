@@ -119,8 +119,8 @@ const songFunctions = (bot) => {
                 clearTimeout(takedownTimer);
                 takedownTimer = null;
 
-                if (typeof userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj()) + 1] !== 'undefined') {
-                    bot.speak("@" + userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj()) + 1] + ", Thanks buddy ;-)");
+                if (typeof userFunctions.theUsersList()[userFunctions.theUsersList().indexOf(roomFunctions.lastdj()) + 1] !== 'undefined') {
+                    bot.speak("@" + userFunctions.theUsersList()[userFunctions.theUsersList().indexOf(roomFunctions.lastdj()) + 1] + ", Thanks buddy ;-)");
                 } else {
                     bot.speak('Thanks buddy ;-)');
                 }
@@ -133,8 +133,8 @@ const songFunctions = (bot) => {
             curSongWatchdog = setTimeout(function () {
                 curSongWatchdog = null;
 
-                if (typeof userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj()) + 1] !== 'undefined') {
-                    bot.speak("@" + userFunctions.theUsersList[userFunctions.theUsersList.indexOf(roomFunctions.lastdj()) + 1] + ", you have 20 seconds to skip your stuck song before you are removed");
+                if (typeof userFunctions.theUsersList()[userFunctions.theUsersList().indexOf(roomFunctions.lastdj()) + 1] !== 'undefined') {
+                    bot.speak("@" + userFunctions.theUsersList()[userFunctions.theUsersList().indexOf(roomFunctions.lastdj()) + 1] + ", you have 20 seconds to skip your stuck song before you are removed");
                 } else {
                     bot.speak("current dj, you have 20 seconds to skip your stuck song before you are removed");
                 }
