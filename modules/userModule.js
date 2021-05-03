@@ -77,7 +77,6 @@ const userFunctions = (bot, roomDefaults) => {
         masterIds: () => masterIds,
 
         name: () => name,
-        isModerator: () => isModerator,
         index: () => index,
         informTimer: () => informTimer,
         playLimitOfRefresher: () => playLimitOfRefresher,
@@ -101,6 +100,10 @@ const userFunctions = (bot, roomDefaults) => {
         lastSeen4: () => lastSeen4,
 
         modList: () => modList,
+
+        isModerator: () => isModerator,
+        setAsModerator: function () { isModerator = true; },
+        removeAsModerator: function () { isModerator = false; },
 
         resetUsersList: function () {
             theUsersList = []
