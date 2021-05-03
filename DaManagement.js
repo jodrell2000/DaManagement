@@ -88,35 +88,6 @@ setInterval( function() {
 
 setInterval( userFunctions.verifyUsersList,1000 * 60 * 15); //check every 15 minutes
 
-global.warnMeCall = function ()
-{
-    if (userFunctions.warnme.length !== 0) //is there anyone in the warnme?
-    {
-        let whatIsPosition = userFunctions.currentDJs().indexOf(roomFunctions.checkWhoIsDj()); //what position are they
-
-        if (whatIsPosition === userFunctions.currentDJs().length - 1) //if 5th dj is playing, check guy on the left
-        {
-            let areTheyNext = userFunctions.warnme.indexOf(userFunctions.currentDJs()[0]);
-            if (areTheyNext !== -1) //is the next dj up in the warnme?
-            {
-                bot.pm('your song is up next!', userFunctions.currentDJs()[0]);
-                userFunctions.warnme.splice(areTheyNext, 1);
-
-            }
-        }
-        else
-        {
-            let areTheyNext = userFunctions.warnme.indexOf(userFunctions.currentDJs()[whatIsPosition + 1]);
-            if (areTheyNext !== -1) //is the next dj up in the warnme?
-            {
-                bot.pm('your song is up next!', userFunctions.currentDJs()[whatIsPosition + 1]);
-                userFunctions.warnme.splice(areTheyNext, 1);
-
-            }
-        }
-    }
-};
-
 //stuck song detection, song length limit, /inform command
 global.checkOnNewSong = function (data)
 {
@@ -216,7 +187,7 @@ bot.on('newsong', function (data)
     }
 
     //this is for /warnme
-    warnMeCall();
+    userFunctions.warnMeCall(roomFunctions);
 
     //removes current dj from stage if they play a banned song or artist.
     if (musicDefaults.bannedArtists.length !== 0 && typeof songFunctions.artist() !== 'undefined' && typeof songFunctions.song() !== 'undefined')
@@ -1771,7 +1742,7 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/warnme/))
     {
-        let areTheyBeingWarned = userFunctions.warnme.indexOf(data.userid);
+        let areTheyBeingWarned = userFunctions.warnme().indexOf(data.userid);
         let areTheyDj80 = userFunctions.currentDJs().indexOf(data.userid);
         let Position56 = userFunctions.currentDJs().indexOf(roomFunctions.checkWhoIsDj()); //current djs index
 
@@ -1793,12 +1764,12 @@ bot.on('speak', function (data)
                 {
                     if (areTheyBeingWarned === -1) //are they already being warned? no
                     {
-                        userFunctions.warnme.unshift(data.userid);
+                        userFunctions.warnme().unshift(data.userid);
                         bot.speak('@' + userFunctions.name + ' you will be warned when your song is up next');
                     }
                     else if (areTheyBeingWarned !== -1) //yes
                     {
-                        userFunctions.warnme.splice(areTheyBeingWarned, 1);
+                        userFunctions.warnme().splice(areTheyBeingWarned, 1);
                         bot.speak('@' + userFunctions.name + ' you will no longer be warned');
                     }
                 }
@@ -2193,20 +2164,20 @@ bot.on('rem_dj', function (data)
 
 
     //this is for /warnme
-    if (userFunctions.warnme.length !== 0)
+    if (userFunctions.warnme().length !== 0)
     {
-        let areTheyBeingWarned = userFunctions.warnme.indexOf(data.user[0].userid);
+        let areTheyBeingWarned = userFunctions.warnme().indexOf(data.user[0].userid);
 
         if (areTheyBeingWarned !== -1) //if theyre on /warnme and they leave the stage
         {
-            userFunctions.warnme.splice(areTheyBeingWarned, 1);
+            userFunctions.warnme().splice(areTheyBeingWarned, 1);
         }
     }
 
 
     //checks if when someone gets off the stage, if the person
     //on the left is now the next dj
-    warnMeCall();
+    userFunctions.warnMeCall(roomFunctions);
 
 
     //check to see if conditions are met for bot's autodjing feature
@@ -2347,7 +2318,7 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/warnme/) && isInRoom === true)
     {
-        let areTheyBeingWarned = userFunctions.warnme.indexOf(data.senderid);
+        let areTheyBeingWarned = userFunctions.warnme().indexOf(data.senderid);
         let areTheyDj80 = userFunctions.currentDJs().indexOf(data.senderid);
         let Position56 = userFunctions.currentDJs().indexOf(roomFunctions.checkWhoIsDj()); //current djs index
 
@@ -2369,12 +2340,12 @@ bot.on('pmmed', function (data)
                 {
                     if (areTheyBeingWarned === -1) //are they already being warned? no
                     {
-                        userFunctions.warnme.unshift(data.senderid);
+                        userFunctions.warnme().unshift(data.senderid);
                         bot.pm('you will be warned when your song is up next', data.senderid);
                     }
                     else if (areTheyBeingWarned !== -1) //yes
                     {
-                        userFunctions.warnme.splice(areTheyBeingWarned, 1);
+                        userFunctions.warnme().splice(areTheyBeingWarned, 1);
                         bot.pm('you will no longer be warned', data.senderid);
                     }
                 }

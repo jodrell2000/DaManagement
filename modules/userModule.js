@@ -693,7 +693,7 @@ const userFunctions = (bot, roomDefaults) => {
             }, 10 * 1000);
         },
 
-        clearInformTimer(roomFunctions) {
+        clearInformTimer: function (roomFunctions) {
             //this is for the /inform command
             if (informTimer !== null) {
                 clearTimeout(informTimer);
@@ -703,6 +703,34 @@ const userFunctions = (bot, roomDefaults) => {
                     bot.speak("@" + theUsersList[theUsersList.indexOf(roomFunctions.lastdj()) + 1] + ", Thanks buddy ;-)");
                 } else {
                     bot.speak('Thanks buddy ;-)');
+                }
+            }
+        },
+
+        warnMeCall: function (roomFunctions) {
+            if (warnme.length !== 0) //is there anyone in the warnme?
+            {
+                let whatIsPosition = currentDJs.indexOf(roomFunctions.checkWhoIsDj()); //what position are they
+
+                if (whatIsPosition === currentDJs.length - 1) //if 5th dj is playing, check guy on the left
+                {
+                    let areTheyNext = warnme.indexOf(currentDJs[0]);
+                    if (areTheyNext !== -1) //is the next dj up in the warnme?
+                    {
+                        bot.pm('your song is up next!', currentDJs[0]);
+                        warnme.splice(areTheyNext, 1);
+
+                    }
+                }
+                else
+                {
+                    let areTheyNext = warnme.indexOf(currentDJs[whatIsPosition + 1]);
+                    if (areTheyNext !== -1) //is the next dj up in the warnme?
+                    {
+                        bot.pm('your song is up next!', currentDJs[whatIsPosition + 1]);
+                        warnme.splice(areTheyNext, 1);
+
+                    }
                 }
             }
         }
