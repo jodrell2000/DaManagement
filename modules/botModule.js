@@ -27,7 +27,6 @@ const botFunctions = (bot) => {
         returnToRoom: true, //used to toggle on and off the bot reconnecting to its room(it toggles off when theres no internet connection because it only works when its connected to turntable.fm)
         wserrorTimeout: null, //this is for the setTimeout in ws error
         autoDjingTimer: null, //governs the timer for the bot's auto djing
-        escortMeList: [], //holds the userid of everyone who has used the /escortme command, auto removed when the person leaves the stage
 
         checkIfConnected: function () {
             {
@@ -113,23 +112,23 @@ const botFunctions = (bot) => {
 
         isBotOnStage: function (userFunctions) {
             logMe("debug", "Check if the bot is already on stage")
-            let isBotAlreadyOnStage = userFunctions.currentDJs.indexOf(authModule.USERID);
+            let isBotAlreadyOnStage = userFunctions.currentDJs().indexOf(authModule.USERID);
             return isBotAlreadyOnStage !== -1;
         },
 
         shouldTheBotDJ: function (userFunctions, roomFunctions) {
             logMe("debug", "Check if the bot should DJ or not")
-            return userFunctions.currentDJs.length >= 1 && // is there at least one DJ on stage
-                userFunctions.currentDJs.length <= botDefaults.whenToGetOnStage && // are there fewer than the limit of DJs on stage
-                roomFunctions.queueList.length === 0 && // is the queue empty
+            return userFunctions.currentDJs().length >= 1 && // is there at least one DJ on stage
+                userFunctions.currentDJs().length <= botDefaults.whenToGetOnStage && // are there fewer than the limit of DJs on stage
+                userFunctions.queueList().length === 0 && // is the queue empty
                 userFunctions.vipList.length === 0 && // there no VIPs
-                userFunctions.refreshList.length === 0; // is there someone currently using the refresh command
+                userFunctions.refreshList().length === 0; // is there someone currently using the refresh command
         },
 
         shouldStopBotDJing: function (userFunctions, roomFunctions) {
             logMe("debug", "Check if the bot stop DJing")
-            return userFunctions.currentDJs.length >= botDefaults.whenToGetOffStage && // are there enough DJs onstage
-                roomFunctions.checkWhoIsDj !== authModule.USERID; // check the Bot isn't currently DJing
+            return userFunctions.currentDJs().length >= botDefaults.whenToGetOffStage && // are there enough DJs onstage
+                roomFunctions.checkWhoIsDj() !== authModule.USERID; // check the Bot isn't currently DJing
         },
 
         checkAutoDJing: function (userFunctions, roomFunctions) {
@@ -187,7 +186,7 @@ const botFunctions = (bot) => {
         },
 
         checkAndAddToPlaylist: function (songFunctions) {
-            const thisSong = songFunctions.getSong;
+            const thisSong = songFunctions.getSong();
 
             if (botDefaults.botPlaylist !== null && thisSong !== null) {
                 if (!this.isSongInBotPlaylist(thisSong)) {
@@ -196,6 +195,15 @@ const botFunctions = (bot) => {
             }
         },
 
+        clearAllTimers(userFunctions, roomFunctions, songFunctions) {
+            userFunctions.clearInformTimer(roomFunctions);
+
+            roomFunctions.clearSongLimitTimer(userFunctions, roomFunctions);
+
+            songFunctions.clearWatchDogTimer();
+
+            songFunctions.clearTakedownTimer(userFunctions, roomFunctions);
+        },
     }
 }
 

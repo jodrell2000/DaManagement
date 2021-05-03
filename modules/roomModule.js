@@ -1,10 +1,20 @@
 let roomDefaults = require('../defaultSettings/roomDefaults.js');
-let musicDefaults   = require('../defaultSettings/musicDefaults.js');
-let botDefaults     = require('../defaultSettings/botDefaults.js');
+let musicDefaults = require('../defaultSettings/musicDefaults.js');
+let botDefaults = require('../defaultSettings/botDefaults.js');
+
+let djCount = null; //the number of dj's on stage, gets reset every song
+let checkWhoIsDj = null; //the userid of the currently playing dj
+let bannedArtistsMatcher = ''; //holds the regular expression for banned artist / song matching
+let stageBannedList = []; //holds the userid of everyone who is in the command based banned from stage list
+let skipVoteUsers = []; //holds the userid's of everyone who has voted for the currently playing song to be skipped, is cleared every song
+let lastdj = null; //holds the userid of the currently playing dj
+let songLimitTimer = null; //holds the timer used to remove a dj off stage if they don't skip their song in time, and their song has exceeded the max allowed song time
+
+let queueTimer = null; //holds the timer the auto removes dj's from the queue if they do not get on stage within the allowed time period
 
 const roomFunctions = (bot) => {
     function logMe(logLevel, message) {
-        if (logLevel==='error') {
+        if (logLevel === 'error') {
             console.log("roomFunctions:" + logLevel + "->" + message + "\n");
         } else {
             if (bot.debug) {
@@ -12,20 +22,23 @@ const roomFunctions = (bot) => {
             }
         }
     }
+    
     return {
-        djCount: null, //the number of dj's on stage, gets reset every song
-        checkWhoIsDj: null, //the userid of the currently playing dj
-        bannedArtistsMatcher: '', //holds the regular expression for banned artist / song matching
-        stageBannedList: [], //holds the userid of everyone who is in the command based banned from stage list
-        skipVoteUsers: [], //holds the userid's of everyone who has voted for the currently playing song to be skipped, is cleared every song
-        lastdj: null, //holds the userid of the currently playing dj
-        songLimitTimer: null, //holds the timer used to remove a dj off stage if they don't skip their song in time, and their song has exceeded the max allowed song time
+        djCount: () => djCount, setDJCount: function (theCount) { djCount = theCount; },
+        checkWhoIsDj: () => checkWhoIsDj, setCheckWhoIsDj: function (currentDJ) { checkWhoIsDj = currentDJ; },
+        bannedArtistsMatcher: () => bannedArtistsMatcher,
+        stageBannedList: () => stageBannedList,
+        skipVoteUsers: () => skipVoteUsers,
+        lastdj: () => lastdj,
+        songLimitTimer: () => songLimitTimer,
+        queueTimer: () => queueTimer,
 
-        queueList: [], //holds the name and userid of everyone in the queue
-        queueName: [], //holds just the name of everyone who is in the queue
-        queueTimer: null, //holds the timer the auto removes dj's from the queue if they do not get on stage within the allowed time period
+        resetSkipVoteUsers: function () {
+            skipVoteUsers = []
+            logMe("debug", "resetSkipVoteUsers: I've reset the Users who skipped")
+        },
 
-        queuePromptToDJ: function (botFunctions, userFunctions) {
+        queuePromptToDJ: function (userFunctions) {
             let thisMessage;
             if ((roomDefaults.queueWaitTime / 60) < 1) { //is it seconds
                 thisMessage = ' you have ' + roomDefaults.queueWaitTime + ' seconds to get on stage.';
@@ -37,25 +50,25 @@ const roomFunctions = (bot) => {
                 thisMessage = ' you have ' + minutes + ' minutes to get on stage.';
             }
 
-            bot.speak('@' + this.queueName[0] + thisMessage);
+            bot.speak('@' + userFunctions.queueName[0] + thisMessage);
         },
 
-        removeFirstDJFromQueue: function (botFunctions) {
-            bot.speak('Sorry @' + this.queueName[0] + ' you have run out of time.');
-            this.queueList.splice(0, 2);
-            this.queueName.splice(0, 1);
+        removeFirstDJFromQueue: function (botFunctions, userFunctions) {
+            bot.speak('Sorry @' + userFunctions.queueName[0] + ' you have run out of time.');
+            userFunctions.queueList().splice(0, 2);
+            userFunctions.queueName().splice(0, 1);
             botFunctions.sayOnce = true;
         },
 
-        readQueueMembers: function () {
+        readQueueMembers: function (userFunctions) {
             let queueMessage = '';
-            if (this.queueName.length !== 0) {
+            if (userFunctions.queueName.length !== 0) {
                 let queueMessage = 'The queue is now: ';
-                for (let kj = 0; kj < this.queueName.length; kj++) {
-                    if (kj !== (this.queueName.length - 1)) {
-                        queueMessage += this.queueName[kj] + ', ';
-                    } else if (kj === (this.queueName.length - 1)) {
-                        queueMessage += this.queueName[kj];
+                for (let kj = 0; kj < userFunctions.queueName.length; kj++) {
+                    if (kj !== (userFunctions.queueName.length - 1)) {
+                        queueMessage += userFunctions.queueName[kj] + ', ';
+                    } else if (kj === (userFunctions.queueName.length - 1)) {
+                        queueMessage += userFunctions.queueName[kj];
                     }
                 }
             } else {
@@ -65,14 +78,14 @@ const roomFunctions = (bot) => {
         },
 
         clearDecksForVIPs: function (userFunctions, authModule) {
-            if (userFunctions.vipList.length !== 0 && userFunctions.currentDJs.length !== userFunctions.vipList.length)
+            if (userFunctions.vipList.length !== 0 && userFunctions.currentDJs().length !== userFunctions.vipList.length)
             {
-                for (let p = 0; p < userFunctions.currentDJs.length; p++)
+                for (let p = 0; p < userFunctions.currentDJs().length; p++)
                 {
-                    let checkIfVip = userFunctions.vipList.indexOf(userFunctions.currentDJs[p]);
-                    if (checkIfVip === -1 && userFunctions.currentDJs[p] !== authModule.USERID)
+                    let checkIfVip = userFunctions.vipList.indexOf(userFunctions.currentDJs()[p]);
+                    if (checkIfVip === -1 && userFunctions.currentDJs()[p] !== authModule.USERID)
                     {
-                        bot.remDj(userFunctions.currentDJs[p]);
+                        bot.remDj(userFunctions.currentDJs()[p]);
                     }
                 }
             }
@@ -99,33 +112,33 @@ const roomFunctions = (bot) => {
                 }
 
                 //create regular expression
-                this.bannedArtistsMatcher = new RegExp('\\b' + tempString + '\\b', 'i');
+                bannedArtistsMatcher = new RegExp('\\b' + tempString + '\\b', 'i');
             }
         },
 
         escortDJsDown: function (currentDJ, botFunctions, userFunctions) {
             //iterates through the escort list and escorts all djs on the list off the stage.
-            for (let i = 0; i < botFunctions.escortMeList.length; i++) {
+            for (let i = 0; i < userFunctions.escortMeList().length; i++) {
                 logMe("debug", "DJ to be escorted:" + currentDJ);
-                if (typeof botFunctions.escortMeList[i] !== 'undefined' && currentDJ === botFunctions.escortMeList[i]) {
-                    let lookname = userFunctions.theUsersList.indexOf(currentDJ) + 1;
-                    bot.remDj(botFunctions.escortMeList[i]);
+                if (typeof userFunctions.escortMeList()[i] !== 'undefined' && currentDJ === userFunctions.escortMeList()[i]) {
+                    let lookname = userFunctions.theUsersList().indexOf(currentDJ) + 1;
+                    bot.remDj(userFunctions.escortMeList()[i]);
 
                     if (lookname !== -1) {
-                        const theMessage = '@' + userFunctions.theUsersList[lookname] + ' had enabled escortme';
+                        const theMessage = '@' + userFunctions.theUsersList()[lookname] + ' had enabled escortme';
                         botFunctions.botSpeak(false, null, theMessage);
                     }
 
-                    let removeFromList = botFunctions.escortMeList.indexOf(botFunctions.escortMeList[i]);
+                    let removeFromList = userFunctions.escortMeList().indexOf(userFunctions.escortMeList()[i]);
 
                     if (removeFromList !== -1) {
-                        botFunctions.escortMeList.splice(removeFromList, 1);
+                        userFunctions.escortMeList().splice(removeFromList, 1);
                     }
                 }
             }
         },
 
-        setRoomDefaults(data) {
+        setRoomDefaults: function (data) {
             roomDefaults.detail = data.room.description; //used to get room description
             roomDefaults.roomName = data.room.name; //gets your rooms name
             roomDefaults.ttRoomName = data.room.shortcut; //gets room shortcut
@@ -135,6 +148,21 @@ const roomFunctions = (bot) => {
             });
 
         },
+
+        clearSongLimitTimer(userFunctions, roomFunctions) {
+            //this is for the song length limit
+            if (songLimitTimer !== null) {
+                clearTimeout(songLimitTimer);
+                songLimitTimer = null;
+
+                if (typeof userFunctions.theUsersList()[userFunctions.theUsersList().indexOf(roomFunctions.lastdj()) + 1] !== 'undefined') {
+                    bot.speak("@" + userFunctions.theUsersList()[userFunctions.theUsersList().indexOf(roomFunctions.lastdj()) + 1] + ", Thanks buddy ;-)");
+                } else {
+                    bot.speak('Thanks buddy ;-)');
+                }
+            }
+        }
     }
 }
+
 module.exports = roomFunctions;
