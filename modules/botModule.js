@@ -1,7 +1,21 @@
 let roomDefaults = require('../defaultSettings/roomDefaults.js');
 let botDefaults     = require('../defaultSettings/botDefaults.js');
+let musicDefaults   = require('../defaultSettings/musicDefaults.js');
 
 let authModule = require('../auth.js');
+
+let checkActivity = Date.now();
+let skipOn = null; //if true causes the bot to skip every song it plays, toggled on and off by commands
+let randomOnce = 0; //a flag used to check if the /randomSong command has already been activated, 0 is no, 1 is yes
+let sayOnce = true; //makes it so that the queue timeout can only be used once per per person, stops the bot from spamming
+let botStartTime = null; //the current time in milliseconds when the bot has started, used for the /uptime
+let uptimeTime = null; //the current time in milliseconds when the /uptime is actually used
+let messageCounter = 0; //this is for the array of messages, it lets it know which message it is currently on, resets to 0 after cycling through all of them
+let netwatchdogTimer = null; // Used to detect internet connection dropping out
+let attemptToReconnect = null; //used for reconnecting to the bots room if its not in there (only works if internet connection is working)
+let returnToRoom = true; //used to toggle on and off the bot reconnecting to its room(it toggles off when theres no internet connection because it only works when its connected to turntable.fm)
+let wserrorTimeout = null; //this is for the setTimeout in ws error
+let autoDjingTimer = null; //governs the timer for the bot's auto djing
 
 const botFunctions = (bot) => {
     function logMe(logLevel, message) {
@@ -15,26 +29,35 @@ const botFunctions = (bot) => {
     }
 
     return {
-        checkActivity: Date.now(),
-        skipOn: null, //if true causes the bot to skip every song it plays, toggled on and off by commands
-        randomOnce: 0, //a flag used to check if the /randomSong command has already been activated, 0 is no, 1 is yes
-        sayOnce: true, //makes it so that the queue timeout can only be used once per per person, stops the bot from spamming
-        botStartTime: null, //the current time in milliseconds when the bot has started, used for the /uptime
-        uptimeTime: null, //the current time in milliseconds when the /uptime is actually used
-        messageCounter: 0, //this is for the array of messages, it lets it know which message it is currently on, resets to 0 after cycling through all of them
-        netwatchdogTimer: null, // Used to detect internet connection dropping out
-        attemptToReconnect: null, //used for reconnecting to the bots room if its not in there (only works if internet connection is working)
-        returnToRoom: true, //used to toggle on and off the bot reconnecting to its room(it toggles off when theres no internet connection because it only works when its connected to turntable.fm)
-        wserrorTimeout: null, //this is for the setTimeout in ws error
-        autoDjingTimer: null, //governs the timer for the bot's auto djing
+        checkActivity: () => checkActivity,
+        botStartTime: () => botStartTime,
+        messageCounter: () => messageCounter,
+        netwatchdogTimer: () => netwatchdogTimer,
+        attemptToReconnect: () => attemptToReconnect,
+        returnToRoom: () => returnToRoom,
+        wserrorTimeout: () => wserrorTimeout,
+        autoDjingTimer: () => autoDjingTimer,
+
+        skipOn: () => skipOn,
+        setSkipOn: function (value) { skipOn = value; },
+
+        randomOnce: () => randomOnce,
+        incrementRandomOnce: function () { ++randomOnce; },
+        decrementRandomOnce: function () { --randomOnce; },
+
+        sayOnce: () => sayOnce,
+        setSayOnce: function (value) { sayOnce = value; },
+
+        uptimeTime: () => uptimeTime,
+        setUptimeTime: function (value) { uptimeTime = value; },
 
         checkIfConnected: function () {
             {
-                if (this.attemptToReconnect === null) //if a reconnection attempt is already in progress, do not attempt it
+                if (attemptToReconnect === null) //if a reconnection attempt is already in progress, do not attempt it
                 {
                     if (bot._isAuthenticated) // if bot is actually connected to turntable use the speaking method
                     {
-                        let currentActivity = (Date.now() - this.checkActivity) / 1000 / 60;
+                        let currentActivity = (Date.now() - checkActivity) / 1000 / 60;
 
                         if (currentActivity > 30) //if greater than 30 minutes of no talking
                         {
@@ -56,9 +79,7 @@ const botFunctions = (bot) => {
         },
 
         reconnect: function () {
-            const attemptToReconnect = this.attemptToReconnect;
-
-            this.attemptToReconnect = setInterval(function () {
+            attemptToReconnect = setInterval(function () {
                 let whichMessage;
                 if (bot._isAuthenticated) {
                     whichMessage = true;
@@ -73,7 +94,7 @@ const botFunctions = (bot) => {
                         roomDefaults.errorMessage = null;
                         clearInterval(attemptToReconnect);
                         module.exports.attemptToReconnect = null;
-                        this.checkActivity = Date.now();
+                        checkActivity = Date.now();
 
                         if (whichMessage) {
                             logMe('the bot has reconnected to the room ' +
@@ -91,7 +112,7 @@ const botFunctions = (bot) => {
         },
 
         recordActivity: function () {
-            this.checkActivity = Date.now(); //update when someone says something
+            checkActivity = Date.now(); //update when someone says something
         },
 
         botSpeak: function (pm, user, message) {
@@ -133,15 +154,15 @@ const botFunctions = (bot) => {
 
         checkAutoDJing: function (userFunctions, roomFunctions) {
             logMe("debug", "Check if the bot should DJ and start it, or remove if required")
-            if (this.autoDjingTimer != null)
+            if (autoDjingTimer != null)
             {
-                clearTimeout(this.autoDjingTimer);
-                this.autoDjingTimer = null;
+                clearTimeout(autoDjingTimer);
+                autoDjingTimer = null;
             }
 
             if (botDefaults.getonstage === true) {
 
-                this.autoDjingTimer = setTimeout(function () {
+                autoDjingTimer = setTimeout(function () {
                     if (!this.isBotOnStage) { //if the bot is not already on stage
                         if (this.shouldTheBotDJ(userFunctions, roomFunctions)) {
                             this.startBotDJing();
@@ -195,14 +216,51 @@ const botFunctions = (bot) => {
             }
         },
 
-        clearAllTimers(userFunctions, roomFunctions, songFunctions) {
+        clearAllTimers: function (userFunctions, roomFunctions, songFunctions) {
             userFunctions.clearInformTimer(roomFunctions);
-
             roomFunctions.clearSongLimitTimer(userFunctions, roomFunctions);
-
             songFunctions.clearWatchDogTimer();
-
             songFunctions.clearTakedownTimer(userFunctions, roomFunctions);
+        },
+
+        checkOnNewSong: function (data, roomFunctions, songFunctions, userFunctions) {
+            let length = data.room.metadata.current_song.metadata.length;
+            let masterIndex; //used to tell whether current dj is on the master id's list or not
+
+            //clears timers if previously set
+            this.clearAllTimers(userFunctions, roomFunctions, songFunctions);
+
+            // Set this after processing things from last timer calls
+            roomFunctions.lastdj = data.room.metadata.current_dj;
+            masterIndex = userFunctions.masterIds().indexOf(roomFunctions.lastdj); //master id's check
+
+            songFunctions.startSongWatchdog(data, userFunctions, roomFunctions);
+
+            //this boots the user if their song is over the length limit
+            if ((length / 60) >=  roomDefaults.songLengthLimit )
+            {
+                if (roomFunctions.lastdj() === authModule.USERID || masterIndex === -1) //if dj is the bot or not a master
+                {
+                    if (musicDefaults.LIMIT === true)
+                    {
+                        if (typeof userFunctions.theUsersList()[userFunctions.theUsersList().indexOf(roomFunctions.lastdj) + 1] !== 'undefined')
+                        {
+                            bot.speak("@" + userFunctions.theUsersList()[userFunctions.theUsersList().indexOf(roomFunctions.lastdj) + 1] + ", your song is over " + roomDefaults.songLengthLimit + " mins long, you have 20 seconds to skip before being removed.");
+                        }
+                        else
+                        {
+                            bot.speak('current dj, your song is over ' + roomDefaults.songLengthLimit + ' mins long, you have 20 seconds to skip before being removed.');
+                        }
+
+                        //START THE 20 SEC TIMER
+                        roomFunctions.songLimitTimer = setTimeout(function ()
+                        {
+                            roomFunctions.songLimitTimer = null;
+                            bot.remDj(roomFunctions.lastdj()); // Remove Saved DJ from last newsong call
+                        }, 20 * 1000); // Current DJ has 20 seconds to skip before they are removed
+                    }
+                }
+            }
         },
     }
 }

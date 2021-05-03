@@ -58,8 +58,8 @@ setInterval( function() { userFunctions.roomAFKCheck() }, 5 * 1000)
 // every 5 seconds, check if the there's an empty DJ slot, and promt the next in the queue to join the decks, remove them if they don't
 setInterval(function () {
     if (roomDefaults.queue === true && userFunctions.queueList().length !== 0) {
-        if (botFunctions.sayOnce === true && (userFunctions.refreshList().length + userFunctions.currentDJs().length) < 5) {
-            botFunctions.sayOnce = false;
+        if (botFunctions.sayOnce() === true && (userFunctions.refreshList().length + userFunctions.currentDJs().length) < 5) {
+            botFunctions.setSayOnce(false);
 
             roomFunctions.queuePromptToDJ(userFunctions);
 
@@ -87,48 +87,6 @@ setInterval( function() {
 
 
 setInterval( userFunctions.verifyUsersList,1000 * 60 * 15); //check every 15 minutes
-
-//stuck song detection, song length limit, /inform command
-global.checkOnNewSong = function (data)
-{
-    let length = data.room.metadata.current_song.metadata.length;
-    let masterIndex; //used to tell whether current dj is on the master id's list or not
-
-    //clears timers if previously set
-    botFunctions.clearAllTimers(userFunctions, roomFunctions, songFunctions);
-
-    // Set this after processing things from last timer calls
-    roomFunctions.lastdj = data.room.metadata.current_dj;
-    masterIndex = userFunctions.masterIds().indexOf(roomFunctions.lastdj); //master id's check
-
-    songFunctions.startSongWatchdog(data, userFunctions, roomFunctions);
-
-    //this boots the user if their song is over the length limit
-    if ((length / 60) >=  roomDefaults.songLengthLimit )
-    {
-        if (roomFunctions.lastdj() === authModule.USERID || masterIndex === -1) //if dj is the bot or not a master
-        {
-            if (musicDefaults.LIMIT === true)
-            {
-                if (typeof userFunctions.theUsersList()[userFunctions.theUsersList().indexOf(roomFunctions.lastdj) + 1] !== 'undefined')
-                {
-                    bot.speak("@" + userFunctions.theUsersList()[userFunctions.theUsersList().indexOf(roomFunctions.lastdj) + 1] + ", your song is over " + roomDefaults.songLengthLimit + " mins long, you have 20 seconds to skip before being removed.");
-                }
-                else
-                {
-                    bot.speak('current dj, your song is over ' + roomDefaults.songLengthLimit + ' mins long, you have 20 seconds to skip before being removed.');
-                }
-
-                //START THE 20 SEC TIMER
-                roomFunctions.songLimitTimer = setTimeout(function ()
-                {
-                    roomFunctions.songLimitTimer = null;
-                    bot.remDj(roomFunctions.lastdj()); // Remove Saved DJ from last newsong call
-                }, 20 * 1000); // Current DJ has 20 seconds to skip before they are removed
-            }
-        }
-    }
-}
 
 bot.on('ready', function ()
 {
@@ -177,11 +135,11 @@ bot.on('newsong', function (data)
     //they will stop skipping
     if (roomFunctions.djCount() === 1 && roomFunctions.checkWhoIsDj() === authModule.USERID && botFunctions.skipOn === true)
     {
-        botFunctions.skipOn = false;
+        botFunctions.setSkipOn(false);
     }
 
     //used to have the bot skip its song if its the current player and skipOn command was used
-    if (authModule.USERID === roomFunctions.checkWhoIsDj() && botFunctions.skipOn === true)
+    if (authModule.USERID === roomFunctions.checkWhoIsDj() && botFunctions.skipOn() === true)
     {
         bot.skip();
     }
@@ -252,7 +210,7 @@ bot.on('newsong', function (data)
     }
 
     //look at function above, /inform, song length limit,stuck song detection
-    checkOnNewSong(data);
+    botFunctions.checkOnNewSong(data, roomFunctions, songFunctions, userFunctions);
 
     //quality control check, if current dj's information is somehow wrong because
     //of some event not firing, remake currentDj's array
@@ -278,7 +236,7 @@ bot.on('nosong', function ()
         bot.addDj();
     }
 
-    botFunctions.skipOn = false;
+    botFunctions.setSkipOn(false);
     botFunctions.clearAllTimers(userFunctions, roomFunctions, songFunctions);
 })
 
@@ -306,11 +264,11 @@ bot.on('speak', function (data)
     }
     else if (text.match(/^\/randomSong$/) && userFunctions.isModerator === true)
     {
-        if (botFunctions.randomOnce !== 1)
+        if (botFunctions.randomOnce() !== 1)
         {
             let ez = 0;
             bot.speak("Reorder initiated.");
-            ++botFunctions.randomOnce;
+            botFunctions.incrementRandomOnce();
             let reorder = setInterval(function ()
             {
                 if (ez <= botDefaults.botPlaylist.length)
@@ -325,7 +283,7 @@ bot.on('speak', function (data)
                     clearInterval(reorder);
                     console.log("Reorder Ended");
                     bot.speak("Reorder completed.");
-                    --botFunctions.randomOnce;
+                    botFunctions.decrementRandomOnce();
                 }
             }, 1000);
         }
@@ -351,7 +309,7 @@ bot.on('speak', function (data)
             if (index35 !== -1 && index80 !== -1)
             {
                 clearTimeout(roomFunctions.queueTimer());
-                botFunctions.sayOnce = true;
+                botFunctions.setSayOnce(true);
                 userFunctions.queueList().splice(index35, 2);
                 userFunctions.queueList().unshift(index81, index82);
                 userFunctions.queueName().splice(index46, 1);
@@ -570,7 +528,7 @@ bot.on('speak', function (data)
         {
             whatsOn += 'refreshing: Off, ';
         }
-        if (botFunctions.skipOn === true)
+        if (botFunctions.skipOn() === true)
         {
             whatsOn += 'autoskipping: On, ';
         }
@@ -594,7 +552,7 @@ bot.on('speak', function (data)
         {
             whatsOn += 'vote based song adding: Off, ';
         }
-        if (botFunctions.randomOnce === 0)
+        if (botFunctions.randomOnce() === 0)
         {
             whatsOn += 'playlist reordering in progress?: No';
         }
@@ -792,8 +750,8 @@ bot.on('speak', function (data)
         let msecPerMinute = 1000 * 60;
         let msecPerHour = msecPerMinute * 60;
         let msecPerDay = msecPerHour * 24;
-        botFunctions.uptimeTime = Date.now();
-        let currentTime = botFunctions.uptimeTime - botFunctions.botStartTime;
+        botFunctions.setUptimeTime(Date.now());
+        let currentTime = botFunctions.uptimeTime() - botFunctions.botStartTime();
 
         let days = Math.floor(currentTime / msecPerDay);
         currentTime = currentTime - (days * msecPerDay);
@@ -1115,12 +1073,12 @@ bot.on('speak', function (data)
     else if (text.match(/^\/skipon$/) && userFunctions.isModerator === true)
     {
         bot.speak('i am now skipping my songs');
-        botFunctions.skipOn = true;
+        botFunctions.setSkipOn(true);
     }
     else if (text.match(/^\/skipoff$/) && userFunctions.isModerator === true)
     {
         bot.speak('i am no longer skipping my songs');
-        botFunctions.skipOn = false;
+        botFunctions.setSkipOn(false);
     }
     else if (text.match(/^\/fanratio/)) //this one courtesy of JenTheInstigator of turntable.fm
     {
@@ -1264,7 +1222,7 @@ bot.on('speak', function (data)
                             userFunctions.queueName().splice(0, 0, whatIsTheirName); //add them to beggining
                             userFunctions.queueList().splice(0, 0, whatIsTheirName, userFunctions.theUsersList()[whatIsTheirUserid2 - 1]); //add them to beggining
                             clearTimeout(roomFunctions.queueTimer); //clear timeout because first person has been replaced
-                            botFunctions.sayOnce = true;
+                            botFunctions.setSayOnce(true);
                             bot.speak(whatIsTheirName + ' has been moved to position 1 in the queue');
                         }
                         else if (tempName[2] >= userFunctions.queueName().length)
@@ -1272,7 +1230,7 @@ bot.on('speak', function (data)
                             if (userFunctions.queueName()[areTheyInTheQueue] === userFunctions.queueName()[0]) //if position given higher than end
                             {
                                 clearTimeout(roomFunctions.queueTimer()); //clear timeout because first person has been replaced
-                                botFunctions.sayOnce = true;
+                                botFunctions.setSayOnce(true);
                             }
                             userFunctions.queueName().splice(areTheyInTheQueue, 1); //remove them
                             userFunctions.queueList().splice(areTheyInTheQueueList, 2); //remove them
@@ -1286,7 +1244,7 @@ bot.on('speak', function (data)
                             if (userFunctions.queueName()[areTheyInTheQueue] === userFunctions.queueName()[0])
                             {
                                 clearTimeout(roomFunctions.queueTimer()); //clear timeout because first person has been replaced
-                                botFunctions.sayOnce = true;
+                                botFunctions.setSayOnce(true);
                             }
 
                             userFunctions.queueName().splice(areTheyInTheQueue, 1); //remove them
@@ -1538,7 +1496,7 @@ bot.on('speak', function (data)
                 if (userFunctions.queueName()[index6] === userFunctions.queueName()[0])
                 {
                     clearTimeout(roomFunctions.queueTimer());
-                    botFunctions.sayOnce = true;
+                    botFunctions.setSayOnce(true);
                 }
                 userFunctions.queueList().splice(index5, 2);
                 userFunctions.queueName().splice(index6, 1);
@@ -1595,7 +1553,7 @@ bot.on('speak', function (data)
                 if (data.name === userFunctions.queueName()[0])
                 {
                     clearTimeout(roomFunctions.queueTimer());
-                    botFunctions.sayOnce = true;
+                    botFunctions.setSayOnce(true);
                 }
 
                 userFunctions.queueName().splice(list2, 1);
@@ -1670,7 +1628,7 @@ bot.on('speak', function (data)
         bot.speak('the queue is now active.');
         roomDefaults.queue = true;
         clearTimeout(roomFunctions.queueTimer()); //if queue is turned on again while somebody was on timeout to get on stage, then clear it
-        botFunctions.sayOnce = true;
+        botFunctions.setSayOnce(true);
     }
     else if (text.match(/^\/whatsplaylimit/))
     {
@@ -2063,7 +2021,7 @@ bot.on('add_dj', function (data)
                 if (checkQueue !== -1 && checkQueue === 0)
                 {
                     clearTimeout(roomFunctions.queueTimer());
-                    botFunctions.sayOnce = true;
+                    botFunctions.setSayOnce(true);
                     userFunctions.queueList().splice(checkQueue, 2);
                     userFunctions.queueName().splice(checkName2, 1);
                 }
@@ -2395,7 +2353,7 @@ bot.on('pmmed', function (data)
                             userFunctions.queueName().splice(0, 0, tempName[1]); //add them to beggining
                             userFunctions.queueList().splice(0, 0, tempName[1], userFunctions.theUsersList()[whatIsTheirUserid2 - 1]); //add them to beggining
                             clearTimeout(roomFunctions.queueTimer()); //clear timeout because first person has been replaced
-                            botFunctions.sayOnce = true;
+                            botFunctions.setSayOnce(true);
                             bot.pm(tempName[1] + ' has been moved to position 1 in the queue', data.senderid);
                         }
                         else if (tempName[2] >= userFunctions.queueName().length)
@@ -2403,7 +2361,7 @@ bot.on('pmmed', function (data)
                             if (userFunctions.queueName()[areTheyInTheQueue] === userFunctions.queueName()[0])
                             {
                                 clearTimeout(roomFunctions.queueTimer()); //clear timeout because first person has been replaced
-                                botFunctions.sayOnce = true;
+                                botFunctions.setSayOnce(true);
                             }
                             userFunctions.queueName().splice(areTheyInTheQueue, 1); //remove them
                             userFunctions.queueList().splice(areTheyInTheQueueList, 2); //remove them
@@ -2417,7 +2375,7 @@ bot.on('pmmed', function (data)
                             if (userFunctions.queueName()[areTheyInTheQueue] === userFunctions.queueName()[0])
                             {
                                 clearTimeout(roomFunctions.queueTimer()); //clear timeout because first person has been replaced
-                                botFunctions.sayOnce = true;
+                                botFunctions.setSayOnce(true);
                             }
 
                             userFunctions.queueName().splice(areTheyInTheQueue, 1); //remove them
@@ -2615,7 +2573,7 @@ bot.on('pmmed', function (data)
         bot.pm('the queue is now active.', data.senderid);
         roomDefaults.queue = true;
         clearTimeout(roomFunctions.queueTimer()); //if queue is turned on again while somebody was on timeout to get on stage, then clear it
-        botFunctions.sayOnce = true;
+        botFunctions.setSayOnce(true);
     }
     else if (text.match(/^\/queueOff$/) && userFunctions.isModerator === true && isInRoom === true)
     {
@@ -2698,7 +2656,7 @@ bot.on('pmmed', function (data)
                 if (userFunctions.theUsersList[name1] === userFunctions.queueName()[0])
                 {
                     clearTimeout(roomFunctions.queueTimer());
-                    botFunctions.sayOnce = true;
+                    botFunctions.setSayOnce(true);
                 }
                 userFunctions.queueName().splice(list2, 1);
 
@@ -2741,7 +2699,7 @@ bot.on('pmmed', function (data)
                 if (userFunctions.queueName()[index6] === userFunctions.queueName()[0])
                 {
                     clearTimeout(roomFunctions.queueTimer());
-                    botFunctions.sayOnce = true;
+                    botFunctions.setSayOnce(true);
                 }
                 userFunctions.queueList().splice(index5, 2);
                 userFunctions.queueName().splice(index6, 1);
@@ -2840,12 +2798,12 @@ bot.on('pmmed', function (data)
     else if (text.match(/^\/skipoff$/) && userFunctions.isModerator === true && isInRoom === true)
     {
         bot.pm('i am no longer skipping my songs', data.senderid);
-        botFunctions.skipOn = false;
+        botFunctions.setSkipOn(false);
     }
     else if (text.match(/^\/skipon$/) && userFunctions.isModerator === true && isInRoom === true)
     {
         bot.pm('i am now skipping my songs', data.senderid);
-        botFunctions.skipOn = true;
+        botFunctions.setSkipOn(true);
     }
     else if (text.match('/awesome') && isInRoom === true)
     {
@@ -3013,8 +2971,8 @@ bot.on('pmmed', function (data)
         let msecPerMinute = 1000 * 60;
         let msecPerHour = msecPerMinute * 60;
         let msecPerDay = msecPerHour * 24;
-        botFunctions.uptimeTime = Date.now();
-        let currentTime = botFunctions.uptimeTime - botFunctions.botStartTime;
+        botFunctions.setUptimeTime(Date.now());
+        let currentTime = botFunctions.uptimeTime() - botFunctions.botStartTime();
 
         let days = Math.floor(currentTime / msecPerDay);
         currentTime = currentTime - (days * msecPerDay);
@@ -3101,11 +3059,11 @@ bot.on('pmmed', function (data)
     }
     else if (text.match(/^\/randomSong$/) && userFunctions.isModerator === true && isInRoom === true)
     {
-        if (botFunctions.randomOnce !== 1)
+        if (botFunctions.randomOnce() !== 1)
         {
             let ez = 0;
             bot.pm("Reorder initiated.", data.senderid);
-            ++botFunctions.randomOnce;
+            botFunctions.incrementRandomOnce();
             let reorder = setInterval(function ()
             {
                 if (ez <= botDefaults.botPlaylist.length)
@@ -3120,7 +3078,7 @@ bot.on('pmmed', function (data)
                     clearInterval(reorder);
                     console.log("Reorder Ended");
                     bot.pm("Reorder completed.", data.senderid);
-                    --botFunctions.randomOnce;
+                    botFunctions.decrementRandomOnce();
                 }
             }, 1000);
         }
@@ -3142,7 +3100,7 @@ bot.on('pmmed', function (data)
             if (index35 !== -1 && index80 !== -1)
             {
                 clearTimeout(roomFunctions.queueTimer());
-                botFunctions.sayOnce = true;
+                botFunctions.setSayOnce(true);
                 userFunctions.queueList().splice(index35, 2);
                 userFunctions.queueList().unshift(index81, index82);
                 userFunctions.queueName().splice(index46, 1);
@@ -3298,7 +3256,7 @@ bot.on('pmmed', function (data)
         {
             whatsOn += 'refreshing: Off, ';
         }
-        if (botFunctions.skipOn === true)
+        if (botFunctions.skipOn() === true)
         {
             whatsOn += 'autoskipping: On, ';
         }
@@ -3322,7 +3280,7 @@ bot.on('pmmed', function (data)
         {
             whatsOn += 'vote based song adding: Off, ';
         }
-        if (botFunctions.randomOnce === 0)
+        if (botFunctions.randomOnce() === 0)
         {
             whatsOn += 'playlist reordering in progress?: No';
         }
