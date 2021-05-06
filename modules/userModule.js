@@ -1,19 +1,19 @@
 let musicDefaults = require('../defaultSettings/musicDefaults.js');
+let roomDefaults = require('../defaultSettings/roomDefaults.js');
 
 let authModule = require('../auth.js');
 
-let theUsersList = []; //holds the name and userid of everyone in the room
+let theUsersList = []; // object array of everyone in the room
 let afkPeople = []; //holds the userid of everyone who has used the /afk command
 let modPM = []; //holds the userid's of everyone in the /modpm feature
 let currentDJs = []; //holds the userid of all the dj's who are on stage currently
-let userIDs = []; //holds the userid's of everyone who is in the room
 let people = []; //holds the userid's of everyone who is kicked off stage for the spam limit
 let myTime = []; //holds a date object for everyone in the room, which represents the time when they joined the room, resets every time the person rejoins
 let timer = []; //holds the timeout of everyone who has been spamming the stage, resets their spam count if their timer completes
 let myID = null; //the userid of the person using the /fanme command, speak event only
 
-let bannedUsers = ['636473737373', 'bob', '535253533353', 'joe']; //banned users list, put userids in string form here for permanent banning(put their name after their userid to tell who is banned).
-let bannedFromStage = ['636473737373', 'bob', '535253533353', 'joe']; //put userids in here to ban from djing permanently(put their name after their userid to tell who is banned)
+let bannedUsers = {'636473737373': {username: 'bob'}, '535253533353': {username: 'joe'}}; //banned users list, put userids in string form here for permanent banning(put their name after their userid to tell who is banned).
+let bannedFromStage = {'636473737373': {username: 'bob'}, '535253533353': {username: 'joe'}}; //put userids in here to ban from djing permanently(put their name after their userid to tell who is banned)
 let vipList = [];
 /* this is the vip list, it accepts userids as input, this is for when you have a special guest or guests in your room and you only
    want to hear them dj, leave this empty unless you want everyone other than the people whos userids are in the vip list to be automatically kicked from stage. */
@@ -45,8 +45,7 @@ let lastSeen3 = {}; //holds a date object to be used for the audience afk limit
 let lastSeen4 = {}; //holds a date object to be used for the audience afk limit
 let escortMeList = []; //holds the userid of everyone who has used the /escortme command, auto removed when the person leaves the stage
 let modList = []; //set the afk limit in minutes here
-let queueList = []; //holds the name and userid of everyone in the queue
-let queueName = []; //holds just the name of everyone who is in the queue
+let queueList = []; //holds the userid of everyone in the queue
 
 const userFunctions = (bot, roomDefaults) => {
     function logMe(logLevel, message) {
@@ -87,8 +86,6 @@ const userFunctions = (bot, roomDefaults) => {
         djSongCount: (djID) => djSongCount[djID],
 
         roomafkLimit: () => roomafkLimit,
-        queueList: () => queueList,
-        queueName: () => queueName,
         escortMeList: () => escortMeList,
 
         lastSeen: () => lastSeen,
@@ -100,16 +97,87 @@ const userFunctions = (bot, roomDefaults) => {
         modList: () => modList,
 
         isModerator: () => isModerator,
-        setAsModerator: function () { isModerator = true; },
-        removeAsModerator: function () { isModerator = false; },
+        setAsModerator: function () {
+            isModerator = true;
+        },
+        removeAsModerator: function () {
+            isModerator = false;
+        },
 
         AFK: () => AFK,
-        enableAFK: function () { AFK = true; },
-        disableAFK: function () { AFK = false; },
+        enableAFK: function () {
+            AFK = true;
+        },
+        disableAFK: function () {
+            AFK = false;
+        },
 
         roomAFK: () => roomAFK,
-        enableRoomAFK: function () { roomAFK = true; },
-        disableRoomAFK: function () { roomAFK = false; },
+        enableRoomAFK: function () {
+            roomAFK = true;
+        },
+        disableRoomAFK: function () {
+            roomAFK = false;
+        },
+
+        queueList: () => queueList,
+
+        buildQueueMessage: function () {
+            let message;
+
+            return message;
+        },
+
+        addUserToQueue: function (userID) {
+            if (!roomDefaults.queue) {
+                return [ false, "the queue is disabled." ];
+            }
+
+            if (!this.isUserIDInQueue(userID)) {
+                return [ false, "you are already in queue." ];
+            }
+
+            if (this.isUserIDOnStage()) {
+                return [ false, "you are already on stage!" ];
+            }
+
+            if (this.isUserIDStageBanned()) {
+                return [ false, "sorry, you are banned from the stage." ];
+            }
+
+            queueList.push( { id:userID} );
+            return [ true, '' ];
+        },
+
+        removeUserFromQueue: function (userID) {
+            if (!this.isUserIDInQueue(userID)) {
+                return [ false, "not in queue" ];
+            } else {
+                const queuePosition = queueList.findIndex( ({ id }) => id === userID );
+                queueList.splice(queuePosition, 1);
+                return [ true, '' ];
+            }
+        },
+
+        isUserIDInQueue: function (userID) {
+            const inQueue = queueList.findIndex(({id}) => id === userID);
+            return inQueue !== -1;
+        },
+
+        isUserIDOnStage: function (userID) {
+            const onStage = currentDJs.findIndex(({id}) => id === userID);
+            return onStage !== -1;
+        },
+
+        isUserIDStageBanned: function (userID) {
+            const stageBanned = bannedFromStage.findIndex(({id}) => id === userID);
+            return stageBanned !== -1;
+        },
+
+        isUserBannedFromRoom: function (userID) {
+            const banned = bannedUsers.findIndex(({id}) => id === userID);
+            return banned !== -1;
+        },
 
         resetUsersList: function () {
             theUsersList = []
@@ -119,11 +187,6 @@ const userFunctions = (bot, roomDefaults) => {
         resetEscortMeList: function () {
             escortMeList = []
             logMe("debug", "resetEscortMeList: I've reset the Escort Users list")
-        },
-
-        resetQueueNames: function () {
-            queueName = []
-            logMe("debug", "resetQueueNames: I've reset the Queue Names")
         },
 
         resetQueueList: function () {
@@ -316,12 +379,9 @@ const userFunctions = (bot, roomDefaults) => {
             }
 
             //checks if user is on the banned list
-            for (let z = 0; z < bannedUsers.length; z++) {
-                if (bannedUsers[z].match(user.userid)) {
-                    bootUser = true;
-                    bootMessage = 'You are on the banned user list.';
-                    break;
-                }
+            if (this.isUserBannedFromRoom(user.userid)) {
+                bootUser = true;
+                bootMessage = 'You are on the banned user list.';
             }
 
             // don't let the bot boot itself!
@@ -345,7 +405,7 @@ const userFunctions = (bot, roomDefaults) => {
         greetNewuser: function (userID, username, roomFunctions) {
             //gets newest user and prints greeting, does not greet the bot or the ttstats bot, or banned users
             if (roomFunctions.greet() === true && userID !== authModule.USERID && !username.match('@ttstat')) {
-                const greetingTimers = roomFunctions.greetingTimer() ;
+                const greetingTimers = roomFunctions.greetingTimer();
 
                 // if there's a timeout function waiting to be called for
                 // this user, cancel it.
@@ -730,9 +790,7 @@ const userFunctions = (bot, roomDefaults) => {
                         warnme.splice(areTheyNext, 1);
 
                     }
-                }
-                else
-                {
+                } else {
                     let areTheyNext = warnme.indexOf(currentDJs[whatIsPosition + 1]);
                     if (areTheyNext !== -1) //is the next dj up in the warnme?
                     {

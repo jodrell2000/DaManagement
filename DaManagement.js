@@ -577,7 +577,7 @@ bot.on('registered', function (data) {
             const greetingTimers = roomFunctions.greetingTimer() ;
 
             greetingTimers[userID] = setTimeout(function() {
-                chatFunctions.userGreeting(userID, username)
+                chatFunctions.userGreeting(userID, username, roomFunctions)
 
                 // remove timeout function from the list of timeout functions
                 delete greetingTimers[userID];

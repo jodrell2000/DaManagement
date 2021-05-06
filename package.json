@@ -3,5 +3,8 @@
 	"private": true,
 	"dependencies": {
 		"ttapi": "^4.0.2"
+	},
+	"devDependencies": {
+		"prettier": "^2.2.1"
 	}
 }

@@ -910,40 +910,14 @@ const commandFunctions = (bot) => {
             } else if (text.match(/^\/addme$/) && roomDefaults.queue === true) {
                 if (typeof data.userid == 'undefined') {
                     logMe("debug", "User is undefined");
-                    bot.speak('failed to add to queue, please try the command again');
+                    bot.speak('failed to add to queue, please try the command again: undefined userID');
                 } else {
-                    let indexInUsersList = userFunctions.theUsersList().indexOf(data.userid) + 1;
-                    if (typeof userFunctions.theUsersList()[indexInUsersList] == 'undefined') {
-                        logMe("debug", "Userlist is undefined");
-                        bot.pm('failed to add to queue, please try the command again', data.userid);
-                    } else {
-                        let list3 = userFunctions.queueList().indexOf(userFunctions.theUsersList()[indexInUsersList]);
-                        let list10 = userFunctions.currentDJs().indexOf(data.userid)
-                        let checkStageList = roomFunctions.stageBannedList().indexOf(data.userid);
-                        let checkManualStageList = userFunctions.bannedFromStage().indexOf(data.userid);
-                        //if not in the queue already, not already a dj, not banned from stage
-                        if (list3 === -1 && list10 === -1 && checkStageList === -1 && checkManualStageList === -1) {
-                            userFunctions.queueList().push(userFunctions.theUsersList()[indexInUsersList], data.userid);
-                            userFunctions.queueName().push(userFunctions.theUsersList()[indexInUsersList]);
-                            let temp91 = 'The queue is now: ';
-                            for (let hj = 0; hj < userFunctions.queueName().length; hj++) {
-                                if (hj !== (userFunctions.queueName().length - 1)) {
-                                    temp91 += userFunctions.queueName()[hj] + ', ';
-                                } else if (hj === (userFunctions.queueName().length - 1)) {
-                                    temp91 += userFunctions.queueName()[hj];
-                                }
-                            }
-                            bot.speak(temp91);
-                        } else if (list3 !== -1) //if already in queue
-                        {
-                            bot.pm('sorry i can\'t add you to the queue because you are already in the queue!', data.userid);
-                        } else if (checkStageList !== -1 || checkManualStageList !== -1) //if banned from stage
-                        {
-                            bot.pm('sorry i can\'t add you to the queue because you are currently banned from djing', data.userid);
-                        } else if (list10 !== -1) //if already on stage
-                        {
-                            bot.pm('you are already djing!', data.userid);
-                        }
+                    let theMessage;
+                    [addedToQueue, theMessage] = userFunctions.addUserToQueue(data.userid);
+                    bot.speak(userFunctions.buildQueueMessage());
+
+                    if (!addedToQueue) {
+                        bot.pm(theMessage, data.userid);
                     }
                 }
             } else if (text.match(/^\/queueOn$/) && userFunctions.isModerator() === true) {
