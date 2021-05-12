@@ -61,32 +61,20 @@ const roomFunctions = (bot) => {
                 let minutes = Math.floor((roomDefaults.queueWaitTime / 60));
                 thisMessage = ' you have ' + minutes + ' minutes to get on stage.';
             }
+            logMe('debug', 'queuePromptToDJ: userID ' + userFunctions.queueList(0) );
+            logMe('debug', 'queuePromptToDJ: typeof userID ' + typeof(userFunctions.queueList(0).toString()) );
 
-            bot.speak('@' + userFunctions.queueName[0] + thisMessage);
+            bot.speak('@' + userFunctions.getUsername(userFunctions.queueList(0).toString()) + thisMessage);
         },
 
         removeFirstDJFromQueue: function (botFunctions, userFunctions) {
-            bot.speak('Sorry @' + userFunctions.queueName[0] + ' you have run out of time.');
+            bot.speak('Sorry @' + userFunctions.getUsername(userFunctions.queueList(0).toString()) + ' you have run out of time.');
             userFunctions.queueList().splice(0, 2);
-            userFunctions.queueName().splice(0, 1);
             botFunctions.sayOnce = true;
         },
 
         readQueueMembers: function (userFunctions) {
-            let queueMessage = '';
-            if (userFunctions.queueName.length !== 0) {
-                let queueMessage = 'The queue is now: ';
-                for (let kj = 0; kj < userFunctions.queueName.length; kj++) {
-                    if (kj !== (userFunctions.queueName.length - 1)) {
-                        queueMessage += userFunctions.queueName[kj] + ', ';
-                    } else if (kj === (userFunctions.queueName.length - 1)) {
-                        queueMessage += userFunctions.queueName[kj];
-                    }
-                }
-            } else {
-                queueMessage = 'The queue is now empty.';
-            }
-            bot.speak(queueMessage);
+            bot.speak(userFunctions.buildQueueMessage());
         },
 
         clearDecksForVIPs: function (userFunctions, authModule) {

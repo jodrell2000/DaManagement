@@ -720,7 +720,7 @@ const commandFunctions = (bot) => {
             } else if (text.match(/^\/m/) && !text.match(/^\/me/) && userFunctions.isModerator() === true) {
                 bot.speak(text.substring(3));
             } else if (text.match(/^\/hello$/)) {
-                bot.speak('Hey! How are you @' + userFunctions.name() + '?');
+                bot.speak('Hey! How are you @' + userFunctions.getUsername(data.userid) + '?');
             } else if (text.match(/^\/snagevery$/) && userFunctions.isModerator() === true) {
                 if (songFunctions.snagSong() === true) {
                     songFunctions.snagSong = false;
@@ -788,21 +788,8 @@ const commandFunctions = (bot) => {
                     bot.speak('There is currently no queue.');
                 }
             } else if (text.match(/^\/queue$/)) {
-                if (roomDefaults.queue === true && userFunctions.queueName().length !== 0) {
-                    let temp95 = 'The queue is now: ';
-                    for (let kl = 0; kl < userFunctions.queueName().length; kl++) {
-                        if (kl !== (userFunctions.queueName().length - 1)) {
-                            temp95 += userFunctions.queueName()[kl] + ', ';
-                        } else if (kl === (userFunctions.queueName().length - 1)) {
-                            temp95 += userFunctions.queueName()[kl];
-                        }
-                    }
-                    bot.speak(temp95);
-
-                } else if (roomDefaults.queue === true) {
-                    bot.speak('The queue is currently empty.');
-                } else {
-                    bot.speak('There is currently no queue.');
+                if (roomDefaults.queue === true) {
+                    bot.speak( userFunctions.buildQueueMessage() );
                 }
             } else if (text.match(/^\/playminus/) && userFunctions.isModerator() === true) {
                 if (musicDefaults.PLAYLIMIT === true) //is the play limit on?
@@ -907,18 +894,16 @@ const commandFunctions = (bot) => {
                         bot.pm('error, you have to be in the queue to remove yourself from the queue', data.userid);
                     }
                 }
-            } else if (text.match(/^\/addme$/) && roomDefaults.queue === true) {
+            } else if ( text.match(/^\/addme$/ ) ) {
                 if (typeof data.userid == 'undefined') {
                     logMe("debug", "User is undefined");
                     bot.speak('failed to add to queue, please try the command again: undefined userID');
                 } else {
-                    let theMessage;
+                    let theMessage, addedToQueue;
                     [addedToQueue, theMessage] = userFunctions.addUserToQueue(data.userid);
                     bot.speak(userFunctions.buildQueueMessage());
 
-                    if (!addedToQueue) {
-                        bot.pm(theMessage, data.userid);
-                    }
+                    if (!addedToQueue) bot.pm(theMessage, data.userid);
                 }
             } else if (text.match(/^\/queueOn$/) && userFunctions.isModerator() === true) {
                 userFunctions.resetQueueList();
