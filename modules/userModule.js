@@ -143,14 +143,9 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         getUsername: function (userID) {
-            logMe('debug', 'getUsername:typeof userID ' + typeof(userID) );
-            logMe('debug', 'getUsername:userID ' + userID );
             theUsersList.forEach(function(theUser) {
-                logMe('debug', 'getUsername:forEach, theUser.id ' + theUser.id );
-                logMe('debug', 'getUsername:forEach, theUser.username ' + theUser.username );
             });
             let theUser = theUsersList.find(({id}) => id === userID);
-            logMe('debug', 'getUsername:theUser ' + theUser );
             return theUser.username;
         },
 
@@ -158,10 +153,7 @@ const userFunctions = (bot, roomDefaults) => {
             let listOfUsers = '';
             let message;
 
-            logMe('debug', 'buildQueueMessage (theUsersList):' + theUsersList);
-            logMe('debug', 'buildQueueMessage (queueList):' + queueList);
             queueList.forEach(function(userID){
-                logMe('debug', 'buildQueueMessage: userLoop...' + userID);
                 if (listOfUsers==='') {
                     listOfUsers = this.getUsername(userID);
 
@@ -200,7 +192,6 @@ const userFunctions = (bot, roomDefaults) => {
             }
 
             queueList.push( userID );
-            logMe('debug', 'addUserToQueue:queueList ' + queueList );
             return [ true, '' ];
         },
 
@@ -225,8 +216,6 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         isUserIDStageBanned: function (userID) {
-            logMe('debug', 'isUserIDStageBanned (userID):' + userID );
-            logMe('debug', 'isUserIDStageBanned (bannedFromStage): ' + bannedFromStage );
             const stageBanned = bannedFromStage.findIndex(({id}) => id === userID);
             return stageBanned !== -1;
         },
@@ -445,10 +434,8 @@ const userFunctions = (bot, roomDefaults) => {
 
         bootThisUser: function (userID, bootMessage) {
             if (bootMessage == null) {
-                logMe("debug", "Boot userID: ====" + userID + "++++++")
                 bot.boot(userID)
             } else {
-                logMe("debug", "Boot userID: ====" + userID + "++++++ with message ====" + bootMessage + "+++++++")
                 bot.bootUser(userID, bootMessage);
             }
         },
@@ -482,14 +469,13 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         getPositionOnUsersList: function (userID) {
-            return theUsersList.find(({id}) => id === userID);
+            let listPosition = theUsersList.findIndex( ( { id } ) => id === userID)
+            return listPosition;
         },
 
         userJoinsRoom: function (userID, username) {
             //adds users who join the room to the user list if their not already on the list
             this.addUserToTheUsersList(userID, username);
-
-            logMe('debug', '============== got here');
 
             //starts time for everyone that joins the room
             this.addUserJoinedTime(userID);
