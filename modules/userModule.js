@@ -86,14 +86,7 @@ const userFunctions = (bot, roomDefaults) => {
 
         djSongCount: (djID) => djSongCount[djID],
 
-        roomafkLimit: () => roomafkLimit,
         escortMeList: () => escortMeList,
-
-        lastSeen: () => lastSeen,
-        lastSeen1: () => lastSeen1,
-        lastSeen2: () => lastSeen2,
-        lastSeen3: () => lastSeen3,
-        lastSeen4: () => lastSeen4,
 
         modList: () => modList,
 
@@ -490,77 +483,70 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
+        getAFKTime: function (userID) {
+            let userPosition = this.getPositionOnUsersList(userID);
+            let userLastActive = theUsersList[userPosition]['joinTime'];
+            let afkAllowedTime = roomDefaults.afkTimeLimit * 60 * 1000; // AFK time in milliseconds
 
-        //whichFunction represents which justSaw object do you want to access
-        //num is the time in minutes till afk timeout
-        //userid is the person's userid
-        isAFK: function (userId, num, whichFunction) {
-            let last;
-            //which last seen object to use?
-            switch (whichFunction) {
-                case 'isAfk':
-                    last = lastSeen[userId];
-                    break;
-                case 'isAfk1':
-                    last = lastSeen1[userId];
-                    break;
-                case 'isAfk2':
-                    last = lastSeen2[userId];
-                    break;
-                case 'isAfk3':
-                    last = lastSeen3[userId];
-                    break;
-                case 'isAfk4':
-                    last = lastSeen4[userId];
-                    break;
+            // afkTimeLimit: 20
+            if (roomDefaults.voteMeansActive) {
+                if ( theUsersList[userPosition]['lastVoted'] > userLastActive ) {
+                    userLastActive = theUsersList[userPosition]['lastVoted'];
+                }
             }
 
-            let age_ms = Date.now() - last;
-            let age_m = Math.floor(age_ms / 1000 / 60);
-            return age_m >= num;
+            if (roomDefaults.speechMeansActive) {
+                if ( theUsersList[userPosition]['lastSpoke'] > userLastActive ) {
+                    userLastActive = theUsersList[userPosition]['lastSpoke'];
+                }
+            }
+
+            if (roomDefaults.snagMeansActive) {
+                if ( theUsersList[userPosition]['lastSnagged'] > userLastActive ) {
+                    userLastActive = theUsersList[userPosition]['lastSnagged'];
+                }
+            }
+
+            return (Date.now() - userLastActive)/1000; // return usersAFK time in seconds
+        },
+
+        afkWarning: function (userID, minutesRemaining) {
+            let theMessage;
+            let pmMessage;
+
+            if (minutesRemaining !== 0) {
+                theMessage = ' you have ' + minutesRemaining + ' minutes left of afk, chat or awesome please.';
+                pmMessage = 'you have ' + minutesRemaining + ' minutes left of afk, chat or awesome please.';
+            } else {
+                theMessage = ' you are over the afk limit of ' + roomDefaults.afkLimit + ' minutes.';
+                pmMessage = 'you are over the afk limit of ' + roomDefaults.afkLimit + ' minutes.';
+            }
+
+            if (roomDefaults.afkThroughPm === false) {
+                bot.speak('@' + this.getUsername(userID) + theMessage);
+            } else {
+                bot.pm(pmMessage, userID);
+            }
         },
 
         //removes afk dj's after roomDefaultsModule.afkLimit is up.
         afkCheck: function (roomFunctions, roomDefaults) {
-            let afker;
+            let djID;
             for (let i = 0; i < currentDJs.length; i++) {
-                afker = currentDJs[i]; //Pick a DJ
-                let isAfkMaster = masterIds.indexOf(afker); //master ids check
-                let whatIsAfkerName = theUsersList.indexOf(afker) + 1;
-                if ((this.isAFK(afker, (roomDefaults.afkLimit - 5), 'isAfk1')) && AFK === true) {
-                    if (afker !== authModule.USERID && isAfkMaster === -1) {
-                        if (roomDefaults.afkThroughPm === false) {
-                            bot.speak('@' + theUsersList[whatIsAfkerName] + ' you have 5 minutes left of afk, chat or awesome please.');
-                        } else {
-                            bot.pm('you have 5 minutes left of afk, chat or awesome please.', afker);
-                        }
-                        this.justSaw(afker, 'justSaw1');
+                djID = currentDJs[i]; //Pick a DJ
+                if (djID !== authModule.USERID) {
+
+                    if (this.getAFKTime(djID)/60 >  roomDefaults.afkLimit - 5 ) {
+                        this.afkWarning(djID, 5);
                     }
-                }
-                if ((this.isAFK(afker, (roomDefaults.afkLimit - 1), 'isAfk2')) && AFK === true) {
-                    if (afker !== authModule.USERID && isAfkMaster === -1) {
-                        if (roomDefaults.afkThroughPm === false) {
-                            bot.speak('@' + theUsersList[whatIsAfkerName] + ' you have 1 minute left of afk, chat or awesome please.');
-                        } else {
-                            bot.pm('you have 1 minute left of afk, chat or awesome please.', afker);
-                        }
-                        this.justSaw(afker, 'justSaw2');
+
+                    if (this.getAFKTime(djID)/60 >  roomDefaults.afkLimit - 1 ) {
+                        this.afkWarning(djID, 1);
                     }
-                }
-                if ((this.isAFK(afker, roomDefaults.afkLimit, 'isAfk')) && AFK === true) { //if Dj is afk then
-                    if (afker !== authModule.USERID && isAfkMaster === -1) //checks to see if afker is a mod or a bot or the current dj, if they are is does not kick them.
-                    {
-                        if (afker !== roomFunctions.checkWhoIsDj()) {
-                            if (roomDefaults.afkThroughPm === false) {
-                                bot.speak('@' + theUsersList[whatIsAfkerName] + ' you are over the afk limit of ' + roomDefaults.afkLimit + ' minutes.');
-                            } else {
-                                bot.pm('you are over the afk limit of ' + roomDefaults.afkLimit + ' minutes.', afker);
-                            }
-                            this.justSaw(afker, 'justSaw1');
-                            this.justSaw(afker, 'justSaw2');
-                            this.justSaw(afker, 'justSaw');
-                            bot.remDj(afker); //remove them
-                        }
+
+                    if (this.getAFKTime(djID)/60 >  roomDefaults.afkLimit ) {
+                        this.afkWarning(djID, 0);
+                        bot.remDj(djID); //remove them
                     }
                 }
             }
@@ -568,39 +554,35 @@ const userFunctions = (bot, roomDefaults) => {
 
         //this removes people on the floor, not the djs
         roomAFKCheck: function () {
-            for (let i = 0; i < userIDs.length; i++) {
-                let afker2 = userIDs[i]; //Pick a DJ
-                let isAfkMod = modList.indexOf(afker2);
-                let isDj = currentDJs.indexOf(afker2);
-                if ((this.isAFK(afker2, (roomafkLimit - 1), 'isAfk3')) && roomAFK === true) {
-                    if (afker2 !== authModule.USERID && isDj === -1 && isAfkMod === -1) {
-                        bot.pm('you have 1 minute left of afk, chat or awesome please.', afker2);
-                        this.justSaw(afker2, 'justSaw3');
-                    }
+            let theUserID;
+            for (let userLoop = 0; userLoop < theUsersList.length; userLoop++) {
+                theUserID = theUsersList[userLoop].id;
+
+                if (roomAFK === true && theUserID !== authModule.USERID) {
+                    this.afkWarning(theUserID, 5)
                 }
-                if ((this.isAFK(afker2, roomafkLimit, 'isAfk4')) && roomAFK === true) { //if person is afk then
-                    if (afker2 !== authModule.USERID && isAfkMod === -1) //checks to see if afker is a mod or this, if they are is does not kick them.
-                    {
-                        if (isDj === -1) {
-                            bot.pm('you are over the afk limit of ' + roomafkLimit + ' minutes.', afker2);
-                            bot.boot(afker2, 'you are over the afk limit');
-                            this.justSaw(afker2, 'justSaw3');
-                            this.justSaw(afker2, 'justSaw4');
-                        }
-                    }
+
+                if (roomAFK === true && theUserID !== authModule.USERID) {
+                    this.afkWarning(theUserID, 1)
+                }
+
+                if (roomAFK === true && theUserID !== authModule.USERID) {
+                    this.afkWarning(theUserID, 0)
+                    bot.boot(theUserID, 'you are over the afk limit');
                 }
             }
         },
 
-        updateAfkPostionOfUser: function (userid) {
-            //updates the afk position of the speaker.
-            if (AFK === true || roomAFK === true) {
-                this.justSaw(userid, 'justSaw');
-                this.justSaw(userid, 'justSaw1');
-                this.justSaw(userid, 'justSaw2');
-                this.justSaw(userid, 'justSaw3');
-                this.justSaw(userid, 'justSaw4');
-            }
+        updateUserLastSpoke: function (userID) {
+            theUsersList[this.getPositionOnUsersList(userID)]['lastSpoke'] = Date.now();
+        },
+
+        updateUserLastVoted: function (userID) {
+            theUsersList[this.getPositionOnUsersList(userID)]['lastVoted'] = Date.now();
+        },
+
+        updateUserLastSnagged: function (userID) {
+            theUsersList[this.getPositionOnUsersList(userID)]['lastSnagged'] = Date.now();
         },
 
         justSaw: function (uid, whichFunction) {
@@ -634,23 +616,11 @@ const userFunctions = (bot, roomDefaults) => {
 
         isUserInUsersList: function (userID) {
             // if the userID is in the userList return true, else false
-            logMe('debug', 'isUserInUsersList:userID: ' + userID);
-            logMe('debug', 'isUserInUsersList:theUsersList Position ' + theUsersList.find(({id}) => id === userID));
-            if (theUsersList.find(({id}) => id === userID) === undefined) {
-                return false;
-            } else {
-                return true;
-            }
+            return theUsersList.find(({id}) => id === userID) !== undefined;
         },
 
         addUserToTheUsersList: function (userID, username) {
-            logMe('debug', 'addUserToTheUsersList:' + userID + ' ' + username);
-            logMe('debug', 'addUserToTheUsersList: typeof userID ' + typeof(userID));
-            logMe('debug', 'addUserToTheUsersList: typeof username ' + typeof(username));
-            logMe('debug', 'addUserToTheUsersList: typeof usernamethis.isUserInUsersList(userID) ' + this.isUserInUsersList(userID));
-
             if (!this.isUserInUsersList(userID)) {
-                logMe('debug', userID + ' not in the list, adding them');
                 theUsersList.push( { id: userID, username: username } );
             }
             this.debugPrintTheUsersList();
@@ -692,7 +662,8 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         incrementDJPlayCount: function (userID) {
-            ++theUsersList[this.getPositionOnUsersList(userID)]['songCount']
+            ++theUsersList[this.getPositionOnUsersList(userID)]['songCount'];
+
         },
 
         decrementDJPlayCount: function (userID) {
@@ -708,6 +679,12 @@ const userFunctions = (bot, roomDefaults) => {
         deleteDJPlayCount: function (userID) {
             if(this.isUserInUsersList(userID)) {
                 delete theUsersList[this.getPositionOnUsersList(userID)]['songCount'];
+            }
+        },
+
+        getDJPlayCount: function (userID) {
+            if(this.isUserInUsersList(userID)) {
+                return theUsersList[this.getPositionOnUsersList(userID)]['songCount'];
             }
         },
 
@@ -741,24 +718,16 @@ const userFunctions = (bot, roomDefaults) => {
         buildModList: function (data) {
             //set modlist to list of moderators
             //modList = data.room.metadata.moderator_id;
-            logMe('debug', 'Moderator count ->' + data.room.metadata.moderator_id.length + '<-');
             for (let ihp = 0; ihp < data.room.metadata.moderator_id.length; ihp++) {
                 modList.push(data.room.metadata.moderator_id[ihp]);
             }
-            logMe('debug', 'Build Mod List ->' + modList + '<-');
         },
 
         resetAllSpamCounts: function () {
             //sets everyones spam count to zero
             //puts people on the global afk list when it joins the room
-            for (let z = 0; z < userIDs.length; z++) {
-                if (typeof userIDs[z] !== 'undefined') {
-                    people[userIDs[z]] = {
-                        spamCount: 0
-                    };
-                    this.justSaw(userIDs[z], 'justSaw3');
-                    this.justSaw(userIDs[z], 'justSaw4');
-                }
+            for (let userLoop = 0; userLoop < theUsersList.length; userLoop++) {
+                theUsersList[userLoop]['spamCount'] = 0;
             }
         },
 
@@ -841,8 +810,6 @@ const userFunctions = (bot, roomDefaults) => {
             for (let iop = 0; iop < data.room.metadata.djs.length; iop++) {
                 if (typeof data.room.metadata.djs[iop] !== 'undefined') {
                     this.currentDJs().push(data.room.metadata.djs[iop]);
-                    logMe("debug", "data iop:" + data.room.metadata.djs[iop]);
-                    logMe("debug", "current DJs:" + this.currentDJs());
                     this.initialiseDJPlayCount(data.room.metadata.djs[iop]);
                     this.initializeDJAFKCount(data, iop);
                 }

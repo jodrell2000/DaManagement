@@ -111,7 +111,7 @@ bot.on('registered', function (data) {
     } else {
         //if there are 5 dj's on stage and the queue is turned on when a user enters the room
         if (roomDefaults.queue === true && userFunctions.currentDJs().length === 5) {
-            bot.pm('The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.', userID);
+            bot.pm('The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.', userFunctions.getUsername(theUserID));
         }
 
         if (userFunctions.greetNewuser(theUserID, username, roomFunctions)) {
@@ -150,11 +150,7 @@ bot.on('roomChanged', function (data)
         userFunctions.startAllUserTimers();
     }
     catch (err) {
-        if (typeof errorMessage === 'string') {
-            logMe('debug', 'unable to join the room the room due to errormessage: ' + errorMessage);
-        } else {
-            logMe('debug', 'unable to join the room the room due to err: ' + err);
-        }
+            logMe('debug', 'unable to join the room the room due to err: ' + err.toString());
     }
 });
 
@@ -311,18 +307,19 @@ bot.on('nosong', function ()
 bot.on('speak', function (data)
 {
     let text = data.text; //the most recent text in the chatbox on turntable
+    let theUserID = data.userid;
     userFunctions.name = data.name; //name of latest person to say something
     botFunctions.recordActivity();
 
-    userFunctions.checkIfUserIsMod(data.userid); //check to see if speaker is a moderator or not
+    userFunctions.checkIfUserIsMod(theUserID); //check to see if speaker is a moderator or not
 
-    userFunctions.updateAfkPostionOfUser(data.userid); //update the afk position of the speaker
+    userFunctions.updateUserLastSpoke(theUserID); //update the afk position of the speaker
 
-    commandFunctions.parseChat(data, userFunctions, botFunctions, roomFunctions, songFunctions);
+    commandFunctions.parseChat(data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions);
 
 
     //checks to see if someone is trying to speak to an afk person or not.
-    if (userFunctions.afkPeople.length !== 0 && data.userid !== authModule.USERID)
+    if (userFunctions.afkPeople.length !== 0 && theUserID !== authModule.USERID)
     {
         for (let j = 0; j < userFunctions.afkPeople.length; j++) //loop through afk people array
         {
@@ -342,7 +339,7 @@ bot.on('speak', function (data)
 //checks when the bot recieves a pm
 bot.on('pmmed', function (data)
 {
-    commandFunctions.parsePM(data, userFunctions, botFunctions, roomFunctions, songFunctions);
+    commandFunctions.parsePM(data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions);
 });
 
 //checks who voted and updates their position on the afk list.
@@ -350,7 +347,7 @@ bot.on('update_votes', function (data)
 {
     songFunctions.recordUpVotes(data);
     songFunctions.recordDownVotes(data);
-    userFunctions.updateAfkPostionOfUser(data.room.metadata.votelog[0][0]); //update the afk position of people who vote for a song
+    userFunctions.updateUserLastVoted(data.room.metadata.votelog[0][0]); //update the afk position of people who vote for a song
 
     //this is for /autosnag, automatically adds songs that get over the awesome threshold
     if (botDefaults.autoSnag === true && songFunctions.snagSong() === false && songFunctions.upVotes() >=  botDefaults.howManyVotes && songFunctions.ALLREADYCALLED() === false)
@@ -364,7 +361,7 @@ bot.on('update_votes', function (data)
 bot.on('snagged', function (data)
 {
     songFunctions.voteSnagged();
-    userFunctions.updateAfkPostionOfUser(data.userid); //update the afk position of people who add a song to their queue
+    userFunctions.updateUserLastSnagged(data.userid); //update the afk position of people who add a song to their queue
 })
 
 //this activates when a user joins the stage.
@@ -395,7 +392,7 @@ bot.on('add_dj', function (data)
     }
 
     //updates the afk position of the person who joins the stage.
-    userFunctions.updateAfkPostionOfUser(theUserID);
+    userFunctions.updateUserLastSpoke(theUserID);
 
     //adds a user to the current Djs list when they join the stage.
     let check89 = userFunctions.currentDJs().indexOf(theUserID);
@@ -486,12 +483,10 @@ bot.on('add_dj', function (data)
         }
     }
 
-
-
     //checks to see if user is on the manually added banned from stage list, if they are they are removed from stage
     for (let z = 0; z < userFunctions.bannedFromStage().length; z++)
     {
-        if (userFunctions.bannedFromStage()[z].match(theUserID)) //== userFunctions.bannedFromStage()[z])
+        if (userFunctions.isUserIDStageBanned(theUserID)) //== userFunctions.bannedFromStage()[z])
         {
             bot.remDj(theUserID);
             bot.speak('@' + userFunctions.getUsername(theUserID) + ' you are banned from djing');
@@ -520,6 +515,7 @@ bot.on('add_dj', function (data)
 //checks when a dj leaves the stage
 bot.on('rem_dj', function (data)
 {
+    let theUserID = data.user[0].userid;
     //removes user from the dj list when they leave the stage
     userFunctions.deleteDJPlayCount(theUserID);
 
@@ -595,16 +591,18 @@ bot.on('endsong', function (data)
 {
     const djID = data.room.metadata.current_dj;
 
-    logMe('debug', 'Type of djSongCount:' + typeof (userFunctions.djSongCount(djID).nbSong));
-    logMe('debug', 'Type of djSongCount:' + userFunctions.djSongCount(djID).nbSong);
+    logMe('debug', 'bot.on endsong Type of djSongCount:' + typeof (userFunctions.getDJPlayCount(djID)));
+    logMe('debug', 'bot.on endsong djSongCount:' + userFunctions.getDJPlayCount(djID));
 
-    if (typeof (userFunctions.djSongCount(djID).nbSong) === 'undefined') {
+    if (typeof (userFunctions.getDJPlayCount(djID)) === 'undefined') {
         // increase the playcount for the current DJ
+        logMe('debug', 'bot.on endsong: undefined playCount');
         userFunctions.initialiseDJPlayCount(djID);
     } else {
+        logMe('debug', 'bot.on endsong: increment playCount');
         userFunctions.incrementDJPlayCount(djID);
     }
-    logMe('debug', 'song count:' + userFunctions.djSongCount(djID));
+    logMe('debug', 'song count:' + userFunctions.getDJPlayCount(djID));
 
     // check the playlimit and remove the current DJ if they've reached it
     userFunctions.removeDJsOverPlaylimit(chatFunctions, djID);

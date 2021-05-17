@@ -1,10 +1,23 @@
 const chatFunctions = (bot, roomDefaults) => {
+    function logMe(logLevel, message) {
+        if (logLevel === 'error') {
+            console.log("chatFunctions:" + logLevel + "->" + message + "\n");
+        } else {
+            if (bot.debug) {
+                console.log("chatFunctions:" + logLevel + "->" + message + "\n");
+            }
+        }
+    }
+
     return {
-        botMessage: function () {
-
-        },
-
-        botChat: function () {
+        botSpeak: function (message, userID) {
+            logMe('debug', 'userID: ' + userID );
+            logMe('debug', 'message: ' + message );
+            if (userID !== undefined) {
+                bot.pm(message, userID);
+            } else {
+                bot.speak( message );
+            }
 
         },
 
@@ -39,6 +52,29 @@ const chatFunctions = (bot, roomDefaults) => {
             }
         },
 
+        buildDJPlaysMessage: function (userFunctions) {
+            if (userFunctions.currentDJs().length === 0) {
+                return 'There are no dj\'s on stage.';
+            } else {
+                let theMessage = '';
+                let theUserID;
+                let theUserPosition;
+                let theUsername;
+                for (let djLoop = 0; djLoop < userFunctions.currentDJs().length; djLoop++) {
+                    theUserID = userFunctions.currentDJs()[djLoop];
+                    theUsername = userFunctions.getUsername(theUserID);
+                    theUserPosition = userFunctions.getPositionOnUsersList(theUserID);
+                    theMessage = theMessage +
+                        userFunctions.getUsername(userFunctions.currentDJs()[djLoop]) +
+                        ': ' +
+                        userFunctions.theUsersList()[theUserPosition]['songCount'] +
+                        ', ';
+                }
+
+                theMessage = 'The play counts are now ' + theMessage.substring(0, theMessage.length - 2);;
+                return theMessage;
+            }
+        },
 
         readSongStats: function (songFunctions, roomDefaults) {
             if (roomDefaults.SONGSTATS) {

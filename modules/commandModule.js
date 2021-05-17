@@ -16,7 +16,7 @@ const commandFunctions = (bot) => {
 
     return {
 
-        parseChat: function (data, userFunctions, botFunctions, roomFunctions, songFunctions) {
+        parseChat: function (data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) {
             const text = data.text; //the most recent text in the chatbox on turntable
 
             if (text.match(/^\/autodj$/) && userFunctions.isModerator() === true) {
@@ -306,35 +306,9 @@ const commandFunctions = (bot) => {
             } else if (text.match(/^\/roomafkoff/) && userFunctions.isModerator() === true) {
                 userFunctions.disableRoomAFK();
                 bot.speak('the audience afk list is now inactive.');
+
             } else if (text.match(/^\/djplays/)) {
-                if (userFunctions.currentDJs().length !== 0) {
-                    let djsnames = [];
-                    let djplays = 'dj plays: ';
-                    for (let i = 0; i < userFunctions.currentDJs().length; i++) {
-                        let djname = userFunctions.theUsersList().indexOf(userFunctions.currentDJs()[i]) + 1;
-                        djsnames.push(userFunctions.theUsersList()[djname]);
-
-                        if (typeof (userFunctions.djSongCount(userFunctions.currentDJs()[i])) == 'undefined' && typeof userFunctions.currentDJs()[i] != 'undefined') //if doesn't exist at this point, create it
-                        {
-                            userFunctions.initialiseDJPlayCount(userFunctions.currentDJs()[i]);
-                        }
-
-                        if (userFunctions.currentDJs()[i] !== userFunctions.currentDJs()[(userFunctions.currentDJs().length - 1)]) {
-                            if (typeof (userFunctions.djSongCount(userFunctions.currentDJs()[i])) != 'undefined' && typeof userFunctions.currentDJs()[i] != 'undefined') //if doesn't exist at this point, create it
-                            {
-                                djplays = djplays + djsnames[i] + ': ' + userFunctions.djSongCount(userFunctions.currentDJs()[i]).nbSong + ', ';
-                            }
-                        } else {
-                            if (typeof (userFunctions.djSongCount(userFunctions.currentDJs()[i])) != 'undefined' && typeof userFunctions.currentDJs()[i] != 'undefined') //if doesn't exist at this point, create it
-                            {
-                                djplays = djplays + djsnames[i] + ': ' + userFunctions.djSongCount(userFunctions.currentDJs()[i]).nbSong;
-                            }
-                        }
-                    }
-                    bot.speak(djplays);
-                } else if (userFunctions.currentDJs().length === 0) {
-                    bot.speak('There are no dj\'s on stage.');
-                }
+                chatFunctions.botSpeak(chatFunctions.buildDJPlaysMessage(userFunctions));
             } else if (text.match(/^\/skipsong/) && userFunctions.isModerator() === true) {
                 if (roomFunctions.checkWhoIsDj() === authModule.USERID) {
                     bot.speak("Sorry...I'll play something better next time!");
@@ -1090,7 +1064,14 @@ const commandFunctions = (bot) => {
                 }
         },
 
-        parsePM: function (data, userFunctions, botFunctions, roomFunctions, songFunctions) {
+        parsePM: function (data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) {
+
+            // ===================================
+            // ===================================
+            // PUT SOMETHING IN HERE SO THAT YOU CAN ONLY PM COMMANDS TO THE BOT IF YOU"RE ACTUALLY IN THE ROOM
+            // ===================================
+            // ===================================
+
             let senderid = data.senderid; //the userid of the person who just pmmed the bot
             let text = data.text; //the text sent to the bot in a pm
             let name1 = userFunctions.theUsersList().indexOf(data.senderid) + 1; //the name of the person who sent the bot a pm
@@ -1872,36 +1853,10 @@ const commandFunctions = (bot) => {
                 }
 
                 bot.pm(whatsOn, data.senderid);
-            } else if (text.match(/^\/djplays/) && isInRoom === true) {
-                if (userFunctions.currentDJs().length !== 0) {
-                    let djsnames = [];
-                    let djplays = 'dj plays: ';
-                    for (let i = 0; i < userFunctions.currentDJs().length; i++) {
-                        let djname = userFunctions.theUsersList().indexOf(userFunctions.currentDJs()[i]) + 1;
-                        djsnames.push(userFunctions.theUsersList()[djname]);
 
-                        if (typeof (userFunctions.djSongCount(userFunctions.currentDJs()[i])) == 'undefined' && typeof userFunctions.currentDJs()[i] !== 'undefined') //if doesn't exist at this point, create it
-                        {
-                            userFunctions.initialiseDJPlayCount(userFunctions.currentDJs()[i]);
-                        }
+            } else if (text.match(/^\/djplays/)) {
+                chatFunctions.botSpeak( chatFunctions.buildDJPlaysMessage(userFunctions), data.senderid );
 
-                        if (userFunctions.currentDJs()[i] !== userFunctions.currentDJs()[(userFunctions.currentDJs().length - 1)]) {
-                            if (typeof (userFunctions.djSongCount(userFunctions.currentDJs()[i])) != 'undefined' && typeof userFunctions.currentDJs()[i] !== 'undefined') //if doesn't exist at this point, create it
-                            {
-                                djplays = djplays + djsnames[i] + ': ' + userFunctions.djSongCount(userFunctions.currentDJs()[i]).nbSong + ', ';
-                            }
-                        } else {
-                            if (typeof (userFunctions.djSongCount(userFunctions.currentDJs()[i])) !== 'undefined' && typeof userFunctions.currentDJs()[i] != 'undefined') //if doesn't exist at this point, create it
-                            {
-                                djplays = djplays + djsnames[i] + ': ' + userFunctions.djSongCount(userFunctions.currentDJs()[i]).nbSong;
-                            }
-                        }
-                    }
-
-                    bot.pm(djplays, data.senderid);
-                } else if (userFunctions.currentDJs().length === 0) {
-                    bot.pm('There are no dj\'s on stage.', data.senderid);
-                }
             } else if (text.match('/banstage') && userFunctions.isModerator() === true && isInRoom === true) {
                 let ban12 = data.text.slice(11);
                 let checkBan = roomFunctions.stageBannedList().indexOf(ban12);

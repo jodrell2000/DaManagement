@@ -9,8 +9,6 @@ module.exports = {
 
     SONGSTATS: true, //song stats after each song(on by default)
 
-
-    afkThroughPm: true, //choose whether afk warnings(for dj's on stage) will be given through the pm or the chatbox (false = chatbox, true = pm message)
     repeatMessageThroughPm: false,
     /*choose whether the repeating room message(the one corresponding to MESSAGE up above) will be through the chatbox or the pm,
                                           (false = through the chatbox, true = through the pm) (MESSAGE must equal true for this to work) (this feature is off by default)
@@ -39,7 +37,6 @@ module.exports = {
 
     HowManyVotesToSkip: 2, //how many votes for a song to get skipped(default value, only works if voteSkip = true)
 
-    AFK: true, //afk limit(on by default), this is for the dj's on stage
 
     // declarations, DO NOT SET
     ttRoomName: null, //the url extension of the room name, example "straight_chillin16" would be the format
@@ -61,7 +58,12 @@ module.exports = {
 
     detail: null, //the discription given in the "room" tab of the room that the bot is in
 
-    afkLimit: 20, //set the afk limit in minutes here
+    removeAFKDJs: true, //afk limit(on by default), this is for the dj's on stage
+    afkThroughPm: true, //choose whether afk warnings(for dj's on stage) will be given through the pm or the chatbox (false = chatbox, true = pm message)
+    afkTimeLimit: 20, //set the afk limit in minutes here
+    voteMeansActive: false, // voting/bopping does not count as user being active (too many user autoBop)
+    speechMeansActive: true, // chatting does not count as user being active
+    snagMeansActive: true, // snagging a track does not count as use being active
 
     queueWaitTime: 60, /*how many second's does a dj have to get on stage when it's their turn to dj after waiting in the queue.
 						 The value must be entered in seconds in order to display the correct message, i.e 3 mins = 180 seconds.
