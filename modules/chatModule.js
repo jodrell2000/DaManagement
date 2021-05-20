@@ -14,11 +14,19 @@ const chatFunctions = (bot, roomDefaults) => {
             logMe('debug', 'userID: ' + userID );
             logMe('debug', 'message: ' + message );
             if (userID !== undefined) {
-                bot.pm(message, userID);
+                this.botPM( userID, message);
             } else {
-                bot.speak( message );
+                this.botChat( message );
             }
 
+        },
+
+        botChat: function (message) {
+            bot.speak(message);
+        },
+
+        botPM: function (user, message) {
+            bot.speak(user, message);
         },
 
         userGreeting: function (userID, username, roomFunctions) {

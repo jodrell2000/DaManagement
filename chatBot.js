@@ -52,5 +52,9 @@ userList.push( { id:99, username: 'Jodrell'} );
 console.log('3 userlist:', userList);
 
 // add afk property for user Jodrell
-userList[0]['wibble'] = true;
+userList[2]['wibble'] = true;
+console.log('3 userlist:', userList);
+
+// remove afk property for user Jodrell
+delete userList[2]['wibble'];
 console.log('3 userlist:', userList);

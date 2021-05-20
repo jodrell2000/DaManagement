@@ -23,8 +23,6 @@ let masterIds = ['6040a0333f4bfc001be4cf39']; //example (clear this before using
     This is meant to explicitly give extra privileges to yourself and anyone else you want to put in here. It takes userid's as input in string format separated by commas.
     You can put the person's name in the array either before or after a userid to tell who it belongs to, it will not affect its ability to function. */
 
-let name = null; //the name of the person using the person who activated the speak event
-let isModerator = null; //is the person using a command a moderator? true or false
 let index = null; //the index returned when using unban commands
 let informTimer = null; //holds the timeout for the /inform command, null lets it know that it hasn't already been set
 let playLimitOfRefresher = []; //holds a copy of the number of plays for people who have used the /refresh command
@@ -32,20 +30,12 @@ let refreshList = []; //this holds the userid's of people who have used the /ref
 let refreshTimer = []; //this holds the timers of people who have used the /refresh command
 let warnme = []; //holds the userid's of everyone using the /warnme feature
 
-let djSongCount = []; //holds the song count that each of the dj's on stage have played
-
 let roomAFK = false; //audience afk limit(off by default)
 let roomafkLimit = 30; //set the afk limit for the audience here(in minutes), this feature is off by default
 let AFK = true; //afk limit(on by default), this is for the dj's on stage
 
-let lastSeen = {}; //holds a date object to be used for the dj afk timer, there are different ones because they have different timeouts
-let lastSeen1 = {}; //holds a date object to be used for the dj afk timer
-let lastSeen2 = {}; //holds a date object to be used for the dj afk timer
-let lastSeen3 = {}; //holds a date object to be used for the audience afk limit
-let lastSeen4 = {}; //holds a date object to be used for the audience afk limit
-let escortMeList = []; //holds the userid of everyone who has used the /escortme command, auto removed when the person leaves the stage
-let modList = []; //set the afk limit in minutes here
 let queueList = []; //holds the userid of everyone in the queue
+let djList = []; // list of the current DJs
 
 const userFunctions = (bot, roomDefaults) => {
     function logMe(logLevel, message) {
@@ -64,14 +54,8 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         theUsersList: () => theUsersList,
-        afkPeople: () => afkPeople,
         modPM: () => modPM,
         currentDJs: () => currentDJs,
-        userIDs: () => userIDs,
-        people: () => people,
-        myTime: () => myTime,
-        timer: () => timer,
-        myID: () => myID,
 
         bannedUsers: () => bannedUsers,
         bannedFromStage: () => bannedFromStage,
@@ -84,34 +68,160 @@ const userFunctions = (bot, roomDefaults) => {
         playLimitOfRefresher: () => playLimitOfRefresher,
         warnme: () => warnme,
 
-        djSongCount: (djID) => djSongCount[djID],
-
-        escortMeList: () => escortMeList,
-
-        modList: () => modList,
-
-        isModerator: () => isModerator,
-        setAsModerator: function () {
-            isModerator = true;
-        },
-        removeAsModerator: function () {
-            isModerator = false;
+        getUsername: function (userID) {
+            theUsersList.forEach(function(theUser) {
+            });
+            let theUser = theUsersList.find(({id}) => id === userID);
+            return theUser.username;
         },
 
-        AFK: () => AFK,
-        enableAFK: function () {
-            AFK = true;
-        },
-        disableAFK: function () {
-            AFK = false;
+        isUserIDOnStage: function (userID) {
+            const onStage = currentDJs.findIndex(({id}) => id === userID);
+            return onStage !== -1;
         },
 
-        roomAFK: () => roomAFK,
-        enableRoomAFK: function () { roomAFK = true; },
-        disableRoomAFK: function () { roomAFK = false; },
+        isUserIDStageBanned: function (userID) {
+            const stageBanned = bannedFromStage.findIndex(({id}) => id === userID);
+            return stageBanned !== -1;
+        },
+
+        isUserBannedFromRoom: function (userID) {
+            const banned = bannedUsers.findIndex(({id}) => id === userID);
+            return banned !== -1;
+        },
+
+        resetModPM: function () {
+            modPM = []
+            logMe("debug", "resetModPM: I've reset the ModPM List")
+        },
+
+        resetPeople: function () {
+            people = []
+            logMe("debug", "resetPeople: I've reset the People")
+        },
+
+        botStartReset: function (botFunctions, data) {
+            logMe('debug', 'botStartReset: Resetting everything');
+            this.resetAllEscortMe(bot);
+            this.resetUsersList();
+            this.resetQueueList();
+            this.resetPeople();
+            this.resetAFKPeople();
+            this.deleteAllDJsPlayCount();
+            this.resetModPM();
+
+            if ( botFunctions.botStartTime === null) {
+                botFunctions.botStartTime = Date.now();
+            }
+        },
+
+        removeDJsOverPlaylimit: function (chatFunctions, djID) {
+            if (musicDefaults.PLAYLIMIT === true) //is playlimit on?
+            {
+                if (djID !== authModule.USERID && djID === currentDJs[0] && roomDefaults.playLimit === 1) //if person is in the far left seat and limit is set to one
+                {
+                    let checklist33 = theUsersList.indexOf(djID) + 1;
+
+                    logMe("debug", "checkList33:" + checklist33);
+
+                    if (checklist33 !== -1) {
+                        chatFunctions.overPlayLimit(theUsersList[checklist33], roomDefaults.playLimit)
+                    }
+
+                    bot.remDj(djID);
+                }
+            }
+        },
+
+        isPMerInRoom: function (userID) {
+            let isInRoom = theUsersList.indexOf(userID);
+            isInRoom = isInRoom !== -1;
+            return isInRoom;
+        },
+
+        // ========================================================
+        // Moderator Management Functions
+        // ========================================================
+
+        resetModerators: function (data) {
+            logMe("debug", "resetModerators: I've reset the Moderators list")
+            let userPosition;
+            let theUserID;
+            if ( data.room !== undefined ) {
+                for (let modLoop = 0; modLoop < data.room.metadata.moderator_id.length; modLoop++) {
+                    theUserID = data.room.metadata.moderator_id[modLoop];
+                    userPosition = this.getPositionOnUsersList(theUserID)
+                    if ( !userPosition ) {
+                        theUsersList[userPosition]['moderator'] = true;
+                    }
+                }
+            }
+        },
+
+        addModerator: function (theUserID) {
+            let userPosition = this.getPositionOnUsersList(theUserID);
+            theUsersList[userPosition]['moderator'] = true;
+        },
+
+        removeModerator: function (theUserID) {
+            let userPosition = this.getPositionOnUsersList(theUserID);
+            theUsersList[userPosition]['moderator'] = false;
+        },
+
+        isUserModerator: function (theUserID) {
+            let userPosition = this.getPositionOnUsersList(theUserID);
+            return theUsersList[userPosition]['moderator'] === true;
+        },
+
+        // ========================================================
+
+        // ========================================================
+        // User SPAM Functions
+        // ========================================================
+
+        resetAllSpamCounts: function () {
+            //sets everyones spam count to zero
+            //puts people on the global afk list when it joins the room
+            for (let userLoop = 0; userLoop < theUsersList.length; userLoop++) {
+                theUsersList[userLoop]['spamCount'] = 0;
+            }
+        },
+
+        incrementSpamCounter: function (userID) {
+            if(this.isUserInUsersList(userID)) {
+                ++theUsersList[this.getPositionOnUsersList(userID)]['spamCount'];
+            }
+
+            if (theUsersList[this.getPositionOnUsersList(userID)]['spamTimer'] !== null) {
+                clearTimeout(theUsersList[this.getPositionOnUsersList(userID)]['spamTimer']);
+                theUsersList[this.getPositionOnUsersList(userID)]['spamTimer'] = null;
+            }
+
+            theUsersList[this.getPositionOnUsersList(userID)]['spamTimer'] = setTimeout( function() {
+                this.resetUsersSpamCount(userID);
+            }, 10 * 1000);
+        },
+
+        resetUsersSpamCount: function (userID) {
+            if(this.isUserInUsersList(userID)) {
+                theUsersList[this.getPositionOnUsersList(userID)]['spamCount'] = 0;
+            }
+        },
+
+        getUserSpamCount: function (userID) {
+            if(this.isUserInUsersList(userID)) {
+                return theUsersList[this.getPositionOnUsersList(userID)]['spamCount'];
+            }
+        },
+
+
+        // ========================================================
+
+        // ========================================================
+        // Refresh Functions
+        // ========================================================
 
         refreshTimer: () => refreshTimer,
-
         refreshList: () => refreshList,
 
         isUserInRefreshList: function (userID) {
@@ -135,102 +245,24 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        getUsername: function (userID) {
-            theUsersList.forEach(function(theUser) {
-            });
-            let theUser = theUsersList.find(({id}) => id === userID);
-            return theUser.username;
+        // ========================================================
+
+        // ========================================================
+        // AFK Functions
+        // ========================================================
+
+        afkPeople: () => afkPeople,
+        roomAFK: () => roomAFK,
+        enableRoomAFK: function () { roomAFK = true; },
+        disableRoomAFK: function () { roomAFK = false; },
+        AFK: () => AFK,
+
+        enableAFK: function () {
+            AFK = true;
         },
 
-        buildQueueMessage: function () {
-            let listOfUsers = '';
-            let message;
-
-            queueList.forEach(function(userID){
-                if (listOfUsers==='') {
-                    listOfUsers = this.getUsername(userID);
-
-                } else {
-                    listOfUsers = listOfUsers + ", " + this.getUsername(userID);
-
-                }
-            }.bind(this));
-
-            if ( listOfUsers !== '' ) {
-                message = "The queue is now: " + listOfUsers;
-            } else {
-                message = "The queue is empty...";
-            }
-
-            return message;
-        },
-
-        queueList: () => queueList,
-
-        addUserToQueue: function (userID) {
-            if (!roomDefaults.queue) {
-                return [ false, "the queue is disabled." ];
-            }
-
-            if (this.isUserIDInQueue(userID)) {
-                return [ false, "you are already in queue." ];
-            }
-
-            if (this.isUserIDOnStage(userID)) {
-                return [ false, "you are already on stage!" ];
-            }
-
-            if (this.isUserIDStageBanned(userID)) {
-                return [ false, "sorry, you are banned from the stage." ];
-            }
-
-            queueList.push( userID );
-            return [ true, '' ];
-        },
-
-        removeUserFromQueue: function (userID) {
-            if (!this.isUserIDInQueue(userID)) {
-                return [ false, "not in queue" ];
-            } else {
-                const queuePosition = queueList.findIndex( ({ id }) => id === userID );
-                queueList.splice(queuePosition, 1);
-                return [ true, '' ];
-            }
-        },
-
-        isUserIDInQueue: function (userID) {
-            const inQueue = queueList.findIndex(({id}) => id === userID);
-            return inQueue !== -1;
-        },
-
-        isUserIDOnStage: function (userID) {
-            const onStage = currentDJs.findIndex(({id}) => id === userID);
-            return onStage !== -1;
-        },
-
-        isUserIDStageBanned: function (userID) {
-            const stageBanned = bannedFromStage.findIndex(({id}) => id === userID);
-            return stageBanned !== -1;
-        },
-
-        isUserBannedFromRoom: function (userID) {
-            const banned = bannedUsers.findIndex(({id}) => id === userID);
-            return banned !== -1;
-        },
-
-        resetUsersList: function () {
-            theUsersList = []
-            logMe("debug", "resetUsersList: I've reset the Users list")
-        },
-
-        resetEscortMeList: function () {
-            escortMeList = []
-            logMe("debug", "resetEscortMeList: I've reset the Escort Users list")
-        },
-
-        resetQueueList: function () {
-            queueList = []
-            logMe("debug", "resetQueueList: I've reset the Queue List")
+        disableAFK: function () {
+            AFK = false;
         },
 
         resetAFKPeople: function () {
@@ -238,276 +270,35 @@ const userFunctions = (bot, roomDefaults) => {
             logMe("debug", "resetAFKPeople: I've reset the AFK List")
         },
 
-        resetModPM: function () {
-            modPM = []
-            logMe("debug", "resetModPM: I've reset the ModPM List")
-        },
-
-        resetCurrentDJs: function () {
-            currentDJs = []
-            logMe("debug", "resetCurrentDJs: I've reset the Current DJs List")
-        },
-
-        resetMyTime: function () {
-            myTime = []
-            logMe("debug", "resetMyTime: I've reset My Time")
-        },
-
-        resetPeople: function () {
-            people = []
-            logMe("debug", "resetPeople: I've reset the People")
-        },
-
-        resetWarnMe: function () {
-            warnme = [];
-            logMe("debug", "resetWarnMe: I've reset the Warn Me list")
-        },
-
-        resetDJSongCount: function () {
-            djSongCount = [];
-            logMe("debug", "resetDJSongCount: I've reset the DJ Song count")
-        },
-
-        resetModList: function () {
-            modList = []
-            logMe("debug", "resetModList: I've reset the Mod list: ");
-        },
-
-        botStartReset: function (botFunctions) {
-            logMe('debug', 'botStartReset');
-            this.resetEscortMeList(bot);
-            this.resetUsersList();
-            this.resetModList(bot);
-            this.resetCurrentDJs();
-            this.resetQueueList();
-            this.resetPeople();
-            this.resetMyTime();
-            this.resetAFKPeople();
-            this.resetLastSeen();
-            this.resetDJSongCount();
-            this.resetWarnMe();
-            this.resetModPM();
-
-            //only set begintime if it has not already been set
-            if (botFunctions.botStartTime === null) {
-                botFunctions.botStartTime = Date.now(); //the time the bot entered the room at
-            }
-        },
-
-
-        updateUser: function (data, roomFunctions) {
-            if (typeof data.name === 'string') {
-                let oldname = ''; //holds users old name if exists
-                let queueNamePosition;
-                let queueListPosition;
-                let afkPeoplePosition;
-
-                //when when person updates their profile
-                //and their name is not found in the users list then they must have changed
-                //their name
-                if (theUsersList.indexOf(data.name) === -1) {
-                    let nameIndex = theUsersList.indexOf(data.userid);
-                    if (nameIndex !== -1) //if their userid was found in theUsersList
-                    {
-                        oldname = theUsersList[nameIndex + 1];
-                        theUsersList[nameIndex + 1] = data.name;
-
-                        if (typeof oldname !== 'undefined') {
-                            queueNamePosition = userFunctions.queueName().indexOf(oldname);
-                            queueListPosition = userFunctions.queueList().indexOf(oldname);
-                            afkPeoplePosition = afkPeople.indexOf(oldname);
-
-
-                            if (queueNamePosition !== -1) //if they were in the queue when they changed their name, then replace their name
-                            {
-                                userFunctions.queueName()[queueNamePosition] = data.name;
-                            }
-
-                            if (queueListPosition !== -1) //this is also for the queue
-                            {
-                                userFunctions.queueList()[queueListPosition] = data.name;
-                            }
-
-                            if (afkPeoplePosition !== -1) //this checks the afk list
-                            {
-                                afkPeople[afkPeoplePosition] = data.name;
-                            }
-                        }
-                    }
-                }
-            }
-        },
-
-        deregisterUser: function (userID) {
-            //removes dj's from the lastSeen object when they leave the room
-            delete lastSeen[userID];
-            delete lastSeen1[userID];
-            delete lastSeen2[userID];
-            delete lastSeen3[userID];
-            delete lastSeen4[userID];
-            delete people[userID];
-            delete timer[userID];
-            delete myTime[userID];
-
-
-            //double check to make sure that if someone is on stage and they disconnect, that they are being removed
-            //from the current Dj's array
-            let checkIfStillInDjArray = currentDJs.indexOf(userID);
-            if (checkIfStillInDjArray !== -1) {
-                currentDJs.splice(checkIfStillInDjArray, 1);
-            }
-
-            //removes people who leave the room from the afk list
-            if (afkPeople.length !== 0) {
-                let checkUserName = afkPeople.indexOf(bot.data.user[0].name);
-                if (checkUserName !== -1) {
-                    afkPeople.splice(checkUserName, 1);
-                }
-            }
-
-            //removes people leaving the room in modpm still
-            if (modPM.length !== 0) {
-                let areTheyStillInModpm = modPM.indexOf(userID);
-
-                if (areTheyStillInModpm !== -1) {
-                    let whatIsTheirName = theUsersList.indexOf(userID);
-                    modPM.splice(areTheyStillInModpm, 1);
-
-                    if (whatIsTheirName !== -1) {
-                        for (let hg = 0; hg < modPM.length; hg++) {
-                            if (typeof modPM[hg] !== 'undefined' && modPM[hg] !== userID) {
-                                bot.pm(theUsersList[whatIsTheirName + 1] + ' has left the modpm chat', modPM[hg]);
-                            }
-                        }
-                    }
-                }
-            }
-
-            //updates the users list when a user leaves the room.
-            let checkLeave = theUsersList.indexOf(userID);
-            let checkUserIds = userIDs.indexOf(userID);
-
-            if (checkLeave !== -1 && checkUserIds !== -1) {
-                theUsersList.splice(checkLeave, 2);
-                userIDs.splice(checkUserIds, 1);
-            }
-        },
-
-        bootNewUserCheck: function () {
-            let bootUser = false;
-            let bootMessage = null;
-            const user = bot.data.user[0];
-
-            if (roomDefaults.kickTTSTAT === true && user.name.match('@ttstat')) {
-                bootUser = true;
-            }
-
-            //checks to see if user is on the blacklist, if they are they are booted from the room.
-            for (let i = 0; i < roomDefaults.blackList.length; i++) {
-                if (user.userid === roomDefaults.blackList[i]) {
-                    bootUser = true;
-                    bootMessage = 'You are on the user banned list.';
-                    break;
-                }
-            }
-
-            //checks if user is on the banned list
-            if (this.isUserBannedFromRoom(user.userid)) {
-                bootUser = true;
-                bootMessage = 'You are on the banned user list.';
-            }
-
-            // don't let the bot boot itself!
-            if (user.userid === authModule.USERID) {
-                bootUser = false;
-            }
-
-            return [bootUser, bootMessage];
-        },
-
-        bootThisUser: function (userID, bootMessage) {
-            if (bootMessage == null) {
-                bot.boot(userID)
-            } else {
-                bot.bootUser(userID, bootMessage);
-            }
-        },
-
-        greetNewuser: function (userID, username, roomFunctions) {
-            //gets newest user and prints greeting, does not greet the bot or the ttstats bot, or banned users
-            if (roomFunctions.greet() === true && userID !== authModule.USERID && !username.match('@ttstat')) {
-                const greetingTimers = roomFunctions.greetingTimer();
-
-                // if there's a timeout function waiting to be called for
-                // this user, cancel it.
-                if (greetingTimers[userID] !== null) {
-                    clearTimeout(greetingTimers[userID]);
-                    delete greetingTimers[userID];
-                }
-
-                return true;
-            }
-        },
-
-        addUserJoinedTime: function (userID) {
-            if(this.isUserInUsersList(userID)) {
-                theUsersList[this.getPositionOnUsersList(userID)]['joinTime'] = Date.now();
-            }
-        },
-
-        resetUsersSpamCount: function (userID) {
-            if(this.isUserInUsersList(userID)) {
-                theUsersList[this.getPositionOnUsersList(userID)]['spamCount'] = 0;
-            }
-        },
-
-        getPositionOnUsersList: function (userID) {
-            let listPosition = theUsersList.findIndex( ( { id } ) => id === userID)
-            return listPosition;
-        },
-
-        userJoinsRoom: function (userID, username) {
-            //adds users who join the room to the user list if their not already on the list
-            this.addUserToTheUsersList(userID, username);
-
-            //starts time for everyone that joins the room
-            this.addUserJoinedTime(userID);
-
-            //sets new persons spam count to zero
-            this.resetUsersSpamCount(userID);
-
-            //puts people who join the room on the global afk list
-            if (roomAFK === true) {
-                this.justSaw(userID, 'justSaw3');
-                this.justSaw(userID, 'justSaw4');
-            }
-        },
-
         getAFKTime: function (userID) {
             let userPosition = this.getPositionOnUsersList(userID);
-            let userLastActive = theUsersList[userPosition]['joinTime'];
-            let afkAllowedTime = roomDefaults.afkTimeLimit * 60 * 1000; // AFK time in milliseconds
+            if (userPosition) {
+                let userLastActive = theUsersList[userPosition]['joinTime'];
+                let afkAllowedTime = roomDefaults.afkTimeLimit * 60 * 1000; // AFK time in milliseconds
 
-            // afkTimeLimit: 20
-            if (roomDefaults.voteMeansActive) {
-                if ( theUsersList[userPosition]['lastVoted'] > userLastActive ) {
-                    userLastActive = theUsersList[userPosition]['lastVoted'];
+                // afkTimeLimit: 20
+                if (roomDefaults.voteMeansActive) {
+                    if (theUsersList[userPosition]['lastVoted'] > userLastActive) {
+                        userLastActive = theUsersList[userPosition]['lastVoted'];
+                    }
                 }
-            }
 
-            if (roomDefaults.speechMeansActive) {
-                if ( theUsersList[userPosition]['lastSpoke'] > userLastActive ) {
-                    userLastActive = theUsersList[userPosition]['lastSpoke'];
+                if (roomDefaults.speechMeansActive) {
+                    if (theUsersList[userPosition]['lastSpoke'] > userLastActive) {
+                        userLastActive = theUsersList[userPosition]['lastSpoke'];
+                    }
                 }
-            }
 
-            if (roomDefaults.snagMeansActive) {
-                if ( theUsersList[userPosition]['lastSnagged'] > userLastActive ) {
-                    userLastActive = theUsersList[userPosition]['lastSnagged'];
+                if (roomDefaults.snagMeansActive) {
+                    if (theUsersList[userPosition]['lastSnagged'] > userLastActive) {
+                        userLastActive = theUsersList[userPosition]['lastSnagged'];
+                    }
                 }
-            }
 
-            return (Date.now() - userLastActive)/1000; // return usersAFK time in seconds
+                return (Date.now() - userLastActive) / 1000; // return usersAFK time in seconds
+            } else {
+                return null;
+            }
         },
 
         afkWarning: function (userID, minutesRemaining) {
@@ -573,91 +364,70 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        updateUserLastSpoke: function (userID) {
-            theUsersList[this.getPositionOnUsersList(userID)]['lastSpoke'] = Date.now();
+        // ========================================================
+
+        // ========================================================
+        // DJ Functions
+        // ========================================================
+
+        djList: () => djList,
+
+        clearDJList: function () {
+            djList = []
         },
 
-        updateUserLastVoted: function (userID) {
-            theUsersList[this.getPositionOnUsersList(userID)]['lastVoted'] = Date.now();
-        },
-
-        updateUserLastSnagged: function (userID) {
-            theUsersList[this.getPositionOnUsersList(userID)]['lastSnagged'] = Date.now();
-        },
-
-        justSaw: function (uid, whichFunction) {
-            switch (whichFunction) {
-                case 'justSaw':
-                    return lastSeen[uid] = Date.now();
-                case 'justSaw1':
-                    return lastSeen1[uid] = Date.now();
-                case 'justSaw2':
-                    return lastSeen2[uid] = Date.now();
-                case 'justSaw3':
-                    return lastSeen3[uid] = Date.now();
-                case 'justSaw4':
-                    return lastSeen4[uid] = Date.now();
-            }
-        },
-
-        resetLastSeen: function () {
-            lastSeen = {};
-            lastSeen1 = {};
-            lastSeen2 = {};
-            lastSeen3 = {};
-            lastSeen4 = {};
-        },
-
-        checkForEmptyUsersList: function (data) {
-          if(theUsersList.length === 0) {
-              this.rebuildUserList(data);
-          }
-        },
-
-        isUserInUsersList: function (userID) {
-            // if the userID is in the userList return true, else false
-            return theUsersList.find(({id}) => id === userID) !== undefined;
-        },
-
-        addUserToTheUsersList: function (userID, username) {
-            if (!this.isUserInUsersList(userID)) {
-                theUsersList.push( { id: userID, username: username } );
-            }
-            this.debugPrintTheUsersList();
-        },
-
-        removeUserFromTheUsersList: function (userID) {
-            let listLocation = theUsersList.find( ({ id }) => id === userID );
-            theUsersList.splice(listLocation, 1);
-        },
-
-        rebuildUserList: function (data) {
-            this.resetUsersList();
-
-            for (let i = 0; i < data.users.length; i++) {
-                if (typeof data.users[i] !== 'undefined') {
-                    //userid then the name
-                    this.addUserToTheUsersList(data.users[i].userid, data.users[i].name);
+        resetDJs: function (data) {
+            logMe("debug", "resetDJs: I've reset the DJ list")
+            let djID;
+            if ( data.room !== undefined ) {
+                for (let djLoop = 0; djLoop < data.room.metadata.djs.length; djLoop++) {
+                    djID = data.room.metadata.djs[djLoop];
+                    if (typeof djID !== 'undefined') {
+                        this.initialiseDJPlayCount(djID);
+                        this.addDJToList(djID);
+                    }
                 }
             }
         },
 
-        newModerator: function (data) {
-            if (modList.indexOf(data.userid) === -1) {
-                modList.push(data.userid);
-                logMe("debug", "I've reset the Mod list: " + modList);
-            }
+        addDJToList: function (userID) {
+            djList.push( userID );
         },
 
-        updateModeratorList: function (data) {
-            modList.splice(modList.indexOf(data.userid), 1);
-            logMe("debug", "I've reset the Mod list: " + modList);
+        removeDJFromList: function (userID) {
+            const findDJ = ( dj ) => dj === userID;
+            const listPosition = djList.findIndex( findDJ )
+
+            djList.splice(listPosition, 1);
+        },
+
+        howManyDJs: function () {
+            return djList.length;
+        },
+
+        isCurrentDJ: function (userID) {
+            const findDJ = ( dj ) => dj === userID;
+            const listPosition = djList.findIndex( findDJ );
+
+            return listPosition !== -1;
+        },
+
+        // ========================================================
+
+        // ========================================================
+        // DJ Play Count Functions
+        // ========================================================
+
+        deleteAllDJsPlayCount: function () {
+            for (let userLoop = 0; userLoop < theUsersList.length; userLoop++) {
+                this.deleteDJPlayCount(theUsersList[userLoop]['id']);
+            }
         },
 
         initialiseDJPlayCount: function (userID) {
             logMe('debug', 'Initialise playcount for:' + userID);
             if(this.isUserInUsersList(userID)) {
-                theUsersList[this.getPositionOnUsersList(userID)]['songCount'] = 0;
+                this.setDJPlayCount(userID, 0);
             }
         },
 
@@ -688,20 +458,289 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        removeDJsOverPlaylimit: function (chatFunctions, djID) {
-            if (musicDefaults.PLAYLIMIT === true) //is playlimit on?
-            {
-                if (djID !== authModule.USERID && djID === currentDJs[0] && roomDefaults.playLimit === 1) //if person is in the far left seat and limit is set to one
-                {
-                    let checklist33 = theUsersList.indexOf(djID) + 1;
+        // ========================================================
 
-                    logMe("debug", "checkList33:" + checklist33);
+        // ========================================================
+        // DJ Queue Functions
+        // ========================================================
 
-                    if (checklist33 !== -1) {
-                        chatFunctions.overPlayLimit(theUsersList[checklist33], roomDefaults.playLimit)
+        queueList: () => queueList,
+
+        resetQueueList: function () {
+            queueList = []
+            logMe("debug", "resetQueueList: I've reset the Queue List")
+        },
+
+        addUserToQueue: function (userID) {
+            if (!roomDefaults.queue) {
+                return [ false, "the queue is disabled." ];
+            }
+
+            if (this.isUserIDInQueue(userID)) {
+                return [ false, "you are already in queue." ];
+            }
+
+            if (this.isUserIDOnStage(userID)) {
+                return [ false, "you are already on stage!" ];
+            }
+
+            if (this.isUserIDStageBanned(userID)) {
+                return [ false, "sorry, you are banned from the stage." ];
+            }
+
+            queueList.push( userID );
+            return [ true, '' ];
+        },
+
+        removeUserFromQueue: function (userID) {
+            if (!this.isUserIDInQueue(userID)) {
+                return [ false, "not in queue" ];
+            } else {
+                const queuePosition = queueList.findIndex( ({ id }) => id === userID );
+                queueList.splice(queuePosition, 1);
+                return [ true, '' ];
+            }
+        },
+
+        isUserIDInQueue: function (userID) {
+            const inQueue = queueList.findIndex(({id}) => id === userID);
+            return inQueue !== -1;
+        },
+
+        buildQueueMessage: function () {
+            let listOfUsers = '';
+            let message;
+
+            queueList.forEach(function(userID){
+                if (listOfUsers==='') {
+                    listOfUsers = this.getUsername(userID);
+
+                } else {
+                    listOfUsers = listOfUsers + ", " + this.getUsername(userID);
+
+                }
+            }.bind(this));
+
+            if ( listOfUsers !== '' ) {
+                message = "The queue is now: " + listOfUsers;
+            } else {
+                message = "The queue is empty...";
+            }
+
+            return message;
+        },
+
+        // ========================================================
+
+        // ========================================================
+        // User Object Functions
+        // ========================================================
+
+        resetUsersList: function () {
+            theUsersList = []
+            logMe("debug", "resetUsersList: I've reset the Users list")
+        },
+
+        updateUser: function (data, roomFunctions) {
+            if (typeof data.name === 'string') {
+                let oldname = ''; //holds users old name if exists
+                let queueNamePosition;
+                let queueListPosition;
+                let afkPeoplePosition;
+
+                //when when person updates their profile
+                //and their name is not found in the users list then they must have changed
+                //their name
+                if (theUsersList.indexOf(data.name) === -1) {
+                    let nameIndex = theUsersList.indexOf(data.userid);
+                    if (nameIndex !== -1) //if their userid was found in theUsersList
+                    {
+                        oldname = theUsersList[nameIndex + 1];
+                        theUsersList[nameIndex + 1] = data.name;
+
+                        if (typeof oldname !== 'undefined') {
+                            queueNamePosition = userFunctions.queueName().indexOf(oldname);
+                            queueListPosition = userFunctions.queueList().indexOf(oldname);
+                            afkPeoplePosition = afkPeople.indexOf(oldname);
+
+
+                            if (queueNamePosition !== -1) //if they were in the queue when they changed their name, then replace their name
+                            {
+                                userFunctions.queueName()[queueNamePosition] = data.name;
+                            }
+
+                            if (queueListPosition !== -1) //this is also for the queue
+                            {
+                                userFunctions.queueList()[queueListPosition] = data.name;
+                            }
+
+                            if (afkPeoplePosition !== -1) //this checks the afk list
+                            {
+                                afkPeople[afkPeoplePosition] = data.name;
+                            }
+                        }
                     }
+                }
+            }
+        },
 
-                    bot.remDj(djID);
+        removeUserFromTheUsersList: function (userID) {
+            let listPosition = this.getPositionOnUsersList(userID);
+            if ( listPosition !== -1 ) {
+                theUsersList.splice( listPosition, 1);
+            }
+        },
+
+        deregisterUser: function (userID) {
+            //double check to make sure that if someone is on stage and they disconnect, that they are being removed
+            //from the current Dj's array
+            let checkIfStillInDjArray = currentDJs.indexOf(userID);
+            if (checkIfStillInDjArray !== -1) {
+                currentDJs.splice(checkIfStillInDjArray, 1);
+            }
+
+            //removes people leaving the room in modpm still
+            if (modPM.length !== 0) {
+                let areTheyStillInModpm = modPM.indexOf(userID);
+
+                if (areTheyStillInModpm !== -1) {
+                    let whatIsTheirName = theUsersList.indexOf(userID);
+                    modPM.splice(areTheyStillInModpm, 1);
+
+                    if (whatIsTheirName !== -1) {
+                        for (let hg = 0; hg < modPM.length; hg++) {
+                            if (typeof modPM[hg] !== 'undefined' && modPM[hg] !== userID) {
+                                bot.pm(theUsersList[whatIsTheirName + 1] + ' has left the modpm chat', modPM[hg]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            this.removeUserFromTheUsersList(userID);
+        },
+
+
+        bootNewUserCheck: function () {
+            let bootUser = false;
+            let bootMessage = null;
+            const user = bot.data.user[0];
+
+            if (roomDefaults.kickTTSTAT === true && user.name.match('@ttstat')) {
+                bootUser = true;
+            }
+
+            //checks to see if user is on the blacklist, if they are they are booted from the room.
+            for (let i = 0; i < roomDefaults.blackList.length; i++) {
+                if (user.userid === roomDefaults.blackList[i]) {
+                    bootUser = true;
+                    bootMessage = 'You are on the user banned list.';
+                    break;
+                }
+            }
+
+            //checks if user is on the banned list
+            if (this.isUserBannedFromRoom(user.userid)) {
+                bootUser = true;
+                bootMessage = 'You are on the banned user list.';
+            }
+
+            // don't let the bot boot itself!
+            if (user.userid === authModule.USERID) {
+                bootUser = false;
+            }
+
+            return [bootUser, bootMessage];
+        },
+
+        bootThisUser: function (userID, bootMessage) {
+            if (bootMessage == null) {
+                bot.boot(userID)
+            } else {
+                bot.bootUser(userID, bootMessage);
+            }
+        },
+
+        greetNewuser: function (userID, username, roomFunctions) {
+            //gets newest user and prints greeting, does not greet the bot or the ttstats bot, or banned users
+            if (roomFunctions.greet() === true && userID !== authModule.USERID && !username.match('@ttstat')) {
+                const greetingTimers = roomFunctions.greetingTimer();
+
+                // if there's a timeout function waiting to be called for
+                // this user, cancel it.
+                if (greetingTimers[userID] !== null) {
+                    clearTimeout(greetingTimers[userID]);
+                    delete greetingTimers[userID];
+                }
+
+                return true;
+            }
+        },
+
+        addUserJoinedTime: function (userID) {
+            if(this.isUserInUsersList(userID)) {
+                theUsersList[this.getPositionOnUsersList(userID)]['joinTime'] = Date.now();
+            }
+        },
+
+        getPositionOnUsersList: function (userID) {
+            let listPosition = theUsersList.findIndex( ( { id } ) => id === userID)
+            return listPosition;
+        },
+
+        userJoinsRoom: function (userID, username) {
+            //adds users who join the room to the user list if their not already on the list
+            this.addUserToTheUsersList(userID, username);
+
+            //starts time for everyone that joins the room
+            this.addUserJoinedTime(userID);
+
+            //sets new persons spam count to zero
+            this.resetUsersSpamCount(userID);
+        },
+
+        updateUserLastSpoke: function (userID) {
+            theUsersList[this.getPositionOnUsersList(userID)]['lastSpoke'] = Date.now();
+        },
+
+        updateUserLastVoted: function (userID) {
+            theUsersList[this.getPositionOnUsersList(userID)]['lastVoted'] = Date.now();
+        },
+
+        updateUserLastSnagged: function (userID) {
+            theUsersList[this.getPositionOnUsersList(userID)]['lastSnagged'] = Date.now();
+        },
+
+        checkForEmptyUsersList: function (data) {
+            if(theUsersList.length === 0) {
+                this.rebuildUserList(data);
+            }
+        },
+
+        isUserInUsersList: function (userID) {
+            // if the userID is in the userList return true, else false
+            return theUsersList.find(({id}) => id === userID) !== undefined;
+        },
+
+        addUserToTheUsersList: function (userID, username) {
+            if (!this.isUserInUsersList(userID)) {
+                theUsersList.push( { id: userID, username: username } );
+            }
+            this.debugPrintTheUsersList();
+        },
+
+        removeUserFromTheUsersList: function (userID) {
+            let listLocation = theUsersList.find( ({ id }) => id === userID );
+            theUsersList.splice(listLocation, 1);
+        },
+
+        rebuildUserList: function (data) {
+            this.resetUsersList();
+
+            for (let i = 0; i < data.users.length; i++) {
+                if (typeof data.users[i] !== 'undefined') {
+                    //userid then the name
+                    this.addUserToTheUsersList(data.users[i].userid, data.users[i].name);
                 }
             }
         },
@@ -715,55 +754,11 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        buildModList: function (data) {
-            //set modlist to list of moderators
-            //modList = data.room.metadata.moderator_id;
-            for (let ihp = 0; ihp < data.room.metadata.moderator_id.length; ihp++) {
-                modList.push(data.room.metadata.moderator_id[ihp]);
-            }
-        },
+        // ========================================================
 
-        resetAllSpamCounts: function () {
-            //sets everyones spam count to zero
-            //puts people on the global afk list when it joins the room
-            for (let userLoop = 0; userLoop < theUsersList.length; userLoop++) {
-                theUsersList[userLoop]['spamCount'] = 0;
-            }
-        },
-
-        initializeDJAFKCount: function (data, dj) {
-            this.justSaw(data.room.metadata.djs[dj], 'justSaw'); //initialize dj afk count
-            this.justSaw(data.room.metadata.djs[dj], 'justSaw1');
-            this.justSaw(data.room.metadata.djs[dj], 'justSaw2');
-        },
-
-        checkIfUserIsMod: function (userID) {
-            let modIndex = modList.indexOf(userID);
-            isModerator = modIndex !== -1;
-        },
-
-        isPMerInRoom: function (userID) {
-            let isInRoom = theUsersList.indexOf(userID);
-            isInRoom = isInRoom !== -1;
-            return isInRoom;
-        },
-
-        incrementSpamCounter: function (userID) {
-            if (typeof people[userID] != 'undefined') {
-                ++people[userID].spamCount;
-            }
-
-            if (timer[userID] !== null) {
-                clearTimeout(timer[userID]);
-                timer[userID] = null;
-            }
-
-            timer[userID] = setTimeout(function () {
-                people[userID] = {
-                    spamCount: 0
-                };
-            }, 10 * 1000);
-        },
+        // ========================================================
+        // Inform Functions
+        // ========================================================
 
         clearInformTimer: function (roomFunctions) {
             //this is for the /inform command
@@ -778,6 +773,12 @@ const userFunctions = (bot, roomDefaults) => {
                 }
             }
         },
+
+        // ========================================================
+
+        // ========================================================
+        // Warn Me Functions
+        // ========================================================
 
         warnMeCall: function (roomFunctions) {
             if (warnme.length !== 0) //is there anyone in the warnme?
@@ -805,16 +806,75 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        buildDJList(data) {
-            //finds out who the currently playing dj's are.
-            for (let iop = 0; iop < data.room.metadata.djs.length; iop++) {
-                if (typeof data.room.metadata.djs[iop] !== 'undefined') {
-                    this.currentDJs().push(data.room.metadata.djs[iop]);
-                    this.initialiseDJPlayCount(data.room.metadata.djs[iop]);
-                    this.initializeDJAFKCount(data, iop);
+        // ========================================================
+
+        // ========================================================
+        // WarnMe Functions
+        // ========================================================
+
+        resetAllWarnMe: function (data) {
+            let theUserID;
+            if ( data.room !== undefined ) {
+                for (let userLoop = 0; userLoop < data.users.length; userLoop++) {
+                    theUserID = data.users[userLoop];
+                    if (typeof theUserID !== 'undefined') {
+                        this.removeWarnMeFromUser(theUserID);
+                    }
                 }
             }
         },
+
+        addWarnMeToUser(userID) {
+            if(this.isUserInUsersList(userID)) {
+                theUsersList[this.getPositionOnUsersList(userID)]['WarnMe'] = true;
+            }
+        },
+
+        removeWarnMeFromUser(userID) {
+            if(this.isUserInUsersList(userID)) {
+                delete theUsersList[this.getPositionOnUsersList(userID)]['WarnMe'];
+            }
+        },
+
+        // ========================================================
+
+        // ========================================================
+        // Escort Me Functions
+        // ========================================================
+
+        resetAllEscortMe: function (data) {
+            let theUserID;
+            if ( data.room !== undefined ) {
+                for (let userLoop = 0; userLoop < data.users.length; userLoop++) {
+                    theUserID = data.users[userLoop];
+                    if (typeof theUserID !== 'undefined') {
+                        this.removeEscortMeFromUser(theUserID);
+                    }
+                }
+            }
+        },
+
+        addEscortMeToUser: function (userID) {
+            if(this.isUserInUsersList(userID)) {
+                theUsersList[this.getPositionOnUsersList(userID)]['EscortMe'] = true;
+            }
+        },
+
+        removeEscortMeFromUser: function (userID) {
+            if(this.isUserInUsersList(userID)) {
+                delete theUsersList[this.getPositionOnUsersList(userID)]['EscortMe'];
+            }
+        },
+
+        escortMeIsEnabled: function (userID) {
+            if(this.isUserInUsersList(userID)) {
+                return theUsersList[this.getPositionOnUsersList(userID)]['EscortMe'] === true;
+            }
+        },
+
+
+        // ========================================================
+
     }
 }
 

@@ -578,11 +578,10 @@ const commandFunctions = (bot) => {
                 let botname = userFunctions.theUsersList().indexOf(authModule.USERID) + 1;
                 bot.speak('@' + userFunctions.theUsersList()[botname] + ' hands ' + '@' + userFunctions.name() + ' a nice cold :beer:');
             } else if (data.text === '/escortme') {
-                let djListIndex = userFunctions.currentDJs().indexOf(data.userid);
-                let escortmeIndex = userFunctions.escortMeList().indexOf(data.userid);
-                if (djListIndex !== -1 && escortmeIndex === -1) {
-                    userFunctions.escortMeList().push(data.userid);
-                    bot.speak('@' + userFunctions.name() + ' you will be escorted after you play your song');
+                let theUserID = data.userid;
+                if ( !userFunctions.escortMeIsEnabled() && userFunctions.isCurrentDJ(theUserID) ) {
+                    userFunctions.addEscortMeToUser(theUserID);
+                    bot.speak('@' + userFunctions.getUsername(theUserID) + ' you will be escorted after you play your song');
                 }
             } else if (data.text === '/stopescortme') {
                 bot.speak('@' + userFunctions.name() + ' you will no longer be escorted after you play your song');
@@ -1077,7 +1076,7 @@ const commandFunctions = (bot) => {
             let name1 = userFunctions.theUsersList().indexOf(data.senderid) + 1; //the name of the person who sent the bot a pm
             let isInRoom = userFunctions.isPMerInRoom(senderid); //check to see whether pmmer is in the same room as the bot
 
-            userFunctions.checkIfUserIsMod(data.senderid); //check to see if person pming the bot a command is a moderator or not
+            userFunctions.isUserModerator(data.senderid); //check to see if person pming the bot a command is a moderator or not
 
             //if no commands match, the pmmer is a moderator and theres more than zero people in the modpm chat
             if (userFunctions.modPM.length !== 0 && data.text.charAt(0) !== '/' && userFunctions.isModerator() === true) //if no other commands match, send dpm

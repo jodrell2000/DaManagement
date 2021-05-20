@@ -97,7 +97,6 @@ bot.on('ready', function ()
 
 //starts up when a new person joins the room
 bot.on('registered', function (data) {
-    logMe('debug', '============== bot.on registered');
     const theUserID = data.user[0].userid;
     const username = data.user[0].name;
 
@@ -134,16 +133,20 @@ bot.on('roomChanged', function (data)
     try
     {
         //reset arrays in case this was triggered by the bot restarting
-        userFunctions.botStartReset(botFunctions);
+        userFunctions.botStartReset(botFunctions, data);
+
+        userFunctions.resetAllWarnMe(data);
+        userFunctions.resetModerators(data);
+        userFunctions.resetDJs(data);
 
         //get & set information
         roomFunctions.setRoomDefaults(data);
 
         userFunctions.rebuildUserList(data);
 
-        userFunctions.buildDJList(data);
+        userFunctions.clearDJList(data);
 
-        userFunctions.buildModList(data);
+        userFunctions.resetModerators(data);
 
         userFunctions.resetAllSpamCounts();
 
@@ -274,17 +277,8 @@ bot.on('newsong', function (data)
 
     //quality control check, if current dj's information is somehow wrong because
     //of some event not firing, remake currentDj's array
-    if (data.room.metadata.djcount !== userFunctions.currentDJs().length)
-    {
-        userFunctions.resetCurrentDJs(); //reset current djs array
-
-        for (let hjg = 0; hjg < data.room.metadata.djcount; hjg++)
-        {
-            if (typeof data.room.metadata.djs[hjg] !== 'undefined')
-            {
-                userFunctions.currentDJs().push(data.room.metadata.djs[hjg]);
-            }
-        }
+    if ( data.room.metadata.djcount !== userFunctions.howManyDJs() ) {
+        userFunctions.resetDJs(data); //reset current djs array
     }
 });
 
@@ -311,7 +305,7 @@ bot.on('speak', function (data)
     userFunctions.name = data.name; //name of latest person to say something
     botFunctions.recordActivity();
 
-    userFunctions.checkIfUserIsMod(theUserID); //check to see if speaker is a moderator or not
+    userFunctions.isUserModerator(theUserID); //check to see if speaker is a moderator or not
 
     userFunctions.updateUserLastSpoke(theUserID); //update the afk position of the speaker
 
@@ -500,15 +494,12 @@ bot.on('add_dj', function (data)
     botFunctions.checkAutoDJing(userFunctions, roomFunctions);
 
     //if person exceeds spam count within 10 seconds they are kicked
-    if (typeof userFunctions.people[theUserID] != 'undefined' && userFunctions.people[theUserID].spamCount >= roomDefaults.spamLimit)
+    logMe('debug', 'add_dj: theUserID ' + theUserID );
+    logMe('debug', 'add_dj: The User ' + userFunctions.getUserSpamCount(theUserID) );
+    if (typeof userFunctions.getUserSpamCount(theUserID) !== undefined &&
+        userFunctions.getUserSpamCount(theUserID) >= roomDefaults.spamLimit)
     {
         bot.boot(theUserID, 'stop spamming');
-    }
-    else if (typeof userFunctions.people[theUserID] == 'undefined') //if something weird happened, recover here
-    {
-        userFunctions.people[theUserID] = {
-            spamCount: 0
-        };
     }
 });
 
@@ -545,22 +536,15 @@ bot.on('rem_dj', function (data)
         }
     }
 
-
     //checks if when someone gets off the stage, if the person
     //on the left is now the next dj
     userFunctions.warnMeCall(roomFunctions);
 
-
     //check to see if conditions are met for bot's autodjing feature
     botFunctions.checkAutoDJing(userFunctions, roomFunctions);
 
-
     //takes a user off the escort list if they leave the stage.
-    let checkEscort = userFunctions.escortMeList().indexOf(theUserID);
-    if (checkEscort !== -1)
-    {
-        userFunctions.escortMeList().splice(checkEscort, 1);
-    }
+    userFunctions.removeEscortMeFromUser(theUserID);
 });
 
 bot.on('update_user', function (data) {
@@ -570,20 +554,22 @@ bot.on('update_user', function (data) {
 //updates the moderator list when a moderator is added.
 bot.on('new_moderator', function (data)
 {
-    userFunctions.newModerator(data)
+    const theUserID = data.userid;
+    userFunctions.addModerator(theUserID)
 })
 
 //updates the moderator list when a moderator is removed.
 bot.on('rem_moderator', function (data)
 {
-    userFunctions.updateModeratorList(data)
+    const theUserID = data.userid;
+    userFunctions.removeModerator(theUserID)
 })
 
 //starts up when a user leaves the room
 bot.on('deregistered', function (data)
 {
-    const userID = theUserID;
-    userFunctions.deregisterUser(userID)
+    let theUserID = data.user[0].userid;
+    userFunctions.deregisterUser(theUserID)
 })
 
 //activates at the end of a song.
@@ -610,6 +596,6 @@ bot.on('endsong', function (data)
     //bot says song stats for each song
     chatFunctions.readSongStats(songFunctions, roomDefaults)
 
-    roomFunctions.escortDJsDown(djID, botFunctions, userFunctions);
+    roomFunctions.escortDJsDown(djID, botFunctions, userFunctions, chatFunctions);
 
 });

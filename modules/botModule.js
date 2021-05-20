@@ -115,22 +115,6 @@ const botFunctions = (bot) => {
             checkActivity = Date.now(); //update when someone says something
         },
 
-        botSpeak: function (pm, user, message) {
-            if (pm === true) {
-                this.botPM(user, message);
-            } else {
-                this.botChat(message);
-            }
-        },
-
-        botChat: function (message) {
-            bot.speak(message);
-        },
-
-        botPM: function (user, message) {
-            bot.speak(user, message);
-        },
-
         isBotOnStage: function (userFunctions) {
             logMe("debug", "Check if the bot is already on stage")
             let isBotAlreadyOnStage = userFunctions.currentDJs().indexOf(authModule.USERID);

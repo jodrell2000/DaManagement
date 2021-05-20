@@ -116,25 +116,16 @@ const roomFunctions = (bot) => {
             }
         },
 
-        escortDJsDown: function (currentDJ, botFunctions, userFunctions) {
+        escortDJsDown: function (currentDJ, botFunctions, userFunctions, chatFunctions) {
             //iterates through the escort list and escorts all djs on the list off the stage.
-            for (let i = 0; i < userFunctions.escortMeList().length; i++) {
-                logMe("debug", "DJ to be escorted:" + currentDJ);
-                if (typeof userFunctions.escortMeList()[i] !== 'undefined' && currentDJ === userFunctions.escortMeList()[i]) {
-                    let lookname = userFunctions.theUsersList().indexOf(currentDJ) + 1;
-                    bot.remDj(userFunctions.escortMeList()[i]);
+            logMe("debug", "DJ to be escorted:" + currentDJ);
 
-                    if (lookname !== -1) {
-                        const theMessage = '@' + userFunctions.theUsersList()[lookname] + ' had enabled escortme';
-                        botFunctions.botSpeak(false, null, theMessage);
-                    }
+            if (userFunctions.escortMeIsEnabled(currentDJ)) {
+                bot.remDj(currentDJ);
+                userFunctions.removeEscortMeFromUser(currentDJ);
 
-                    let removeFromList = userFunctions.escortMeList().indexOf(userFunctions.escortMeList()[i]);
-
-                    if (removeFromList !== -1) {
-                        userFunctions.escortMeList().splice(removeFromList, 1);
-                    }
-                }
+                const theMessage = '@' + userFunctions.getUsername(currentDJ) + ' had enabled escortme';
+                chatFunctions.botSpeak(theMessage);
             }
         },
 
