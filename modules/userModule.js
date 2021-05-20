@@ -197,9 +197,10 @@ const userFunctions = (bot, roomDefaults) => {
                 theUsersList[this.getPositionOnUsersList(userID)]['spamTimer'] = null;
             }
 
-            theUsersList[this.getPositionOnUsersList(userID)]['spamTimer'] = setTimeout( function() {
+            theUsersList[this.getPositionOnUsersList(userID)]['spamTimer'] = setTimeout( function(userID) {
+                logMe('debug', 'incrementSpamCounter:');
                 this.resetUsersSpamCount(userID);
-            }, 10 * 1000);
+            }.bind(this), 10 * 1000);
         },
 
         resetUsersSpamCount: function (userID) {
