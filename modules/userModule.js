@@ -139,7 +139,6 @@ const userFunctions = (bot, roomDefaults) => {
         // ========================================================
 
         resetModerators: function (data) {
-            logMe("debug", "resetModerators: I've reset the Moderators list")
             let userPosition;
             let theUserID;
             if ( data.room !== undefined ) {

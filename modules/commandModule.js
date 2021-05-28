@@ -832,7 +832,6 @@ const commandFunctions = (bot) => {
                 }
             } else if (text.match(/^\/queueOn$/) && userFunctions.isUserModerator(speaker) === true) {
                 userFunctions.resetQueueList();
-                userFunctions.resetQueueNames();
                 bot.speak('the queue is now active.');
                 roomDefaults.queueActive = true;
                 clearTimeout(roomFunctions.queueTimer()); //if queue is turned on again while somebody was on timeout to get on stage, then clear it
@@ -1328,7 +1327,6 @@ const commandFunctions = (bot) => {
                 bot.pm('the play limit is now inactive.', speaker);
             } else if (text.match(/^\/queueOn$/) && userFunctions.isUserModerator(speaker) === true && isInRoom === true) {
                 userFunctions.resetQueueList();
-                userFunctions.resetQueueNames();
                 bot.pm('the queue is now active.', speaker);
                 roomDefaults.queueActive = true;
                 clearTimeout(roomFunctions.queueTimer()); //if queue is turned on again while somebody was on timeout to get on stage, then clear it
