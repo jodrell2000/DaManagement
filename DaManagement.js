@@ -361,16 +361,12 @@ bot.on('snagged', function (data)
 //this activates when a user joins the stage.
 bot.on('add_dj', function (data)
 {
-    logMe('debug', "============================== bot.on: add_dj")
 
     let OKToDJ;
     let theMessage;
     const theUserID = data.user[0].userid;
-    logMe('debug', "============================== data.user[0].userid" + data.user[0].userid );
 
     [ OKToDJ, theMessage ] = userFunctions.checkOKToDJ(theUserID, roomFunctions);
-    logMe('debug', "============================== OKToDJ:'" + OKToDJ + "'" );
-    logMe('debug', "============================== theMessage:'" + theMessage + "'"  );
 
     if ( !OKToDJ ) {
         bot.remDj(theUserID);

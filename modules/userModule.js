@@ -484,6 +484,10 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         checkOKToDJ: function (theUserID, roomFunctions) {
+            if ( theUserID === authModule.USERID ) {
+                return [ true, '' ];
+            }
+
             if ( !this.isUserVIP(theUserID) && roomDefaults.vipsOnly ) {
                 return [ false, "The VIP list is active...and you're not on the list. Sorry!" ];
             }
