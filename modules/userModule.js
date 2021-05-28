@@ -6,14 +6,14 @@ let authModule = require('../auth.js');
 let theUsersList = []; // object array of everyone in the room
 let afkPeople = []; //holds the userid of everyone who has used the /afk command
 let modPM = []; //holds the userid's of everyone in the /modpm feature
-let currentDJs = []; //holds the userid of all the dj's who are on stage currently
+let djList = []; //holds the userid of all the dj's who are on stage currently
 let people = []; //holds the userid's of everyone who is kicked off stage for the spam limit
 let myTime = []; //holds a date object for everyone in the room, which represents the time when they joined the room, resets every time the person rejoins
 let timer = []; //holds the timeout of everyone who has been spamming the stage, resets their spam count if their timer completes
 let myID = null; //the userid of the person using the /fanme command, speak event only
 
 let bannedUsers = [ { id:636473737373 }, { id:535253533353 } ]; //banned users list, put userids in string form here for permanent banning(put their name after their userid to tell who is banned).
-let bannedFromStage = [ { id:636473737373 }, { id:535253533353 } ]; //put userids in here to ban from djing permanently(put their name after their userid to tell who is banned)
+let permanentStageBan = [ { id:636473737373 }, { id:535253533353 } ]; //put userids in here to ban from djing permanently(put their name after their userid to tell who is banned)
 let vipList = [];
 /* this is the vip list, it accepts userids as input, this is for when you have a special guest or guests in your room and you only
    want to hear them dj, leave this empty unless you want everyone other than the people whos userids are in the vip list to be automatically kicked from stage. */
@@ -26,8 +26,7 @@ let masterIds = ['6040a0333f4bfc001be4cf39']; //example (clear this before using
 let index = null; //the index returned when using unban commands
 let informTimer = null; //holds the timeout for the /inform command, null lets it know that it hasn't already been set
 let playLimitOfRefresher = []; //holds a copy of the number of plays for people who have used the /refresh command
-let refreshList = []; //this holds the userid's of people who have used the /refresh command
-let refreshTimer = []; //this holds the timers of people who have used the /refresh command
+let refreshDJCount = 0; // how many people are currently using the refresh command
 let warnme = []; //holds the userid's of everyone using the /warnme feature
 
 let roomAFK = false; //audience afk limit(off by default)
@@ -35,7 +34,6 @@ let roomafkLimit = 30; //set the afk limit for the audience here(in minutes), th
 let AFK = true; //afk limit(on by default), this is for the dj's on stage
 
 let queueList = []; //holds the userid of everyone in the queue
-let djList = []; // list of the current DJs
 
 const userFunctions = (bot, roomDefaults) => {
     function logMe(logLevel, message) {
@@ -55,17 +53,14 @@ const userFunctions = (bot, roomDefaults) => {
 
         theUsersList: () => theUsersList,
         modPM: () => modPM,
-        currentDJs: () => currentDJs,
 
         bannedUsers: () => bannedUsers,
-        bannedFromStage: () => bannedFromStage,
-        vipList: () => vipList,
+        permanentStageBan: () => permanentStageBan,
 
         masterIds: () => masterIds,
 
         index: () => index,
         informTimer: () => informTimer,
-        playLimitOfRefresher: () => playLimitOfRefresher,
         warnme: () => warnme,
 
         getUsername: function (userID) {
@@ -76,12 +71,12 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         isUserIDOnStage: function (userID) {
-            const onStage = currentDJs.findIndex(({id}) => id === userID);
+            const onStage = djList.findIndex(({id}) => id === userID);
             return onStage !== -1;
         },
 
         isUserIDStageBanned: function (userID) {
-            const stageBanned = bannedFromStage.findIndex(({id}) => id === userID);
+            const stageBanned = permanentStageBan.findIndex(({id}) => id === userID);
             return stageBanned !== -1;
         },
 
@@ -118,7 +113,7 @@ const userFunctions = (bot, roomDefaults) => {
         removeDJsOverPlaylimit: function (chatFunctions, djID) {
             if (musicDefaults.PLAYLIMIT === true) //is playlimit on?
             {
-                if (djID !== authModule.USERID && djID === currentDJs[0] && roomDefaults.playLimit === 1) //if person is in the far left seat and limit is set to one
+                if (djID !== authModule.USERID && djID === djList[0] && roomDefaults.playLimit === 1) //if person is in the far left seat and limit is set to one
                 {
                     let checklist33 = theUsersList.indexOf(djID) + 1;
 
@@ -176,6 +171,18 @@ const userFunctions = (bot, roomDefaults) => {
         // ========================================================
 
         // ========================================================
+        // VIP Functions
+        // ========================================================
+
+        vipList: () => vipList,
+
+        isUserVIP: function (userID) {
+            return this.vipList().indexOf(userID) !== -1;
+        },
+
+        // ========================================================
+
+        // ========================================================
         // User SPAM Functions
         // ========================================================
 
@@ -222,27 +229,64 @@ const userFunctions = (bot, roomDefaults) => {
         // Refresh Functions
         // ========================================================
 
-        refreshTimer: () => refreshTimer,
-        refreshList: () => refreshList,
+        refreshDJCount: () => refreshDJCount,
 
-        isUserInRefreshList: function (userID) {
-            const inList = refreshList.findIndex(({id}) => id === userID);
-            return inList !== -1;
-        },
+        addRefreshToUser: function (userID) {
+            if ( roomDefaults.refreshingEnabled ) {
+                if (this.isUserInUsersList(userID)) {
+                    if (this.isCurrentDJ(userID)) {
+                        if (!this.isUserInRefreshList(userID)) {
+                            let listPosition = this.getPositionOnUsersList(userID);
+                            theUsersList[listPosition]['Refresh'] = Date.now();
+                            ++theUsersList[listPosition]['RefreshCount'];
+                            theUsersList[listPosition]['RefreshPlayCount'] = this.getDJPlayCount(userID);
+                            theUsersList[listPosition]['RefreshTimer'] = setTimeout(function (userID) {
+                                this.removeRefreshFromUser(userID);
+                            }.bind(this), 60 * 1000);
 
-        addToRefreshList: function (userID) {
-            if(!this.isUserInRefreshList) {
-                refreshList.push(userID);
+                            ++refreshDJCount;
+
+                            let message = '@' + this.getUsername(userID) + ' i\'ll hold your spot on stage for the next ' + roomDefaults.amountOfTimeToRefresh + ' minutes';
+                            return [ true, message ]
+                        } else {
+                            return [false, "You're already using the refresh command"];
+                        }
+                    } else {
+                        return [false, "You're not currently DJing...so you don't need the refresh command"];
+                    }
+                } else {
+                    logMe('error', 'userFunctions.addRefreshToUser: userID "' + userID + '" isn\'t in theUsersList');
+                    return [false, "You seem not to exist. Please tell a Moderator! (err: userFunctions.addRefreshToUser)"];
+                }
+            } else {
+                return [ false, "Use of the /refresh command is currently disabled" ]
             }
         },
 
-        removeFromRefreshList: function (userID) {
-            if (!this.isUserInRefreshList(userID)) {
-                return [ false, "not in refresh list" ];
-            } else {
-                const listPosition = refreshList.findIndex( ({ id }) => id === userID );
-                refreshList.splice(listPosition, 1);
-                return [ true, '' ];
+        removeRefreshFromUser: function (userID) {
+            if (this.isUserInUsersList(userID)) {
+                let listPosition = this.getPositionOnUsersList(userID);
+                delete theUsersList[listPosition]['Refresh'];
+                delete theUsersList[listPosition]['RefreshPlayCount']
+                delete theUsersList[listPosition]['RefreshTimer']
+                --refreshDJCount;
+            }
+        },
+
+        isUserInRefreshList: function (userID) {
+            if(this.isUserInUsersList(userID)) {
+                return theUsersList[this.getPositionOnUsersList(userID)]['Refresh'] !== undefined;
+            }
+        },
+
+        getUsersRefreshPlayCount: function (userID) {
+            if(this.isUserInUsersList(userID)) {
+                let listPosition = this.getPositionOnUsersList(userID);
+                if ( theUsersList[listPosition]['RefreshPlayCount'] !== undefined ) {
+                    return theUsersList[listPosition]['RefreshPlayCount'];
+                } else {
+                    return 0;
+                }
             }
         },
 
@@ -271,13 +315,28 @@ const userFunctions = (bot, roomDefaults) => {
             logMe("debug", "resetAFKPeople: I've reset the AFK List")
         },
 
+        updateUserLastSpoke: function (userID) {
+            theUsersList[this.getPositionOnUsersList(userID)]['lastSpoke'] = Date.now();
+        },
+
+        updateUserLastVoted: function (userID) {
+            theUsersList[this.getPositionOnUsersList(userID)]['lastVoted'] = Date.now();
+        },
+
+        updateUserLastSnagged: function (userID) {
+            theUsersList[this.getPositionOnUsersList(userID)]['lastSnagged'] = Date.now();
+        },
+
+        updateUserJoinedStage: function (userID) {
+            theUsersList[this.getPositionOnUsersList(userID)]['joinedStage'] = Date.now();
+        },
+
         getAFKTime: function (userID) {
             let userPosition = this.getPositionOnUsersList(userID);
             if (userPosition) {
                 let userLastActive = theUsersList[userPosition]['joinTime'];
                 let afkAllowedTime = roomDefaults.afkTimeLimit * 60 * 1000; // AFK time in milliseconds
 
-                // afkTimeLimit: 20
                 if (roomDefaults.voteMeansActive) {
                     if (theUsersList[userPosition]['lastVoted'] > userLastActive) {
                         userLastActive = theUsersList[userPosition]['lastVoted'];
@@ -293,6 +352,12 @@ const userFunctions = (bot, roomDefaults) => {
                 if (roomDefaults.snagMeansActive) {
                     if (theUsersList[userPosition]['lastSnagged'] > userLastActive) {
                         userLastActive = theUsersList[userPosition]['lastSnagged'];
+                    }
+                }
+
+                if (roomDefaults.djingMeansActive) {
+                    if (theUsersList[userPosition]['joinedStage'] > userLastActive) {
+                        userLastActive = theUsersList[userPosition]['joinedStage'];
                     }
                 }
 
@@ -324,8 +389,8 @@ const userFunctions = (bot, roomDefaults) => {
         //removes afk dj's after roomDefaultsModule.afkLimit is up.
         afkCheck: function (roomFunctions, roomDefaults) {
             let djID;
-            for (let i = 0; i < currentDJs.length; i++) {
-                djID = currentDJs[i]; //Pick a DJ
+            for (let i = 0; i < djList.length; i++) {
+                djID = djList[i]; //Pick a DJ
                 if (djID !== authModule.USERID) {
 
                     if (this.getAFKTime(djID)/60 >  roomDefaults.afkLimit - 5 ) {
@@ -368,27 +433,13 @@ const userFunctions = (bot, roomDefaults) => {
         // ========================================================
 
         // ========================================================
-        // DJ Functions
+        // DJ Core Functions
         // ========================================================
 
         djList: () => djList,
 
         clearDJList: function () {
             djList = []
-        },
-
-        resetDJs: function (data) {
-            logMe("debug", "resetDJs: I've reset the DJ list")
-            let djID;
-            if ( data.room !== undefined ) {
-                for (let djLoop = 0; djLoop < data.room.metadata.djs.length; djLoop++) {
-                    djID = data.room.metadata.djs[djLoop];
-                    if (typeof djID !== 'undefined') {
-                        this.initialiseDJPlayCount(djID);
-                        this.addDJToList(djID);
-                    }
-                }
-            }
         },
 
         addDJToList: function (userID) {
@@ -406,11 +457,73 @@ const userFunctions = (bot, roomDefaults) => {
             return djList.length;
         },
 
+        // ========================================================
+
+        // ========================================================
+        // DJ Helper Functions
+        // ========================================================
+
         isCurrentDJ: function (userID) {
             const findDJ = ( dj ) => dj === userID;
             const listPosition = djList.findIndex( findDJ );
 
             return listPosition !== -1;
+        },
+
+        resetDJs: function (data) {
+            logMe("debug", "resetDJs: I've reset the DJ list")
+            let djID;
+            if ( data.room !== undefined ) {
+                for (let djLoop = 0; djLoop < data.room.metadata.djs.length; djLoop++) {
+                    djID = data.room.metadata.djs[djLoop];
+                    if (typeof djID !== 'undefined') {
+                        this.initialiseDJPlayCount(djID);
+                        this.addDJToList(djID);
+                    }
+                }
+            }
+        },
+
+        checkOKToDJ: function (theUserID, roomFunctions) {
+            if ( !this.isUserVIP(theUserID) && roomDefaults.vipsOnly ) {
+                return [ false, "The VIP list is active...and you're not on the list. Sorry!" ];
+            }
+
+            if ( roomDefaults.queueActive ) {
+                if ( this.isUserInRefreshList(theUserID) ) {
+                    return [ true, '' ];
+                }
+
+                if ( this.isUserIDInQueue(theUserID) ) {
+                    if ( theUserID !== this.headOfQueue() ) {
+                        return [false, 'Sorry, but you are not first in queue. please wait your turn.'];
+                    } else {
+                        return [ true, '' ];
+                    }
+                } else {
+                    return [ false, 'The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.' ];
+                }
+            }
+
+            if ( this.refreshDJCount() + this.djList().length >= 5 ) {
+                return [ false, 'Sorry, but i\m holding that spot for someone in the refresh list' ];
+            }
+
+            for ( let banLoop = 0; banLoop < roomFunctions.tempBanList().length; banLoop++ ) {
+                if (theUserID === roomFunctions.tempBanList()[banLoop]) {
+                    return [ false, 'You are banned from djing. Please speak to a Mod to find out why' ];
+                }
+            }
+
+            if (this.isUserIDStageBanned(theUserID)) {
+                return [ false, 'You are banned from djing. Please speak to a Mod to find out why' ];
+            }
+
+            if ( this.getUserSpamCount(theUserID) >= roomDefaults.spamLimit ) {
+                return [ false, 'You been SPAMming too much...please want a few minutes before trying again' ];
+            }
+
+            return [ true, '' ];
         },
 
         // ========================================================
@@ -462,7 +575,7 @@ const userFunctions = (bot, roomDefaults) => {
         // ========================================================
 
         // ========================================================
-        // DJ Queue Functions
+        // DJ Queue Core Functions
         // ========================================================
 
         queueList: () => queueList,
@@ -473,7 +586,7 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         addUserToQueue: function (userID) {
-            if (!roomDefaults.queue) {
+            if (!roomDefaults.queueActive) {
                 return [ false, "the queue is disabled." ];
             }
 
@@ -504,9 +617,22 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         isUserIDInQueue: function (userID) {
-            const inQueue = queueList.findIndex(({id}) => id === userID);
+            logMe('debug', 'isUserIDInQueue, userID:' + userID );
+            logMe('debug', 'isUserIDInQueue, queueList:' + queueList );
+            const inQueue = queueList.indexOf(userID);
+            logMe('debug', 'isUserIDInQueue, inQueue:' + inQueue );
             return inQueue !== -1;
         },
+
+        headOfQueue: function () {
+            return queueList[0];
+        },
+
+        // ========================================================
+
+        // ========================================================
+        // DJ Queue Helper Functions
+        // ========================================================
 
         buildQueueMessage: function () {
             let listOfUsers = '';
@@ -595,9 +721,9 @@ const userFunctions = (bot, roomDefaults) => {
         deregisterUser: function (userID) {
             //double check to make sure that if someone is on stage and they disconnect, that they are being removed
             //from the current Dj's array
-            let checkIfStillInDjArray = currentDJs.indexOf(userID);
+            let checkIfStillInDjArray = djList.indexOf(userID);
             if (checkIfStillInDjArray !== -1) {
-                currentDJs.splice(checkIfStillInDjArray, 1);
+                djList.splice(checkIfStillInDjArray, 1);
             }
 
             //removes people leaving the room in modpm still
@@ -700,18 +826,6 @@ const userFunctions = (bot, roomDefaults) => {
             this.resetUsersSpamCount(userID);
         },
 
-        updateUserLastSpoke: function (userID) {
-            theUsersList[this.getPositionOnUsersList(userID)]['lastSpoke'] = Date.now();
-        },
-
-        updateUserLastVoted: function (userID) {
-            theUsersList[this.getPositionOnUsersList(userID)]['lastVoted'] = Date.now();
-        },
-
-        updateUserLastSnagged: function (userID) {
-            theUsersList[this.getPositionOnUsersList(userID)]['lastSnagged'] = Date.now();
-        },
-
         checkForEmptyUsersList: function (data) {
             if(theUsersList.length === 0) {
                 this.rebuildUserList(data);
@@ -784,22 +898,22 @@ const userFunctions = (bot, roomDefaults) => {
         warnMeCall: function (roomFunctions) {
             if (warnme.length !== 0) //is there anyone in the warnme?
             {
-                let whatIsPosition = currentDJs.indexOf(roomFunctions.checkWhoIsDj()); //what position are they
+                let whatIsPosition = djList.indexOf(roomFunctions.checkWhoIsDj()); //what position are they
 
-                if (whatIsPosition === currentDJs.length - 1) //if 5th dj is playing, check guy on the left
+                if (whatIsPosition === djList.length - 1) //if 5th dj is playing, check guy on the left
                 {
-                    let areTheyNext = warnme.indexOf(currentDJs[0]);
+                    let areTheyNext = warnme.indexOf(djList[0]);
                     if (areTheyNext !== -1) //is the next dj up in the warnme?
                     {
-                        bot.pm('your song is up next!', currentDJs[0]);
+                        bot.pm('your song is up next!', djList[0]);
                         warnme.splice(areTheyNext, 1);
 
                     }
                 } else {
-                    let areTheyNext = warnme.indexOf(currentDJs[whatIsPosition + 1]);
+                    let areTheyNext = warnme.indexOf(djList[whatIsPosition + 1]);
                     if (areTheyNext !== -1) //is the next dj up in the warnme?
                     {
-                        bot.pm('your song is up next!', currentDJs[whatIsPosition + 1]);
+                        bot.pm('your song is up next!', djList[whatIsPosition + 1]);
                         warnme.splice(areTheyNext, 1);
 
                     }

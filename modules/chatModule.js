@@ -61,19 +61,19 @@ const chatFunctions = (bot, roomDefaults) => {
         },
 
         buildDJPlaysMessage: function (userFunctions) {
-            if (userFunctions.currentDJs().length === 0) {
+            if (userFunctions.djList().length === 0) {
                 return 'There are no dj\'s on stage.';
             } else {
                 let theMessage = '';
                 let theUserID;
                 let theUserPosition;
                 let theUsername;
-                for (let djLoop = 0; djLoop < userFunctions.currentDJs().length; djLoop++) {
-                    theUserID = userFunctions.currentDJs()[djLoop];
+                for (let djLoop = 0; djLoop < userFunctions.djList().length; djLoop++) {
+                    theUserID = userFunctions.djList()[djLoop];
                     theUsername = userFunctions.getUsername(theUserID);
                     theUserPosition = userFunctions.getPositionOnUsersList(theUserID);
                     theMessage = theMessage +
-                        userFunctions.getUsername(userFunctions.currentDJs()[djLoop]) +
+                        userFunctions.getUsername(userFunctions.djList()[djLoop]) +
                         ': ' +
                         userFunctions.theUsersList()[theUserPosition]['songCount'] +
                         ', ';

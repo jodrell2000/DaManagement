@@ -5,7 +5,7 @@ let botDefaults = require('../defaultSettings/botDefaults.js');
 let djCount = null; //the number of dj's on stage, gets reset every song
 let checkWhoIsDj = null; //the userid of the currently playing dj
 let bannedArtistsMatcher = ''; //holds the regular expression for banned artist / song matching
-let stageBannedList = []; //holds the userid of everyone who is in the command based banned from stage list
+let tempBanList = []; //holds the userid of everyone who is in the command based banned from stage list
 let skipVoteUsers = []; //holds the userid's of everyone who has voted for the currently playing song to be skipped, is cleared every song
 let lastdj = null; //holds the userid of the currently playing dj
 let songLimitTimer = null; //holds the timer used to remove a dj off stage if they don't skip their song in time, and their song has exceeded the max allowed song time
@@ -31,7 +31,7 @@ const roomFunctions = (bot) => {
         djCount: () => djCount, setDJCount: function (theCount) { djCount = theCount; },
         checkWhoIsDj: () => checkWhoIsDj, setCheckWhoIsDj: function (currentDJ) { checkWhoIsDj = currentDJ; },
         bannedArtistsMatcher: () => bannedArtistsMatcher,
-        stageBannedList: () => stageBannedList,
+        tempBanList: () => tempBanList,
         skipVoteUsers: () => skipVoteUsers,
         lastdj: () => lastdj,
         songLimitTimer: () => songLimitTimer,
@@ -78,14 +78,14 @@ const roomFunctions = (bot) => {
         },
 
         clearDecksForVIPs: function (userFunctions, authModule) {
-            if (userFunctions.vipList.length !== 0 && userFunctions.currentDJs().length !== userFunctions.vipList.length)
+            if (userFunctions.vipList.length !== 0 && userFunctions.djList().length !== userFunctions.vipList.length)
             {
-                for (let p = 0; p < userFunctions.currentDJs().length; p++)
+                for (let p = 0; p < userFunctions.djList().length; p++)
                 {
-                    let checkIfVip = userFunctions.vipList.indexOf(userFunctions.currentDJs()[p]);
-                    if (checkIfVip === -1 && userFunctions.currentDJs()[p] !== authModule.USERID)
+                    let checkIfVip = userFunctions.vipList.indexOf(userFunctions.djList()[p]);
+                    if (checkIfVip === -1 && userFunctions.djList()[p] !== authModule.USERID)
                     {
-                        bot.remDj(userFunctions.currentDJs()[p]);
+                        bot.remDj(userFunctions.djList()[p]);
                     }
                 }
             }

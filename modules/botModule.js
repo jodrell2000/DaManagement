@@ -117,14 +117,14 @@ const botFunctions = (bot) => {
 
         isBotOnStage: function (userFunctions) {
             logMe("debug", "Check if the bot is already on stage")
-            let isBotAlreadyOnStage = userFunctions.currentDJs().indexOf(authModule.USERID);
+            let isBotAlreadyOnStage = userFunctions.djList().indexOf(authModule.USERID);
             return isBotAlreadyOnStage !== -1;
         },
 
         shouldTheBotDJ: function (userFunctions, roomFunctions) {
             logMe("debug", "Check if the bot should DJ or not")
-            return userFunctions.currentDJs().length >= 1 && // is there at least one DJ on stage
-                userFunctions.currentDJs().length <= botDefaults.whenToGetOnStage && // are there fewer than the limit of DJs on stage
+            return userFunctions.djList().length >= 1 && // is there at least one DJ on stage
+                userFunctions.djList().length <= botDefaults.whenToGetOnStage && // are there fewer than the limit of DJs on stage
                 userFunctions.queueList().length === 0 && // is the queue empty
                 userFunctions.vipList.length === 0 && // there no VIPs
                 userFunctions.refreshList().length === 0; // is there someone currently using the refresh command
@@ -132,7 +132,7 @@ const botFunctions = (bot) => {
 
         shouldStopBotDJing: function (userFunctions, roomFunctions) {
             logMe("debug", "Check if the bot stop DJing")
-            return userFunctions.currentDJs().length >= botDefaults.whenToGetOffStage && // are there enough DJs onstage
+            return userFunctions.djList().length >= botDefaults.whenToGetOffStage && // are there enough DJs onstage
                 roomFunctions.checkWhoIsDj() !== authModule.USERID; // check the Bot isn't currently DJing
         },
 

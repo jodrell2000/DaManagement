@@ -32,7 +32,7 @@ module.exports = {
     playLimit: 3, //set the playlimit here (default 4 songs)
     songLengthLimit: 10.0, //set song limit in minutes
 
-    isRefreshing: true, //whether or not /refresh can be used or not (true = yes, false = no)
+    refreshingEnabled: true, //whether or not /refresh can be used or not (true = yes, false = no)
     amountOfTimeToRefresh: 30, //the amount of seconds someone has to use the refresh command(if enabled)
 
     HowManyVotesToSkip: 2, //how many votes for a song to get skipped(default value, only works if voteSkip = true)
@@ -42,8 +42,6 @@ module.exports = {
     ttRoomName: null, //the url extension of the room name, example "straight_chillin16" would be the format
 
     roomName: null, //the name of the room, example "straight chillin" would be the format for the straight chillin room...
-
-    queue: true, //queue(on by default)
 
     blackList: [], //holds the userid of everyone who is in the command based banned from the room list
 
@@ -61,15 +59,18 @@ module.exports = {
     removeAFKDJs: true, //afk limit(on by default), this is for the dj's on stage
     afkThroughPm: true, //choose whether afk warnings(for dj's on stage) will be given through the pm or the chatbox (false = chatbox, true = pm message)
     afkTimeLimit: 20, //set the afk limit in minutes here
-    voteMeansActive: false, // voting/bopping does not count as user being active (too many user autoBop)
-    speechMeansActive: true, // chatting does not count as user being active
-    snagMeansActive: true, // snagging a track does not count as use being active
+    voteMeansActive: false, // does voting/bopping count as user being active (too many user autoBop)
+    speechMeansActive: true, // does chatting count as user being active
+    snagMeansActive: true, // does snagging a track count as user being active
+    djingMeansActive: true, // does starting to DJ mean someone is active...disable if you think people are scripting a lot
 
+    queueActive: true, //queue(on by default)
     queueWaitTime: 60, /*how many second's does a dj have to get on stage when it's their turn to dj after waiting in the queue.
 						 The value must be entered in seconds in order to display the correct message, i.e 3 mins = 180 seconds.
 						 Note that people are not removed from the queue when they leave the room so a lower number is preferable in high pop rooms to avoid backup.
 						 (only work when queue = true)
 						*/
 
+    vipsOnly: false, // is true ONLY users on the VIP list will be able to play, otherwise a space will be reserved for everyone on the list but others will be allowed to play
 
 }

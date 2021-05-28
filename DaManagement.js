@@ -59,8 +59,8 @@ setInterval( function() { userFunctions.roomAFKCheck() }, 5 * 1000)
 
 // every 5 seconds, check if the there's an empty DJ slot, and promt the next in the queue to join the decks, remove them if they don't
 setInterval(function () {
-    if (roomDefaults.queue === true && userFunctions.queueList().length !== 0) {
-        if (botFunctions.sayOnce() === true && (userFunctions.refreshList().length + userFunctions.currentDJs().length) < 5) {
+    if (roomDefaults.queueActive === true && userFunctions.queueList().length !== 0) {
+        if ( botFunctions.sayOnce() === true && (userFunctions.refreshDJCount() + userFunctions.djList().length ) < 5) {
             botFunctions.setSayOnce(false);
 
             roomFunctions.queuePromptToDJ(userFunctions);
@@ -109,7 +109,7 @@ bot.on('registered', function (data) {
         userFunctions.bootThisUser(theUserID, bootMessage);
     } else {
         //if there are 5 dj's on stage and the queue is turned on when a user enters the room
-        if (roomDefaults.queue === true && userFunctions.currentDJs().length === 5) {
+        if (roomDefaults.queueActive === true && userFunctions.djList().length === 5) {
             bot.pm('The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.', userFunctions.getUsername(theUserID));
         }
 
@@ -361,146 +361,44 @@ bot.on('snagged', function (data)
 //this activates when a user joins the stage.
 bot.on('add_dj', function (data)
 {
+    logMe('debug', "============================== bot.on: add_dj")
+
+    let OKToDJ;
+    let theMessage;
     const theUserID = data.user[0].userid;
-    
-    //removes dj when they try to join the stage if the vip list has members in it.
-    //does not remove the bot
-    let checkVip = userFunctions.vipList().indexOf(theUserID);
-    if (userFunctions.vipList().length !== 0 && checkVip === -1 && theUserID !== authModule.USERID)
-    {
+    logMe('debug', "============================== data.user[0].userid" + data.user[0].userid );
+
+    [ OKToDJ, theMessage ] = userFunctions.checkOKToDJ(theUserID, roomFunctions);
+    logMe('debug', "============================== OKToDJ:'" + OKToDJ + "'" );
+    logMe('debug', "============================== theMessage:'" + theMessage + "'"  );
+
+    if ( !OKToDJ ) {
         bot.remDj(theUserID);
-        bot.pm('The vip list is currently active, only the vips may dj at this time', userFunctions.getUsername(theUserID));
-
         userFunctions.incrementSpamCounter(theUserID);
+        chatFunctions.botSpeak( theMessage, theUserID );
     }
-
-
 
     //sets dj's songcount to zero when they enter the stage.
     //unless they used the refresh command, in which case its set to
     //what it was before they left the room
-    if (typeof userFunctions.playLimitOfRefresher[theUserID] == 'number') {
-        userFunctions.setDJPlayCount(theUserID, userFunctions.playLimitOfRefresher[theUserID]);
-    } else {
-        userFunctions.initialiseDJPlayCount(theUserID);
-    }
+    userFunctions.setDJPlayCount(theUserID, userFunctions.getUsersRefreshPlayCount[theUserID]);
 
     //updates the afk position of the person who joins the stage.
-    userFunctions.updateUserLastSpoke(theUserID);
+    userFunctions.updateUserJoinedStage(theUserID);
 
     //adds a user to the current Djs list when they join the stage.
-    let check89 = userFunctions.currentDJs().indexOf(theUserID);
-    if (check89 === -1 && typeof data.user[0] != 'undefined') {
-        userFunctions.currentDJs().push(theUserID);
+    userFunctions.addDJToList(theUserID);
+
+    if ( userFunctions.isUserIDInQueue(theUserID) ) {
+        userFunctions.removeUserFromQueue(theUserID);
     }
 
-    if ((userFunctions.refreshList().length + userFunctions.currentDJs().length) <= 5) { //if there are still seats left to give out, then give them(but reserve for refreshers)
-        if (userFunctions.isUserInRefreshList(theUserID)) { //don't show these messages to people on the refresh list
-            //tells a dj trying to get on stage how to add themselves to the queuelist
-            let ifUser2 = userFunctions.queueList().indexOf(theUserID);
-            if (roomDefaults.queue === true && ifUser2 === -1) {
-                if (userFunctions.queueList().length !== 0) {
-                    bot.pm('The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.', theUserID);
-                }
-            }
-            else if (roomDefaults.queue === true && ifUser2 !== -1 && userFunctions.getUsername(theUserID) !== userFunctions.queueName()[0])
-            {
-                bot.pm('sorry, but you are not first in queue. please wait your turn.', theUserID);
-            }
-        }
-    }
-    else if (userFunctions.refreshList().length !== 0 && userFunctions.refreshList().indexOf(theUserID) === -1) //if there are people in the refresh list
-    { //and the person who just joined the stage is not one of them
-        bot.pm('sorry, but i\m holding that spot for someone in the refresh list', theUserID);
-    }
-
-
-
-    //escorting for the queue will not apply to people who are on the refresh list
-    if (userFunctions.refreshList().indexOf(theUserID) === -1 && (userFunctions.refreshList().length + userFunctions.currentDJs().length) <= 5) {
-        //removes a user from the queue list when they join the stage.
-        if (roomDefaults.queue === true) {
-            let firstOnly = userFunctions.queueList().indexOf(theUserID);
-            let queueListLength = userFunctions.queueList().length;
-            if (firstOnly !== 1 && queueListLength !== 0) {
-                bot.remDj(theUserID);
-
-                userFunctions.incrementSpamCounter(theUserID);
-            }
-        }
-        if (roomDefaults.queue === true) {
-            let checkQueue = userFunctions.queueList().indexOf(userFunctions.getUsername(theUserID));
-            if (checkQueue !== -1 && checkQueue === 0) {
-                clearTimeout(roomFunctions.queueTimer());
-                botFunctions.setSayOnce(true);
-                userFunctions.queueList().splice(checkQueue, 2);
-            }
-        }
-    }
-
-
-    //if when adding up the number of people in the refresh list with the number of dj's on stage
-    //it exceeds the number of seats available (this assumes a 5 seater room
-    if ((userFunctions.refreshList().length + userFunctions.currentDJs().length) > 5)
-    {
-        if (userFunctions.refreshList().indexOf(theUserID) === -1) //if person joining is not in refresh list
-        {
-            bot.remDj(theUserID);
-
-            userFunctions.incrementSpamCounter(theUserID);
-        }
-    }
-
-
-
-    //if user is still in refresh list when they get on stage, remove them
-    let areTheyStillInRefreshList = userFunctions.refreshList().indexOf(theUserID);
-    if (areTheyStillInRefreshList !== -1)
-    {
-        clearTimeout(userFunctions.refreshTimer[theUserID]); //clear their timeout
-        delete userFunctions.refreshTimer[theUserID];
-        userFunctions.refreshList().splice(areTheyStillInRefreshList, 1); //remove them from the refresh list
-    }
-
-
-
-    //checks to see if user is on the banned from stage list, if they are they are removed from stage
-    for (let g = 0; g < roomFunctions.stageBannedList().length; g++)
-    {
-        if (theUserID === roomFunctions.stageBannedList()[g])
-        {
-            bot.remDj(theUserID);
-            bot.speak('@' + userFunctions.getUsername(theUserID) + ' you are banned from djing');
-
-            userFunctions.incrementSpamCounter(theUserID);
-            break;
-        }
-    }
-
-    //checks to see if user is on the manually added banned from stage list, if they are they are removed from stage
-    for (let z = 0; z < userFunctions.bannedFromStage().length; z++)
-    {
-        if (userFunctions.isUserIDStageBanned(theUserID)) //== userFunctions.bannedFromStage()[z])
-        {
-            bot.remDj(theUserID);
-            bot.speak('@' + userFunctions.getUsername(theUserID) + ' you are banned from djing');
-
-            userFunctions.incrementSpamCounter(theUserID);
-            break;
-        }
+    if ( userFunctions.isUserInRefreshList(theUserID) ) {
+        userFunctions.removeRefreshFromUser(theUserID);
     }
 
     //check to see if conditions are met for bot's autodjing feature
     botFunctions.checkAutoDJing(userFunctions, roomFunctions);
-
-    //if person exceeds spam count within 10 seconds they are kicked
-    logMe('debug', 'add_dj: theUserID ' + theUserID );
-    logMe('debug', 'add_dj: The User ' + userFunctions.getUserSpamCount(theUserID) );
-    if (typeof userFunctions.getUserSpamCount(theUserID) !== undefined &&
-        userFunctions.getUserSpamCount(theUserID) >= roomDefaults.spamLimit)
-    {
-        bot.boot(theUserID, 'stop spamming');
-    }
 });
 
 //checks when a dj leaves the stage
@@ -511,17 +409,17 @@ bot.on('rem_dj', function (data)
     userFunctions.deleteDJPlayCount(theUserID);
 
     //gives them one chance to get off stage then after that theyre play limit is treated as normal
-    if (typeof userFunctions.playLimitOfRefresher[theUserID] == 'number' && userFunctions.refreshList().indexOf(theUserID) === -1)
+    if (typeof userFunctions.getUsersRefreshPlayCount[theUserID] == 'number' && userFunctions.refreshList().indexOf(theUserID) === -1)
     {
-        delete userFunctions.playLimitOfRefresher[theUserID]
+        delete userFunctions.getUsersRefreshPlayCount[theUserID]
     }
 
 
     //updates the current dj's list.
-    let check30 = userFunctions.currentDJs().indexOf(theUserID);
+    let check30 = userFunctions.djList().indexOf(theUserID);
     if (check30 !== -1)
     {
-        userFunctions.currentDJs().splice(check30, 1);
+        userFunctions.djList().splice(check30, 1);
     }
 
 
