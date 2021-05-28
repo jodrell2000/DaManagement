@@ -45,6 +45,10 @@ const songFunctions = (bot) => {
         voteCountSkip: () => voteCountSkip,
         ALLREADYCALLED: () => ALLREADYCALLED,
 
+        votesLeft: () => votesLeft,
+        setVotesLeft: function (value) { votesLeft = value; },
+        decrementVotesLeft: function (value) { --votesLeft; },
+
         getSongTags: function (current_song) {
             logMe('debug', "getSongs:" + JSON.stringify(current_song));
             song = current_song.metadata.song;

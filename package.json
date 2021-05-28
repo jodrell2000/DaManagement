@@ -2,6 +2,9 @@
 	"name": "Da_Management",
 	"private": true,
 	"dependencies": {
-		"ttapi": "^4.0.2"
+		"ttapi": "^4.0.3"
+	},
+	"devDependencies": {
+		"prettier": "^2.3.0"
 	}
 }

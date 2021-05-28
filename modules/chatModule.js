@@ -1,23 +1,44 @@
 const chatFunctions = (bot, roomDefaults) => {
+    function logMe(logLevel, message) {
+        if (logLevel === 'error') {
+            console.log("chatFunctions:" + logLevel + "->" + message + "\n");
+        } else {
+            if (bot.debug) {
+                console.log("chatFunctions:" + logLevel + "->" + message + "\n");
+            }
+        }
+    }
+
     return {
-        botMessage: function () {
+        botSpeak: function (message, userID) {
+            logMe('debug', 'userID: ' + userID );
+            logMe('debug', 'message: ' + message );
+            if (userID !== undefined) {
+                this.botPM( userID, message);
+            } else {
+                this.botChat( message );
+            }
 
         },
 
-        botChat: function () {
-
+        botChat: function (message) {
+            bot.speak(message);
         },
 
-        userGreeting: function (userID, username) {
+        botPM: function (user, message) {
+            bot.speak(user, message);
+        },
+
+        userGreeting: function (userID, username, roomFunctions) {
             this.message = '';
 
-            if (roomDefaults.roomJoinMessage !== '') //if your not using the default greeting
+            if (roomFunctions.roomJoinMessage()  !== '') //if your not using the default greeting
             {
                 if (roomDefaults.theme === false) //if theres no theme this is the message.
                 {
-                    this.message = roomDefaults.roomJoinMessage;
+                    this.message = roomFunctions.roomJoinMessage() ;
                 } else {
-                    this.message = roomDefaults.roomJoinMessage + '; The theme is currently set to: ' + roomDefaults.whatIsTheme;
+                    this.message = roomFunctions.roomJoinMessage()  + '; The theme is currently set to: ' + roomDefaults.whatIsTheme;
                 }
             } else {
                 if (roomDefaults.theme === false) //if theres no theme this is the message.
@@ -27,11 +48,11 @@ const chatFunctions = (bot, roomDefaults) => {
                     this.message = 'Welcome to ' + roomDefaults.roomName + ' @' + username + ', the theme is currently set to: ' + roomDefaults.whatIsTheme;
                 }
             }
-            this.greetMessage(userID, username, this.message)
+            this.greetMessage(userID, username, this.message, roomFunctions)
         },
 
-        greetMessage: function (userID, username, message) {
-            if (roomDefaults.greetThroughPm === false) //if your not sending the message through the pm
+        greetMessage: function (userID, username, message, roomFunctions) {
+            if (roomFunctions.greetThroughPm()  === false) //if your not sending the message through the pm
             {
                 bot.speak('@' + username + ', ' + message);
             } else {
@@ -39,6 +60,29 @@ const chatFunctions = (bot, roomDefaults) => {
             }
         },
 
+        buildDJPlaysMessage: function (userFunctions) {
+            if (userFunctions.djList().length === 0) {
+                return 'There are no dj\'s on stage.';
+            } else {
+                let theMessage = '';
+                let theUserID;
+                let theUserPosition;
+                let theUsername;
+                for (let djLoop = 0; djLoop < userFunctions.djList().length; djLoop++) {
+                    theUserID = userFunctions.djList()[djLoop];
+                    theUsername = userFunctions.getUsername(theUserID);
+                    theUserPosition = userFunctions.getPositionOnUsersList(theUserID);
+                    theMessage = theMessage +
+                        userFunctions.getUsername(userFunctions.djList()[djLoop]) +
+                        ': ' +
+                        userFunctions.theUsersList()[theUserPosition]['songCount'] +
+                        ', ';
+                }
+
+                theMessage = 'The play counts are now ' + theMessage.substring(0, theMessage.length - 2);;
+                return theMessage;
+            }
+        },
 
         readSongStats: function (songFunctions, roomDefaults) {
             if (roomDefaults.SONGSTATS) {
