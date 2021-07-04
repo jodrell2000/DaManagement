@@ -8,9 +8,6 @@ const botModule = (bot) => {
     const responder = chatModule(bot);
 
     availableCommands.hello = (data) => {
-        console.log("++++++++++++++++++++++++++++++++++++++++++++++");
-        console.log("data:" + data);
-        console.log("++++++++++++++++++++++++++++++++++++++++++++++");
         responder.sayHello(data.name);
     }
     availableCommands.hello.help = "'/hello': Reply to the sender with a Hello! Likely used to test if the Bot is working";
@@ -31,8 +28,6 @@ const botModule = (bot) => {
     }
 
     function listCommands() {
-        console.log("Listing all available commands");
-        console.log("Commands:" + Object.keys(availableCommands));
         return Object.keys(availableCommands);
     }
 
@@ -57,11 +52,8 @@ const botModule = (bot) => {
         },
 
         getCommandAndArguments: function(text, availableCommands) {
-            console.log("Text:" + text);
             const [sentCommand, ...args] = text.split(" ");
             let theCommand = sentCommand.substring(1, sentCommand.length)
-            console.log("Command:" + theCommand);
-            console.log("Args:" + args);
             const commandObj = availableCommands[theCommand];
             if (commandObj) {
                 return [commandObj, args];
@@ -72,12 +64,7 @@ const botModule = (bot) => {
 
         newParseCommands: function(data, userFunctions) {
             const [command, args] = this.getCommandAndArguments(data.text, availableCommands);
-            console.log("Command:" + command);
-            console.log("Args:" + args);
             if (command) {
-                console.log("++++++++++++++++++++++++++++++++++++++++++++++");
-                console.log("data:" + data);
-                console.log("++++++++++++++++++++++++++++++++++++++++++++++");
                 command.call(null, data, args);
             } else {
                 bot.speak("Nope, no idea");
