@@ -26,7 +26,7 @@ const chatFunctions = (bot, roomDefaults) => {
         },
 
         botPM: function (user, message) {
-            bot.speak(user, message);
+            bot.speak(message, user);
         },
 
         userGreeting: function (userID, username, roomFunctions) {

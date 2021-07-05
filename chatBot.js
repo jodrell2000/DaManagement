@@ -5,7 +5,7 @@ let bot = new Bot(authModule.AUTH, authModule.USERID, authModule.ROOMID);
 let botModule = require("./chatbot/botModule.js")
 const botFunctions = botModule(bot);
 
-bot.debug = false;
+bot.debug = true;
 
 bot.roomRegister(authModule.ROOMID, function() {
   bot.setAsBot();
@@ -17,7 +17,14 @@ bot.on("newsong", function () {
 
 bot.on("speak", function (data) {
   if (botFunctions.wasThisACommand(data)) {
-    botFunctions.parseCommand(data);
+    botFunctions.newParseCommands(data);
+  }
+});
+
+bot.on('pmmed', function (data)
+{
+  if (botFunctions.wasThisACommand(data)) {
+    botFunctions.newParseCommands(data);
   }
 });
 

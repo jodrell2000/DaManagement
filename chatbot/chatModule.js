@@ -2,16 +2,45 @@ let responseModule = require("../chatbot/responseModule.js");
 let thisMsgText = "Hey! How are you @";
 
 const chatModule = (bot) => {
-  return {
-    saySomething: (message) => {
-      responseModule.responseCount++;
-      bot.speak(responseModule.responseCount + ": " + message);
-    },
+    return {
+        saySomething: function (data, message, public) {
+            let pmResponse;
+            let senderID;
+            if ( data.command === "pmmed" ) { pmResponse = true; senderID = data.senderid }
+            responseModule.responseCount++;
+            if ( pmResponse === true && public === undefined ) {
+                this.botPM( responseModule.responseCount + ": " + message, senderID);
+            } else {
+                this.botChat( responseModule.responseCount + ": " + message );
+            }
 
-    buildMessage: (name) => {
-      return thisMsgText + name;
-    }
-  };
+        },
+
+        botChat: function (message) {
+            console.log("Public response");
+            bot.speak(message);
+        },
+
+        botPM: function (message, user) {
+            console.log("user:" + user);
+            console.log("message:" + message);
+            console.log("PM response");
+            bot.pm(message, user);
+        },
+
+        buildMessage: (name) => {
+            return thisMsgText + name;
+        },
+
+        sayHello(data) {
+            if ( data.command === "pmmed" ) {
+                this.saySomething( data, "Hello..." );
+            } else {
+                const theName = data.name;
+                this.saySomething( data, "Hello " + theName + "..." );
+            }
+        }
+    };
 };
 
 module.exports = chatModule;
