@@ -7,24 +7,23 @@ const availableCommands = {};
 const botModule = (bot) => {
     const responder = chatModule(bot);
 
-    availableCommands.hello = (data) => {
-        responder.sayHello(data.name);
-    }
+    availableCommands.hello = (data) => { responder.sayHello(data); }
     availableCommands.hello.help = "'/hello': Reply to the sender with a Hello! Likely used to test if the Bot is working";
 
-    availableCommands.list = () => {
-        responder.saySomething("Available commands are: " + listCommands());
-    }
+    availableCommands.list = (data) => { responder.saySomething(data, "Available commands are: " + listCommands()); }
     availableCommands.list.help = "'/list': Lists all available commands";
 
-    availableCommands.help = (data, command) => {
-        displayHelp(command);
-    }
+    availableCommands.help = (data, command) => { console.log("Command:" + typeof(command) + "===="); displayHelp(data, command); }
     availableCommands.help.argumentCount = 1;
     availableCommands.help.help = "/help [command] Display how to use an individual command";
 
-    function displayHelp(command) {
-        responder.saySomething(availableCommands[command].help);
+    function displayHelp(data, command) {
+        if ( command[0] === undefined ) { command = "help" }
+        if ( availableCommands[command] === undefined ) {
+            responder.saySomething( data, "That command desn't exist. Try /list to find the available commands");
+        } else {
+            responder.saySomething(data, availableCommands[command].help);
+        }
     }
 
     function listCommands() {
@@ -64,52 +63,11 @@ const botModule = (bot) => {
 
         newParseCommands: function(data, userFunctions) {
             const [command, args] = this.getCommandAndArguments(data.text, availableCommands);
-            if (command) {
+             if (command) {
                 command.call(null, data, args);
             } else {
-                bot.speak("Nope, no idea");
+                bot.speak(data, "Sorry, that's not a command I recognise. Try /list to find out more.");
             }
-        },
-
-        // getCommandAndArguments: function(text, availableCommands) {
-        //     const [command, ...args] = text.split(" ");
-        //     const commandObj = availableCommands[command];
-        //     if (commandObj) {
-        //         return [commandObj, args];
-        //     } else {
-        //         return null;
-        //     }
-        // },
-        //
-        // newParseCommands: function (data, userFunctions) {
-        //     const [theCommand, args] = this.getCommandAndArguments(data.text, availableCommands);
-        //
-        //     if (theCommand) {
-        //         theCommand.apply(null, args);
-        //     } else {
-        //         bot.speak("No idea what you're talking about");
-        //     }
-        //
-        //     // const speaker = data.name;
-        //     //const moderatorCommands = {};
-        //     //moderatorCommands.riggedflip = () => { action: "riggedFlipResponse", helpText: "Ask the bot to flip a coin for you, always tails" }
-        //     //const isMod = userFunctions.isUserModerator(speaker) === true;
-        // },
-
-        parseCommand: function (data) {
-            let theCommand = data.text;
-            console.log("parseCommand, theCommand:" + theCommand + "-----");
-
-            for (let commandLoop = 0; commandLoop < availableCommands.length; commandLoop++) {
-                console.log("In the commandLoop:" + commandLoop + "-----");
-                if (availableCommands[commandLoop]["command"] === theCommand) {
-                    responder[availableCommands[commandLoop]["action"]](data);
-                }
-            }
-            // switch (data.text) {
-            //     case "/hello":
-            //         responder.saySomething(responder.buildMessage(data.name));
-            // }
         },
     };
 };

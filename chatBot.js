@@ -21,6 +21,13 @@ bot.on("speak", function (data) {
   }
 });
 
+bot.on('pmmed', function (data)
+{
+  if (botFunctions.wasThisACommand(data)) {
+    botFunctions.newParseCommands(data);
+  }
+});
+
 // playing with arrays and objects...
 //
 // userList = [ { id:636473737373, username: 'Tom'},
