@@ -17,6 +17,9 @@ const botModule = (bot) => {
     availableCommands.help.argumentCount = 1;
     availableCommands.help.help = "/help [command] Display how to use an individual command";
 
+    availableCommands.queue = (data) => { responder.saySomething(data, "This would be a queue in he actual bot", true); }
+    availableCommands.queue.help = "/queue Command that always responds in public";
+
     function displayHelp(data, command) {
         if ( command[0] === undefined ) { command = "help" }
         if ( availableCommands[command] === undefined ) {

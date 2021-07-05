@@ -3,12 +3,12 @@ let thisMsgText = "Hey! How are you @";
 
 const chatModule = (bot) => {
     return {
-        saySomething: function (data, message) {
+        saySomething: function (data, message, public) {
             let pmResponse;
             let senderID;
             if ( data.command === "pmmed" ) { pmResponse = true; senderID = data.senderid }
             responseModule.responseCount++;
-            if ( pmResponse === true ) {
+            if ( pmResponse === true && public === undefined ) {
                 this.botPM( responseModule.responseCount + ": " + message, senderID);
             } else {
                 this.botChat( responseModule.responseCount + ": " + message );
