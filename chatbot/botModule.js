@@ -3,9 +3,14 @@ let responseModule = require("../chatbot/responseModule.js");
 let chatModule = require("../chatbot/chatModule.js");
 
 const availableCommands = {};
+const moderatorCommands = {};
 
 const botModule = (bot) => {
     const responder = chatModule(bot);
+    const allCommands = () => ({
+        ...availableCommands,
+        ...moderatorCommands
+    })
 
     availableCommands.hello = (data) => { responder.sayHello(data); }
     availableCommands.hello.help = "'/hello': Reply to the sender with a Hello! Likely used to test if the Bot is working";
@@ -17,20 +22,20 @@ const botModule = (bot) => {
     availableCommands.help.argumentCount = 1;
     availableCommands.help.help = "/help [command] Display how to use an individual command";
 
-    availableCommands.queue = (data) => { responder.saySomething(data, "This would be a queue in he actual bot", true); }
-    availableCommands.queue.help = "/queue Command that always responds in public";
+    moderatorCommands.queue = (data) => { responder.saySomething(data, "This would be a queue in he actual bot", true); }
+    moderatorCommands.queue.help = "/queue Command that always responds in public";
 
     function displayHelp(data, command) {
         if ( command[0] === undefined ) { command = "help" }
-        if ( availableCommands[command] === undefined ) {
+        if ( allCommands[command] === undefined ) {
             responder.saySomething( data, "That command desn't exist. Try /list to find the available commands");
         } else {
-            responder.saySomething(data, availableCommands[command].help);
+            responder.saySomething(data, allCommands[command].help);
         }
     }
 
     function listCommands() {
-        return Object.keys(availableCommands);
+        return Object.keys(allCommands);
     }
 
     return {
@@ -53,10 +58,10 @@ const botModule = (bot) => {
             }
         },
 
-        getCommandAndArguments: function(text, availableCommands) {
+        getCommandAndArguments: function(text, allCommands) {
             const [sentCommand, ...args] = text.split(" ");
             let theCommand = sentCommand.substring(1, sentCommand.length)
-            const commandObj = availableCommands[theCommand];
+            const commandObj = allCommands[theCommand];
             if (commandObj) {
                 return [commandObj, args];
             } else {
@@ -65,7 +70,7 @@ const botModule = (bot) => {
         },
 
         newParseCommands: function(data, userFunctions) {
-            const [command, args] = this.getCommandAndArguments(data.text, availableCommands);
+            const [command, args] = this.getCommandAndArguments(data.text, allCommands);
              if (command) {
                 command.call(null, data, args);
             } else {

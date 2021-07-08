@@ -3,6 +3,15 @@ let botDefaults = require('../defaultSettings/botDefaults.js');
 let roomDefaults = require('../defaultSettings/roomDefaults.js');
 let musicDefaults = require('../defaultSettings/musicDefaults.js');
 
+const availableCommands = {};
+const moderatorCommands = {};
+
+let allCommands = {
+    ...availableCommands,
+    ...moderatorCommands
+};
+
+
 const commandFunctions = (bot) => {
     function logMe(logLevel, message) {
         if (logLevel === 'error') {
@@ -14,15 +23,52 @@ const commandFunctions = (bot) => {
         }
     }
 
+    moderatorCommands.autodj = () => { bot.addDj(); }
+    moderatorCommands.autodj.help = "Starts the Bot DJing";
+
+    availableCommands.playlist = () => {
+        if (botDefaults.botPlaylist !== null) {
+            bot.speak('There are currently ' + botDefaults.botPlaylist.length + ' songs in my playlist.');
+        }
+    }
+    availableCommands.playlist.help = "Tells you how many songs are in the Bot playlist";
+
     return {
+
+        wasThisACommand: function (data) {
+            let text = data.text;
+
+            // check if this was a command
+            if (text.match(/^\|/)) {
+                return true;
+            }
+        },
+
+        getCommandAndArguments: function(text, availableCommands) {
+            const [sentCommand, ...args] = text.split(" ");
+            let theCommand = sentCommand.substring(1, sentCommand.length)
+            const commandObj = availableCommands[theCommand];
+            if (commandObj) {
+                return [commandObj, args];
+            } else {
+                return [null, null];
+            }
+        },
+
+        parseCommands: function(data, userFunctions) {
+            const [command, args] = this.getCommandAndArguments(data.text, availableCommands);
+            if (command) {
+                command.call(null, data, args);
+            } else {
+                bot.speak(data, "Sorry, that's not a command I recognise. Try /list to find out more.");
+            }
+        },
 
         parseChat: function (data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) {
             const text = data.text; //the most recent text in the chatbox on turntable
             const speaker = data.userid;
 
-            if (text.match(/^\/autodj$/) && userFunctions.isUserModerator(speaker) === true) {
-                bot.addDj();
-            } else if (text.match(/^\/playlist/)) {
+            if (text.match(/^\/playlist/)) {
                 if (botDefaults.botPlaylist !== null) {
                     bot.speak('There are currently ' + botDefaults.botPlaylist.length + ' songs in my playlist.');
                 }
@@ -1511,10 +1557,6 @@ const commandFunctions = (bot) => {
                     roomDefaults.SONGSTATS = true;
                     bot.pm('song stats is now active', speaker);
                 }
-            } else if (text.match(/^\/playlist/) && userFunctions.isUserModerator(speaker) === true && isInRoom === true) {
-                if (botDefaults.botPlaylist !== null) {
-                    bot.pm('There are currently ' + botDefaults.botPlaylist.length + ' songs in my playlist.', speaker);
-                }
             } else if (text.match(/^\/setTheme/) && userFunctions.isUserModerator(speaker) === true && isInRoom === true) {
                 whatIsTheme = data.text.slice(10);
                 roomDefaults.THEME = true;
@@ -1558,8 +1600,6 @@ const commandFunctions = (bot) => {
                     userFunctions.justSaw(userFunctions.djList()[z], 'justSaw1');
                     userFunctions.justSaw(userFunctions.djList()[z], 'justSaw2');
                 }
-            } else if (text.match(/^\/autodj$/) && userFunctions.isUserModerator(speaker) === true && isInRoom === true) {
-                bot.addDj();
             } else if (text.match(/^\/removedj$/) && userFunctions.isUserModerator(speaker) === true && isInRoom === true) {
                 bot.remDj();
             } else if (text.match(/^\/voteskipoff$/) && userFunctions.isUserModerator(speaker) === true && isInRoom === true) {
