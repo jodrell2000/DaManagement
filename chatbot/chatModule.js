@@ -17,14 +17,10 @@ const chatModule = (bot) => {
         },
 
         botChat: function (message) {
-            console.log("Public response");
             bot.speak(message);
         },
 
         botPM: function (message, user) {
-            console.log("user:" + user);
-            console.log("message:" + message);
-            console.log("PM response");
             bot.pm(message, user);
         },
 
