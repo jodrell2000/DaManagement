@@ -17,3 +17,6 @@
 * don't reset the djplay counters when enabling the playlimit, or at least have a separate counter so that the djstats can be maintained
 * roomsummary command available to all room users giving info on queue, playlimits etc
 * admin function to manually set DJ playcounts, if the bot crashes for example
+* post Minday "OK, I Love You Bye Bye" gif when booting etc
+https://media.giphy.com/media/l2QE4oXcsxunFIUo0/giphy.gif
+* personalised /props gifs and welcome messages tied to userIDs
