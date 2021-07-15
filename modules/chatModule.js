@@ -50,7 +50,8 @@ const chatFunctions = (bot, roomDefaults) => {
                 "https://media.giphy.com/media/26BRvQJ3ke9rHRPyg/giphy.gif",
                 "https://media.giphy.com/media/HX3lSnGXZnaWk/giphy.gif",
                 "https://media.tenor.com/images/00cec448b487873b51ad2e7ec3933beb/tenor.gif",
-                "https://media.giphy.com/media/lEVZJzy4w15qE/giphy-downsized-large.gif"
+                "https://media.giphy.com/media/lEVZJzy4w15qE/giphy-downsized-large.gif",
+                "https://media.giphy.com/media/j2ptl95PRwZTo0IAuP/giphy.gif"
             ]
             this.botSpeak ( data, '@' + userFunctions.getUsername(data.userid) + ' gives the props to @' + userFunctions.getUsername(currentDJID), true);
             const randomPic = Math.floor(Math.random() * propsPics.length);
