@@ -29,13 +29,18 @@ const botFunctions = (bot) => {
 
     return {
         checkActivity: () => checkActivity,
-        botStartTime: () => botStartTime,
         messageCounter: () => messageCounter,
         netwatchdogTimer: () => netwatchdogTimer,
         attemptToReconnect: () => attemptToReconnect,
         returnToRoom: () => returnToRoom,
         wserrorTimeout: () => wserrorTimeout,
         autoDjingTimer: () => autoDjingTimer,
+
+        botStartTime: () => botStartTime,
+        setBotStartTime:  function () {
+            botStartTime = Date.now()
+            logMe('debug', 'setBotStartTime: Setting bot start time to ' + botStartTime );
+        },
 
         skipOn: () => skipOn,
         setSkipOn: function (value) { skipOn = value; },
@@ -45,6 +50,28 @@ const botFunctions = (bot) => {
 
         uptimeTime: () => uptimeTime,
         setUptimeTime: function (value) { uptimeTime = value; },
+
+        uptime: function (chatFunctions) {
+            logMe('debug', 'botCommands.uptime')
+            let msecPerMinute = 1000 * 60;
+            let msecPerHour = msecPerMinute * 60;
+            let msecPerDay = msecPerHour * 24;
+            this.setUptimeTime(Date.now());
+            let currentTime = this.uptimeTime() - this.botStartTime();
+            logMe('debug', 'botCommands.uptime, uptimeTime:' + this.uptimeTime() )
+            logMe('debug', 'botCommands.uptime, botStartTime:' + this.botStartTime() )
+            logMe('debug', 'botCommands.uptime, currentTime:' + currentTime )
+
+            let days = Math.floor(currentTime / msecPerDay);
+            currentTime = currentTime - (days * msecPerDay);
+
+            let hours = Math.floor(currentTime / msecPerHour);
+            currentTime = currentTime - (hours * msecPerHour);
+
+            let minutes = Math.floor(currentTime / msecPerMinute);
+
+            chatFunctions.botSpeak('bot uptime: ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes');
+        },
 
         checkIfConnected: function () {
             {

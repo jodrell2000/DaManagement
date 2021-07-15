@@ -105,8 +105,11 @@ const userFunctions = (bot, roomDefaults) => {
             this.deleteAllDJsPlayCount();
             this.resetModPM();
 
-            if ( botFunctions.botStartTime === null) {
-                botFunctions.botStartTime = Date.now();
+            const theStartTime = botFunctions.botStartTime();
+            logMe('debug', 'botStartReset: ============================= here! --' + botFunctions.botStartTime() + '--' );
+            if ( !theStartTime ) {
+                logMe('debug', 'botStartReset: ============================= settting the start time ');
+                botFunctions.setBotStartTime();
             }
         },
 
