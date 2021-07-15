@@ -51,7 +51,7 @@ const botFunctions = (bot) => {
         uptimeTime: () => uptimeTime,
         setUptimeTime: function (value) { uptimeTime = value; },
 
-        uptime: function (chatFunctions) {
+        uptime: function (data, chatFunctions) {
             logMe('debug', 'botCommands.uptime')
             let msecPerMinute = 1000 * 60;
             let msecPerHour = msecPerMinute * 60;
@@ -70,7 +70,7 @@ const botFunctions = (bot) => {
 
             let minutes = Math.floor(currentTime / msecPerMinute);
 
-            chatFunctions.botSpeak('bot uptime: ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes');
+            chatFunctions.botSpeak(data, 'bot uptime: ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes');
         },
 
         checkIfConnected: function () {

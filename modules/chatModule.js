@@ -10,23 +10,29 @@ const chatFunctions = (bot, roomDefaults) => {
     }
 
     return {
-        botSpeak: function (message, userID) {
-            logMe('debug', 'message: ' + message );
-            logMe('debug', 'userID: ' + userID );
-            if (userID !== undefined) {
-                this.botPM( userID, message);
+        botSpeak: function (data, message, public) {
+            let pmResponse;
+            let senderID;
+            if ( data.command === "pmmed" ) {
+                pmResponse = true;
+                senderID = data.senderid
+            }
+
+            if ( pmResponse === true && public === undefined ) {
+                this.botPM( senderID, message);
             } else {
                 this.botChat( message );
             }
 
         },
 
+
         botChat: function (message) {
             bot.speak(message);
         },
 
         botPM: function (user, message) {
-            bot.speak(message, user);
+            bot.pm(message, user);
         },
 
         userGreeting: function (userID, username, roomFunctions) {

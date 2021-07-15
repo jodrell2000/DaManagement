@@ -125,7 +125,7 @@ const roomFunctions = (bot) => {
                 userFunctions.removeEscortMeFromUser(currentDJ);
 
                 const theMessage = '@' + userFunctions.getUsername(currentDJ) + ' had enabled escortme';
-                chatFunctions.botSpeak(theMessage);
+                chatFunctions.botSpeak(null, theMessage);
             }
         },
 
