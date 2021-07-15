@@ -93,7 +93,7 @@ const userFunctions = (bot, roomDefaults) => {
             people = []
         },
 
-        botStartReset: function (botFunctions, data) {
+        botStartReset: function (botFunctions, songFunctions) {
             this.resetAllEscortMe(bot);
             this.resetUsersList();
             this.resetQueueList();
@@ -101,6 +101,8 @@ const userFunctions = (bot, roomDefaults) => {
             this.resetAFKPeople();
             this.deleteAllDJsPlayCount();
             this.resetModPM();
+
+            songFunctions.loadPlaylist();
 
             const theStartTime = botFunctions.botStartTime();
             if ( !theStartTime ) {

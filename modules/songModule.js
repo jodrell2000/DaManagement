@@ -54,12 +54,18 @@ const songFunctions = (bot) => {
         // Playlist Functions
         // ========================================================
 
+        loadPlaylist: function () {
+            bot.playlistAll(function (callback) {
+                botDefaults.botPlaylist = callback.list;
+            });
+        },
+
         randomisePlaylist: function () {
             let ez = 0;
             bot.speak("Reorder initiated.");
             let reorder = setInterval(function () {
                 if (ez <= botDefaults.botPlaylist.length) {
-                    let nextId = Math.ceil(Math.random() * botDefaults.botPlaylist);
+                    let nextId = Math.ceil(Math.random() * botDefaults.botPlaylist.length);
                     bot.playlistReorder(ez, nextId);
                     console.log("Song " + ez + " changed.");
                     ez++;

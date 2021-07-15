@@ -56,7 +56,9 @@ const commandFunctions = (bot) => {
     moderatorCommands.autodj = () => { bot.addDj(); }
     moderatorCommands.autodj.help = "Starts the Bot DJing";
 
-    moderatorCommands.randomisePlaylist = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { songFunctions.randomisePlaylist() }
+    moderatorCommands.randomisePlaylist = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
+        songFunctions.randomisePlaylist()
+    }
     moderatorCommands.randomisePlaylist.help = () => {  }
 
     function listCommands() {
