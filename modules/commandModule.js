@@ -18,6 +18,18 @@ const commandFunctions = (bot) => {
         }
     }
 
+    botCommands.uptime = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
+        botFunctions.uptime(chatFunctions);
+    }
+    botCommands.uptime.help = "Tells you how long the bot has been running for";
+
+        generalCommands.list = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
+        chatFunctions.botSpeak( "Available commands are: " + listCommands());
+    }
+    generalCommands.list.help = "'/list': Lists all available commands";
+
+
+
     moderatorCommands.autodj = () => { bot.addDj(); }
     moderatorCommands.autodj.help = "Starts the Bot DJing";
 
@@ -35,25 +47,6 @@ const commandFunctions = (bot) => {
         chatFunctions.botSpeak( "Available commands are: " + listCommands());
     }
     generalCommands.list.help = "'/list': Lists all available commands";
-
-    botCommands.uptime = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
-        logMe('debug', 'botCommands.uptime')
-        let msecPerMinute = 1000 * 60;
-        let msecPerHour = msecPerMinute * 60;
-        let msecPerDay = msecPerHour * 24;
-        botFunctions.setUptimeTime(Date.now());
-        let currentTime = botFunctions.uptimeTime() - botFunctions.botStartTime();
-
-        let days = Math.floor(currentTime / msecPerDay);
-        currentTime = currentTime - (days * msecPerDay);
-
-        let hours = Math.floor(currentTime / msecPerHour);
-        currentTime = currentTime - (hours * msecPerHour);
-
-        let minutes = Math.floor(currentTime / msecPerMinute);
-
-        chatFunctions.botSpeak('bot uptime: ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes');
-    }
 
     function listCommands() {
         return Object.keys(allCommands);
