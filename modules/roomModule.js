@@ -47,7 +47,6 @@ const roomFunctions = (bot) => {
 
         resetSkipVoteUsers: function () {
             skipVoteUsers = []
-            logMe("debug", "resetSkipVoteUsers: I've reset the Users who skipped")
         },
 
         queuePromptToDJ: function (userFunctions) {
@@ -61,8 +60,6 @@ const roomFunctions = (bot) => {
                 let minutes = Math.floor((roomDefaults.queueWaitTime / 60));
                 thisMessage = ' you have ' + minutes + ' minutes to get on stage.';
             }
-            logMe('debug', 'queuePromptToDJ: userID ' + userFunctions.queueList(0) );
-            logMe('debug', 'queuePromptToDJ: typeof userID ' + typeof(userFunctions.queueList(0).toString()) );
 
             bot.speak('@' + userFunctions.getUsername(userFunctions.queueList(0).toString()) + thisMessage);
         },
@@ -118,9 +115,8 @@ const roomFunctions = (bot) => {
 
         escortDJsDown: function (currentDJ, botFunctions, userFunctions, chatFunctions) {
             //iterates through the escort list and escorts all djs on the list off the stage.
-            logMe("debug", "DJ to be escorted:" + currentDJ);
 
-            if (userFunctions.escortMeIsEnabled(currentDJ)) {
+            if ( userFunctions.escortMeIsEnabled(currentDJ) === true ) {
                 bot.remDj(currentDJ);
                 userFunctions.removeEscortMeFromUser(currentDJ);
 

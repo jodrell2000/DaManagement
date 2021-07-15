@@ -183,12 +183,10 @@ const botFunctions = (bot) => {
         },
 
         removeDJ: function (userID) {
-            logMe("debug", "Remove a DJ:" + userID)
             bot.remDj(userID); // remove the Bot from stage
         },
 
         startBotDJing: function () {
-            logMe("debug", "Start the bot DJing")
             bot.addDj(); // start the Bot DJing
         },
 

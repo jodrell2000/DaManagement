@@ -48,7 +48,7 @@ const userFunctions = (bot, roomDefaults) => {
 
     return {
         debugPrintTheUsersList: function () {
-            console.log("Full theUsersList: " + theUsersList);
+            console.log("Full theUsersList: " + JSON.stringify(theUsersList));
         },
 
         theUsersList: () => theUsersList,
@@ -87,16 +87,13 @@ const userFunctions = (bot, roomDefaults) => {
 
         resetModPM: function () {
             modPM = []
-            logMe("debug", "resetModPM: I've reset the ModPM List")
         },
 
         resetPeople: function () {
             people = []
-            logMe("debug", "resetPeople: I've reset the People")
         },
 
         botStartReset: function (botFunctions, data) {
-            logMe('debug', 'botStartReset: Resetting everything');
             this.resetAllEscortMe(bot);
             this.resetUsersList();
             this.resetQueueList();
@@ -106,9 +103,7 @@ const userFunctions = (bot, roomDefaults) => {
             this.resetModPM();
 
             const theStartTime = botFunctions.botStartTime();
-            logMe('debug', 'botStartReset: ============================= here! --' + botFunctions.botStartTime() + '--' );
             if ( !theStartTime ) {
-                logMe('debug', 'botStartReset: ============================= settting the start time ');
                 botFunctions.setBotStartTime();
             }
         },
@@ -119,8 +114,6 @@ const userFunctions = (bot, roomDefaults) => {
                 if (djID !== authModule.USERID && djID === djList[0] && roomDefaults.playLimit === 1) //if person is in the far left seat and limit is set to one
                 {
                     let checklist33 = theUsersList.indexOf(djID) + 1;
-
-                    logMe("debug", "checkList33:" + checklist33);
 
                     if (checklist33 !== -1) {
                         chatFunctions.overPlayLimit(theUsersList[checklist33], roomDefaults.playLimit)
@@ -207,7 +200,6 @@ const userFunctions = (bot, roomDefaults) => {
             }
 
             theUsersList[this.getPositionOnUsersList(userID)]['spamTimer'] = setTimeout( function(userID) {
-                logMe('debug', 'incrementSpamCounter:');
                 this.resetUsersSpamCount(userID);
             }.bind(this), 10 * 1000);
         },
@@ -257,7 +249,6 @@ const userFunctions = (bot, roomDefaults) => {
                         return [false, "You're not currently DJing...so you don't need the refresh command"];
                     }
                 } else {
-                    logMe('error', 'userFunctions.addRefreshToUser: userID "' + userID + '" isn\'t in theUsersList');
                     return [false, "You seem not to exist. Please tell a Moderator! (err: userFunctions.addRefreshToUser)"];
                 }
             } else {
@@ -314,7 +305,6 @@ const userFunctions = (bot, roomDefaults) => {
 
         resetAFKPeople: function () {
             afkPeople = []
-            logMe("debug", "resetAFKPeople: I've reset the AFK List")
         },
 
         updateUserLastSpoke: function (userID) {
@@ -459,6 +449,29 @@ const userFunctions = (bot, roomDefaults) => {
             return djList.length;
         },
 
+        clearCurrentDJFlags: function () {
+            for (let userLoop = 0; userLoop < theUsersList.length; userLoop++) {
+                theUsersList[userLoop]['currentDJ'] = false;
+            }
+        },
+
+        setCurrentDJ: function (userID) {
+            this.clearCurrentDJFlags()
+            theUsersList[this.getPositionOnUsersList(userID)]['currentDJ'] = true;
+        },
+
+        getCurrentDJID: function () {
+            this.debugPrintTheUsersList();
+
+            for (let userLoop = 0; userLoop < theUsersList.length; userLoop++) {
+                if ( theUsersList[userLoop]['currentDJ'] === true ) {
+                    return theUsersList[userLoop]['id'];
+                }
+            }
+
+            return null;
+        },
+
         // ========================================================
 
         // ========================================================
@@ -473,7 +486,6 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         resetDJs: function (data) {
-            logMe("debug", "resetDJs: I've reset the DJ list")
             let djID;
             if ( data.room !== undefined ) {
                 for (let djLoop = 0; djLoop < data.room.metadata.djs.length; djLoop++) {
@@ -545,7 +557,6 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         initialiseDJPlayCount: function (userID) {
-            logMe('debug', 'Initialise playcount for:' + userID);
             if(this.isUserInUsersList(userID)) {
                 this.setDJPlayCount(userID, 0);
             }
@@ -588,7 +599,6 @@ const userFunctions = (bot, roomDefaults) => {
 
         resetQueueList: function () {
             queueList = []
-            logMe("debug", "resetQueueList: I've reset the Queue List")
         },
 
         addUserToQueue: function (userID) {
@@ -623,10 +633,7 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         isUserIDInQueue: function (userID) {
-            logMe('debug', 'isUserIDInQueue, userID:' + userID );
-            logMe('debug', 'isUserIDInQueue, queueList:' + queueList );
             const inQueue = queueList.indexOf(userID);
-            logMe('debug', 'isUserIDInQueue, inQueue:' + inQueue );
             return inQueue !== -1;
         },
 
@@ -671,7 +678,6 @@ const userFunctions = (bot, roomDefaults) => {
 
         resetUsersList: function () {
             theUsersList = []
-            logMe("debug", "resetUsersList: I've reset the Users list")
         },
 
         updateUser: function (data, roomFunctions) {
@@ -847,7 +853,6 @@ const userFunctions = (bot, roomDefaults) => {
             if (!this.isUserInUsersList(userID)) {
                 theUsersList.push( { id: userID, username: username } );
             }
-            this.debugPrintTheUsersList();
         },
 
         removeUserFromTheUsersList: function (userID) {
@@ -989,7 +994,11 @@ const userFunctions = (bot, roomDefaults) => {
 
         escortMeIsEnabled: function (userID) {
             if(this.isUserInUsersList(userID)) {
-                return theUsersList[this.getPositionOnUsersList(userID)]['EscortMe'] === true;
+                if ( theUsersList[this.getPositionOnUsersList(userID)]['EscortMe'] === true ) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
         },
 
