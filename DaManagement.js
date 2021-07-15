@@ -89,7 +89,7 @@ setInterval( function() {
 
 bot.on('ready', function ()
 {
-    userFunctions.botStartReset(botFunctions);
+    userFunctions.botStartReset(botFunctions, songFunctions);
 
     //format the musicDefaults.bannedArtists list at runtime
     roomFunctions.formatBannedArtists();
@@ -132,7 +132,7 @@ bot.on('roomChanged', function (data)
     try
     {
         //reset arrays in case this was triggered by the bot restarting
-        userFunctions.botStartReset(botFunctions, data);
+        userFunctions.botStartReset(botFunctions, songFunctions);
 
         userFunctions.resetAllWarnMe(data);
         userFunctions.resetModerators(data);
