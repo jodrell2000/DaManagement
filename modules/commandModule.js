@@ -42,6 +42,13 @@ const commandFunctions = (bot) => {
     }
     generalCommands.props.help = "'/props' congratulate the current DJ on playing an absolute banger";
 
+    generalCommands.playlist = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
+        if (botDefaults.botPlaylist !== null) {
+            chatFunctions.botSpeak(data, 'There are currently ' + botDefaults.botPlaylist.length + ' songs in my playlist.');
+        }
+    }
+    generalCommands.playlist.help = "'/playlist' Tells you how many songs are in the Bot playlist";
+
     // end of fully checked commands
     // #############################
 
@@ -51,13 +58,6 @@ const commandFunctions = (bot) => {
 
     moderatorCommands.randomisePlaylist = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { songFunctions.randomisePlaylist() }
     moderatorCommands.randomisePlaylist.help = () => {  }
-
-    generalCommands.playlist = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
-        if (botDefaults.botPlaylist !== null) {
-            chatFunctions.botSpeak(data, 'There are currently ' + botDefaults.botPlaylist.length + ' songs in my playlist.');
-        }
-    }
-    generalCommands.playlist.help = "Tells you how many songs are in the Bot playlist";
 
     function listCommands() {
         return Object.keys(allCommands);
