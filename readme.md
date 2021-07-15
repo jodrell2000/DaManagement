@@ -35,7 +35,7 @@ The current command list for DaManagement.js exists in the file modules/commandM
 The comamnds follow the pattern,
 commands.[command name] = (data, command) => {  }  
 commands.[command name].argumentCount = 1;  
-commands.[command name].help = "/<command name> [<command name>] Info for how to use an individual command";
+commands.[command name].help = "'/[command name]' Info for how to use an individual command";
 
 I'm trying to put the commands into groups such as <strong>moderatorCommands</strong> (so that the verification that they're being called by a Mod can be centralised), or <strong>botCommands, playlistCommands</strong> so that the /list command can display available commands in logical groups.
 
