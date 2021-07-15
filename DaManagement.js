@@ -129,7 +129,6 @@ bot.on('registered', function (data) {
 //starts up when bot first enters the room
 bot.on('roomChanged', function (data)
 {
-    logMe('debug', '=========== bot.on roomChanged');
     try
     {
         //reset arrays in case this was triggered by the bot restarting
@@ -151,6 +150,10 @@ bot.on('roomChanged', function (data)
         userFunctions.resetAllSpamCounts();
 
         userFunctions.startAllUserTimers();
+
+        // set user as current DJ
+        userFunctions.setCurrentDJ(data.room.metadata.current_dj);
+
     }
     catch (err) {
             logMe('debug', 'unable to join the room the room due to err: ' + err.toString());
@@ -177,7 +180,9 @@ bot.on('newsong', function (data)
     //set information
     roomFunctions.setDJCount(data.room.metadata.djcount); //the number of dj's on stage
     roomDefaults.detail = data.room.description; //set room description again in case it was changed
-    roomFunctions.setCheckWhoIsDj(data.room.metadata.current_dj); //used to check who the currently playing dj is.
+
+    // set user as current DJ
+    userFunctions.setCurrentDJ(data.room.metadata.current_dj);
 
     //adds a song to the end of your bots queue
     if (songFunctions.snagSong() === true)
@@ -213,7 +218,6 @@ bot.on('newsong', function (data)
     //removes current dj from stage if they play a banned song or artist.
     if (musicDefaults.bannedArtists.length !== 0 && typeof songFunctions.artist() !== 'undefined' && typeof songFunctions.song() !== 'undefined')
     {
-        logMe('debug', "artist:" + typeof songFunctions.artist() + " dj:" + roomFunctions.checkWhoIsDj());
         const djCheck = roomFunctions.checkWhoIsDj();
         let checkIfAdmin = userFunctions.masterIds().indexOf(djCheck); //is user an exempt admin?
         let nameDj = userFunctions.theUsersList().indexOf(djCheck) + 1; //the currently playing dj's name
@@ -381,7 +385,7 @@ bot.on('add_dj', function (data)
     //updates the afk position of the person who joins the stage.
     userFunctions.updateUserJoinedStage(theUserID);
 
-    //adds a user to the current Djs list when they join the stage.
+    //adds a user to the Djs list when they join the stage.
     userFunctions.addDJToList(theUserID);
 
     if ( userFunctions.isUserIDInQueue(theUserID) ) {
@@ -470,18 +474,12 @@ bot.on('endsong', function (data)
 {
     const djID = data.room.metadata.current_dj;
 
-    logMe('debug', 'bot.on endsong Type of djSongCount:' + typeof (userFunctions.getDJPlayCount(djID)));
-    logMe('debug', 'bot.on endsong djSongCount:' + userFunctions.getDJPlayCount(djID));
-
     if (typeof (userFunctions.getDJPlayCount(djID)) === 'undefined') {
         // increase the playcount for the current DJ
-        logMe('debug', 'bot.on endsong: undefined playCount');
         userFunctions.initialiseDJPlayCount(djID);
     } else {
-        logMe('debug', 'bot.on endsong: increment playCount');
         userFunctions.incrementDJPlayCount(djID);
     }
-    logMe('debug', 'song count:' + userFunctions.getDJPlayCount(djID));
 
     // check the playlimit and remove the current DJ if they've reached it
     userFunctions.removeDJsOverPlaylimit(chatFunctions, djID);

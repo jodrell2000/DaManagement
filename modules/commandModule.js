@@ -37,6 +37,11 @@ const commandFunctions = (bot) => {
     generalCommands.help.argumentCount = 1;
     generalCommands.help.help = "'/help' [command] Display how to use an individual command";
 
+    generalCommands.props = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
+        chatFunctions.props( data, userFunctions );
+    }
+    generalCommands.props.help = "'/props' congratulate the current DJ on playing an absolute banger";
+
     // end of fully checked commands
     // #############################
 
@@ -425,8 +430,6 @@ const commandFunctions = (bot) => {
                     roomDefaults.SONGSTATS = true;
                     bot.speak('song stats is now active');
                 }
-            } else if (text.match(/^\/props/)) {
-                bot.speak('@' + userFunctions.name() + ' gives ' + '@' + songFunctions.dj() + ' an epic high :hand:');
             } else if (text.match(/^\/whosrefreshing/)) {
                 if (userFunctions.refreshList().length !== 0) {
                     let whosRefreshing = 'refreshing: ';
