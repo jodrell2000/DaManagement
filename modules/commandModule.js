@@ -18,16 +18,27 @@ const commandFunctions = (bot) => {
         }
     }
 
+    // #############################################
+    // These comamnds are confirmed as fully working
+
     botCommands.uptime = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
         botFunctions.uptime(chatFunctions);
     }
-    botCommands.uptime.help = "Tells you how long the bot has been running for";
+    botCommands.uptime.help = "'/uptime': Tells you how long the bot has been running for";
 
-        generalCommands.list = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
+    generalCommands.list = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
         chatFunctions.botSpeak( "Available commands are: " + listCommands());
     }
     generalCommands.list.help = "'/list': Lists all available commands";
 
+    generalCommands.help = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
+        displayHelp(data, command, chatFunctions);
+    }
+    generalCommands.help.argumentCount = 1;
+    generalCommands.help.help = "'/help' [command] Display how to use an individual command";
+
+    // end of fully checked commands
+    // #############################
 
 
     moderatorCommands.autodj = () => { bot.addDj(); }
@@ -43,13 +54,17 @@ const commandFunctions = (bot) => {
     }
     generalCommands.playlist.help = "Tells you how many songs are in the Bot playlist";
 
-    generalCommands.list = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
-        chatFunctions.botSpeak( "Available commands are: " + listCommands());
-    }
-    generalCommands.list.help = "'/list': Lists all available commands";
-
     function listCommands() {
         return Object.keys(allCommands);
+    }
+
+    function displayHelp( data, command, chatFunctions ) {
+        if ( command[0] === undefined ) { command = "help" }
+        if ( allCommands[command] === undefined ) {
+            chatFunctions.botSpeak( "That command desn't exist. Try /list to find the available commands");
+        } else {
+            chatFunctions.botSpeak( allCommands[command].help);
+        }
     }
 
     const allCommands = {
