@@ -49,17 +49,17 @@ const commandFunctions = (bot) => {
     }
     generalCommands.playlist.help = "'/playlist' Tells you how many songs are in the Bot playlist";
 
+    moderatorCommands.randomisePlaylist = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
+        songFunctions.randomisePlaylist()
+    }
+    moderatorCommands.randomisePlaylist.help = () => {  }
+
     // end of fully checked commands
     // #############################
 
 
     moderatorCommands.autodj = () => { bot.addDj(); }
     moderatorCommands.autodj.help = "Starts the Bot DJing";
-
-    moderatorCommands.randomisePlaylist = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
-        songFunctions.randomisePlaylist()
-    }
-    moderatorCommands.randomisePlaylist.help = () => {  }
 
     function listCommands() {
         return Object.keys(allCommands);
@@ -96,16 +96,20 @@ const commandFunctions = (bot) => {
             let theCommand = sentCommand.substring(1, sentCommand.length)
             const commandObj = allCommands[theCommand];
             if (commandObj) {
-                return [commandObj, args];
+                const moderatorOnly = !!moderatorCommands[theCommand];
+                return [commandObj, args, moderatorOnly];
             } else {
                 return [null, null];
             }
         },
 
         parseCommands: function(data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) {
-            const [command, args] = this.getCommandAndArguments(data.text, allCommands);
-            if (command) {
-                command.call(null, data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions);
+            const senderID = data.userid;
+            const [ command, args, moderatorOnly ] = this.getCommandAndArguments( data.text, allCommands );
+            if ( moderatorOnly && !userFunctions.isUserModerator(senderID) ) {
+                chatFunctions.botSpeak( data,"Sorry, that function is only available to moderators");
+            } else if ( command ) {
+                command.call( null, data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions );
             } else {
                 chatFunctions.botSpeak( data,"Sorry, that's not a command I recognise. Try /list to find out more.");
             }
