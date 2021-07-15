@@ -3,7 +3,7 @@ let botDefaults = require('../defaultSettings/botDefaults.js');
 let roomDefaults = require('../defaultSettings/roomDefaults.js');
 let musicDefaults = require('../defaultSettings/musicDefaults.js');
 
-const availableCommands = {};
+const generalCommands = {};
 const moderatorCommands = {};
 const botCommands = {};
 
@@ -24,17 +24,17 @@ const commandFunctions = (bot) => {
     moderatorCommands.randomisePlaylist = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { songFunctions.randomisePlaylist() }
     moderatorCommands.randomisePlaylist.help = () => {  }
 
-    availableCommands.playlist = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
+    generalCommands.playlist = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
         if (botDefaults.botPlaylist !== null) {
             chatFunctions.botSpeak('There are currently ' + botDefaults.botPlaylist.length + ' songs in my playlist.');
         }
     }
-    availableCommands.playlist.help = "Tells you how many songs are in the Bot playlist";
+    generalCommands.playlist.help = "Tells you how many songs are in the Bot playlist";
 
-    availableCommands.list = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
+    generalCommands.list = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
         chatFunctions.botSpeak( "Available commands are: " + listCommands());
     }
-    availableCommands.list.help = "'/list': Lists all available commands";
+    generalCommands.list.help = "'/list': Lists all available commands";
 
     botCommands.uptime = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
         logMe('debug', 'botCommands.uptime')
@@ -60,7 +60,7 @@ const commandFunctions = (bot) => {
     }
 
     const allCommands = {
-        ...availableCommands,
+        ...generalCommands,
         ...moderatorCommands,
         ...botCommands
     }
