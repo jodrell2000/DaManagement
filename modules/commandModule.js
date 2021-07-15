@@ -5,12 +5,7 @@ let musicDefaults = require('../defaultSettings/musicDefaults.js');
 
 const availableCommands = {};
 const moderatorCommands = {};
-
-let allCommands = {
-    ...availableCommands,
-    ...moderatorCommands
-};
-
+const botCommands = {};
 
 const commandFunctions = (bot) => {
     function logMe(logLevel, message) {
@@ -26,28 +21,69 @@ const commandFunctions = (bot) => {
     moderatorCommands.autodj = () => { bot.addDj(); }
     moderatorCommands.autodj.help = "Starts the Bot DJing";
 
-    availableCommands.playlist = () => {
+    moderatorCommands.randomisePlaylist = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { songFunctions.randomisePlaylist() }
+    moderatorCommands.randomisePlaylist.help = () => {  }
+
+    availableCommands.playlist = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
         if (botDefaults.botPlaylist !== null) {
-            bot.speak('There are currently ' + botDefaults.botPlaylist.length + ' songs in my playlist.');
+            chatFunctions.botSpeak('There are currently ' + botDefaults.botPlaylist.length + ' songs in my playlist.');
         }
     }
     availableCommands.playlist.help = "Tells you how many songs are in the Bot playlist";
 
+    availableCommands.list = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
+        chatFunctions.botSpeak( "Available commands are: " + listCommands());
+    }
+    availableCommands.list.help = "'/list': Lists all available commands";
+
+    botCommands.uptime = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
+        logMe('debug', 'botCommands.uptime')
+        let msecPerMinute = 1000 * 60;
+        let msecPerHour = msecPerMinute * 60;
+        let msecPerDay = msecPerHour * 24;
+        botFunctions.setUptimeTime(Date.now());
+        let currentTime = botFunctions.uptimeTime() - botFunctions.botStartTime();
+
+        let days = Math.floor(currentTime / msecPerDay);
+        currentTime = currentTime - (days * msecPerDay);
+
+        let hours = Math.floor(currentTime / msecPerHour);
+        currentTime = currentTime - (hours * msecPerHour);
+
+        let minutes = Math.floor(currentTime / msecPerMinute);
+
+        chatFunctions.botSpeak('bot uptime: ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes');
+    }
+
+    function listCommands() {
+        return Object.keys(allCommands);
+    }
+
+    const allCommands = {
+        ...availableCommands,
+        ...moderatorCommands,
+        ...botCommands
+    }
+
     return {
 
         wasThisACommand: function (data) {
+            logMe('debug', "wasThisACommand")
             let text = data.text;
 
             // check if this was a command
-            if (text.match(/^\|/)) {
+            if (text.match(/^\//)) {
+                logMe('debug', "wasThisACommand: yes it was")
                 return true;
             }
         },
 
-        getCommandAndArguments: function(text, availableCommands) {
+        getCommandAndArguments: function(text, allCommands) {
+            logMe('debug', "getCommandAndArguments")
             const [sentCommand, ...args] = text.split(" ");
             let theCommand = sentCommand.substring(1, sentCommand.length)
-            const commandObj = availableCommands[theCommand];
+            logMe('debug', "getCommandAndArguments: theCommand ->" + theCommand)
+            const commandObj = allCommands[theCommand];
             if (commandObj) {
                 return [commandObj, args];
             } else {
@@ -55,12 +91,12 @@ const commandFunctions = (bot) => {
             }
         },
 
-        parseCommands: function(data, userFunctions) {
-            const [command, args] = this.getCommandAndArguments(data.text, availableCommands);
+        parseCommands: function(data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) {
+            const [command, args] = this.getCommandAndArguments(data.text, allCommands);
             if (command) {
-                command.call(null, data, args);
+                command.call(null, data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions);
             } else {
-                bot.speak(data, "Sorry, that's not a command I recognise. Try /list to find out more.");
+                chatFunctions.botSpeak("Sorry, that's not a command I recognise. Try /list to find out more.");
             }
         },
 
@@ -68,11 +104,7 @@ const commandFunctions = (bot) => {
             const text = data.text; //the most recent text in the chatbox on turntable
             const speaker = data.userid;
 
-            if (text.match(/^\/playlist/)) {
-                if (botDefaults.botPlaylist !== null) {
-                    bot.speak('There are currently ' + botDefaults.botPlaylist.length + ' songs in my playlist.');
-                }
-            } else if (text.match(/^\/randomSong$/) && userFunctions.isUserModerator(speaker) === true) {
+            if (text.match(/^\/randomSong$/) && userFunctions.isUserModerator(speaker) === true) {
                 if (botFunctions.randomOnce() !== 1) {
                     let ez = 0;
                     bot.speak("Reorder initiated.");
@@ -381,22 +413,6 @@ const commandFunctions = (bot) => {
                 bot.getProfile(data.userid, function (data6) {
                     bot.speak('@' + data6.name + ' you have been in the room for: ' + days1 + ' days, ' + hours1 + ' hours, ' + minutes1 + ' minutes');
                 });
-            } else if (text.match(/^\/uptime/)) {
-                let msecPerMinute = 1000 * 60;
-                let msecPerHour = msecPerMinute * 60;
-                let msecPerDay = msecPerHour * 24;
-                botFunctions.setUptimeTime(Date.now());
-                let currentTime = botFunctions.uptimeTime() - botFunctions.botStartTime();
-
-                let days = Math.floor(currentTime / msecPerDay);
-                currentTime = currentTime - (days * msecPerDay);
-
-                let hours = Math.floor(currentTime / msecPerHour);
-                currentTime = currentTime - (hours * msecPerHour);
-
-                let minutes = Math.floor(currentTime / msecPerMinute);
-
-                bot.speak('bot uptime: ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes');
             } else if (text.match(/^\/songstats/) && userFunctions.isUserModerator(speaker) === true) {
                 if (roomDefaults.SONGSTATS === true) {
                     roomDefaults.SONGSTATS = false;
@@ -1625,22 +1641,6 @@ const commandFunctions = (bot) => {
 
                 bot.pm('you have been in the room for: ' + days1 + ' days, ' + hours1 + ' hours, ' + minutes1 + ' minutes', speaker);
 
-            } else if (text.match(/^\/uptime/) && isInRoom === true) {
-                let msecPerMinute = 1000 * 60;
-                let msecPerHour = msecPerMinute * 60;
-                let msecPerDay = msecPerHour * 24;
-                botFunctions.setUptimeTime(Date.now());
-                let currentTime = botFunctions.uptimeTime() - botFunctions.botStartTime();
-
-                let days = Math.floor(currentTime / msecPerDay);
-                currentTime = currentTime - (days * msecPerDay);
-
-                let hours = Math.floor(currentTime / msecPerHour);
-                currentTime = currentTime - (hours * msecPerHour);
-
-                let minutes = Math.floor(currentTime / msecPerMinute);
-
-                bot.pm('bot uptime: ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes', speaker);
             } else if (text.match(/^\/voteskipon/) && userFunctions.isUserModerator(speaker) === true && isInRoom === true) {
                 userFunctions.resetSkipVoteUsers();
                 roomDefaults.HowManyVotesToSkip = Number(data.text.slice(12))

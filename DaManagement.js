@@ -298,8 +298,7 @@ bot.on('nosong', function ()
 })
 
 //checks when the bot speaks
-bot.on('speak', function (data)
-{
+bot.on('speak', function (data) {
     let text = data.text; //the most recent text in the chatbox on turntable
     let theUserID = data.userid;
     userFunctions.name = data.name; //name of latest person to say something
@@ -309,20 +308,19 @@ bot.on('speak', function (data)
 
     userFunctions.updateUserLastSpoke(theUserID); //update the afk position of the speaker
 
-    commandFunctions.parseChat(data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions);
+    if (commandFunctions.wasThisACommand(data)) {
+        commandFunctions.parseCommands(data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions);
+    }
 
 
     //checks to see if someone is trying to speak to an afk person or not.
-    if (userFunctions.afkPeople.length !== 0 && theUserID !== authModule.USERID)
-    {
+    if (userFunctions.afkPeople.length !== 0 && theUserID !== authModule.USERID) {
         for (let j = 0; j < userFunctions.afkPeople.length; j++) //loop through afk people array
         {
-            if (typeof (userFunctions.afkPeople[j] !== 'undefined'))
-            {
+            if (typeof (userFunctions.afkPeople[j] !== 'undefined')) {
                 let areTheyAfk56 = data.text.toLowerCase().indexOf(userFunctions.afkPeople[j].toLowerCase()); //is an afk persons name being called
 
-                if (areTheyAfk56 !== -1)
-                {
+                if (areTheyAfk56 !== -1) {
                     bot.speak(userFunctions.afkPeople[j] + ' is afk');
                 }
             }
@@ -331,9 +329,10 @@ bot.on('speak', function (data)
 });
 
 //checks when the bot recieves a pm
-bot.on('pmmed', function (data)
-{
-    commandFunctions.parsePM(data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions);
+bot.on('pmmed', function (data) {
+    if (commandFunctions.wasThisACommand(data)) {
+        commandFunctions.parseCommands(data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions);
+    }
 });
 
 //checks who voted and updates their position on the afk list.

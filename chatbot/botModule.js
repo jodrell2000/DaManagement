@@ -8,13 +8,13 @@ const moderatorCommands = {};
 const botModule = (bot) => {
     const responder = chatModule(bot);
 
-    availableCommands.hello = (data) => { console.log("hello function"); responder.sayHello(data); }
+    availableCommands.hello = (data) => { responder.sayHello(data); }
     availableCommands.hello.help = "'/hello': Reply to the sender with a Hello! Likely used to test if the Bot is working";
 
     availableCommands.list = (data) => { responder.saySomething(data, "Available commands are: " + listCommands()); }
     availableCommands.list.help = "'/list': Lists all available commands";
 
-    availableCommands.help = (data, command) => { console.log("Command:" + typeof(command) + "===="); displayHelp(data, command); }
+    availableCommands.help = (data, command) => { displayHelp(data, command); }
     availableCommands.help.argumentCount = 1;
     availableCommands.help.help = "/help [command] Display how to use an individual command";
 

@@ -6,7 +6,6 @@ let authModule = require('../auth.js');
 
 let checkActivity = Date.now();
 let skipOn = null; //if true causes the bot to skip every song it plays, toggled on and off by commands
-let randomOnce = 0; //a flag used to check if the /randomSong command has already been activated, 0 is no, 1 is yes
 let sayOnce = true; //makes it so that the queue timeout can only be used once per per person, stops the bot from spamming
 let botStartTime = null; //the current time in milliseconds when the bot has started, used for the /uptime
 let uptimeTime = null; //the current time in milliseconds when the /uptime is actually used
@@ -40,10 +39,6 @@ const botFunctions = (bot) => {
 
         skipOn: () => skipOn,
         setSkipOn: function (value) { skipOn = value; },
-
-        randomOnce: () => randomOnce,
-        incrementRandomOnce: function () { ++randomOnce; },
-        decrementRandomOnce: function () { --randomOnce; },
 
         sayOnce: () => sayOnce,
         setSayOnce: function (value) { sayOnce = value; },

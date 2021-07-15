@@ -11,8 +11,8 @@ const chatFunctions = (bot, roomDefaults) => {
 
     return {
         botSpeak: function (message, userID) {
-            logMe('debug', 'userID: ' + userID );
             logMe('debug', 'message: ' + message );
+            logMe('debug', 'userID: ' + userID );
             if (userID !== undefined) {
                 this.botPM( userID, message);
             } else {

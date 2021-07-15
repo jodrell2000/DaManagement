@@ -1,4 +1,5 @@
 let roomDefaults = require('../defaultSettings/roomDefaults.js');
+let botDefaults = require('../defaultSettings/botDefaults.js');
 
 let song = null; // info for the currently playing song, so default to null
 let album = null; // info for the currently playing song, so default to null
@@ -48,6 +49,29 @@ const songFunctions = (bot) => {
         votesLeft: () => votesLeft,
         setVotesLeft: function (value) { votesLeft = value; },
         decrementVotesLeft: function (value) { --votesLeft; },
+
+        // ========================================================
+        // Playlist Functions
+        // ========================================================
+
+        randomisePlaylist: function () {
+            let ez = 0;
+            bot.speak("Reorder initiated.");
+            let reorder = setInterval(function () {
+                if (ez <= botDefaults.botPlaylist.length) {
+                    let nextId = Math.ceil(Math.random() * botDefaults.botPlaylist);
+                    bot.playlistReorder(ez, nextId);
+                    console.log("Song " + ez + " changed.");
+                    ez++;
+                } else {
+                    clearInterval(reorder);
+                    console.log("Reorder Ended");
+                    bot.speak("Reorder completed.");
+                }
+            }, 1000);
+        },
+
+        // ========================================================
 
         getSongTags: function (current_song) {
             logMe('debug', "getSongs:" + JSON.stringify(current_song));
