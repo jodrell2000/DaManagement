@@ -22,12 +22,12 @@ const commandFunctions = (bot) => {
     // These comamnds are confirmed as fully working
 
     botCommands.uptime = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
-        botFunctions.uptime(chatFunctions);
+        botFunctions.uptime(data, chatFunctions);
     }
     botCommands.uptime.help = "'/uptime': Tells you how long the bot has been running for";
 
     generalCommands.list = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
-        chatFunctions.botSpeak( "Available commands are: " + listCommands());
+        chatFunctions.botSpeak( data, "Available commands are: " + listCommands());
     }
     generalCommands.list.help = "'/list': Lists all available commands";
 
@@ -49,7 +49,7 @@ const commandFunctions = (bot) => {
 
     generalCommands.playlist = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
         if (botDefaults.botPlaylist !== null) {
-            chatFunctions.botSpeak('There are currently ' + botDefaults.botPlaylist.length + ' songs in my playlist.');
+            chatFunctions.botSpeak(data, 'There are currently ' + botDefaults.botPlaylist.length + ' songs in my playlist.');
         }
     }
     generalCommands.playlist.help = "Tells you how many songs are in the Bot playlist";
@@ -61,9 +61,9 @@ const commandFunctions = (bot) => {
     function displayHelp( data, command, chatFunctions ) {
         if ( command[0] === undefined ) { command = "help" }
         if ( allCommands[command] === undefined ) {
-            chatFunctions.botSpeak( "That command desn't exist. Try /list to find the available commands");
+            chatFunctions.botSpeak( data,"That command desn't exist. Try /list to find the available commands");
         } else {
-            chatFunctions.botSpeak( allCommands[command].help);
+            chatFunctions.botSpeak( data, allCommands[command].help);
         }
     }
 
@@ -76,21 +76,17 @@ const commandFunctions = (bot) => {
     return {
 
         wasThisACommand: function (data) {
-            logMe('debug', "wasThisACommand")
             let text = data.text;
 
             // check if this was a command
             if (text.match(/^\//)) {
-                logMe('debug', "wasThisACommand: yes it was")
                 return true;
             }
         },
 
         getCommandAndArguments: function(text, allCommands) {
-            logMe('debug', "getCommandAndArguments")
             const [sentCommand, ...args] = text.split(" ");
             let theCommand = sentCommand.substring(1, sentCommand.length)
-            logMe('debug', "getCommandAndArguments: theCommand ->" + theCommand)
             const commandObj = allCommands[theCommand];
             if (commandObj) {
                 return [commandObj, args];
@@ -104,7 +100,7 @@ const commandFunctions = (bot) => {
             if (command) {
                 command.call(null, data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions);
             } else {
-                chatFunctions.botSpeak("Sorry, that's not a command I recognise. Try /list to find out more.");
+                chatFunctions.botSpeak( data,"Sorry, that's not a command I recognise. Try /list to find out more.");
             }
         },
 
@@ -395,7 +391,7 @@ const commandFunctions = (bot) => {
                 bot.speak('the audience afk list is now inactive.');
 
             } else if (text.match(/^\/djplays/)) {
-                chatFunctions.botSpeak(chatFunctions.buildDJPlaysMessage(userFunctions));
+                chatFunctions.botSpeak(null, chatFunctions.buildDJPlaysMessage(userFunctions));
             } else if (text.match(/^\/skipsong/) && userFunctions.isUserModerator(speaker) === true) {
                 if (roomFunctions.checkWhoIsDj() === authModule.USERID) {
                     bot.speak("Sorry...I'll play something better next time!");
@@ -458,7 +454,7 @@ const commandFunctions = (bot) => {
                 roomDefaults.refreshingEnabled = true;
             } else if (text.match(/^\/refresh/)) {
                 [ refreshSuccessful, theMessage ] = userFunctions.addRefreshToUser(data.userid);
-                if ( !refreshSuccessful ) { chatFunctions.botSpeak( theMessage ) }
+                if ( !refreshSuccessful ) { chatFunctions.botSpeak( null, theMessage ) }
             } else if (text.match(/^\/greeton/) && userFunctions.isUserModerator(speaker) === true) {
                 bot.speak('room greeting: On');
                 roomFunctions.enableGreet();
