@@ -20,46 +20,45 @@ const commandFunctions = (bot) => {
 
     // #############################################
     // These comamnds are confirmed as fully working
+    // #############################################
 
-    botCommands.uptime = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
-        botFunctions.uptime(data, chatFunctions);
-    }
-    botCommands.uptime.help = "'/uptime': Tells you how long the bot has been running for";
+    // #############################################
+    // General commands
+    // #############################################
 
-    generalCommands.list = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
-        chatFunctions.botSpeak( data, "Available commands are: " + listCommands());
-    }
+    generalCommands.list = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.botSpeak( data, "Available commands are: " + listCommands()); }
     generalCommands.list.help = "'/list': Lists all available commands";
 
-    generalCommands.help = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
-        displayHelp(data, command, chatFunctions);
-    }
+    generalCommands.help = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { displayHelp(data, command, chatFunctions); }
     generalCommands.help.argumentCount = 1;
     generalCommands.help.help = "'/help' [command] Display how to use an individual command";
 
-    generalCommands.props = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
-        chatFunctions.props( data, userFunctions );
-    }
+    generalCommands.props = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.props( data, userFunctions ); }
     generalCommands.props.help = "'/props' congratulate the current DJ on playing an absolute banger";
 
-    generalCommands.playlist = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
-        if (botDefaults.botPlaylist !== null) {
-            chatFunctions.botSpeak(data, 'There are currently ' + botDefaults.botPlaylist.length + ' songs in my playlist.');
-        }
-    }
-    generalCommands.playlist.help = "'/playlist' Tells you how many songs are in the Bot playlist";
+    // #############################################
+    // Bot control commands
+    // #############################################
 
-    moderatorCommands.randomisePlaylist = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => {
-        songFunctions.randomisePlaylist()
-    }
+    botCommands.uptime = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { botFunctions.uptime(data, chatFunctions); }
+    botCommands.uptime.help = "'/uptime': Tells you how long the bot has been running for";
+
+    botCommands.playlist = ( data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.readPlaylistStats( data ); }
+    botCommands.playlist.help = "'/playlist' Tells you how many songs are in the Bot playlist";
+
+    // #############################################
+    // Moderator comamnds
+    // #############################################
+
+    moderatorCommands.randomisePlaylist = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { songFunctions.randomisePlaylist() }
     moderatorCommands.randomisePlaylist.help = () => {  }
-
-    // end of fully checked commands
-    // #############################
-
 
     moderatorCommands.autodj = () => { bot.addDj(); }
     moderatorCommands.autodj.help = "Starts the Bot DJing";
+
+    // #############################
+    // end of fully checked commands
+    // #############################
 
     function listCommands() {
         return Object.keys(allCommands);

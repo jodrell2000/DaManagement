@@ -1,3 +1,5 @@
+let botDefaults     = require('../defaultSettings/botDefaults.js');
+
 const chatFunctions = (bot, roomDefaults) => {
     function logMe(logLevel, message) {
         if (logLevel === 'error') {
@@ -118,6 +120,12 @@ const chatFunctions = (bot, roomDefaults) => {
         readSongStats: function (songFunctions, roomDefaults) {
             if (roomDefaults.SONGSTATS) {
                 bot.speak('Stats for ' + songFunctions.song() + ' by ' + songFunctions.artist() + ': ' + ':thumbsup:' + songFunctions.upVotes() + ':thumbsdown:' + songFunctions.downVotes() + ':heart:' + songFunctions.whoSnagged());
+            }
+        },
+
+        readPlaylistStats: function (data) {
+            if (botDefaults.botPlaylist !== null) {
+                this.botSpeak(data, 'There are currently ' + botDefaults.botPlaylist.length + ' songs in my playlist.');
             }
         },
 

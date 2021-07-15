@@ -201,6 +201,11 @@ const botFunctions = (bot) => {
             return foundSong;
         },
 
+
+        getPlaylistCount: function () {
+            return  botDefaults.botPlaylist.length;
+        },
+
         addToBotPlaylist: function (thisSong) {
             bot.playlistAdd(thisSong, -1); //add song to the end of the playlist
             botDefaults.botPlaylist.push(thisSong);
