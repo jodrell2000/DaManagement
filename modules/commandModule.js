@@ -34,101 +34,77 @@ const commandFunctions = (bot) => {
     generalCommands.help.argumentCount = 1;
     generalCommands.help.help = "'/help' [command] Display how to use an individual command";
 
-    generalCommands.props = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.props( data, userFunctions ); }
-    generalCommands.props.help = "'/props' congratulate the current DJ on playing an absolute banger";
-
     // #############################################
     // Chat commands...make the bot post silly stuff
     // #############################################
 
-    chatCommands.props = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.props( data, userFunctions, true ); }
+    chatCommands.props = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.props( data, userFunctions ); }
     chatCommands.props.help = "'/props' congratulate the current DJ on playing an absolute banger";
 
-    chatCommands.mom =
-        let x = Math.round(Math.random() * 3);
-    switch (x) {
-        case 0:
-            bot.speak('@' + userFunctions.name() + ' ur mom is fat');
-            break;
-        case 1:
-            bot.speak('@' + userFunctions.name() + ' yo momma sooo fat....');
-            break;
-        case 2:
-            bot.speak('@' + userFunctions.name() + ' damn yo momma fat');
-            break;
-        case 3:
-            bot.speak('@' + userFunctions.name() + ' your mother is an outstanding member of the community ' +
-                'and well liked by all.');
-            break;
-    }
+    chatCommands.yomamma = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.mom( data, userFunctions ); }
+    chatCommands.yomamma.argumentCount = 1;
+    chatCommands.yomamma.help = "'/mom' send a random mom joke to another user";
 
-    chatCommands.coinflip =
-        let y = Math.ceil(Math.random() * 2);
-    switch (y) {
-        case 1:
-            bot.speak('@' + userFunctions.name() + ' i am flipping a coin... you got... heads');
-            break;
-        case 2:
-            bot.speak('@' + userFunctions.name() + ' i am flipping a coin... you got... tails');
-            break;
-    }
+    chatCommands.coinflip =(data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.coinflip( data, userFunctions ); }
+    chatCommands.coinflip.help = "'/coinflip' Flip a coin and return heads or tails?";
 
-    chatCommands.cheers =
-        bot.speak('@' + userFunctions.name() + ' raises their glass for a toast');
-
-    chatCommands.dance =
-        bot.speak('https://media.tenor.com/images/939895eeadd796565d3ef07b7a7169f3/tenor.gif');
-
-    chatCommands.frankie =
-        bot.speak('Relax!');
-
-    chatCommands.hair =
-        bot.speak('Jersey Hair: Engage');
-
-    chatCommands.eddie =
-        bot.speak('PARTY ALL THE TIME!');
-
-    chatCommands.lonely =
-        bot.speak('Dancing with myself...');
-
-    chatCommands.jump =
-        bot.speak('For my love!');
-
-    chatCommands.flirt =
-        bot.speak('How YOU doin’?!');
-
-    chatCommands.rub =
-        bot.speak('It rubs the lotion on its skin or else it gets the hose again');
-
-    chatCommands.wc =
-        bot.speak('Everybody Wang Chung tonight.  Everybody have fun tonight.');
-
-    chatCommands.alice =
-        bot.speak('We’re not worthy! We’re not worthy');
-
-    chatCommands.feart =
-        bot.speak('It STINKS in here!');
-
-    chatCommands.suggestions =
-        bot.speak(':robot: command suggestions: https://bit.ly/80scd');
-
-    chatCommands.rules =
-        bot.speak(':memo: official room rules: https://bit.ly/ilt80s');
-
-    chatCommands.beer =
-        let botname = userFunctions.theUsersList().indexOf(authModule.USERID) + 1;
-        bot.speak('@' + userFunctions.theUsersList()[botname] + ' hands ' + '@' + userFunctions.name() + ' a nice cold :beer:');
-
-    chatCommands.dice =
-        let random = Math.floor(Math.random() * 12 + 1);
-        bot.speak('@' + userFunctions.name() + ' i am rolling the dice... your number is... ' + random);
-
-    chatCommands.surf =
-        bot.speak('http://25.media.tumblr.com/tumblr_mce8z6jN0d1qbzqexo1_r1_500.gif');
-
-    chatCommands.hello =
-        bot.speak('Hey! How are you @' + userFunctions.getUsername(data.userid) + '?');
-
+    //
+    // chatCommands.cheers =
+    //     bot.speak('@' + userFunctions.name() + ' raises their glass for a toast');
+    //
+    // chatCommands.dance =
+    //     bot.speak('https://media.tenor.com/images/939895eeadd796565d3ef07b7a7169f3/tenor.gif');
+    //
+    // chatCommands.frankie =
+    //     bot.speak('Relax!');
+    //
+    // chatCommands.hair =
+    //     bot.speak('Jersey Hair: Engage');
+    //
+    // chatCommands.eddie =
+    //     bot.speak('PARTY ALL THE TIME!');
+    //
+    // chatCommands.lonely =
+    //     bot.speak('Dancing with myself...');
+    //
+    // chatCommands.jump =
+    //     bot.speak('For my love!');
+    //
+    // chatCommands.flirt =
+    //     bot.speak('How YOU doin’?!');
+    //
+    // chatCommands.rub =
+    //     bot.speak('It rubs the lotion on its skin or else it gets the hose again');
+    //
+    // chatCommands.wc =
+    //     bot.speak('Everybody Wang Chung tonight.  Everybody have fun tonight.');
+    //
+    // chatCommands.alice =
+    //     bot.speak('We’re not worthy! We’re not worthy');
+    //
+    // chatCommands.feart =
+    //     bot.speak('It STINKS in here!');
+    //
+    // chatCommands.suggestions =
+    //     bot.speak(':robot: command suggestions: https://bit.ly/80scd');
+    //
+    // chatCommands.rules =
+    //     bot.speak(':memo: official room rules: https://bit.ly/ilt80s');
+    //
+    // chatCommands.beer =
+    //     let botname = userFunctions.theUsersList().indexOf(authModule.USERID) + 1;
+    //     bot.speak('@' + userFunctions.theUsersList()[botname] + ' hands ' + '@' + userFunctions.name() + ' a nice cold :beer:');
+    //
+    // chatCommands.dice =
+    //     let random = Math.floor(Math.random() * 12 + 1);
+    //     bot.speak('@' + userFunctions.name() + ' i am rolling the dice... your number is... ' + random);
+    //
+    // chatCommands.surf =
+    //     bot.speak('http://25.media.tumblr.com/tumblr_mce8z6jN0d1qbzqexo1_r1_500.gif');
+    //
+    // chatCommands.hello =
+    //     bot.speak('Hey! How are you @' + userFunctions.getUsername(data.userid) + '?');
+    //
 
 
 
