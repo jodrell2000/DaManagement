@@ -6,6 +6,7 @@ let musicDefaults = require('../defaultSettings/musicDefaults.js');
 const generalCommands = {};
 const moderatorCommands = {};
 const botCommands = {};
+const chatCommands = {};
 
 const commandFunctions = (bot) => {
     function logMe(logLevel, message) {
@@ -35,6 +36,13 @@ const commandFunctions = (bot) => {
 
     generalCommands.props = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.props( data, userFunctions ); }
     generalCommands.props.help = "'/props' congratulate the current DJ on playing an absolute banger";
+
+    // #############################################
+    // Chat commands...make the bot post silly stuff
+    // #############################################
+
+    chatCommands.props = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.props( data, userFunctions, true ); }
+    chatCommands.props.help = "'/props' congratulate the current DJ on playing an absolute banger";
 
     // #############################################
     // Bot control commands
@@ -76,7 +84,8 @@ const commandFunctions = (bot) => {
     const allCommands = {
         ...generalCommands,
         ...moderatorCommands,
-        ...botCommands
+        ...botCommands,
+        ...chatCommands
     }
 
     return {
@@ -118,28 +127,7 @@ const commandFunctions = (bot) => {
             const text = data.text; //the most recent text in the chatbox on turntable
             const speaker = data.userid;
 
-            if (text.match(/^\/randomSong$/) && userFunctions.isUserModerator(speaker) === true) {
-                if (botFunctions.randomOnce() !== 1) {
-                    let ez = 0;
-                    bot.speak("Reorder initiated.");
-                    botFunctions.incrementRandomOnce();
-                    let reorder = setInterval(function () {
-                        if (ez <= botDefaults.botPlaylist.length) {
-                            let nextId = Math.ceil(Math.random() * botDefaults.botPlaylist);
-                            bot.playlistReorder(ez, nextId);
-                            console.log("Song " + ez + " changed.");
-                            ez++;
-                        } else {
-                            clearInterval(reorder);
-                            console.log("Reorder Ended");
-                            bot.speak("Reorder completed.");
-                            botFunctions.decrementRandomOnce();
-                        }
-                    }, 1000);
-                } else {
-                    bot.pm('error, playlist reordering is already in progress', data.userid);
-                }
-            } else if (text.match('turntable.fm/') && !text.match('turntable.fm/' + roomDefaults.ttRoomName) && !userFunctions.isUserModerator(speaker) && data.userid !== authModule.USERID) {
+            if (text.match('turntable.fm/') && !text.match('turntable.fm/' + roomDefaults.ttRoomName) && !userFunctions.isUserModerator(speaker) && data.userid !== authModule.USERID) {
                 bot.boot(data.userid, 'do not advertise other rooms here');
             } else if (text.match('/bumptop') && userFunctions.isUserModerator() === true) {
                 if (roomDefaults.queueActive === true) {
@@ -1699,27 +1687,6 @@ const commandFunctions = (bot) => {
                     bot.pm('The queue is currently empty.', speaker);
                 } else {
                     bot.pm('There is currently no queue.', speaker);
-                }
-            } else if (text.match(/^\/randomSong$/) && userFunctions.isUserModerator(speaker) === true && isInRoom === true) {
-                if (botFunctions.randomOnce() !== 1) {
-                    let ez = 0;
-                    bot.pm("Reorder initiated.", speaker);
-                    botFunctions.incrementRandomOnce();
-                    let reorder = setInterval(function () {
-                        if (ez <= botDefaults.botPlaylist.length) {
-                            let nextId = Math.ceil(Math.random() * botDefaults.botPlaylist);
-                            bot.playlistReorder(ez, nextId);
-                            console.log("Song " + ez + " changed.");
-                            ez++;
-                        } else {
-                            clearInterval(reorder);
-                            console.log("Reorder Ended");
-                            bot.pm("Reorder completed.", speaker);
-                            botFunctions.decrementRandomOnce();
-                        }
-                    }, 1000);
-                } else {
-                    bot.pm('error, playlist reordering is already in progress', speaker);
                 }
             } else if (text.match('/bumptop') && userFunctions.isUserModerator(speaker) === true && isInRoom === true) {
                 if (roomDefaults.queueActive === true) {
