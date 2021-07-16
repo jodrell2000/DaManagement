@@ -43,17 +43,11 @@ const chatFunctions = (bot, roomDefaults) => {
         // ========================================================
 
         props: function (data, userFunctions) {
-            logMe('debug', 'chatModule:props...here!' );
-
-            const currentDJID = userFunctions.getUsername(userFunctions.getCurrentDJID());
-            logMe('debug', '' + currentDJID);
-
+            const currentDJID = userFunctions.getCurrentDJID();
             const senderUsername = userFunctions.getUsername(data.userid);
-            logMe('debug', '' + senderUsername);
 
             if ( currentDJID !== null ) {
                 const receiverUsername = userFunctions.getUsername(currentDJID);
-
                 this.botSpeak(data, '@' + senderUsername + ' gives the props to @' + receiverUsername, true);
                 const randomPic = Math.floor(Math.random() * chatCommandItems.propsPics.length);
                 this.botSpeak(data, chatCommandItems.propsPics[randomPic], true);
@@ -62,24 +56,10 @@ const chatFunctions = (bot, roomDefaults) => {
             }
         },
 
-        yomamma: function (data, userFunctions) {
+        shade: function (data, userFunctions) {
             const theUsername = userFunctions.getUsername(data.userid)
-            let x = Math.round(Math.random() * 3);
-            switch (x) {
-                case 0:
-                    this.botSpeak( data, '@' + theUsername + ' ur mom is fat', true);
-                    break;
-                case 1:
-                    this.botSpeak( data,'@' + theUsername + ' yo momma sooo fat....', true);
-                    break;
-                case 2:
-                    this.botSpeak( data,'@' + theUsername + ' damn yo momma fat', true);
-                    break;
-                case 3:
-                    this.botSpeak( data,'@' + theUsername + ' your mother is an outstanding member of the community ' +
-                        'and well liked by all.', true);
-                    break;
-            }
+            let randomShade = Math.round(Math.random() * chatCommandItems.shadeMessages.length);
+            this.botSpeak(data, chatCommandItems.shadeMessages[randomShade], true);
         },
 
         coinflip: function ( data, userFunctions ) {

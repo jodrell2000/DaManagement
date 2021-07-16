@@ -12,7 +12,7 @@ module.exports = {
         "https://media.giphy.com/media/j2ptl95PRwZTo0IAuP/giphy.gif"
     ],
 
-    yomammaMessages: [
+    shadeMessages: [
         "ur mom is fat",
         "yo momma sooo feat....",
         "damn yo momma fat",

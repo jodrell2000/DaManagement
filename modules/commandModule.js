@@ -41,9 +41,9 @@ const commandFunctions = (bot) => {
     chatCommands.props = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.props( data, userFunctions ); }
     chatCommands.props.help = "'/props' congratulate the current DJ on playing an absolute banger";
 
-    chatCommands.yomamma = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.mom( data, userFunctions ); }
-    chatCommands.yomamma.argumentCount = 1;
-    chatCommands.yomamma.help = "'/mom' send a random mom joke to another user";
+    chatCommands.shade = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.shade( data, userFunctions ); }
+    chatCommands.shade.argumentCount = 1;
+    chatCommands.shade.help = "'/mom' send a random mom joke to another user";
 
     chatCommands.coinflip =(data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.coinflip( data, userFunctions ); }
     chatCommands.coinflip.help = "'/coinflip' Flip a coin and return heads or tails?";
