@@ -101,6 +101,9 @@ const commandFunctions = (bot) => {
     chatCommands.macho = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.machoMessages, chatCommandItems.machoPics, userFunctions ); }
     chatCommands.macho.help = "'/macho' Randy Savage!!!";
 
+    chatCommands.ferris = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.ferrisMessages, chatCommandItems.ferrisPics, userFunctions ); }
+    chatCommands.ferris.help = "'/ferris' Bueller? Bueller? Bueller?";
+
     // ######################################################
     // Advanced chat commands...more than just basic messages
     // ######################################################

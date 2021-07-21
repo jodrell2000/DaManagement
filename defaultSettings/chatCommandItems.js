@@ -105,6 +105,9 @@ module.exports = {
 
     flirtPics: [
         "https://media.giphy.com/media/L13NsH0Aij4Sf2Gdjt/giphy.gif",
+        "https://media1.tenor.com/images/783e5a4c1c8fee2bfe1aa06dae7e56f5/tenor.gif",
+        "https://media.giphy.com/media/HiDfhTFGZ4geI/giphy.gif",
+        "https://media.giphy.com/media/ct0qic39dyPaN92yNs/giphy.gif"
     ],
 
     rubMessages: [
@@ -157,6 +160,19 @@ module.exports = {
 
     machoPics: [
         "https://media.giphy.com/media/13DrdRI2JqdoLC/giphy.gif"
+    ],
+
+    ferrisMessages: [
+        "Life moves pretty fast. If you don't stop and look around once in a while, you could miss it.",
+        "The question isn't 'what are we going to do', the question is 'what aren't we going to do?'",
+        "Hey batter, batter, swing batter!",
+        "How can I possibly be expected to handle school on a day like this?",
+        "You killed the car."
+    ],
+
+    ferrisPics: [
+        "https://media.giphy.com/media/EZ7IUK6mXpuN2/giphy.gif",
+        "https://media.giphy.com/media/V526T6UMjXx0A/giphy.gif"
     ]
 
 }
