@@ -47,9 +47,6 @@ const commandFunctions = (bot) => {
     chatCommands.shade = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.shadeMessages, userFunctions ); }
     chatCommands.shade.help = "'/shade' lovingly, and randomly, diss the DJ ;-)";
 
-    chatCommands.coinflip =(data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.coinflip( data, userFunctions ); }
-    chatCommands.coinflip.help = "'/coinflip' Flip a coin and return heads or tails?";
-
     chatCommands.cheers = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.cheersMessages, userFunctions ); }
     chatCommands.cheers.help = "'/cheers' raise a glass";
 
@@ -83,42 +80,37 @@ const commandFunctions = (bot) => {
     chatCommands.flirt = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.flirtMessages, chatCommandItems.flirtPics, userFunctions ); }
     chatCommands.flirt.help = "'/flirt' you know...";
 
-    //
-    // chatCommands.wc =
-    //     bot.speak('Everybody Wang Chung tonight.  Everybody have fun tonight.');
+    chatCommands.rub = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.rubMessages, userFunctions ); }
+    chatCommands.rub.help = "'/rub' is Buffalo Bill in?!?";
 
-    // chatCommands.jump =
-    //     bot.speak('For my love!');
-    //
-    // chatCommands.flirt =
-    //     bot.speak('How YOU doin’?!');
-    //
-    // chatCommands.rub =
-    //     bot.speak('It rubs the lotion on its skin or else it gets the hose again');
-    //
-    // chatCommands.alice =
-    //     bot.speak('We’re not worthy! We’re not worthy');
-    //
-    // chatCommands.feart =
-    //     bot.speak('It STINKS in here!');
-    //
-    // chatCommands.beer =
-    //     let botname = userFunctions.theUsersList().indexOf(authModule.USERID) + 1;
-    //     bot.speak('@' + userFunctions.theUsersList()[botname] + ' hands ' + '@' + userFunctions.name() + ' a nice cold :beer:');
-    //
-    // chatCommands.dice =
-    //     let random = Math.floor(Math.random() * 12 + 1);
-    //     bot.speak('@' + userFunctions.name() + ' i am rolling the dice... your number is... ' + random);
-    //
-    // chatCommands.surf =
-    //     bot.speak('http://25.media.tumblr.com/tumblr_mce8z6jN0d1qbzqexo1_r1_500.gif');
-    //
-    // chatCommands.hello =
-    //     bot.speak('Hey! How are you @' + userFunctions.getUsername(data.userid) + '?');
-    //
+    chatCommands.alice = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.aliceMessages, chatCommandItems.alicePics, userFunctions ); }
+    chatCommands.alice.help = "'/alice' are you? No, you're not...";
 
+    chatCommands.feart = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.feartMessages, userFunctions ); }
+    chatCommands.feart.help = "'/feart' there's some snagging going on in here";
 
+    chatCommands.beer = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.beerMessages, chatCommandItems.beerPics, userFunctions ); }
+    chatCommands.beer.help = "'/beer' it's 5 o'clock somewhere, right?";
 
+    chatCommands.surf = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.surfMessages, chatCommandItems.surfPics, userFunctions ); }
+    chatCommands.surf.help = "'/surf' Hang 10 dudes!";
+
+    chatCommands.hello = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.helloMessages, userFunctions ); }
+    chatCommands.hello.help = "'/hello' just saying hello...probably testing the bot tho' init";
+
+    chatCommands.macho = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.machoMessages, chatCommandItems.machoPics, userFunctions ); }
+    chatCommands.macho.help = "'/macho' Randy Savage!!!";
+
+    // ######################################################
+    // Advanced chat commands...more than just basic messages
+    // ######################################################
+
+    chatCommands.coinflip =(data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.coinflip( data, userFunctions ); }
+    chatCommands.coinflip.help = "'/coinflip' Flip a coin and return heads or tails?";
+
+    chatCommands.dice =(data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.dice( data, command, userFunctions ); }
+    chatCommands.dice.argumentCount = 2;
+    chatCommands.dice.help = "'/dice 1 d20' Roll some dice";
 
     // #############################################
     // Bot control commands

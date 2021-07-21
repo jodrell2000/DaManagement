@@ -105,6 +105,58 @@ module.exports = {
 
     flirtPics: [
         "https://media.giphy.com/media/L13NsH0Aij4Sf2Gdjt/giphy.gif",
+    ],
+
+    rubMessages: [
+        "It rubs the lotion on its skin or else it gets the hose again",
+    ],
+
+    aliceMessages: [
+        "We’re not worthy! We’re not worthy!",
+    ],
+
+    alicePics: [
+        "https://media.giphy.com/media/iiS84hOJXh1Pq/giphy.gif",
+        "https://media.giphy.com/media/YYCo1PesPPveZrHAba/giphy-downsized-large.gif"
+    ],
+
+    feartMessages: [
+        "It STINKS in here!",
+    ],
+
+    beerMessages: [
+        "@senderUsername hands @receiverUsername a nice cold :beer:"
+    ],
+
+    beerPics: [
+        "https://media.giphy.com/media/mxmvguSsjmfhvNTeDK/giphy.gif",
+        "https://media.giphy.com/media/nDMyoNRkCesJdZAuuL/giphy-downsized-large.gif",
+        "https://media.giphy.com/media/l2R086kmVRAFWEwIo/giphy.gif",
+        "https://media.giphy.com/media/DSB9kbj76v7MmEh9rj/giphy.gif"
+    ],
+
+    surfMessages: [
+        "Hang 10 dudes!"
+    ],
+
+    surfPics: [
+        "http://25.media.tumblr.com/tumblr_mce8z6jN0d1qbzqexo1_r1_500.gif",
+        "https://media.giphy.com/media/dJUtqIcqeyMvK/giphy.gif",
+        "https://media.giphy.com/media/3o7Zetm0RureMk6gzS/giphy.gif",
+        "https://media.giphy.com/media/XIgZcpJlKSMF2/giphy.gif"
+    ],
+
+    helloMessages: [
+        "Hey! How are you @senderUsername?",
+        "Aloha @senderUsername",
+    ],
+
+    machoMessages: [
+        "OOOOOOOooooooooooyeahhhhhhhhhh!!!!"
+    ],
+
+    machoPics: [
+        "https://media.giphy.com/media/13DrdRI2JqdoLC/giphy.gif"
     ]
 
 }

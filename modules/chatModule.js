@@ -104,6 +104,25 @@ const chatFunctions = (bot, roomDefaults) => {
             }
         },
 
+        dice: function ( data, command, userFunctions ) {
+            const theUsername = userFunctions.getUsername(data.userid);
+            const diceCount = command[0];
+            const diceType = command[1].split("d")[1];
+
+            let theMessage = "@" + theUsername + ", you rolled";
+            let theCount = 0;
+            let thisDice;
+
+            for (let diceLoop = 0; diceLoop < diceCount; diceLoop++) {
+                thisDice = Math.floor(Math.random() * diceType);
+                theMessage = theMessage + " a " + thisDice + ", ";
+                theCount = theCount + thisDice;
+            }
+
+            theMessage = theMessage + " for a total of " + theCount;
+            this.botSpeak( data, theMessage );
+        },
+
         // ========================================================
 
         userGreeting: function (userID, username, roomFunctions) {
