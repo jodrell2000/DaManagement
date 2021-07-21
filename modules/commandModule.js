@@ -2,6 +2,9 @@ let authModule = require('../auth.js');
 let botDefaults = require('../defaultSettings/botDefaults.js');
 let roomDefaults = require('../defaultSettings/roomDefaults.js');
 let musicDefaults = require('../defaultSettings/musicDefaults.js');
+let chatDefaults = require('../defaultSettings/chatDefaults.js');
+let chatCommandItems    = require('../defaultSettings/chatCommandItems.js');
+
 
 const generalCommands = {};
 const moderatorCommands = {};
@@ -38,35 +41,52 @@ const commandFunctions = (bot) => {
     // Chat commands...make the bot post silly stuff
     // #############################################
 
-    chatCommands.props = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.props( data, userFunctions ); }
+    chatCommands.props = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.propsMessages, chatCommandItems.propsPics, userFunctions ); }
     chatCommands.props.help = "'/props' congratulate the current DJ on playing an absolute banger";
 
-    chatCommands.shade = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.shade( data, userFunctions ); }
-    chatCommands.shade.argumentCount = 1;
-    chatCommands.shade.help = "'/mom' send a random mom joke to another user";
+    chatCommands.shade = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.shadeMessages, userFunctions ); }
+    chatCommands.shade.help = "'/shade' lovingly, and randomly, diss the DJ ;-)";
 
     chatCommands.coinflip =(data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.coinflip( data, userFunctions ); }
     chatCommands.coinflip.help = "'/coinflip' Flip a coin and return heads or tails?";
 
+    chatCommands.cheers = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.cheersMessages, userFunctions ); }
+    chatCommands.cheers.help = "'/cheers' raise a glass";
+
+    chatCommands.dance = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.danceMessages, chatCommandItems.dancePics, userFunctions ); }
+    chatCommands.dance.help = "'/dance' w00t!";
+
+    chatCommands.frankie = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.frankieMessages, userFunctions ); }
+    chatCommands.frankie.help = "'/frankie' what does Frankie say?";
+
+    chatCommands.hair = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.hairMessages, chatCommandItems.hairPics, userFunctions ); }
+    chatCommands.hair.help = "'/hair' 80s hair time";
+
+    chatCommands.eddie = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.eddieMessages, chatCommandItems.eddiePics, userFunctions ); }
+    chatCommands.eddie.help = "'/eddie' it's Eddie Murphy time!";
+
+    chatCommands.lonely = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.lonelyMessages, userFunctions ); }
+    chatCommands.lonely.help = "'/lonely' we all feel lonely sometimes...";
+
+    chatCommands.suggestions = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.suggestionsMessages, userFunctions ); }
+    chatCommands.suggestions.help = "'/suggestions' find out how to make suggestions";
+
+    chatCommands.rules = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.rulesMessages, userFunctions ); }
+    chatCommands.rules.help = "'/rules' get a link to the room rules";
+
+    chatCommands.wc = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.wcMessages, userFunctions ); }
+    chatCommands.wc.help = "'/wc' how do you Wang Chung?";
+
+    chatCommands.jump = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.jumpMessages, chatCommandItems.jumpPics, userFunctions ); }
+    chatCommands.jump.help = "'/jump' Van Halen Rulez!";
+
+    chatCommands.flirt = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.flirtMessages, chatCommandItems.flirtPics, userFunctions ); }
+    chatCommands.flirt.help = "'/flirt' you know...";
+
     //
-    // chatCommands.cheers =
-    //     bot.speak('@' + userFunctions.name() + ' raises their glass for a toast');
-    //
-    // chatCommands.dance =
-    //     bot.speak('https://media.tenor.com/images/939895eeadd796565d3ef07b7a7169f3/tenor.gif');
-    //
-    // chatCommands.frankie =
-    //     bot.speak('Relax!');
-    //
-    // chatCommands.hair =
-    //     bot.speak('Jersey Hair: Engage');
-    //
-    // chatCommands.eddie =
-    //     bot.speak('PARTY ALL THE TIME!');
-    //
-    // chatCommands.lonely =
-    //     bot.speak('Dancing with myself...');
-    //
+    // chatCommands.wc =
+    //     bot.speak('Everybody Wang Chung tonight.  Everybody have fun tonight.');
+
     // chatCommands.jump =
     //     bot.speak('For my love!');
     //
@@ -76,20 +96,11 @@ const commandFunctions = (bot) => {
     // chatCommands.rub =
     //     bot.speak('It rubs the lotion on its skin or else it gets the hose again');
     //
-    // chatCommands.wc =
-    //     bot.speak('Everybody Wang Chung tonight.  Everybody have fun tonight.');
-    //
     // chatCommands.alice =
     //     bot.speak('We’re not worthy! We’re not worthy');
     //
     // chatCommands.feart =
     //     bot.speak('It STINKS in here!');
-    //
-    // chatCommands.suggestions =
-    //     bot.speak(':robot: command suggestions: https://bit.ly/80scd');
-    //
-    // chatCommands.rules =
-    //     bot.speak(':memo: official room rules: https://bit.ly/ilt80s');
     //
     // chatCommands.beer =
     //     let botname = userFunctions.theUsersList().indexOf(authModule.USERID) + 1;
@@ -159,10 +170,13 @@ const commandFunctions = (bot) => {
             let text = data.text;
 
             // check if this was a command
-            if (text.match(/^\//)) {
+            const commandString = "^" + chatDefaults.commandIdentifier;
+            if (text.match(commandString)) {
                 return true;
             }
         },
+
+
 
         getCommandAndArguments: function(text, allCommands) {
             const [sentCommand, ...args] = text.split(" ");

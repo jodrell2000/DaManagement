@@ -1,5 +1,4 @@
 let botDefaults         = require('../defaultSettings/botDefaults.js');
-let chatCommandItems    = require('../defaultSettings/chatCommandItems.js');
 
 const chatFunctions = (bot, roomDefaults) => {
     function logMe(logLevel, message) {
@@ -10,6 +9,20 @@ const chatFunctions = (bot, roomDefaults) => {
                 console.log("chatFunctions:" + logLevel + "->" + message + "\n");
             }
         }
+    }
+
+    function buildUserToUserRandomMessage( userFunctions, senderID, theMessage, receiverID ) {
+        const senderUsername = userFunctions.getUsername( senderID );
+        if ( senderUsername ) {
+            theMessage = theMessage.replace( "@senderUsername", "@" + senderUsername );
+        }
+
+        const receiverUsername = userFunctions.getUsername( receiverID );
+        if ( receiverUsername ) {
+            theMessage = theMessage.replace( "@receiverUsername", "@" + receiverUsername );
+        }
+
+        return theMessage
     }
 
     return {
@@ -42,24 +55,35 @@ const chatFunctions = (bot, roomDefaults) => {
         // Misc chat functions
         // ========================================================
 
-        props: function (data, userFunctions) {
-            const currentDJID = userFunctions.getCurrentDJID();
-            const senderUsername = userFunctions.getUsername(data.userid);
+        textMessageTheDJ: function ( data, messageVariable, userFunctions ) {
+            const receiverID = userFunctions.getCurrentDJID();
+            const senderID = data.userid;
 
-            if ( currentDJID !== null ) {
-                const receiverUsername = userFunctions.getUsername(currentDJID);
-                this.botSpeak(data, '@' + senderUsername + ' gives the props to @' + receiverUsername, true);
-                const randomPic = Math.floor(Math.random() * chatCommandItems.propsPics.length);
-                this.botSpeak(data, chatCommandItems.propsPics[randomPic], true);
+            if (receiverID !== null) {
+                const randomMessage = messageVariable[ Math.floor(Math.random() * messageVariable.length ) ];
+                const thisMessage   = buildUserToUserRandomMessage( userFunctions, senderID, randomMessage, receiverID);
+
+                this.botSpeak( data, thisMessage, true );
             } else {
-                this.botSpeak(data, "@" + senderUsername + " you can't give props if there's no DJ?!?", true);
+                this.botSpeak( data, "@" + userFunctions.getUsername(senderID) + " you can't send that message if there's no DJ?!?", true );
             }
         },
 
-        shade: function (data, userFunctions) {
-            const theUsername = userFunctions.getUsername(data.userid)
-            let randomShade = Math.round(Math.random() * chatCommandItems.shadeMessages.length);
-            this.botSpeak(data, chatCommandItems.shadeMessages[randomShade], true);
+        pictureMessageTheDJ: function (data, messageVariable, pictureVariable, userFunctions) {
+            const receiverID    = userFunctions.getCurrentDJID();
+            const senderID      = data.userid;
+
+
+            if (receiverID !== null) {
+                const randomMessage = messageVariable[ Math.floor(Math.random() * messageVariable.length ) ];
+                const randomPic     = pictureVariable[ Math.floor(Math.random() * pictureVariable.length ) ];
+                const thisMessage   = buildUserToUserRandomMessage( userFunctions, senderID, randomMessage, receiverID);
+
+                this.botSpeak( data, thisMessage, true );
+                this.botSpeak( data, randomPic, true );
+            } else {
+                this.botSpeak( data, "@" + userFunctions.getUsername(senderID) + " you can't send that message if there's no DJ?!?", true );
+            }
         },
 
         coinflip: function ( data, userFunctions ) {
@@ -74,7 +98,7 @@ const chatFunctions = (bot, roomDefaults) => {
                         this.botSpeak(data, '@' + theUsername + ' I am flipping a coin. You got...heads', true);
                         break;
                     case 2:
-                        this.botSpeak(data, '@' + theUsername + ' I am flipping a coin. you got...tails', true);
+                        this.botSpeak(data, '@' + theUsername + ' I am flipping a coin. You got...tails', true);
                         break;
                 }
             }
