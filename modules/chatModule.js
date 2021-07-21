@@ -1,4 +1,4 @@
-let botDefaults     = require('../defaultSettings/botDefaults.js');
+let botDefaults         = require('../defaultSettings/botDefaults.js');
 
 const chatFunctions = (bot, roomDefaults) => {
     function logMe(logLevel, message) {
@@ -9,6 +9,20 @@ const chatFunctions = (bot, roomDefaults) => {
                 console.log("chatFunctions:" + logLevel + "->" + message + "\n");
             }
         }
+    }
+
+    function buildUserToUserRandomMessage( userFunctions, senderID, theMessage, receiverID ) {
+        const senderUsername = userFunctions.getUsername( senderID );
+        if ( senderUsername ) {
+            theMessage = theMessage.replace( "@senderUsername", "@" + senderUsername );
+        }
+
+        const receiverUsername = userFunctions.getUsername( receiverID );
+        if ( receiverUsername ) {
+            theMessage = theMessage.replace( "@receiverUsername", "@" + receiverUsername );
+        }
+
+        return theMessage
     }
 
     return {
@@ -41,23 +55,72 @@ const chatFunctions = (bot, roomDefaults) => {
         // Misc chat functions
         // ========================================================
 
-        props: function (data, userFunctions) {
-            const currentDJID = userFunctions.getCurrentDJID();
-            const propsPics = [
-                "https://media.giphy.com/media/3o7btVYvxUMxrLC3yo/giphy.gif",
-                "https://media.giphy.com/media/JWhlrEei7U9aKJyEDv/giphy.gif",
-                "https://media.giphy.com/media/7LNGr0S9JvGJW/giphy.gif",
-                "https://media.giphy.com/media/3ofT5J5ESXh8NTDcpG/giphy.gif",
-                "https://media.giphy.com/media/3oEjHV0z8S7WM4MwnK/giphy.gif",
-                "https://media.giphy.com/media/26BRvQJ3ke9rHRPyg/giphy.gif",
-                "https://media.giphy.com/media/HX3lSnGXZnaWk/giphy.gif",
-                "https://media.tenor.com/images/00cec448b487873b51ad2e7ec3933beb/tenor.gif",
-                "https://media.giphy.com/media/lEVZJzy4w15qE/giphy-downsized-large.gif",
-                "https://media.giphy.com/media/j2ptl95PRwZTo0IAuP/giphy.gif"
-            ]
-            this.botSpeak ( data, '@' + userFunctions.getUsername(data.userid) + ' gives the props to @' + userFunctions.getUsername(currentDJID), true);
-            const randomPic = Math.floor(Math.random() * propsPics.length);
-            this.botSpeak ( data, propsPics[randomPic], true);
+        textMessageTheDJ: function ( data, messageVariable, userFunctions ) {
+            const receiverID = userFunctions.getCurrentDJID();
+            const senderID = data.userid;
+
+            if (receiverID !== null) {
+                const randomMessage = messageVariable[ Math.floor(Math.random() * messageVariable.length ) ];
+                const thisMessage   = buildUserToUserRandomMessage( userFunctions, senderID, randomMessage, receiverID);
+
+                this.botSpeak( data, thisMessage, true );
+            } else {
+                this.botSpeak( data, "@" + userFunctions.getUsername(senderID) + " you can't send that message if there's no DJ?!?", true );
+            }
+        },
+
+        pictureMessageTheDJ: function (data, messageVariable, pictureVariable, userFunctions) {
+            const receiverID    = userFunctions.getCurrentDJID();
+            const senderID      = data.userid;
+
+
+            if (receiverID !== null) {
+                const randomMessage = messageVariable[ Math.floor(Math.random() * messageVariable.length ) ];
+                const randomPic     = pictureVariable[ Math.floor(Math.random() * pictureVariable.length ) ];
+                const thisMessage   = buildUserToUserRandomMessage( userFunctions, senderID, randomMessage, receiverID);
+
+                this.botSpeak( data, thisMessage, true );
+                this.botSpeak( data, randomPic, true );
+            } else {
+                this.botSpeak( data, "@" + userFunctions.getUsername(senderID) + " you can't send that message if there's no DJ?!?", true );
+            }
+        },
+
+        coinflip: function ( data, userFunctions ) {
+            const theUsername = userFunctions.getUsername(data.userid)
+            let randomNumber = Math.random();
+            if ( randomNumber === 0.5 ) {
+                this.botSpeak(data, '@' + theUsername + ' I am flipping a coin. You got...an edge?!?', true);
+            } else {
+                let y = Math.ceil(randomNumber * 2);
+                switch (y) {
+                    case 1:
+                        this.botSpeak(data, '@' + theUsername + ' I am flipping a coin. You got...heads', true);
+                        break;
+                    case 2:
+                        this.botSpeak(data, '@' + theUsername + ' I am flipping a coin. You got...tails', true);
+                        break;
+                }
+            }
+        },
+
+        dice: function ( data, command, userFunctions ) {
+            const theUsername = userFunctions.getUsername(data.userid);
+            const diceCount = command[0];
+            const diceType = command[1].split("d")[1];
+
+            let theMessage = "@" + theUsername + ", you rolled";
+            let theCount = 0;
+            let thisDice;
+
+            for (let diceLoop = 0; diceLoop < diceCount; diceLoop++) {
+                thisDice = Math.floor(Math.random() * diceType);
+                theMessage = theMessage + " a " + thisDice + ", ";
+                theCount = theCount + thisDice;
+            }
+
+            theMessage = theMessage + " for a total of " + theCount;
+            this.botSpeak( data, theMessage );
         },
 
         // ========================================================

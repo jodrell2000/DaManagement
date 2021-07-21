@@ -2,10 +2,14 @@ let authModule = require('../auth.js');
 let botDefaults = require('../defaultSettings/botDefaults.js');
 let roomDefaults = require('../defaultSettings/roomDefaults.js');
 let musicDefaults = require('../defaultSettings/musicDefaults.js');
+let chatDefaults = require('../defaultSettings/chatDefaults.js');
+let chatCommandItems    = require('../defaultSettings/chatCommandItems.js');
+
 
 const generalCommands = {};
 const moderatorCommands = {};
 const botCommands = {};
+const chatCommands = {};
 
 const commandFunctions = (bot) => {
     function logMe(logLevel, message) {
@@ -33,8 +37,80 @@ const commandFunctions = (bot) => {
     generalCommands.help.argumentCount = 1;
     generalCommands.help.help = "'/help' [command] Display how to use an individual command";
 
-    generalCommands.props = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.props( data, userFunctions ); }
-    generalCommands.props.help = "'/props' congratulate the current DJ on playing an absolute banger";
+    // #############################################
+    // Chat commands...make the bot post silly stuff
+    // #############################################
+
+    chatCommands.props = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.propsMessages, chatCommandItems.propsPics, userFunctions ); }
+    chatCommands.props.help = "'/props' congratulate the current DJ on playing an absolute banger";
+
+    chatCommands.shade = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.shadeMessages, userFunctions ); }
+    chatCommands.shade.help = "'/shade' lovingly, and randomly, diss the DJ ;-)";
+
+    chatCommands.cheers = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.cheersMessages, userFunctions ); }
+    chatCommands.cheers.help = "'/cheers' raise a glass";
+
+    chatCommands.dance = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.danceMessages, chatCommandItems.dancePics, userFunctions ); }
+    chatCommands.dance.help = "'/dance' w00t!";
+
+    chatCommands.frankie = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.frankieMessages, userFunctions ); }
+    chatCommands.frankie.help = "'/frankie' what does Frankie say?";
+
+    chatCommands.hair = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.hairMessages, chatCommandItems.hairPics, userFunctions ); }
+    chatCommands.hair.help = "'/hair' 80s hair time";
+
+    chatCommands.eddie = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.eddieMessages, chatCommandItems.eddiePics, userFunctions ); }
+    chatCommands.eddie.help = "'/eddie' it's Eddie Murphy time!";
+
+    chatCommands.lonely = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.lonelyMessages, userFunctions ); }
+    chatCommands.lonely.help = "'/lonely' we all feel lonely sometimes...";
+
+    chatCommands.suggestions = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.suggestionsMessages, userFunctions ); }
+    chatCommands.suggestions.help = "'/suggestions' find out how to make suggestions";
+
+    chatCommands.rules = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.rulesMessages, userFunctions ); }
+    chatCommands.rules.help = "'/rules' get a link to the room rules";
+
+    chatCommands.wc = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.wcMessages, userFunctions ); }
+    chatCommands.wc.help = "'/wc' how do you Wang Chung?";
+
+    chatCommands.jump = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.jumpMessages, chatCommandItems.jumpPics, userFunctions ); }
+    chatCommands.jump.help = "'/jump' Van Halen Rulez!";
+
+    chatCommands.flirt = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.flirtMessages, chatCommandItems.flirtPics, userFunctions ); }
+    chatCommands.flirt.help = "'/flirt' you know...";
+
+    chatCommands.rub = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.rubMessages, userFunctions ); }
+    chatCommands.rub.help = "'/rub' is Buffalo Bill in?!?";
+
+    chatCommands.alice = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.aliceMessages, chatCommandItems.alicePics, userFunctions ); }
+    chatCommands.alice.help = "'/alice' are you? No, you're not...";
+
+    chatCommands.feart = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.feartMessages, userFunctions ); }
+    chatCommands.feart.help = "'/feart' there's some snagging going on in here";
+
+    chatCommands.beer = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.beerMessages, chatCommandItems.beerPics, userFunctions ); }
+    chatCommands.beer.help = "'/beer' it's 5 o'clock somewhere, right?";
+
+    chatCommands.surf = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.surfMessages, chatCommandItems.surfPics, userFunctions ); }
+    chatCommands.surf.help = "'/surf' Hang 10 dudes!";
+
+    chatCommands.hello = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.helloMessages, userFunctions ); }
+    chatCommands.hello.help = "'/hello' just saying hello...probably testing the bot tho' init";
+
+    chatCommands.macho = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.machoMessages, chatCommandItems.machoPics, userFunctions ); }
+    chatCommands.macho.help = "'/macho' Randy Savage!!!";
+
+    // ######################################################
+    // Advanced chat commands...more than just basic messages
+    // ######################################################
+
+    chatCommands.coinflip =(data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.coinflip( data, userFunctions ); }
+    chatCommands.coinflip.help = "'/coinflip' Flip a coin and return heads or tails?";
+
+    chatCommands.dice =(data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.dice( data, command, userFunctions ); }
+    chatCommands.dice.argumentCount = 2;
+    chatCommands.dice.help = "'/dice 1 d20' Roll some dice";
 
     // #############################################
     // Bot control commands
@@ -76,7 +152,8 @@ const commandFunctions = (bot) => {
     const allCommands = {
         ...generalCommands,
         ...moderatorCommands,
-        ...botCommands
+        ...botCommands,
+        ...chatCommands
     }
 
     return {
@@ -85,10 +162,13 @@ const commandFunctions = (bot) => {
             let text = data.text;
 
             // check if this was a command
-            if (text.match(/^\//)) {
+            const commandString = "^" + chatDefaults.commandIdentifier;
+            if (text.match(commandString)) {
                 return true;
             }
         },
+
+
 
         getCommandAndArguments: function(text, allCommands) {
             const [sentCommand, ...args] = text.split(" ");
@@ -118,28 +198,7 @@ const commandFunctions = (bot) => {
             const text = data.text; //the most recent text in the chatbox on turntable
             const speaker = data.userid;
 
-            if (text.match(/^\/randomSong$/) && userFunctions.isUserModerator(speaker) === true) {
-                if (botFunctions.randomOnce() !== 1) {
-                    let ez = 0;
-                    bot.speak("Reorder initiated.");
-                    botFunctions.incrementRandomOnce();
-                    let reorder = setInterval(function () {
-                        if (ez <= botDefaults.botPlaylist.length) {
-                            let nextId = Math.ceil(Math.random() * botDefaults.botPlaylist);
-                            bot.playlistReorder(ez, nextId);
-                            console.log("Song " + ez + " changed.");
-                            ez++;
-                        } else {
-                            clearInterval(reorder);
-                            console.log("Reorder Ended");
-                            bot.speak("Reorder completed.");
-                            botFunctions.decrementRandomOnce();
-                        }
-                    }, 1000);
-                } else {
-                    bot.pm('error, playlist reordering is already in progress', data.userid);
-                }
-            } else if (text.match('turntable.fm/') && !text.match('turntable.fm/' + roomDefaults.ttRoomName) && !userFunctions.isUserModerator(speaker) && data.userid !== authModule.USERID) {
+            if (text.match('turntable.fm/') && !text.match('turntable.fm/' + roomDefaults.ttRoomName) && !userFunctions.isUserModerator(speaker) && data.userid !== authModule.USERID) {
                 bot.boot(data.userid, 'do not advertise other rooms here');
             } else if (text.match('/bumptop') && userFunctions.isUserModerator() === true) {
                 if (roomDefaults.queueActive === true) {
@@ -517,61 +576,6 @@ const commandFunctions = (bot) => {
                 } else {
                     bot.pm('you must wait one song since the bot has started to use that command', data.userid);
                 }
-            } else if (text.match('/cheers')) {
-                bot.speak('@' + userFunctions.name() + ' raises their glass for a toast');
-            } else if (text.match(/^\/mom$/)) {
-                let x = Math.round(Math.random() * 3);
-                switch (x) {
-                    case 0:
-                        bot.speak('@' + userFunctions.name() + ' ur mom is fat');
-                        break;
-                    case 1:
-                        bot.speak('@' + userFunctions.name() + ' yo momma sooo fat....');
-                        break;
-                    case 2:
-                        bot.speak('@' + userFunctions.name() + ' damn yo momma fat');
-                        break;
-                    case 3:
-                        bot.speak('@' + userFunctions.name() + ' your mother is an outstanding member of the community ' +
-                            'and well liked by all.');
-                        break;
-                }
-            } else if (text.match('/coinflip')) {
-                let y = Math.ceil(Math.random() * 2);
-                switch (y) {
-                    case 1:
-                        bot.speak('@' + userFunctions.name() + ' i am flipping a coin... you got... heads');
-                        break;
-                    case 2:
-                        bot.speak('@' + userFunctions.name() + ' i am flipping a coin... you got... tails');
-                        break;
-                }
-            } else if (text.match(/^\/dance$/)) {
-                bot.speak('https://media.tenor.com/images/939895eeadd796565d3ef07b7a7169f3/tenor.gif');
-            } else if (text.match(/^\/frankie$/)) {
-                bot.speak('Relax!');
-            } else if (text.match(/^\/hair$/)) {
-                bot.speak('Jersey Hair: Engage');
-            } else if (text.match(/^\/eddie$/)) {
-                bot.speak('PARTY ALL THE TIME!');
-            } else if (text.match(/^\/lonely$/)) {
-                bot.speak('Dancing with myself...');
-            } else if (text.match(/^\/jump$/)) {
-                bot.speak('For my love!');
-            } else if (text.match(/^\/flirt$/)) {
-                bot.speak('How YOU doin’?!');
-            } else if (text.match(/^\/rub$/)) {
-                bot.speak('It rubs the lotion on its skin or else it gets the hose again');
-            } else if (text.match(/^\/wc$/)) {
-                bot.speak('Everybody Wang Chung tonight.  Everybody have fun tonight.');
-            } else if (text.match(/^\/alice$/)) {
-                bot.speak('We’re not worthy! We’re not worthy');
-            } else if (text.match(/^\/feart$/)) {
-                bot.speak('It STINKS in here!');
-            } else if (text.match(/^\/suggestions$/)) {
-                bot.speak(':robot: command suggestions: https://bit.ly/80scd');
-            } else if (text.match(/^\/rules$/)) {
-                bot.speak(':memo: official room rules: https://bit.ly/ilt80s');
             } else if (text.match(/^\/skipon$/) && userFunctions.isUserModerator(speaker) === true) {
                 bot.speak('i am now skipping my songs');
                 botFunctions.setSkipOn(true);
@@ -600,9 +604,6 @@ const commandFunctions = (bot) => {
                     bot.speak('I am no longer auto djing');
                     botDefaults.getonstage = false;
                 }
-            } else if (text.match('/beer')) {
-                let botname = userFunctions.theUsersList().indexOf(authModule.USERID) + 1;
-                bot.speak('@' + userFunctions.theUsersList()[botname] + ' hands ' + '@' + userFunctions.name() + ' a nice cold :beer:');
             } else if (data.text === '/escortme') {
                 let theUserID = data.userid;
                 if ( !userFunctions.escortMeIsEnabled() && userFunctions.isCurrentDJ(theUserID) ) {
@@ -625,9 +626,6 @@ const commandFunctions = (bot) => {
                 bot.becomeFan(userFunctions.myID);
             } else if (data.text === '/getTags') {
                 bot.speak('artist name: ' + songFunctions.artist() + ', song name: ' + songFunctions.song() + ', album: ' + songFunctions.album() + ', genre: ' + songFunctions.genre());
-            } else if (data.text === '/dice') {
-                let random = Math.floor(Math.random() * 12 + 1);
-                bot.speak('@' + userFunctions.name() + ' i am rolling the dice... your number is... ' + random);
             } else if (text.match(/^\/dive/)) {
                 let checkDj = userFunctions.djList().indexOf(data.userid);
                 if (checkDj !== -1) {
@@ -635,8 +633,6 @@ const commandFunctions = (bot) => {
                 } else {
                     bot.pm('you must be on stage to use that command.', data.userid);
                 }
-            } else if (text.match('/surf')) {
-                bot.speak('http://25.media.tumblr.com/tumblr_mce8z6jN0d1qbzqexo1_r1_500.gif');
             } else if (data.text === '/unfanme') {
                 bot.speak('@' + userFunctions.name() + ' i am no longer your fan.');
                 userFunctions.myID = data.userid;
@@ -718,8 +714,6 @@ const commandFunctions = (bot) => {
                 }
             } else if (text.match(/^\/m/) && !text.match(/^\/me/) && userFunctions.isUserModerator(speaker) === true) {
                 bot.speak(text.substring(3));
-            } else if (text.match(/^\/hello$/)) {
-                bot.speak('Hey! How are you @' + userFunctions.getUsername(data.userid) + '?');
             } else if (text.match(/^\/snagevery$/) && userFunctions.isUserModerator(speaker) === true) {
                 if (songFunctions.snagSong() === true) {
                     songFunctions.snagSong = false;
@@ -954,8 +948,6 @@ const commandFunctions = (bot) => {
             } else if (text.match(/^\/playLimitOff$/) && userFunctions.isUserModerator(speaker) === true) {
                 musicDefaults.PLAYLIMIT = false;
                 bot.speak('the play limit is now inactive.');
-            } else if (text.match('/surf')) {
-                bot.speak('http://25.media.tumblr.com/tumblr_mce8z6jN0d1qbzqexo1_r1_500.gif');
             } else if (text.match(/^\/queueOff$/) && userFunctions.isUserModerator(speaker) === true) {
                 bot.speak('the queue is now inactive.');
                 roomDefaults.queueActive = false;
@@ -1089,12 +1081,6 @@ const commandFunctions = (bot) => {
         },
 
         parsePM: function (data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) {
-
-            // ===================================
-            // ===================================
-            // PUT SOMETHING IN HERE SO THAT YOU CAN ONLY PM COMMANDS TO THE BOT IF YOU"RE ACTUALLY IN THE ROOM
-            // ===================================
-            // ===================================
 
             let speaker = speaker; //the userid of the person who just pmmed the bot
             let text = data.text; //the text sent to the bot in a pm
@@ -1699,27 +1685,6 @@ const commandFunctions = (bot) => {
                     bot.pm('The queue is currently empty.', speaker);
                 } else {
                     bot.pm('There is currently no queue.', speaker);
-                }
-            } else if (text.match(/^\/randomSong$/) && userFunctions.isUserModerator(speaker) === true && isInRoom === true) {
-                if (botFunctions.randomOnce() !== 1) {
-                    let ez = 0;
-                    bot.pm("Reorder initiated.", speaker);
-                    botFunctions.incrementRandomOnce();
-                    let reorder = setInterval(function () {
-                        if (ez <= botDefaults.botPlaylist.length) {
-                            let nextId = Math.ceil(Math.random() * botDefaults.botPlaylist);
-                            bot.playlistReorder(ez, nextId);
-                            console.log("Song " + ez + " changed.");
-                            ez++;
-                        } else {
-                            clearInterval(reorder);
-                            console.log("Reorder Ended");
-                            bot.pm("Reorder completed.", speaker);
-                            botFunctions.decrementRandomOnce();
-                        }
-                    }, 1000);
-                } else {
-                    bot.pm('error, playlist reordering is already in progress', speaker);
                 }
             } else if (text.match('/bumptop') && userFunctions.isUserModerator(speaker) === true && isInRoom === true) {
                 if (roomDefaults.queueActive === true) {
