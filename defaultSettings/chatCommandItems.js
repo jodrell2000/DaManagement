@@ -173,6 +173,37 @@ module.exports = {
     ferrisPics: [
         "https://media.giphy.com/media/EZ7IUK6mXpuN2/giphy.gif",
         "https://media.giphy.com/media/V526T6UMjXx0A/giphy.gif"
-    ]
+    ],
 
+    lighterMessages: [
+        "Burn baby burn"
+    ],
+
+    lighterPics: [
+        "https://media.giphy.com/media/EU3Du7lhIYzVC/giphy.gif",
+        "https://media.giphy.com/media/UW7eSs0nLXqNtv3ZQq/giphy.gif",
+        "https://media.giphy.com/media/cYev2T7NuwUATCHaZz/giphy.gif"
+
+    ],
+
+    coupleSkateMessages: [
+        "Slow dance"
+    ],
+
+    couplesSkatePics: [
+        "https://media.giphy.com/media/lryuApSUBW8mZU9K0M/giphy.gif",
+        "https://www.daily-shirts.com/wp-content/uploads/2020/05/Couples-Skate.jpg"
+    ],
+
+    noiceMessages: [
+        "Niiiiiiiiiiiice....",
+        "Noice!",
+    ],
+
+    noicePics: [
+        "https://media.giphy.com/media/huyVJYSKcArLiu8J5g/giphy.gif",
+        "https://media.giphy.com/media/l3mZfxgPWhmuXa8Cc/giphy.gif",
+        "https://media.giphy.com/media/d2Z0zWe67TDcbCzC/giphy.gif",
+
+    ]
 }
