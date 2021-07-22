@@ -114,6 +114,9 @@ const commandFunctions = (bot) => {
     chatCommands.noice = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.noiceMessages, chatCommandItems.noicePics, userFunctions ); }
     chatCommands.noice.help = "very nice...";
 
+    chatCommands.shimmy = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.shimmyMessages, chatCommandItems.shimmyPics, userFunctions ); }
+    chatCommands.shimmy.help = "Pat Benatar time";
+
     // ######################################################
     // Advanced chat commands...more than just basic messages
     // ######################################################

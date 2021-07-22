@@ -204,6 +204,13 @@ module.exports = {
         "https://media.giphy.com/media/huyVJYSKcArLiu8J5g/giphy.gif",
         "https://media.giphy.com/media/l3mZfxgPWhmuXa8Cc/giphy.gif",
         "https://media.giphy.com/media/d2Z0zWe67TDcbCzC/giphy.gif",
+    ],
 
+    shimmyMessages: [
+        "Pat Benatar uses shimmy attack...super effective!"
+    ],
+
+    shimmyPics: [
+        "https://media.giphy.com/media/Q8UQS0gJFERag/giphy.gif"
     ]
 }
