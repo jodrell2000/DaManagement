@@ -187,6 +187,8 @@ const commandFunctions = (bot) => {
     return {
 
         wasThisACommand: function (data) {
+            logMe('debug', );
+
             let text = data.text;
 
             // check if this was a command
