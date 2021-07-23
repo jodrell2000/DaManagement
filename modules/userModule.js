@@ -125,7 +125,7 @@ const userFunctions = (bot, roomDefaults) => {
         // Basic User Functions
         // ========================================================
 
-        getUsername: function (userID) {
+        getUsername: function ( userID ) {
             theUsersList.forEach(function(theUser) {
             });
             let theUser = theUsersList.find(({id}) => id === userID);
@@ -442,9 +442,9 @@ const userFunctions = (bot, roomDefaults) => {
         switchUserAFK: function ( data, chatFunctions ) {
             const userID = this.getUserIDFromData( data );
             if ( this.isUserAFK( userID ) === true ) {
-                this.removeUserFromAFKList( userID, chatFunctions );
+                this.removeUserFromAFKList( data, chatFunctions );
             } else {
-                this.addToAFKList( userID, chatFunctions );
+                this.addToAFKList( data, chatFunctions );
             }
         },
 
@@ -457,9 +457,10 @@ const userFunctions = (bot, roomDefaults) => {
 
         removeUserFromAFKList: function ( data, chatFunctions ) {
             const userID = this.getUserIDFromData( data );
-            const listPosition = afkPeople.findIndex( userID )
+            const listPosition = afkPeople.indexOf( userID );
 
             afkPeople.splice(listPosition, 1);
+
             chatFunctions.botSpeak( data, '@' + this.getUsername( userID ) + ' you are no longer afk')
         },
 
