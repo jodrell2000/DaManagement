@@ -442,9 +442,9 @@ const userFunctions = (bot, roomDefaults) => {
         switchUserAFK: function ( data, chatFunctions ) {
             const userID = this.getUserIDFromData( data );
             if ( this.isUserAFK( userID ) === true ) {
-                this.removeUserFromAFKList( userID );
+                this.removeUserFromAFKList( userID, chatFunctions );
             } else {
-                this.addToAFKList( userID );
+                this.addToAFKList( userID, chatFunctions );
             }
         },
 
