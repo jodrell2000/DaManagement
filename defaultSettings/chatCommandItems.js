@@ -18,7 +18,9 @@ module.exports = {
         "https://media.giphy.com/media/HX3lSnGXZnaWk/giphy.gif",
         "https://media.tenor.com/images/00cec448b487873b51ad2e7ec3933beb/tenor.gif",
         "https://media.giphy.com/media/lEVZJzy4w15qE/giphy-downsized-large.gif",
-        "https://media.giphy.com/media/j2ptl95PRwZTo0IAuP/giphy.gif"
+        "https://media.giphy.com/media/j2ptl95PRwZTo0IAuP/giphy.gif",
+        "https://media.giphy.com/media/39hsA5NQKeaFXNgMav/giphy.gif",
+        "https://media.giphy.com/media/XedlfvtiYgrGByude7/giphy-downsized-large.gif"
     ],
 
     shadeMessages: [
@@ -49,13 +51,15 @@ module.exports = {
     ],
 
     hairMessages: [
-        "Jersey Hair: Engage"
+        "Jersey Hair: Engage",
+        "Waaaooooh... :lemon: on a :pear: !"
     ],
 
     hairPics: [
         "https://media.giphy.com/media/5SDGtJCvbNM40/giphy.gif",
         "https://media.giphy.com/media/JM7mzbxs13C92/giphy.gif",
-        "https://media.giphy.com/media/hdekhy8lq74FW/giphy.gif"
+        "https://media.giphy.com/media/hdekhy8lq74FW/giphy.gif",
+        "https://media.giphy.com/media/qVYsnJUNA0iU6XPBkI/giphy.gif"
     ],
 
     eddieMessages: [
@@ -212,5 +216,16 @@ module.exports = {
 
     shimmyPics: [
         "https://media.giphy.com/media/Q8UQS0gJFERag/giphy.gif"
+    ],
+
+    metalMessages: [
+        ":metal:"
+    ],
+
+    metalPics: [
+        "https://media.giphy.com/media/Oivne3ir8TzcA/giphy.gif",
+        "https://media.giphy.com/media/cQRPusQzy23OE/giphy.gif",
+        "https://media.giphy.com/media/bVKYqTNcdk0HC/giphy.gif",
+        "https://media.giphy.com/media/RAGxhwdfH6Je8/giphy.gif"
     ]
 }

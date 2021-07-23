@@ -2,6 +2,7 @@ let musicDefaults = require('../defaultSettings/musicDefaults.js');
 let roomDefaults = require('../defaultSettings/roomDefaults.js');
 
 let authModule = require('../auth.js');
+const auth = require('../auth.js');
 
 let theUsersList = []; // object array of everyone in the room
 let afkPeople = []; //holds the userid of everyone who has used the /afk command
@@ -125,6 +126,14 @@ const userFunctions = (bot, roomDefaults) => {
         // Basic User Functions
         // ========================================================
 
+        isThisTheBot: function ( userID ) {
+            if ( userID === auth.USERID ) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+
         getUsername: function ( userID ) {
             theUsersList.forEach(function(theUser) {
             });
@@ -134,6 +143,14 @@ const userFunctions = (bot, roomDefaults) => {
 
         getUserIDFromData: function ( data ) {
             return data.userid;
+        },
+
+        getUserIDFromUsername: function ( theUsername ) {
+            for ( userLoop = 0; userLoop < theUsersList.length; userLoop++ ){
+                if ( theUsersList[userLoop].username === theUsername ) {
+                    return theUsersList[userLoop].id;
+                }
+            }
         },
 
         // ========================================================
@@ -167,8 +184,13 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         isUserModerator: function (theUserID) {
+            logMe( 'debug', 'isUserModerator, theUserID:' + theUserID + ':');
             let userPosition = this.getPositionOnUsersList(theUserID);
-            return theUsersList[userPosition]['moderator'] === true;
+            if ( theUsersList[userPosition]['moderator'] !== undefined ) {
+                return true;
+            } else {
+                return false;
+            }
         },
 
         // ========================================================
@@ -310,6 +332,7 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         updateUserLastVoted: function (userID) {
+            logMe( 'debug', 'updateUserLastVoted, userID:' + userID );
             theUsersList[this.getPositionOnUsersList(userID)]['lastVoted'] = Date.now();
         },
 
@@ -466,6 +489,10 @@ const userFunctions = (bot, roomDefaults) => {
 
         howManyAFKUsers: function () {
             return afkPeople.length;
+        },
+
+        sendUserIsAFKMessage: function ( data, userID, chatFunctions ) {
+            chatFunctions.botSpeak( data, '@' + this.getUsername( userID ) + ' is currently AFK, sorry')
         },
 
 
@@ -930,6 +957,28 @@ const userFunctions = (bot, roomDefaults) => {
         // ========================================================
 
         // ========================================================
+        // Other User Functions
+        // ========================================================
+
+        checkTextForUsernames: function ( theText ) {
+            let loopUsername;
+            let mentions = [];
+
+            if ( theText.indexOf('@') !== -1 ) {
+                for ( afkPeopleLoop = 0; afkPeopleLoop < afkPeople.length; afkPeopleLoop++ ) {
+                    loopUsername = this.getUsername( afkPeople[afkPeopleLoop] );
+                    if ( theText.indexOf( '@' + loopUsername ) !== -1 ) {
+                        mentions.push( loopUsername );
+                    }
+                }
+            }
+
+            return mentions;
+        },
+
+        // ========================================================
+
+        // ========================================================
         // Inform Functions
         // ========================================================
 
@@ -978,12 +1027,6 @@ const userFunctions = (bot, roomDefaults) => {
                 }
             }
         },
-
-        // ========================================================
-
-        // ========================================================
-        // WarnMe Functions
-        // ========================================================
 
         resetAllWarnMe: function (data) {
             let theUserID;
