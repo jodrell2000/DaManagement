@@ -435,7 +435,7 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         isUserAFK: function ( userID ) {
-            let isAlreadyAfk = afkPeople.indexOf(data.name);
+            let isAlreadyAfk = afkPeople.indexOf( userID );
             return isAlreadyAfk !== -1;
         },
 
