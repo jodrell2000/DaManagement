@@ -316,18 +316,14 @@ bot.on('speak', function (data) {
         commandFunctions.parseCommands(data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions);
     }
 
-
     //checks to see if someone is trying to speak to an afk person or not.
-    if (userFunctions.howManyAFKUsers() !== 0 && theUserID !== authModule.USERID) {
-        for (let j = 0; j < userFunctions.afkPeople.length; j++) //loop through afk people array
-        {
-            if (typeof (userFunctions.afkPeople[j] !== 'undefined')) {
-                let areTheyAfk56 = data.text.toLowerCase().indexOf(userFunctions.afkPeople[j].toLowerCase()); //is an afk persons name being called
+    const foundUsernames = userFunctions.checkTextForUsernames( text );
 
-                if (areTheyAfk56 !== -1) {
-                    bot.speak(userFunctions.afkPeople[j] + ' is afk');
-                }
-            }
+    let thisAFKUser;
+    for ( userLoop = 0; userLoop < foundUsernames.length; userLoop++ ) {
+        thisAFKUserID = userFunctions.getUserIDFromUsername( foundUsernames[userLoop] );
+        if ( userFunctions.isUserAFK( thisAFKUserID ) && !userFunctions.isThisTheBot(theUserID) === true ) {
+            userFunctions.sendUserIsAFKMessage ( data, thisAFKUserID, chatFunctions );
         }
     }
 });

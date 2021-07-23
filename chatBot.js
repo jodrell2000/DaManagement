@@ -28,6 +28,24 @@ bot.on('pmmed', function (data)
   }
 });
 
+// userID1 = 12345;
+// userID2 = 987654;
+// let afkPeople = [];
+// console.log('afkPeople empty: ' + afkPeople );
+
+// afkPeople.push( userID1 );
+// console.log('afkPeople: user 12345 added ' + afkPeople );
+
+// afkPeople.push( userID2 );
+// console.log('afkPeople: user 987654 added ' + afkPeople );
+
+// const listPosition = afkPeople.indexOf( userID1 )
+// console.log('listPosition: position for 12345 ' + listPosition );
+
+// afkPeople.splice(listPosition, 1);
+// console.log('afkPeople: user 12345 removed ' + afkPeople );
+
+
 // playing with arrays and objects...
 //
 // userList = [ { id:636473737373, username: 'Tom'},

@@ -118,6 +118,9 @@ const commandFunctions = (bot) => {
     chatCommands.shimmy = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.shimmyMessages, chatCommandItems.shimmyPics, userFunctions ); }
     chatCommands.shimmy.help = "Pat Benatar time";
 
+    chatCommands.metal = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.metalMessages, chatCommandItems.metalPics, userFunctions ); }
+    chatCommands.metal.help = ":metal: ";
+
     // ######################################################
     // Advanced chat commands...more than just basic messages
     // ######################################################
@@ -175,7 +178,6 @@ const commandFunctions = (bot) => {
         if (allCommands[command] === undefined) {
             chatFunctions.botSpeak(data, "That command desn't exist. Try /list to find the available commands");
         } else {
-            logMe('debug', '=================================== displayHelp, command:' + command);
             theMessage = theMessage + "'" + chatDefaults.commandIdentifier + command + " ";
 
             if (allCommands[command].argumentCount !== undefined) {
@@ -199,8 +201,6 @@ const commandFunctions = (bot) => {
     return {
 
         wasThisACommand: function (data) {
-            logMe('debug', );
-
             let text = data.text;
 
             // check if this was a command
