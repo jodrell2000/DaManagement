@@ -10,6 +10,7 @@ const generalCommands = {};
 const moderatorCommands = {};
 const botCommands = {};
 const chatCommands = {};
+const userCommands = {};
 
 const commandFunctions = (bot) => {
     function logMe(logLevel, message) {
@@ -140,7 +141,14 @@ const commandFunctions = (bot) => {
     botCommands.playlist.help = "Tells you how many songs are in the Bot playlist";
 
     // #############################################
-    // Moderator comamnds
+    // User comamnds
+    // #############################################
+
+    userCommands.afk = ( data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { userFunctions.switchUserAFK ( data, chatFunctions ); }
+    userCommands.afk.help = "Switches the senders AFK state";
+
+        // #############################################
+    // Moderator Only comamnds
     // #############################################
 
     moderatorCommands.randomisePlaylist = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { songFunctions.randomisePlaylist() }
@@ -184,7 +192,8 @@ const commandFunctions = (bot) => {
         ...generalCommands,
         ...moderatorCommands,
         ...botCommands,
-        ...chatCommands
+        ...chatCommands,
+        ...userCommands
     }
 
     return {
@@ -356,7 +365,7 @@ const commandFunctions = (bot) => {
                 } else {
                     whatsOn += 'voteskipping: Off, ';
                 }
-                if (userFunctions.roomAFK() === true) {
+                if (userFunctions.roomIdle() === true) {
                     whatsOn += 'audience afk limit: On, ';
                 } else {
                     whatsOn += 'audience afk limit: Off, ';
@@ -468,7 +477,7 @@ const commandFunctions = (bot) => {
                     bot.pm('sorry but you have already voted, only one vote per person per song is allowed', data.userid);
                 }
             } else if (text.match(/^\/afkon/) && userFunctions.isUserModerator(speaker) === true) {
-                userFunctions.enableAFK();
+                userFunctions.enableDJIdle();
                 bot.speak('the afk list is now active.');
                 for (let z = 0; z < userFunctions.djList().length; z++) {
                     userFunctions.justSaw(userFunctions.djList()[z], 'justSaw');
@@ -476,10 +485,10 @@ const commandFunctions = (bot) => {
                     userFunctions.justSaw(userFunctions.djList()[z], 'justSaw2');
                 }
             } else if (text.match(/^\/afkoff/) && userFunctions.isUserModerator(speaker) === true) {
-                userFunctions.disableAFK();
+                userFunctions.disableDJIdle();
                 bot.speak('the afk list is now inactive.');
             } else if (text.match(/^\/roomafkon/) && userFunctions.isUserModerator(speaker) === true) {
-                userFunctions.enableRoomAFK();
+                userFunctions.enableRoomIdle();
                 bot.speak('the audience afk list is now active.');
                 for (let zh = 0; zh < userFunctions.userIDs().length; zh++) {
                     let isDj2 = userFunctions.djList().indexOf(userFunctions.userIDs()[zh])
@@ -489,7 +498,7 @@ const commandFunctions = (bot) => {
                     }
                 }
             } else if (text.match(/^\/roomafkoff/) && userFunctions.isUserModerator(speaker) === true) {
-                userFunctions.disableRoomAFK();
+                userFunctions.disableRoomIdle();
                 bot.speak('the audience afk list is now inactive.');
 
             } else if (text.match(/^\/djplays/)) {
@@ -1074,19 +1083,6 @@ const commandFunctions = (bot) => {
                 let tmp94 = bot.getProfile(ban50, function (data) {
                     bot.speak('' + data.name);
                 });
-            } else if (text.match(/^\/afk/)) {
-                let isAlreadyAfk = userFunctions.afkPeople().indexOf(data.name);
-                if (isAlreadyAfk === -1) {
-                    if (typeof data.name == 'undefined') {
-                        bot.pm('failed to add to the afk list, please try the command again', data.userid);
-                    } else {
-                        bot.speak('@' + userFunctions.name() + ' you are marked as afk');
-                        userFunctions.afkPeople().push(data.name);
-                    }
-                } else if (isAlreadyAfk !== -1) {
-                    bot.speak('@' + userFunctions.name() + ' you are no longer afk');
-                    userFunctions.afkPeople().splice(isAlreadyAfk, 1);
-                }
             } else if (text === '/up?') //works for djs on stage
             {
                 let areTheyADj = userFunctions.djList().indexOf(data.userid); //are they a dj?
@@ -1624,10 +1620,10 @@ const commandFunctions = (bot) => {
                     bot.pm('error, that command only skips the bots currently playing song', speaker);
                 }
             } else if (text.match(/^\/roomafkoff/) && userFunctions.isUserModerator(speaker) === true && isInRoom === true) {
-                userFunctions.disableRoomAFK();
+                userFunctions.disableRoomIdle();
                 bot.pm('the audience afk list is now inactive.', speaker);
             } else if (text.match(/^\/roomafkon/) && userFunctions.isUserModerator(speaker) === true && isInRoom === true) {
-                userFunctions.enableRoomAFK();
+                userFunctions.enableRoomIdle();
                 bot.pm('the audience afk list is now active.', speaker);
                 for (let zh = 0; zh < userFunctions.userIDs().length; zh++) {
                     let isDj2 = userFunctions.djList().indexOf(userFunctions.userIDs()[zh])
@@ -1637,10 +1633,10 @@ const commandFunctions = (bot) => {
                     }
                 }
             } else if (text.match(/^\/afkoff/) && userFunctions.isUserModerator(speaker) === true && isInRoom === true) {
-                userFunctions.disableAFK();
+                userFunctions.disableDJIdle();
                 bot.pm('the afk list is now inactive.', speaker);
             } else if (text.match(/^\/afkon/) && userFunctions.isUserModerator(speaker) === true && isInRoom === true) {
-                userFunctions.enableAFK();
+                userFunctions.enableDJIdle();
                 bot.pm('the afk list is now active.', speaker);
                 for (let z = 0; z < userFunctions.djList().length; z++) {
                     userFunctions.justSaw(userFunctions.djList()[z], 'justSaw');
@@ -1800,7 +1796,7 @@ const commandFunctions = (bot) => {
                 } else {
                     whatsOn += 'voteskipping: Off, ';
                 }
-                if (userFunctions.roomAFK() === true) {
+                if (userFunctions.roomIdle() === true) {
                     whatsOn += 'audience afk limit: On, ';
                 } else {
                     whatsOn += 'audience afk limit: Off, ';
@@ -2050,20 +2046,6 @@ const commandFunctions = (bot) => {
                 } else {
                     bot.pm('error, that user was not found in the room. multi word names must be specified in the command usage, example: /boot 3 first middle last.' +
                         ' if the name is only one word long then you do not need to specify its length', speaker);
-                }
-            } else if (text.match(/^\/afk/) && isInRoom === true) {
-                let isUserAfk = userFunctions.theUsersList().indexOf(speaker) + 1;
-                let isAlreadyAfk = userFunctions.afkPeople().indexOf(userFunctions.theUsersList()[isUserAfk]);
-                if (isAlreadyAfk === -1) {
-                    if (typeof userFunctions.theUsersList()[isUserAfk] == 'undefined') {
-                        bot.pm('failed to add to the afk list, please try the command again', speaker);
-                    } else {
-                        bot.pm('you are marked as afk', speaker);
-                        userFunctions.afkPeople().push(userFunctions.theUsersList()[isUserAfk]);
-                    }
-                } else if (isAlreadyAfk !== -1) {
-                    bot.pm('you are no longer afk', speaker);
-                    userFunctions.afkPeople().splice(isAlreadyAfk, 1);
                 }
             } else if (text.match(/^\/whosafk/) && isInRoom === true) {
                 if (userFunctions.afkPeople().length !== 0) {

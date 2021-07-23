@@ -56,9 +56,13 @@ module.exports = {
 
     detail: null, //the discription given in the "room" tab of the room that the bot is in
 
-    removeAFKDJs: true, //afk limit(on by default), this is for the dj's on stage
-    afkThroughPm: true, //choose whether afk warnings(for dj's on stage) will be given through the pm or the chatbox (false = chatbox, true = pm message)
-    afkTimeLimit: 20, //set the afk limit in minutes here
+    removeIdleDJs: true, //afk limit(on by default), this is for the dj's on stage
+    djIdleLimit: 20, // idle (minutes) limit for DJs
+    warnIdlePM: true, //choose whether idle warnings(for dj's on stage) will be given through the pm or the chatbox (false = chatbox, true = pm message)
+
+    roomIdle: false, //audience afk limit(off by default)
+    roomIdleLimit: 60, // idle (minutes) limit for DJs
+
     voteMeansActive: false, // does voting/bopping count as user being active (too many user autoBop)
     speechMeansActive: true, // does chatting count as user being active
     snagMeansActive: true, // does snagging a track count as user being active

@@ -39,9 +39,7 @@ const chatFunctions = (bot, roomDefaults) => {
             } else {
                 this.botChat( message );
             }
-
         },
-
 
         botChat: function (message) {
             bot.speak(message);

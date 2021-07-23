@@ -51,11 +51,11 @@ setInterval(function() {
     }
 }, 5 * 1000);
 
-// check if users are idle every 5 seconds
-setInterval( function() { userFunctions.afkCheck(roomFunctions, roomDefaults) }, 5 * 1000);
+// check if DJs are idle every minute
+setInterval( function() { userFunctions.idledOutDJCheck( roomDefaults, chatFunctions ) }, 60 * 1000);
 
-// check if the moderators are idle every 5 seconds
-setInterval( function() { userFunctions.roomAFKCheck() }, 5 * 1000)
+// check if the users are idle every minute
+setInterval( function() { userFunctions.roomIdleCheck( roomDefaults, chatFunctions ) }, 60 * 1000)
 
 // every 5 seconds, check if the there's an empty DJ slot, and promt the next in the queue to join the decks, remove them if they don't
 setInterval(function () {
@@ -318,7 +318,7 @@ bot.on('speak', function (data) {
 
 
     //checks to see if someone is trying to speak to an afk person or not.
-    if (userFunctions.afkPeople.length !== 0 && theUserID !== authModule.USERID) {
+    if (userFunctions.howManyAFKUsers() !== 0 && theUserID !== authModule.USERID) {
         for (let j = 0; j < userFunctions.afkPeople.length; j++) //loop through afk people array
         {
             if (typeof (userFunctions.afkPeople[j] !== 'undefined')) {
