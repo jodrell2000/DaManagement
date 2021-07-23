@@ -20,3 +20,4 @@
 * post Minday "OK, I Love You Bye Bye" gif when booting etc
 https://media.giphy.com/media/l2QE4oXcsxunFIUo0/giphy.gif
 * personalised /props gifs and welcome messages tied to userIDs
+* automatic messages on passing certain scores??
