@@ -152,7 +152,7 @@ const commandFunctions = (bot) => {
     userCommands.afk = ( data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { userFunctions.switchUserAFK ( data, chatFunctions ); }
     userCommands.afk.help = "Switches the senders AFK state";
 
-        // #############################################
+    // #############################################
     // Moderator Only comamnds
     // #############################################
 
