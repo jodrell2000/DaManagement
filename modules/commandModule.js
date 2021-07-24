@@ -31,10 +31,12 @@ const commandFunctions = (bot) => {
     // General commands
     // #############################################
 
-    generalCommands.list = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { chatFunctions.botSpeak( data, "Available commands are: " + listCommands()); }
+    generalCommands.list = (data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { listCommands( data, args, chatFunctions ) }
+    generalCommands.list.argumentCount = 1;
     generalCommands.list.help = "Lists all available commands";
+    generalCommands.list.sampleArguments = [ "[command type]" ]
 
-    generalCommands.help = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { displayHelp(data, command, chatFunctions); }
+    generalCommands.help = (data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) => { displayHelp( data, command, chatFunctions ); }
     generalCommands.help.argumentCount = 1;
     generalCommands.help.help = "Display how to use an individual command";
     generalCommands.help.sampleArguments = [ "[command]" ]
@@ -164,11 +166,52 @@ const commandFunctions = (bot) => {
     // end of fully checked commands
     // #############################
 
-    function listCommands() {
-        return Object.keys(allCommands);
+    const allCommands = {
+        ...generalCommands,
+        ...moderatorCommands,
+        ...botCommands,
+        ...chatCommands,
+        ...userCommands
     }
 
-    function displayHelp(data, command, chatFunctions) {
+    function listCommands( data, commandGroup, chatFunctions ) {
+        let theCommand = commandGroup[0];
+        let theMessage = "";
+
+        switch ( theCommand ) {
+            case "generalCommands":
+                theMessage = "The General Commands are " + buildListFromObject( Object.keys(generalCommands) );
+                break;
+            case "moderatorCommands":
+                theMessage = "The Moderator Commands are " + buildListFromObject( Object.keys(moderatorCommands) );
+                break;
+            case "botCommands":
+                theMessage = "The Bot Commands are " + buildListFromObject( Object.keys(botCommands) );
+                break;
+            case "chatCommands":
+                theMessage = "The Chat Commands are " + buildListFromObject( Object.keys(chatCommands) );
+                break;
+            case "userCommands":
+                theMessage = "The User Commands are " + buildListFromObject( Object.keys(userCommands) );
+                break;
+            default:
+                theMessage = 'Top level command groups are: generalCommands, moderatorCommands, botCommands, chatCommands, userCommands. Please use '  + chatDefaults.commandIdentifier + 'list [commandGroup] for the individual commands';
+                break;
+        }
+
+        theMessage = theMessage.replace(',', ', ');
+        chatFunctions.botSpeak( data, theMessage );
+    }
+
+    function buildListFromObject( commandObject ) {
+        let theList = '';
+        for (let i in commandObject) {
+            theList += chatDefaults.commandIdentifier + commandObject[i] + ", ";
+        }
+        return theList.substring( 0, theList.length - 2 );
+    }
+
+    function displayHelp( data, command, chatFunctions ) {
         let theMessage = "";
 
         if (command[0] === undefined) {
@@ -188,14 +231,6 @@ const commandFunctions = (bot) => {
             theMessage = theMessage + "': " + allCommands[command].help;
             chatFunctions.botSpeak(data, theMessage);
         }
-    }
-
-    const allCommands = {
-        ...generalCommands,
-        ...moderatorCommands,
-        ...botCommands,
-        ...chatCommands,
-        ...userCommands
     }
 
     return {
