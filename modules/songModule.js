@@ -1,5 +1,6 @@
 let roomDefaults = require('../defaultSettings/roomDefaults.js');
 let botDefaults = require('../defaultSettings/botDefaults.js');
+let musicDefaults = require('../defaultSettings/musicDefaults.js');
 
 let song = null; // info for the currently playing song, so default to null
 let album = null; // info for the currently playing song, so default to null
@@ -75,6 +76,31 @@ const songFunctions = (bot) => {
                     bot.speak("Reorder completed.");
                 }
             }, 1000);
+        },
+
+        // ========================================================
+
+        // ========================================================
+        // Playlist Functions
+        // ========================================================
+
+        switchLengthLimit: function ( data, songLength, chatFunctions ) {
+            logMe('default', 'switchLengthLimit, songLength:' + songLength );
+            if ( songLength !== undefined ) {
+                musicDefaults.songLengthLimit = songLength;
+            } else {
+                musicDefaults.songLengthLimitOn = musicDefaults.songLengthLimitOn !== true;
+                musicDefaults.songLengthLimit = musicDefaults.songLengthLimitDefault;
+            }
+
+            let theMessage = "The song length limit is now";
+            if ( musicDefaults.songLengthLimitOn ) {
+                theMessage += " active, and the length limit is " + musicDefaults.songLengthLimit + " minutes";
+            } else {
+                theMessage += " innactive";
+            }
+
+            chatFunctions.botSpeak( data, theMessage, true)
         },
 
         // ========================================================

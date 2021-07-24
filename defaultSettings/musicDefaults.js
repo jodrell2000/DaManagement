@@ -10,7 +10,11 @@ module.exports = {
     bannedArtists: ['dj tiesto', 'skrillex', 'lil wayne', 't-pain', 'tpain', 'katy perry', 'eminem', 'porter robinson', 'gorgoroth', 'justin bieber', 'deadmau5', 'nosia', 'infected mushroom', 'spongebob squarepants', 'usher'],
 
     voteSkip: false, //voteskipping(off by default)
-    LIMIT: true, //song length limit (on by default)
+
+    songLengthLimit: 10,// holds the current song limit in minutes
+    songLengthLimitOn: true, //song length limit (on by default)
+    songLengthLimitDefault: 10.0, //set song limit default in minutes
+
     PLAYLIMIT: false, //song play limit, this is for the playLimit variable up above(off by default)
 
 

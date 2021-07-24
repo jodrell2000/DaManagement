@@ -30,7 +30,6 @@ module.exports = {
 
     // other stuff
     playLimit: 3, //set the playlimit here (default 4 songs)
-    songLengthLimit: 10.0, //set song limit in minutes
 
     refreshingEnabled: true, //whether or not /refresh can be used or not (true = yes, false = no)
     amountOfTimeToRefresh: 30, //the amount of seconds someone has to use the refresh command(if enabled)
