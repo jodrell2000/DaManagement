@@ -228,7 +228,7 @@ const commandFunctions = (bot) => {
         }
 
         if (allCommands[command] === undefined) {
-            chatFunctions.botSpeak(data, "That command desn't exist. Try /list to find the available commands");
+            chatFunctions.botSpeak(data, 'That command doesn\'t exist. Try ' + chatDefaults.commandIdentifier + 'list to find the available commands');
         } else {
             theMessage = theMessage + "'" + chatDefaults.commandIdentifier + command + " ";
 
@@ -274,7 +274,7 @@ const commandFunctions = (bot) => {
             } else if ( command ) {
                 command.call( null, data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions );
             } else {
-                chatFunctions.botSpeak( data,"Sorry, that's not a command I recognise. Try /list to find out more.");
+                chatFunctions.botSpeak( data,"Sorry, that's not a command I recognise. Try " + chatDefaults.commandIdentifier + "list to find out more.");
             }
         },
 
