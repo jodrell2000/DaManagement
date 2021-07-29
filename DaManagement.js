@@ -135,6 +135,8 @@ bot.on('roomChanged', function (data)
         userFunctions.botStartReset(botFunctions, songFunctions);
 
         userFunctions.resetAllWarnMe(data);
+
+        userFunctions.clearDJList(data);
         userFunctions.resetDJs(data);
 
         //get & set information
@@ -142,8 +144,6 @@ bot.on('roomChanged', function (data)
 
         userFunctions.rebuildUserList(data);
         userFunctions.resetModerators(data);
-
-        userFunctions.clearDJList(data);
 
         userFunctions.resetAllSpamCounts();
 
