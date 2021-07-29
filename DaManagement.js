@@ -136,9 +136,6 @@ bot.on('roomChanged', function (data)
 
         userFunctions.resetAllWarnMe(data);
 
-        userFunctions.clearDJList(data);
-        userFunctions.resetDJs(data);
-
         //get & set information
         roomFunctions.setRoomDefaults(data);
 
@@ -148,6 +145,8 @@ bot.on('roomChanged', function (data)
         userFunctions.resetAllSpamCounts();
 
         userFunctions.startAllUserTimers();
+
+        userFunctions.resetDJs(data);
 
         // set user as current DJ
         userFunctions.setCurrentDJ(data.room.metadata.current_dj);

@@ -141,6 +141,9 @@ const commandFunctions = (bot) => {
     chatCommands.metal = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.metalMessages, chatCommandItems.metalPics, userFunctions ); }
     chatCommands.metal.help = ":metal: ";
 
+    chatCommands.birthday = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.birthdayMessages, chatCommandItems.birthdayPics, userFunctions ); }
+    chatCommands.birthday.help = "Happy Birthday!!!";
+
     // ######################################################
     // Advanced chat commands...more than just basic messages
     // ######################################################

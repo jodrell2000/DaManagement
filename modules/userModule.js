@@ -36,10 +36,10 @@ let queueList = []; //holds the userid of everyone in the queue
 const userFunctions = (bot, roomDefaults) => {
     function logMe(logLevel, message) {
         if (logLevel === 'error') {
-            console.log("userFunctions:" + logLevel + "->" + message + "\n");
+            console.log("userFunctions:" + logLevel + "->" + message + "\n" );
         } else {
             if (bot.debug) {
-                console.log("userFunctions:" + logLevel + "->" + message + "\n");
+                console.log("userFunctions:" + logLevel + "->" + message + "\n" );
             }
         }
     }
@@ -62,12 +62,12 @@ const userFunctions = (bot, roomDefaults) => {
         warnme: () => warnme,
 
         isUserIDStageBanned: function ( userID ) {
-            const stageBanned = permanentStageBan.findIndex(({id}) => id === userID);
-            return stageBanned !== -1;
+            const stageBanned = permanentStageBan.findIndex( ( { id } ) => id === userID );
+            return stageBanned !== 0;
         },
 
         isUserBannedFromRoom: function ( userID ) {
-            const banned = bannedUsers.findIndex(({id}) => id === userID);
+            const banned = bannedUsers.findIndex( ( { id} ) => id === userID);
             return banned !== -1;
         },
 
@@ -87,6 +87,7 @@ const userFunctions = (bot, roomDefaults) => {
             this.resetAFKPeople();
             this.deleteAllDJsPlayCount();
             this.resetModPM();
+            this.clearDJList();
 
             songFunctions.loadPlaylist();
 
@@ -133,7 +134,7 @@ const userFunctions = (bot, roomDefaults) => {
         getUsername: function ( userID ) {
             theUsersList.forEach(function(theUser) {
             });
-            let theUser = theUsersList.find(({id}) => id === userID);
+            let theUser = theUsersList.find( ( { id } ) => id === userID);
             return theUser.username;
         },
 
@@ -155,7 +156,7 @@ const userFunctions = (bot, roomDefaults) => {
         // Moderator Management Functions
         // ========================================================
 
-        resetModerators: function (data) {
+        resetModerators: function ( data) {
             let userPosition;
             let theUserID;
             if ( data.room !== undefined ) {
@@ -547,8 +548,8 @@ const userFunctions = (bot, roomDefaults) => {
         // ========================================================
 
         isUserIDOnStage: function ( userID ) {
-            const onStage = djList.findIndex(({userID}) => userID === userID);
-            return onStage !== -1;
+            const onStage = djList.findIndex( ( { userID } ) => userID === userID );
+            return onStage !== 0;
         },
 
         isCurrentDJ: function ( userID ) {
@@ -558,7 +559,7 @@ const userFunctions = (bot, roomDefaults) => {
             return listPosition !== -1;
         },
 
-        resetDJs: function (data) {
+        resetDJs: function ( data) {
             let djID;
             if ( data.room !== undefined ) {
                 for (let djLoop = 0; djLoop < data.room.metadata.djs.length; djLoop++) {
@@ -675,19 +676,19 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         addUserToQueue: function ( userID ) {
-            if (!roomDefaults.queueActive) {
+            if ( !roomDefaults.queueActive ) {
                 return [ false, "the queue is disabled." ];
             }
 
-            if (this.isUserIDInQueue( userID )) {
-                return [ false, "you are already in queue." ];
+            if ( this.isUserIDInQueue( userID ) === true ) {
+                return [ false, "you are already in the queue." ];
             }
 
-            if (this.isUserIDOnStage( userID )) {
+            if ( this.isUserIDOnStage( userID ) === true ) {
                 return [ false, "you are already on stage!" ];
             }
 
-            if (this.isUserIDStageBanned( userID )) {
+            if ( this.isUserIDStageBanned( userID ) === true ) {
                 return [ false, "sorry, you are banned from the stage." ];
             }
 
@@ -699,7 +700,7 @@ const userFunctions = (bot, roomDefaults) => {
             if (!this.isUserIDInQueue( userID )) {
                 return [ true, "not in queue" ];
             } else {
-                const queuePosition = queueList.findIndex( ({ userID }) => userID === userID );
+                const queuePosition = queueList.findIndex( ({ id }) => id === userID );
                 queueList.splice(queuePosition, 1);
                 return [ false, '' ];
             }
@@ -718,17 +719,25 @@ const userFunctions = (bot, roomDefaults) => {
             const username = args[0];
             const userID = this.getUserIDFromUsername( username );
             const newPosition = args[1] - 1;
-            let err, theMessage = this.removeUserFromQueue( userID );
+            const [ err, _ ] = this.removeUserFromQueue( userID );
+
+            logMe('debug', '================ changeUsersQueuePosition, username:' + username );
+            logMe('debug', '================ changeUsersQueuePosition, userID:' + userID );
+            logMe('debug', '================ changeUsersQueuePosition, newPosition:' + newPosition );
+            logMe('debug', '================ changeUsersQueuePosition, err:' + err );
+            logMe('debug', '================ changeUsersQueuePosition, queueList:' + JSON.stringify( queueList ) );
 
             if ( err !== true ) {
                 queueList.splice( newPosition, 0, userID);
+                logMe('debug', '================ changeUsersQueuePosition, queueList:' + JSON.stringify( queueList ) );
             } else {
-                chatFunctions.botSpeak(data, "The user " + this.getUsername( userID ) + " is not currently in the queue");
+                chatFunctions.botSpeak( data, "The user " + this.getUsername( userID ) + " is not currently in the queue" );
             }
             this.readQueue( data, chatFunctions );
         },
 
         moveUserToHeadOfQueue: function ( data, args, chatFunctions ) {
+            logMe('debug', '================ moveUserToHeadOfQueue, args:' + JSON.stringify( args ) );
             args[1] = 1;
             this.changeUsersQueuePosition( data, args, chatFunctions );
         },
@@ -743,35 +752,26 @@ const userFunctions = (bot, roomDefaults) => {
             const userID = data.userid;
 
             if ( !roomDefaults.queueActive ) {
-                chatFunctions.botSpeak(data, '@' + this.getUsername(userID) + ', the queue is currently disabled');
+                chatFunctions.botSpeak( data, '@' + this.getUsername(userID) + ', the queue is currently disabled');
             } else {
-                const queuePosition = queueList.findIndex(({userID}) => userID === userID) + 1;
+                const queuePosition = queueList.findIndex( ( { id } ) => id === userID) + 1;
                 if ( queuePosition !== -1) {
-                    chatFunctions.botSpeak(data, '@' + this.getUsername(userID) + ', you are currently at position ' + queuePosition + ' in the queue');
+                    chatFunctions.botSpeak( data, '@' + this.getUsername(userID) + ', you are currently at position ' + queuePosition + ' in the queue');
                 } else {
-                    chatFunctions.botSpeak(data, '@' + this.getUsername(userID) + ', you are not currently in the queue');
+                    chatFunctions.botSpeak( data, '@' + this.getUsername(userID) + ', you are not currently in the queue');
                 }
             }
         },
 
-        addme: function ( data, chatFunctions ) {
+        addme: function ( data, chatFunctions) {
             const userID = data.userid;
 
-            if ( this.isUserIDOnStage( userID ) ) {
-                chatFunctions.botSpeak(data, "@" + this.getUsername( userID ) + ", you can't join the queue if you're already DJing");
-            } else {
-                if ( this.isUserIDInQueue( userID ) ) {
-                    chatFunctions.botSpeak(data, "@" + this.getUsername( userID ) + ", you're already in the queue");
-                    this.readQueue( data, chatFunctions )
-                } else {
-                    let err, theMessage = this.addUserToQueue( userID );
+            const [ added, theMessage ] = this.addUserToQueue(userID);
 
-                    if (err === true) {
-                        chatFunctions.botSpeak( data, theMessage );
-                    } else {
-                        this.readQueue( data, chatFunctions )
-                    }
-                }
+            if ( added === true ) {
+                this.readQueue( data, chatFunctions )
+            } else {
+                chatFunctions.botSpeak( data, theMessage );
             }
         },
         
@@ -779,9 +779,9 @@ const userFunctions = (bot, roomDefaults) => {
             const userID = data.userid;
             if ( this.isUserIDInQueue( userID ) ) {
                 this.removeUserFromQueue( userID )
-                chatFunctions.botSpeak(data, "@" + this.getUsername( userID ) + ', I\'ve removed you from the queue' );
+                chatFunctions.botSpeak( data, "@" + this.getUsername( userID ) + ', I\'ve removed you from the queue' );
             } else {
-                chatFunctions.botSpeak(data, "@" + this.getUsername( userID ) + ', you\'re not currently in the queue. Use the ' + chatDefaults.commandIdentifier + 'addme command to join' );
+                chatFunctions.botSpeak( data, "@" + this.getUsername( userID ) + ', you\'re not currently in the queue. Use the ' + chatDefaults.commandIdentifier + 'addme command to join' );
             }
             this.readQueue( data, chatFunctions )
         },
@@ -791,7 +791,7 @@ const userFunctions = (bot, roomDefaults) => {
                 chatFunctions.botSpeak( data, "The queue is already enabled" );
             } else {
                 roomDefaults.queueActive = true;
-                chatFunctions.botSpeak(data, "The queue is now on");
+                chatFunctions.botSpeak( data, "The queue is now on" );
             }
         },
 
@@ -800,7 +800,7 @@ const userFunctions = (bot, roomDefaults) => {
                 chatFunctions.botSpeak( data, "The queue is already disabled" );
             } else {
                 roomDefaults.queueActive = false;
-                chatFunctions.botSpeak(data, "The queue is now off");
+                chatFunctions.botSpeak( data, "The queue is now off" );
             }
         },
 
@@ -845,7 +845,7 @@ const userFunctions = (bot, roomDefaults) => {
             theUsersList = []
         },
 
-        updateUser: function (data, roomFunctions) {
+        updateUser: function ( data, roomFunctions) {
             if (typeof data.name === 'string') {
                 let oldname = ''; //holds users old name if exists
                 let queueNamePosition;
@@ -855,8 +855,8 @@ const userFunctions = (bot, roomDefaults) => {
                 //when when person updates their profile
                 //and their name is not found in the users list then they must have changed
                 //their name
-                if (theUsersList.indexOf(data.name) === -1) {
-                    let nameIndex = theUsersList.indexOf(data.userid);
+                if (theUsersList.indexOf( data.name) === -1) {
+                    let nameIndex = theUsersList.indexOf( data.userid);
                     if (nameIndex !== -1) //if their userid was found in theUsersList
                     {
                         oldname = theUsersList[nameIndex + 1];
@@ -1003,15 +1003,15 @@ const userFunctions = (bot, roomDefaults) => {
             this.resetUsersSpamCount( userID );
         },
 
-        checkForEmptyUsersList: function (data) {
+        checkForEmptyUsersList: function ( data) {
             if(theUsersList.length === 0) {
-                this.rebuildUserList(data);
+                this.rebuildUserList( data);
             }
         },
 
         isUserInUsersList: function ( userID ) {
             // if the userID is in the userList return true, else false
-            return theUsersList.find(({id}) => id === userID) !== undefined;
+            return theUsersList.find( ( { id } ) => id === userID) !== undefined;
         },
 
         addUserToTheUsersList: function (userID, username) {
@@ -1021,11 +1021,11 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         removeUserFromTheUsersList: function ( userID ) {
-            let listLocation = theUsersList.find( ({ id }) => id === userID );
+            let listLocation = theUsersList.find( ( { id } ) => id === userID );
             theUsersList.splice(listLocation, 1);
         },
 
-        rebuildUserList: function (data) {
+        rebuildUserList: function ( data) {
             this.resetUsersList();
             let thisUserID;
 
@@ -1082,7 +1082,7 @@ const userFunctions = (bot, roomDefaults) => {
                 informTimer = null;
 
                 if (typeof theUsersList[theUsersList.indexOf(roomFunctions.lastdj()) + 1] !== 'undefined') {
-                    bot.speak("@" + theUsersList[theUsersList.indexOf(roomFunctions.lastdj()) + 1] + ", Thanks buddy ;-)");
+                    bot.speak("@" + theUsersList[theUsersList.indexOf(roomFunctions.lastdj()) + 1] + ", Thanks buddy ;-)" );
                 } else {
                     bot.speak('Thanks buddy ;-)');
                 }
@@ -1121,7 +1121,7 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        resetAllWarnMe: function (data) {
+        resetAllWarnMe: function ( data) {
             let theUserID;
             if ( data.room !== undefined ) {
                 for (let userLoop = 0; userLoop < data.users.length; userLoop++) {
@@ -1151,7 +1151,7 @@ const userFunctions = (bot, roomDefaults) => {
         // Escort Me Functions
         // ========================================================
 
-        resetAllEscortMe: function (data) {
+        resetAllEscortMe: function ( data) {
             let theUserID;
             if ( data.room !== undefined ) {
                 for (let userLoop = 0; userLoop < data.users.length; userLoop++) {

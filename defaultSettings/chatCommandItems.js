@@ -238,5 +238,19 @@ module.exports = {
         "https://media.giphy.com/media/cQRPusQzy23OE/giphy.gif",
         "https://media.giphy.com/media/bVKYqTNcdk0HC/giphy.gif",
         "https://media.giphy.com/media/RAGxhwdfH6Je8/giphy.gif"
+    ],
+
+    birthdayMessages: [
+        "Happy Birthday!!!",
+        "Cake time ;-)"
+    ],
+
+    birthdayPics: [
+        "https://media.giphy.com/media/WUO8fZQmigr4aiqmgl/giphy.gif",
+        "https://media.giphy.com/media/RMqWNH6K5VTJBxcznP/giphy.gif",
+        "https://media.giphy.com/media/WRL7YgP42OKns22wRD/giphy.gif",
+        "https://media.giphy.com/media/xT0BKqk8FSsAgRQ0SY/giphy.gif",
+        "https://media.giphy.com/media/Be9nOh8wsow8Kvt8Jx/giphy.gif",
+        "https://media.giphy.com/media/IFjSbBHETzzr6GJdwW/giphy-downsized-large.gif"
     ]
 }
