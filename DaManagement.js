@@ -356,7 +356,6 @@ bot.on('snagged', function (data)
 //this activates when a user joins the stage.
 bot.on('add_dj', function (data)
 {
-
     let OKToDJ;
     let theMessage;
     const theUserID = data.user[0].userid;
@@ -366,7 +365,7 @@ bot.on('add_dj', function (data)
     if ( !OKToDJ ) {
         bot.remDj(theUserID);
         userFunctions.incrementSpamCounter(theUserID);
-        chatFunctions.botSpeak( theMessage, theUserID );
+        chatFunctions.botSpeak( data, theMessage );
     }
 
     //sets dj's songcount to zero when they enter the stage.

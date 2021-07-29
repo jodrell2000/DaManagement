@@ -1,5 +1,6 @@
 let musicDefaults = require('../defaultSettings/musicDefaults.js');
 let roomDefaults = require('../defaultSettings/roomDefaults.js');
+let chatDefaults = require('../defaultSettings/chatDefaults.js');
 
 let authModule = require('../auth.js');
 const auth = require('../auth.js');
@@ -598,12 +599,12 @@ const userFunctions = (bot, roomDefaults) => {
                         return [ true, '' ];
                     }
                 } else {
-                    return [ false, 'The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.' ];
+                    return [ false, 'The queue is currently active. To add yourself to the queue type ' + chatDefaults.commandIdentifier + 'addme. To remove yourself from the queue type /removeme.' ];
                 }
             }
 
             if ( this.refreshDJCount() + this.djList().length >= 5 ) {
-                return [ false, 'Sorry, but i\m holding that spot for someone in the refresh list' ];
+                return [ false, 'Sorry, but I\'m holding that spot for someone in the refresh list' ];
             }
 
             for ( let banLoop = 0; banLoop < roomFunctions.tempBanList().length; banLoop++ ) {

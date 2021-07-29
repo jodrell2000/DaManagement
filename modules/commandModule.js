@@ -42,7 +42,7 @@ const commandFunctions = (bot) => {
     generalCommands.help.sampleArguments = [ "[command]" ]
 
     generalCommands.q = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { userFunctions.readQueue( data, chatFunctions ); }
-    generalCommands.q.help = "lis the current people in the queue";
+    generalCommands.q.help = "Tells you who's in the queue";
 
     // #############################################
     // Chat commands...make the bot post silly stuff
