@@ -11,6 +11,8 @@ const moderatorCommands = {};
 const botCommands = {};
 const chatCommands = {};
 const userCommands = {};
+const userQueueCommands = {};
+const moderatorQueueCommands = {};
 
 const commandFunctions = (bot) => {
     function logMe(logLevel, message) {
@@ -41,8 +43,21 @@ const commandFunctions = (bot) => {
     generalCommands.help.help = "Display how to use an individual command";
     generalCommands.help.sampleArguments = [ "[command]" ]
 
-    generalCommands.q = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { userFunctions.readQueue( data, chatFunctions ); }
-    generalCommands.q.help = "Tells you who's in the queue";
+    // #############################################
+    // General user Queue commands
+    // #############################################
+
+    userQueueCommands.q = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { userFunctions.readQueue( data, chatFunctions ); }
+    userQueueCommands.q.help = "Tells you who's in the queue";
+
+    userQueueCommands.addme = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { userFunctions.addme( data, chatFunctions ); }
+    userQueueCommands.addme.help = "Join the queue for the decks";
+
+    userQueueCommands.removeme = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { userFunctions.removeme( data, chatFunctions ); }
+    userQueueCommands.removeme.help = "Remove yourself from the queue";
+
+    userQueueCommands.position = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { userFunctions.whatsMyQueuePosition( data, chatFunctions ); }
+    userQueueCommands.position.help = "Tells a user where they are in the queue";
 
     // #############################################
     // Chat commands...make the bot post silly stuff
@@ -168,16 +183,50 @@ const commandFunctions = (bot) => {
     moderatorCommands.lengthLimit = ( data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { songFunctions.switchLengthLimit( data, args, chatFunctions ) }
     moderatorCommands.lengthLimit.argumentCount = 1;
     moderatorCommands.lengthLimit.help = "Switch the song length limit on or off. Sent with a number it changes the limit";
-    moderatorCommands.lengthLimit.sampleArguments = [ "20" ]
+    moderatorCommands.lengthLimit.sampleArguments = [ "20" ];
 
+    // #############################################
+    // Moderator Only Queue commands
+    // #############################################
+
+    moderatorQueueCommands.move = ( data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { userFunctions.changeUsersQueuePosition ( data, args, chatFunctions ) };
+    moderatorQueueCommands.move.argumentCount = 2;
+    moderatorQueueCommands.move.help = "Change a users position in the queue";
+    moderatorQueueCommands.move.sampleArguments = [ 'jodrell', 1 ];
+
+    moderatorQueueCommands.bumptop = ( data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { userFunctions.moveUserToHeadOfQueue ( data, args, chatFunctions ) };
+    moderatorQueueCommands.bumptop.argumentCount = 1;
+    moderatorQueueCommands.bumptop.help = "Move a user to the head of the queue";
+    moderatorQueueCommands.bumptop.sampleArguments = [ 'jodrell' ];
+
+    moderatorQueueCommands.queueOn = ( data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { userFunctions.enableQueue( data, chatFunctions ) }
+    moderatorQueueCommands.queueOn.help = "Enables the queue";
+
+    moderatorQueueCommands.queueOff = ( data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { userFunctions.disableQueue( data, chatFunctions ) }
+    moderatorQueueCommands.queueOff.help = "Disables the queue";
 
     // #############################
     // end of fully checked commands
     // #############################
 
-    const allCommands = {
-        ...generalCommands,
+    const allModeratorCommands = {
         ...moderatorCommands,
+        ...moderatorQueueCommands
+    }
+
+    const allQueueCommands = {
+        ...moderatorQueueCommands,
+        ...userQueueCommands
+    }
+
+    const allGeneralCommands = {
+        ...generalCommands,
+        ...userQueueCommands
+    }
+
+    const allCommands = {
+        ...allGeneralCommands,
+        ...allModeratorCommands,
         ...botCommands,
         ...chatCommands,
         ...userCommands
@@ -189,10 +238,10 @@ const commandFunctions = (bot) => {
 
         switch ( theCommand ) {
             case "generalCommands":
-                theMessage = "The General Commands are " + buildListFromObject( Object.keys(generalCommands) );
+                theMessage = "The General Commands are " + buildListFromObject( Object.keys(allGeneralCommands) );
                 break;
             case "moderatorCommands":
-                theMessage = "The Moderator Commands are " + buildListFromObject( Object.keys(moderatorCommands) );
+                theMessage = "The Moderator Commands are " + buildListFromObject( Object.keys(allModeratorCommands) );
                 break;
             case "botCommands":
                 theMessage = "The Bot Commands are " + buildListFromObject( Object.keys(botCommands) );
@@ -203,8 +252,11 @@ const commandFunctions = (bot) => {
             case "userCommands":
                 theMessage = "The User Commands are " + buildListFromObject( Object.keys(userCommands) );
                 break;
+            case "queueCommands":
+                theMessage = "The User Commands are " + buildListFromObject( Object.keys(allQueueCommands) );
+                break;
             default:
-                theMessage = 'Top level command groups are: generalCommands, moderatorCommands, botCommands, chatCommands, userCommands. Please use '  + chatDefaults.commandIdentifier + 'list [commandGroup] for the individual commands';
+                theMessage = 'Top level command groups are: generalCommands, moderatorCommands, botCommands, chatCommands, userCommands, queueCommands. Please use '  + chatDefaults.commandIdentifier + 'list [commandGroup] for the individual commands';
                 break;
         }
 
@@ -230,11 +282,11 @@ const commandFunctions = (bot) => {
         if (allCommands[command] === undefined) {
             chatFunctions.botSpeak(data, 'That command doesn\'t exist. Try ' + chatDefaults.commandIdentifier + 'list to find the available commands');
         } else {
-            theMessage = theMessage + "'" + chatDefaults.commandIdentifier + command + " ";
+            theMessage = theMessage + "'" + chatDefaults.commandIdentifier + command;
 
             if (allCommands[command].argumentCount !== undefined) {
                 for (let argumentLoop = 0; argumentLoop < allCommands[command].argumentCount; argumentLoop++) {
-                    theMessage = theMessage + allCommands[command].sampleArguments[argumentLoop]
+                    theMessage = theMessage + ' ' + allCommands[command].sampleArguments[argumentLoop]
                 }
             }
             theMessage = theMessage + "': " + allCommands[command].help;
@@ -284,32 +336,6 @@ const commandFunctions = (bot) => {
 
             if (text.match('turntable.fm/') && !text.match('turntable.fm/' + roomDefaults.ttRoomName) && !userFunctions.isUserModerator(speaker) && data.userid !== authModule.USERID) {
                 bot.boot(data.userid, 'do not advertise other rooms here');
-            } else if (text.match('/bumptop') && userFunctions.isUserModerator() === true) {
-                if (roomDefaults.queueActive === true) {
-                    let topOfQueue = data.text.slice(10);
-                    let index35 = userFunctions.queueList().indexOf(topOfQueue);
-                    let index46 = userFunctions.queueName().indexOf(topOfQueue);
-                    let index80 = userFunctions.theUsersList().indexOf(topOfQueue);
-                    let index81 = userFunctions.theUsersList()[index80];
-                    let index82 = userFunctions.theUsersList()[index80 - 1];
-                    if (index35 !== -1 && index80 !== -1) {
-                        clearTimeout(roomFunctions.queueTimer());
-                        botFunctions.setSayOnce(true);
-                        userFunctions.queueList().splice(index35, 2);
-                        userFunctions.queueList().unshift(index81, index82);
-                        userFunctions.queueName().splice(index46, 1);
-                        userFunctions.queueName().unshift(index81);
-                        let temp92 = 'The queue is now: ';
-                        for (let po = 0; po < userFunctions.queueName().length; po++) {
-                            if (po !== (userFunctions.queueName().length - 1)) {
-                                temp92 += userFunctions.queueName()[po] + ', ';
-                            } else if (po === (userFunctions.queueName().length - 1)) {
-                                temp92 += userFunctions.queueName()[po];
-                            }
-                        }
-                        bot.speak(temp92);
-                    }
-                }
             } else if (text.match(/^\/stalk/) && userFunctions.isUserModerator(speaker) === true) {
                 let stalker = text.substring(8);
                 bot.getUserId(stalker, function (data6) {
@@ -344,17 +370,6 @@ const commandFunctions = (bot) => {
                     }
                 } else {
                     bot.pm('error, the dj afk timer has to be active for me to report afk time.', data.userid);
-                }
-            } else if (text.match(/^\/position/)) {
-                let checkPosition = userFunctions.queueName().indexOf(data.name);
-
-                if (checkPosition !== -1 && roomDefaults.queueActive === true) //if person is in the queue and queue is active
-                {
-                    bot.speak('@' + userFunctions.name() + ' you are currently in position number ' + (checkPosition + 1) + ' in the queue');
-                } else if (checkPosition === -1 && roomDefaults.queueActive === true) {
-                    bot.speak('@' + userFunctions.name() + ' i can\'t tell you your position unless you are currently in the queue');
-                } else {
-                    bot.speak('@' + userFunctions.name() + ' there is currently no queue');
                 }
             } else if (text.match(/^\/botstatus/) && userFunctions.isUserModerator(speaker) === true) {
                 let whatsOn = '';
@@ -903,79 +918,6 @@ const commandFunctions = (bot) => {
                 } else {
                     bot.speak('The banned from stage list is currently empty.');
                 }
-            } else if (text.match('/removefromqueue') && roomDefaults.queueActive === true) {
-                if (userFunctions.isUserModerator(speaker) === true) {
-                    let removeFromQueue = data.text.slice(18);
-                    let index5 = userFunctions.queueList().indexOf(removeFromQueue);
-                    let index6 = userFunctions.queueName().indexOf(removeFromQueue);
-                    if (index5 !== -1) {
-                        if (userFunctions.queueName()[index6] === userFunctions.queueName()[0]) {
-                            clearTimeout(roomFunctions.queueTimer());
-                            botFunctions.setSayOnce(true);
-                        }
-                        userFunctions.queueList().splice(index5, 2);
-                        userFunctions.queueName().splice(index6, 1);
-
-                        if (userFunctions.queueName().length !== 0) {
-                            let temp89 = 'The queue is now: ';
-                            for (let jk = 0; jk < userFunctions.queueName().length; jk++) {
-                                if (jk !== (userFunctions.queueName().length - 1)) {
-                                    temp89 += userFunctions.queueName()[jk] + ', ';
-                                } else if (jk === (userFunctions.queueName().length - 1)) {
-                                    temp89 += userFunctions.queueName()[jk];
-                                }
-                            }
-                            bot.speak(temp89);
-                        } else {
-                            bot.speak('The queue is now empty.');
-                        }
-                    } else {
-                        bot.pm('error, no such person was found to be in the queue', data.userid);
-                    }
-                }
-            } else if (text.match(/^\/removeme$/) && roomDefaults.queueActive === true) {
-                if (typeof data.name == 'undefined') {
-                    if (typeof (data.userid) != 'undefined') {
-                        bot.pm('failed to remove from queue, please try the command again', data.userid);
-                    } else {
-                        bot.speak('failed to remove from queue, please try the command again');
-                    }
-                } else {
-                    let list1 = userFunctions.queueList().indexOf(data.name);
-                    let list2 = userFunctions.queueName().indexOf(data.name);
-
-                    if (list2 !== -1 && list1 !== -1) {
-                        userFunctions.queueList().splice(list1, 2);
-
-                        if (data.name === userFunctions.queueName()[0]) {
-                            clearTimeout(roomFunctions.queueTimer());
-                            botFunctions.setSayOnce(true);
-                        }
-
-                        userFunctions.queueName().splice(list2, 1);
-
-                        roomFunctions.readQueueMembers(userFunctions)
-                    } else {
-                        bot.pm('error, you have to be in the queue to remove yourself from the queue', data.userid);
-                    }
-                }
-            } else if ( text.match(/^\/addme$/ ) ) {
-                if (typeof data.userid == 'undefined') {
-                    logMe("debug", "User is undefined");
-                    bot.speak('failed to add to queue, please try the command again: undefined userID');
-                } else {
-                    let theMessage, addedToQueue;
-                    [addedToQueue, theMessage] = userFunctions.addUserToQueue(data.userid);
-                    bot.speak(userFunctions.buildQueueMessage());
-
-                    if (!addedToQueue) bot.pm(theMessage, data.userid);
-                }
-            } else if (text.match(/^\/queueOn$/) && userFunctions.isUserModerator(speaker) === true) {
-                userFunctions.resetQueueList();
-                bot.speak('the queue is now active.');
-                roomDefaults.queueActive = true;
-                clearTimeout(roomFunctions.queueTimer()); //if queue is turned on again while somebody was on timeout to get on stage, then clear it
-                botFunctions.setSayOnce(true);
             } else if (text.match(/^\/whatsplaylimit/)) {
                 if (musicDefaults.PLAYLIMIT === true) {
                     bot.speak('the play limit is currently set to: ' + roomDefaults.playLimit + ' songs.');
@@ -1020,9 +962,6 @@ const commandFunctions = (bot) => {
             } else if (text.match(/^\/playLimitOff$/) && userFunctions.isUserModerator(speaker) === true) {
                 musicDefaults.PLAYLIMIT = false;
                 bot.speak('the play limit is now inactive.');
-            } else if (text.match(/^\/queueOff$/) && userFunctions.isUserModerator(speaker) === true) {
-                bot.speak('the queue is now inactive.');
-                roomDefaults.queueActive = false;
             } else if (text.match(/^\/warnme/)) {
                 let areTheyBeingWarned = userFunctions.warnme().indexOf(data.userid);
                 let areTheyDj80 = userFunctions.djList().indexOf(data.userid);
@@ -1327,18 +1266,6 @@ const commandFunctions = (bot) => {
                         bot.pm('error, queue must turned on to use this command', speaker);
                     }
                 }
-            } else if (text.match(/^\/position/)) //tells you your position in the queue, if there is one
-            {
-                let checkPosition = userFunctions.queueName().indexOf(userFunctions.theUsersList()[name1]);
-
-                if (checkPosition !== -1 && roomDefaults.queueActive === true) //if person is in the queue and queue is active
-                {
-                    bot.pm('you are currently in position number ' + (checkPosition + 1) + ' in the queue', speaker);
-                } else if (checkPosition === -1 && roomDefaults.queueActive === true) {
-                    bot.pm('i can\'t tell you your position unless you are currently in the queue', speaker);
-                } else {
-                    bot.pm('there is currently no queue', speaker);
-                }
             } else if (text.match(/^\/djafk/) && isInRoom === true) {
                 if (userFunctions.AFK() === true) //afk limit turned on?
                 {
@@ -1444,117 +1371,6 @@ const commandFunctions = (bot) => {
             } else if (text.match(/^\/playLimitOff$/) && userFunctions.isUserModerator(speaker) === true && isInRoom === true) {
                 musicDefaults.PLAYLIMIT = false;
                 bot.pm('the play limit is now inactive.', speaker);
-            } else if (text.match(/^\/queueOn$/) && userFunctions.isUserModerator(speaker) === true && isInRoom === true) {
-                userFunctions.resetQueueList();
-                bot.pm('the queue is now active.', speaker);
-                roomDefaults.queueActive = true;
-                clearTimeout(roomFunctions.queueTimer()); //if queue is turned on again while somebody was on timeout to get on stage, then clear it
-                botFunctions.setSayOnce(true);
-            } else if (text.match(/^\/queueOff$/) && userFunctions.isUserModerator(speaker) === true && isInRoom === true) {
-                bot.pm('the queue is now inactive.', speaker);
-                roomDefaults.queueActive = false;
-            } else if (text.match(/^\/addme$/) && roomDefaults.queueActive === true && isInRoom === true) {
-                if (typeof speaker == 'undefined' || typeof userFunctions.theUsersList()[name1] == 'undefined') {
-                    if (typeof speaker != 'undefined') {
-                        bot.pm('failed to add to queue, please try the command again', speaker);
-                    } else {
-                        bot.speak('failed to add to queue, please try the command again');
-                    }
-                } else {
-                    let list3 = userFunctions.queueList().indexOf(userFunctions.theUsersList()[name1]);
-                    let list10 = userFunctions.djList().indexOf(speaker)
-                    let checkStageList = roomFunctions.tempBanList().indexOf(speaker);
-                    let checkManualStageList = userFunctions.permanentStageBan().indexOf(speaker);
-                    if (list3 === -1 && list10 === -1 && checkStageList === -1 && checkManualStageList === -1) {
-                        userFunctions.queueList().push(userFunctions.theUsersList()[name1], speaker);
-                        userFunctions.queueName().push(userFunctions.theUsersList()[name1]);
-                        let temp91 = 'The queue is now: ';
-                        for (let hj = 0; hj < userFunctions.queueName().length; hj++) {
-                            if (hj !== (userFunctions.queueName().length - 1)) {
-                                temp91 += userFunctions.queueName()[hj] + ', ';
-                            } else if (hj === (userFunctions.queueName().length - 1)) {
-                                temp91 += userFunctions.queueName()[hj];
-                            }
-                        }
-                        bot.speak(temp91);
-                    } else if (list3 !== -1) //if already in queue
-                    {
-                        bot.pm('sorry i can\'t add you to the queue because you are already in the queue!', speaker);
-                    } else if (checkStageList !== -1 || checkManualStageList !== -1) //if banned from stage
-                    {
-                        bot.pm('sorry i can\'t add you to the queue because you are currently banned from djing', speaker);
-                    } else if (list10 !== -1) //if already on stage
-                    {
-                        bot.pm('you are already djing!', speaker);
-                    }
-                }
-            } else if (text.match(/^\/removeme$/) && roomDefaults.queueActive === true && isInRoom === true) {
-                if (typeof userFunctions.theUsersList()[name1] == 'undefined') {
-                    if (typeof speaker != 'undefined') {
-                        bot.pm('failed to remove from queue, please try the command again', speaker);
-                    } else {
-                        bot.speak('failed to remove from queue, please try the command again');
-                    }
-                } else {
-                    let list1 = userFunctions.queueList().indexOf(userFunctions.theUsersList()[name1]);
-                    let list2 = userFunctions.queueName().indexOf(userFunctions.theUsersList()[name1]);
-
-                    if (list2 !== -1 && list1 !== -1) {
-                        userFunctions.queueList().splice(list1, 2);
-
-                        if (userFunctions.theUsersList()[name1] === userFunctions.queueName()[0]) {
-                            clearTimeout(roomFunctions.queueTimer());
-                            botFunctions.setSayOnce(true);
-                        }
-                        userFunctions.queueName().splice(list2, 1);
-
-                        if (userFunctions.queueName().length !== 0) {
-                            let temp90 = 'The queue is now: ';
-                            for (let kj = 0; kj < userFunctions.queueName().length; kj++) {
-                                if (kj !== (userFunctions.queueName().length - 1)) {
-                                    temp90 += userFunctions.queueName()[kj] + ', ';
-                                } else if (kj === (userFunctions.queueName().length - 1)) {
-                                    temp90 += userFunctions.queueName()[kj];
-                                }
-                            }
-                            bot.speak(temp90);
-                        } else {
-                            bot.speak('The queue is now empty.');
-                        }
-                    } else {
-                        bot.pm('error, you have to be in the queue to remove yourself from the queue', speaker);
-                    }
-                }
-            } else if (text.match('/removefromqueue') && roomDefaults.queueActive === true && isInRoom === true) {
-                if (userFunctions.isUserModerator(speaker) === true) {
-                    let removeFromQueue = data.text.slice(18);
-                    let index5 = userFunctions.queueList().indexOf(removeFromQueue);
-                    let index6 = userFunctions.queueName().indexOf(removeFromQueue);
-                    if (index5 !== -1) {
-                        if (userFunctions.queueName()[index6] === userFunctions.queueName()[0]) {
-                            clearTimeout(roomFunctions.queueTimer());
-                            botFunctions.setSayOnce(true);
-                        }
-                        userFunctions.queueList().splice(index5, 2);
-                        userFunctions.queueName().splice(index6, 1);
-
-                        if (userFunctions.queueName().length !== 0) {
-                            let temp89 = 'The queue is now: ';
-                            for (let jk = 0; jk < userFunctions.queueName().length; jk++) {
-                                if (jk !== (userFunctions.queueName().length - 1)) {
-                                    temp89 += userFunctions.queueName()[jk] + ', ';
-                                } else if (jk === (userFunctions.queueName().length - 1)) {
-                                    temp89 += userFunctions.queueName()[jk];
-                                }
-                            }
-                            bot.speak(temp89);
-                        } else {
-                            bot.speak('The queue is now empty.');
-                        }
-                    } else {
-                        bot.pm('error, no such person was found to be in the queue', speaker);
-                    }
-                }
             } else if (text.match(/^\/snagevery$/) && userFunctions.isUserModerator(speaker) === true && isInRoom === true) {
                 if (songFunctions.snagSong() === true) {
                     songFunctions.snagSong = false;
@@ -1727,32 +1543,6 @@ const commandFunctions = (bot) => {
                     bot.pm('The queue is currently empty.', speaker);
                 } else {
                     bot.pm('There is currently no queue.', speaker);
-                }
-            } else if (text.match('/bumptop') && userFunctions.isUserModerator(speaker) === true && isInRoom === true) {
-                if (roomDefaults.queueActive === true) {
-                    let topOfQueue = data.text.slice(10);
-                    let index35 = userFunctions.queueList().indexOf(topOfQueue);
-                    let index46 = userFunctions.queueName().indexOf(topOfQueue);
-                    let index80 = userFunctions.theUsersList().indexOf(topOfQueue);
-                    let index81 = userFunctions.theUsersList()[index80];
-                    let index82 = userFunctions.theUsersList()[index80 - 1];
-                    if (index35 !== -1 && index80 !== -1) {
-                        clearTimeout(roomFunctions.queueTimer());
-                        botFunctions.setSayOnce(true);
-                        userFunctions.queueList().splice(index35, 2);
-                        userFunctions.queueList().unshift(index81, index82);
-                        userFunctions.queueName().splice(index46, 1);
-                        userFunctions.queueName().unshift(index81);
-                        let temp92 = 'The queue is now: ';
-                        for (let po = 0; po < userFunctions.queueName().length; po++) {
-                            if (po !== (userFunctions.queueName().length - 1)) {
-                                temp92 += userFunctions.queueName()[po] + ', ';
-                            } else if (po === (userFunctions.queueName().length - 1)) {
-                                temp92 += userFunctions.queueName()[po];
-                            }
-                        }
-                        bot.speak(temp92);
-                    }
                 }
             } else if (text.match(/^\/m/) && userFunctions.isUserModerator(speaker) === true && isInRoom === true) {
                 bot.speak(text.substring(3));

@@ -61,17 +61,12 @@ const userFunctions = (bot, roomDefaults) => {
         informTimer: () => informTimer,
         warnme: () => warnme,
 
-        isUserIDOnStage: function (userID) {
-            const onStage = djList.findIndex(({id}) => id === userID);
-            return onStage !== -1;
-        },
-
-        isUserIDStageBanned: function (userID) {
+        isUserIDStageBanned: function ( userID ) {
             const stageBanned = permanentStageBan.findIndex(({id}) => id === userID);
             return stageBanned !== -1;
         },
 
-        isUserBannedFromRoom: function (userID) {
+        isUserBannedFromRoom: function ( userID ) {
             const banned = bannedUsers.findIndex(({id}) => id === userID);
             return banned !== -1;
         },
@@ -117,8 +112,8 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        isPMerInRoom: function (userID) {
-            let isInRoom = theUsersList.indexOf(userID);
+        isPMerInRoom: function ( userID ) {
+            let isInRoom = theUsersList.indexOf( userID );
             isInRoom = isInRoom !== -1;
             return isInRoom;
         },
@@ -185,16 +180,10 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         isUserModerator: function (theUserID) {
-            logMe( 'debug', '====================== isUserModerator, theUserID:' + theUserID + ':');
             let userPosition = this.getPositionOnUsersList(theUserID);
-            logMe( 'debug', '====================== isUserModerator, userPosition:' + userPosition + ':');
             if ( theUsersList[userPosition]['moderator'] !== undefined ) {
-                logMe( 'debug', '====================== isUserModerator -> User:' + JSON.stringify(theUsersList[userPosition]));
-                logMe( 'debug', '====================== isUserModerator -> User is a Mod');
                 return true;
             } else {
-                logMe( 'debug', '====================== isUserModerator -> User:' + JSON.stringify(theUsersList[userPosition]));
-                logMe( 'debug', '====================== isUserModerator -> User is not a Mod');
                 return false;
             }
         },
@@ -207,8 +196,8 @@ const userFunctions = (bot, roomDefaults) => {
 
         vipList: () => vipList,
 
-        isUserVIP: function (userID) {
-            return this.vipList().indexOf(userID) !== -1;
+        isUserVIP: function ( userID ) {
+            return this.vipList().indexOf( userID ) !== -1;
         },
 
         // ========================================================
@@ -225,30 +214,30 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        incrementSpamCounter: function (userID) {
-            if(this.isUserInUsersList(userID)) {
-                ++theUsersList[this.getPositionOnUsersList(userID)]['spamCount'];
+        incrementSpamCounter: function ( userID ) {
+            if(this.isUserInUsersList( userID )) {
+                ++theUsersList[this.getPositionOnUsersList( userID )]['spamCount'];
             }
 
-            if (theUsersList[this.getPositionOnUsersList(userID)]['spamTimer'] !== null) {
-                clearTimeout(theUsersList[this.getPositionOnUsersList(userID)]['spamTimer']);
-                theUsersList[this.getPositionOnUsersList(userID)]['spamTimer'] = null;
+            if (theUsersList[this.getPositionOnUsersList( userID )]['spamTimer'] !== null) {
+                clearTimeout(theUsersList[this.getPositionOnUsersList( userID )]['spamTimer']);
+                theUsersList[this.getPositionOnUsersList( userID )]['spamTimer'] = null;
             }
 
-            theUsersList[this.getPositionOnUsersList(userID)]['spamTimer'] = setTimeout( function(userID) {
-                this.resetUsersSpamCount(userID);
+            theUsersList[this.getPositionOnUsersList( userID )]['spamTimer'] = setTimeout( function( userID ) {
+                this.resetUsersSpamCount( userID );
             }.bind(this), 10 * 1000);
         },
 
-        resetUsersSpamCount: function (userID) {
-            if(this.isUserInUsersList(userID)) {
-                theUsersList[this.getPositionOnUsersList(userID)]['spamCount'] = 0;
+        resetUsersSpamCount: function ( userID ) {
+            if(this.isUserInUsersList( userID )) {
+                theUsersList[this.getPositionOnUsersList( userID )]['spamCount'] = 0;
             }
         },
 
-        getUserSpamCount: function (userID) {
-            if(this.isUserInUsersList(userID)) {
-                return theUsersList[this.getPositionOnUsersList(userID)]['spamCount'];
+        getUserSpamCount: function ( userID ) {
+            if(this.isUserInUsersList( userID )) {
+                return theUsersList[this.getPositionOnUsersList( userID )]['spamCount'];
             }
         },
 
@@ -261,22 +250,22 @@ const userFunctions = (bot, roomDefaults) => {
 
         refreshDJCount: () => refreshDJCount,
 
-        addRefreshToUser: function (userID) {
+        addRefreshToUser: function ( userID ) {
             if ( roomDefaults.refreshingEnabled ) {
-                if (this.isUserInUsersList(userID)) {
-                    if (this.isCurrentDJ(userID)) {
-                        if (!this.isUserInRefreshList(userID)) {
-                            let listPosition = this.getPositionOnUsersList(userID);
+                if (this.isUserInUsersList( userID )) {
+                    if (this.isCurrentDJ( userID )) {
+                        if (!this.isUserInRefreshList( userID )) {
+                            let listPosition = this.getPositionOnUsersList( userID );
                             theUsersList[listPosition]['Refresh'] = Date.now();
                             ++theUsersList[listPosition]['RefreshCount'];
-                            theUsersList[listPosition]['RefreshPlayCount'] = this.getDJPlayCount(userID);
-                            theUsersList[listPosition]['RefreshTimer'] = setTimeout(function (userID) {
-                                this.removeRefreshFromUser(userID);
+                            theUsersList[listPosition]['RefreshPlayCount'] = this.getDJPlayCount( userID );
+                            theUsersList[listPosition]['RefreshTimer'] = setTimeout(function ( userID ) {
+                                this.removeRefreshFromUser( userID );
                             }.bind(this), 60 * 1000);
 
                             ++refreshDJCount;
 
-                            let message = '@' + this.getUsername(userID) + ' i\'ll hold your spot on stage for the next ' + roomDefaults.amountOfTimeToRefresh + ' minutes';
+                            let message = '@' + this.getUsername( userID ) + ' i\'ll hold your spot on stage for the next ' + roomDefaults.amountOfTimeToRefresh + ' minutes';
                             return [ true, message ]
                         } else {
                             return [false, "You're already using the refresh command"];
@@ -292,9 +281,9 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        removeRefreshFromUser: function (userID) {
-            if (this.isUserInUsersList(userID)) {
-                let listPosition = this.getPositionOnUsersList(userID);
+        removeRefreshFromUser: function ( userID ) {
+            if (this.isUserInUsersList( userID )) {
+                let listPosition = this.getPositionOnUsersList( userID );
                 delete theUsersList[listPosition]['Refresh'];
                 delete theUsersList[listPosition]['RefreshPlayCount']
                 delete theUsersList[listPosition]['RefreshTimer']
@@ -302,15 +291,15 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        isUserInRefreshList: function (userID) {
-            if(this.isUserInUsersList(userID)) {
-                return theUsersList[this.getPositionOnUsersList(userID)]['Refresh'] !== undefined;
+        isUserInRefreshList: function ( userID ) {
+            if(this.isUserInUsersList( userID )) {
+                return theUsersList[this.getPositionOnUsersList( userID )]['Refresh'] !== undefined;
             }
         },
 
-        getUsersRefreshPlayCount: function (userID) {
-            if(this.isUserInUsersList(userID)) {
-                let listPosition = this.getPositionOnUsersList(userID);
+        getUsersRefreshPlayCount: function ( userID ) {
+            if(this.isUserInUsersList( userID )) {
+                let listPosition = this.getPositionOnUsersList( userID );
                 if ( theUsersList[listPosition]['RefreshPlayCount'] !== undefined ) {
                     return theUsersList[listPosition]['RefreshPlayCount'];
                 } else {
@@ -333,25 +322,24 @@ const userFunctions = (bot, roomDefaults) => {
         enableDJIdle: function () { roomDefaults.djIdleLimit = true; },
         disableDJIdle: function () { roomDefaults.djIdleLimit = false; },
 
-        updateUserLastSpoke: function (userID) {
-            theUsersList[this.getPositionOnUsersList(userID)]['lastSpoke'] = Date.now();
+        updateUserLastSpoke: function ( userID ) {
+            theUsersList[this.getPositionOnUsersList( userID )]['lastSpoke'] = Date.now();
         },
 
-        updateUserLastVoted: function (userID) {
-            logMe( 'debug', 'updateUserLastVoted, userID:' + userID );
-            theUsersList[this.getPositionOnUsersList(userID)]['lastVoted'] = Date.now();
+        updateUserLastVoted: function ( userID ) {
+            theUsersList[this.getPositionOnUsersList( userID )]['lastVoted'] = Date.now();
         },
 
-        updateUserLastSnagged: function (userID) {
-            theUsersList[this.getPositionOnUsersList(userID)]['lastSnagged'] = Date.now();
+        updateUserLastSnagged: function ( userID ) {
+            theUsersList[this.getPositionOnUsersList( userID )]['lastSnagged'] = Date.now();
         },
 
-        updateUserJoinedStage: function (userID) {
-            theUsersList[this.getPositionOnUsersList(userID)]['joinedStage'] = Date.now();
+        updateUserJoinedStage: function ( userID ) {
+            theUsersList[this.getPositionOnUsersList( userID )]['joinedStage'] = Date.now();
         },
 
-        getIdleTime: function (userID) {
-            let userPosition = this.getPositionOnUsersList(userID);
+        getIdleTime: function ( userID ) {
+            let userPosition = this.getPositionOnUsersList( userID );
             if (userPosition) {
                 let userLastActive = theUsersList[userPosition]['joinTime'];
 
@@ -395,14 +383,14 @@ const userFunctions = (bot, roomDefaults) => {
             }
 
             if (roomDefaults.warnIdlePM === false) {
-                chatFunctions.botChat('@' + this.getUsername(userID) + ' ' + theMessage);
+                chatFunctions.botChat('@' + this.getUsername( userID ) + ' ' + theMessage);
             } else {
                 chatFunctions.botPM(userID, theMessage);
             }
         },
 
         checkHasUserIdledOut: function ( userID, idleLimit, threshold ) {
-            return this.getIdleTime(userID) / 60 > idleLimit - threshold;
+            return this.getIdleTime( userID ) / 60 > idleLimit - threshold;
         },
 
         //removes idle dj's after roomDefaultsModule.djIdleLimit is up.
@@ -514,11 +502,11 @@ const userFunctions = (bot, roomDefaults) => {
             djList = []
         },
 
-        addDJToList: function (userID) {
+        addDJToList: function ( userID ) {
             djList.push( userID );
         },
 
-        removeDJFromList: function (userID) {
+        removeDJFromList: function ( userID ) {
             const findDJ = ( dj ) => dj === userID;
             const listPosition = djList.findIndex( findDJ )
 
@@ -535,9 +523,9 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        setCurrentDJ: function (userID) {
+        setCurrentDJ: function ( userID ) {
             this.clearCurrentDJFlags()
-            theUsersList[this.getPositionOnUsersList(userID)]['currentDJ'] = true;
+            theUsersList[this.getPositionOnUsersList( userID )]['currentDJ'] = true;
         },
 
         getCurrentDJID: function () {
@@ -558,7 +546,12 @@ const userFunctions = (bot, roomDefaults) => {
         // DJ Helper Functions
         // ========================================================
 
-        isCurrentDJ: function (userID) {
+        isUserIDOnStage: function ( userID ) {
+            const onStage = djList.findIndex(({userID}) => userID === userID);
+            return onStage !== -1;
+        },
+
+        isCurrentDJ: function ( userID ) {
             const findDJ = ( dj ) => dj === userID;
             const listPosition = djList.findIndex( findDJ );
 
@@ -599,7 +592,7 @@ const userFunctions = (bot, roomDefaults) => {
                         return [ true, '' ];
                     }
                 } else {
-                    return [ false, 'The queue is currently active. To add yourself to the queue type ' + chatDefaults.commandIdentifier + 'addme. To remove yourself from the queue type /removeme.' ];
+                    return [ false, 'The queue is currently active. To add yourself to the queue type ' + chatDefaults.commandIdentifier + 'addme. To remove yourself from the queue type ' + chatDefaults.commandIdentifier + 'removeme.' ];
                 }
             }
 
@@ -636,36 +629,36 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        initialiseDJPlayCount: function (userID) {
-            if(this.isUserInUsersList(userID)) {
+        initialiseDJPlayCount: function ( userID ) {
+            if(this.isUserInUsersList( userID )) {
                 this.setDJPlayCount(userID, 0);
             }
         },
 
-        incrementDJPlayCount: function (userID) {
-            ++theUsersList[this.getPositionOnUsersList(userID)]['songCount'];
+        incrementDJPlayCount: function ( userID ) {
+            ++theUsersList[this.getPositionOnUsersList( userID )]['songCount'];
 
         },
 
-        decrementDJPlayCount: function (userID) {
-            --theUsersList[this.getPositionOnUsersList(userID)]['songCount']
+        decrementDJPlayCount: function ( userID ) {
+            --theUsersList[this.getPositionOnUsersList( userID )]['songCount']
         },
 
         setDJPlayCount: function (userID, theCount) {
-            if(this.isUserInUsersList(userID)) {
-                theUsersList[this.getPositionOnUsersList(userID)]['songCount'] = theCount;
+            if(this.isUserInUsersList( userID )) {
+                theUsersList[this.getPositionOnUsersList( userID )]['songCount'] = theCount;
             }
         },
 
-        deleteDJPlayCount: function (userID) {
-            if(this.isUserInUsersList(userID)) {
-                delete theUsersList[this.getPositionOnUsersList(userID)]['songCount'];
+        deleteDJPlayCount: function ( userID ) {
+            if(this.isUserInUsersList( userID )) {
+                delete theUsersList[this.getPositionOnUsersList( userID )]['songCount'];
             }
         },
 
-        getDJPlayCount: function (userID) {
-            if(this.isUserInUsersList(userID)) {
-                return theUsersList[this.getPositionOnUsersList(userID)]['songCount'];
+        getDJPlayCount: function ( userID ) {
+            if(this.isUserInUsersList( userID )) {
+                return theUsersList[this.getPositionOnUsersList( userID )]['songCount'];
             }
         },
 
@@ -681,20 +674,20 @@ const userFunctions = (bot, roomDefaults) => {
             queueList = []
         },
 
-        addUserToQueue: function (userID) {
+        addUserToQueue: function ( userID ) {
             if (!roomDefaults.queueActive) {
                 return [ false, "the queue is disabled." ];
             }
 
-            if (this.isUserIDInQueue(userID)) {
+            if (this.isUserIDInQueue( userID )) {
                 return [ false, "you are already in queue." ];
             }
 
-            if (this.isUserIDOnStage(userID)) {
+            if (this.isUserIDOnStage( userID )) {
                 return [ false, "you are already on stage!" ];
             }
 
-            if (this.isUserIDStageBanned(userID)) {
+            if (this.isUserIDStageBanned( userID )) {
                 return [ false, "sorry, you are banned from the stage." ];
             }
 
@@ -702,23 +695,42 @@ const userFunctions = (bot, roomDefaults) => {
             return [ true, '' ];
         },
 
-        removeUserFromQueue: function (userID) {
-            if (!this.isUserIDInQueue(userID)) {
-                return [ false, "not in queue" ];
+        removeUserFromQueue: function ( userID ) {
+            if (!this.isUserIDInQueue( userID )) {
+                return [ true, "not in queue" ];
             } else {
-                const queuePosition = queueList.findIndex( ({ id }) => id === userID );
+                const queuePosition = queueList.findIndex( ({ userID }) => userID === userID );
                 queueList.splice(queuePosition, 1);
-                return [ true, '' ];
+                return [ false, '' ];
             }
         },
 
-        isUserIDInQueue: function (userID) {
-            const inQueue = queueList.indexOf(userID);
+        isUserIDInQueue: function ( userID ) {
+            const inQueue = queueList.indexOf( userID );
             return inQueue !== -1;
         },
 
         headOfQueue: function () {
             return queueList[0];
+        },
+
+        changeUsersQueuePosition: function ( data, args, chatFunctions ) {
+            const username = args[0];
+            const userID = this.getUserIDFromUsername( username );
+            const newPosition = args[1] - 1;
+            let err, theMessage = this.removeUserFromQueue( userID );
+
+            if ( err !== true ) {
+                queueList.splice( newPosition, 0, userID);
+            } else {
+                chatFunctions.botSpeak(data, "The user " + this.getUsername( userID ) + " is not currently in the queue");
+            }
+            this.readQueue( data, chatFunctions );
+        },
+
+        moveUserToHeadOfQueue: function ( data, args, chatFunctions ) {
+            args[1] = 1;
+            this.changeUsersQueuePosition( data, args, chatFunctions );
         },
 
         // ========================================================
@@ -727,19 +739,74 @@ const userFunctions = (bot, roomDefaults) => {
         // DJ Queue Helper Functions
         // ========================================================
 
+        whatsMyQueuePosition: function ( data, chatFunctions )  {
+            const userID = data.userid;
+
+            if ( !roomDefaults.queueActive ) {
+                chatFunctions.botSpeak(data, '@' + this.getUsername(userID) + ', the queue is currently disabled');
+            } else {
+                const queuePosition = queueList.findIndex(({userID}) => userID === userID) + 1;
+                if ( queuePosition !== -1) {
+                    chatFunctions.botSpeak(data, '@' + this.getUsername(userID) + ', you are currently at position ' + queuePosition + ' in the queue');
+                } else {
+                    chatFunctions.botSpeak(data, '@' + this.getUsername(userID) + ', you are not currently in the queue');
+                }
+            }
+        },
+
+        addme: function ( data, chatFunctions ) {
+            const userID = data.userid;
+
+            if ( this.isUserIDOnStage( userID ) ) {
+                chatFunctions.botSpeak(data, "@" + this.getUsername( userID ) + ", you can't join the queue if you're already DJing");
+            } else {
+                if ( this.isUserIDInQueue( userID ) ) {
+                    chatFunctions.botSpeak(data, "@" + this.getUsername( userID ) + ", you're already in the queue");
+                    this.readQueue( data, chatFunctions )
+                } else {
+                    let err, theMessage = this.addUserToQueue( userID );
+
+                    if (err === true) {
+                        chatFunctions.botSpeak( data, theMessage );
+                    } else {
+                        this.readQueue( data, chatFunctions )
+                    }
+                }
+            }
+        },
+        
+        removeme: function ( data, chatFunctions ) {
+            const userID = data.userid;
+            if ( this.isUserIDInQueue( userID ) ) {
+                this.removeUserFromQueue( userID )
+                chatFunctions.botSpeak(data, "@" + this.getUsername( userID ) + ', I\'ve removed you from the queue' );
+            } else {
+                chatFunctions.botSpeak(data, "@" + this.getUsername( userID ) + ', you\'re not currently in the queue. Use the ' + chatDefaults.commandIdentifier + 'addme command to join' );
+            }
+            this.readQueue( data, chatFunctions )
+        },
+
         enableQueue: function ( data, chatFunctions ) {
-            roomDefaults.queueActive = true;
-            chatFunctions.botSpeak( data, "The queue is now on" );
+            if ( roomDefaults.queueActive === true ) {
+                chatFunctions.botSpeak( data, "The queue is already enabled" );
+            } else {
+                roomDefaults.queueActive = true;
+                chatFunctions.botSpeak(data, "The queue is now on");
+            }
         },
 
         disableQueue: function ( data, chatFunctions ) {
-            roomDefaults.queueActive = false;
-            chatFunctions.botSpeak( data, "The queue is now off" );
+            if ( roomDefaults.queueActive !== true ) {
+                chatFunctions.botSpeak( data, "The queue is already disabled" );
+            } else {
+                roomDefaults.queueActive = false;
+                chatFunctions.botSpeak(data, "The queue is now off");
+            }
         },
 
         readQueue: function ( data, chatFunctions ) {
             if (roomDefaults.queueActive === true) {
-                chatFunctions.botSpeak( data, this.buildQueueMessage() );
+                chatFunctions.botSpeak( data, this.buildQueueMessage(), true );
             } else {
                 chatFunctions.botSpeak( data, "The queue is not active" );
             }
@@ -748,19 +815,19 @@ const userFunctions = (bot, roomDefaults) => {
         buildQueueMessage: function () {
             let listOfUsers = '';
             let message;
+            let thisQueuePosition = 1;
 
-            queueList.forEach(function(userID){
+            queueList.forEach(function( userID ){
                 if (listOfUsers==='') {
-                    listOfUsers = this.getUsername(userID);
-
+                    listOfUsers = '[' + thisQueuePosition + '] ' + this.getUsername( userID );
                 } else {
-                    listOfUsers = listOfUsers + ", " + this.getUsername(userID);
+                    listOfUsers = listOfUsers + ', [' + thisQueuePosition + '] ' + this.getUsername( userID );
 
                 }
             }.bind(this));
 
             if ( listOfUsers !== '' ) {
-                message = "The queue is now: " + listOfUsers;
+                message = "The queue is currently: " + listOfUsers;
             } else {
                 message = "The queue is empty...";
             }
@@ -821,27 +888,27 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        removeUserFromTheUsersList: function (userID) {
-            let listPosition = this.getPositionOnUsersList(userID);
+        removeUserFromTheUsersList: function ( userID ) {
+            let listPosition = this.getPositionOnUsersList( userID );
             if ( listPosition !== -1 ) {
                 theUsersList.splice( listPosition, 1);
             }
         },
 
-        deregisterUser: function (userID) {
+        deregisterUser: function ( userID ) {
             //double check to make sure that if someone is on stage and they disconnect, that they are being removed
             //from the current Dj's array
-            let checkIfStillInDjArray = djList.indexOf(userID);
+            let checkIfStillInDjArray = djList.indexOf( userID );
             if (checkIfStillInDjArray !== -1) {
                 djList.splice(checkIfStillInDjArray, 1);
             }
 
             //removes people leaving the room in modpm still
             if (modPM.length !== 0) {
-                let areTheyStillInModpm = modPM.indexOf(userID);
+                let areTheyStillInModpm = modPM.indexOf( userID );
 
                 if (areTheyStillInModpm !== -1) {
-                    let whatIsTheirName = theUsersList.indexOf(userID);
+                    let whatIsTheirName = theUsersList.indexOf( userID );
                     modPM.splice(areTheyStillInModpm, 1);
 
                     if (whatIsTheirName !== -1) {
@@ -854,7 +921,7 @@ const userFunctions = (bot, roomDefaults) => {
                 }
             }
 
-            this.removeUserFromTheUsersList(userID);
+            this.removeUserFromTheUsersList( userID );
         },
 
 
@@ -892,7 +959,7 @@ const userFunctions = (bot, roomDefaults) => {
 
         bootThisUser: function (userID, bootMessage) {
             if (bootMessage == null) {
-                bot.boot(userID)
+                bot.boot( userID )
             } else {
                 bot.bootUser(userID, bootMessage);
             }
@@ -914,13 +981,13 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        addUserJoinedTime: function (userID) {
-            if(this.isUserInUsersList(userID)) {
-                theUsersList[this.getPositionOnUsersList(userID)]['joinTime'] = Date.now();
+        addUserJoinedTime: function ( userID ) {
+            if(this.isUserInUsersList( userID )) {
+                theUsersList[this.getPositionOnUsersList( userID )]['joinTime'] = Date.now();
             }
         },
 
-        getPositionOnUsersList: function (userID) {
+        getPositionOnUsersList: function ( userID ) {
             let listPosition = theUsersList.findIndex( ( { id } ) => id === userID)
             return listPosition;
         },
@@ -930,10 +997,10 @@ const userFunctions = (bot, roomDefaults) => {
             this.addUserToTheUsersList(userID, username);
 
             //starts time for everyone that joins the room
-            this.addUserJoinedTime(userID);
+            this.addUserJoinedTime( userID );
 
             //sets new persons spam count to zero
-            this.resetUsersSpamCount(userID);
+            this.resetUsersSpamCount( userID );
         },
 
         checkForEmptyUsersList: function (data) {
@@ -942,18 +1009,18 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        isUserInUsersList: function (userID) {
+        isUserInUsersList: function ( userID ) {
             // if the userID is in the userList return true, else false
             return theUsersList.find(({id}) => id === userID) !== undefined;
         },
 
         addUserToTheUsersList: function (userID, username) {
-            if (!this.isUserInUsersList(userID)) {
+            if (!this.isUserInUsersList( userID )) {
                 theUsersList.push( { id: userID, username: username } );
             }
         },
 
-        removeUserFromTheUsersList: function (userID) {
+        removeUserFromTheUsersList: function ( userID ) {
             let listLocation = theUsersList.find( ({ id }) => id === userID );
             theUsersList.splice(listLocation, 1);
         },
@@ -1066,15 +1133,15 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        addWarnMeToUser(userID) {
-            if(this.isUserInUsersList(userID)) {
-                theUsersList[this.getPositionOnUsersList(userID)]['WarnMe'] = true;
+        addWarnMeToUser( userID ) {
+            if(this.isUserInUsersList( userID )) {
+                theUsersList[this.getPositionOnUsersList( userID )]['WarnMe'] = true;
             }
         },
 
-        removeWarnMeFromUser(userID) {
-            if(this.isUserInUsersList(userID)) {
-                delete theUsersList[this.getPositionOnUsersList(userID)]['WarnMe'];
+        removeWarnMeFromUser( userID ) {
+            if(this.isUserInUsersList( userID )) {
+                delete theUsersList[this.getPositionOnUsersList( userID )]['WarnMe'];
             }
         },
 
@@ -1096,21 +1163,21 @@ const userFunctions = (bot, roomDefaults) => {
             }
         },
 
-        addEscortMeToUser: function (userID) {
-            if(this.isUserInUsersList(userID)) {
-                theUsersList[this.getPositionOnUsersList(userID)]['EscortMe'] = true;
+        addEscortMeToUser: function ( userID ) {
+            if(this.isUserInUsersList( userID )) {
+                theUsersList[this.getPositionOnUsersList( userID )]['EscortMe'] = true;
             }
         },
 
-        removeEscortMeFromUser: function (userID) {
-            if(this.isUserInUsersList(userID)) {
-                delete theUsersList[this.getPositionOnUsersList(userID)]['EscortMe'];
+        removeEscortMeFromUser: function ( userID ) {
+            if(this.isUserInUsersList( userID )) {
+                delete theUsersList[this.getPositionOnUsersList( userID )]['EscortMe'];
             }
         },
 
-        escortMeIsEnabled: function (userID) {
-            if(this.isUserInUsersList(userID)) {
-                if ( theUsersList[this.getPositionOnUsersList(userID)]['EscortMe'] === true ) {
+        escortMeIsEnabled: function ( userID ) {
+            if(this.isUserInUsersList( userID )) {
+                if ( theUsersList[this.getPositionOnUsersList( userID )]['EscortMe'] === true ) {
                     return true;
                 } else {
                     return false;
