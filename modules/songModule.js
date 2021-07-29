@@ -85,13 +85,18 @@ const songFunctions = (bot) => {
         // ========================================================
 
         switchLengthLimit: function ( data, songLength, chatFunctions ) {
-            logMe('default', 'switchLengthLimit, songLength:' + songLength );
-            if ( songLength !== undefined ) {
-                musicDefaults.songLengthLimit = songLength;
+            if ( songLength[0] === undefined ) {
+                if ( musicDefaults.songLengthLimitOn === true ) {
+                    musicDefaults.songLengthLimitOn = false;
+                } else {
+                    musicDefaults.songLengthLimitOn = true;
+                    musicDefaults.songLengthLimit = musicDefaults.songLengthLimitDefault;
+                }
             } else {
-                musicDefaults.songLengthLimitOn = musicDefaults.songLengthLimitOn !== true;
-                musicDefaults.songLengthLimit = musicDefaults.songLengthLimitDefault;
+                musicDefaults.songLengthLimitOn = true;
+                musicDefaults.songLengthLimit = songLength;
             }
+
 
             let theMessage = "The song length limit is now";
             if ( musicDefaults.songLengthLimitOn ) {

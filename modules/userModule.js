@@ -166,7 +166,7 @@ const userFunctions = (bot, roomDefaults) => {
                 for (let modLoop = 0; modLoop < data.room.metadata.moderator_id.length; modLoop++) {
                     theUserID = data.room.metadata.moderator_id[modLoop];
                     userPosition = this.getPositionOnUsersList(theUserID)
-                    if ( !userPosition ) {
+                    if ( userPosition !== -1 ) {
                         theUsersList[userPosition]['moderator'] = true;
                     }
                 }
@@ -184,11 +184,16 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         isUserModerator: function (theUserID) {
-            logMe( 'debug', 'isUserModerator, theUserID:' + theUserID + ':');
+            logMe( 'debug', '====================== isUserModerator, theUserID:' + theUserID + ':');
             let userPosition = this.getPositionOnUsersList(theUserID);
+            logMe( 'debug', '====================== isUserModerator, userPosition:' + userPosition + ':');
             if ( theUsersList[userPosition]['moderator'] !== undefined ) {
+                logMe( 'debug', '====================== isUserModerator -> User:' + JSON.stringify(theUsersList[userPosition]));
+                logMe( 'debug', '====================== isUserModerator -> User is a Mod');
                 return true;
             } else {
+                logMe( 'debug', '====================== isUserModerator -> User:' + JSON.stringify(theUsersList[userPosition]));
+                logMe( 'debug', '====================== isUserModerator -> User is not a Mod');
                 return false;
             }
         },
@@ -721,6 +726,24 @@ const userFunctions = (bot, roomDefaults) => {
         // DJ Queue Helper Functions
         // ========================================================
 
+        enableQueue: function ( data, chatFunctions ) {
+            roomDefaults.queueActive = true;
+            chatFunctions.botSpeak( data, "The queue is now on" );
+        },
+
+        disableQueue: function ( data, chatFunctions ) {
+            roomDefaults.queueActive = false;
+            chatFunctions.botSpeak( data, "The queue is now off" );
+        },
+
+        readQueue: function ( data, chatFunctions ) {
+            if (roomDefaults.queueActive === true) {
+                chatFunctions.botSpeak( data, this.buildQueueMessage() );
+            } else {
+                chatFunctions.botSpeak( data, "The queue is not active" );
+            }
+        },
+
         buildQueueMessage: function () {
             let listOfUsers = '';
             let message;
@@ -936,13 +959,15 @@ const userFunctions = (bot, roomDefaults) => {
 
         rebuildUserList: function (data) {
             this.resetUsersList();
+            let thisUserID;
 
             for (let i = 0; i < data.users.length; i++) {
                 if (typeof data.users[i] !== 'undefined') {
-                    //userid then the name
-                    this.addUserToTheUsersList(data.users[i].userid, data.users[i].name);
+                    thisUserID = data.users[i].userid;
+                    this.addUserToTheUsersList(thisUserID, data.users[i].name);
                 }
             }
+
         },
 
         startAllUserTimers: function () {

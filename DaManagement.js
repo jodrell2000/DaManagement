@@ -135,17 +135,15 @@ bot.on('roomChanged', function (data)
         userFunctions.botStartReset(botFunctions, songFunctions);
 
         userFunctions.resetAllWarnMe(data);
-        userFunctions.resetModerators(data);
         userFunctions.resetDJs(data);
 
         //get & set information
         roomFunctions.setRoomDefaults(data);
 
         userFunctions.rebuildUserList(data);
+        userFunctions.resetModerators(data);
 
         userFunctions.clearDJList(data);
-
-        userFunctions.resetModerators(data);
 
         userFunctions.resetAllSpamCounts();
 
@@ -307,8 +305,6 @@ bot.on('speak', function (data) {
     let theUserID = data.userid;
     userFunctions.name = data.name; //name of latest person to say something
     botFunctions.recordActivity();
-
-    userFunctions.isUserModerator(theUserID); //check to see if speaker is a moderator or not
 
     userFunctions.updateUserLastSpoke(theUserID); //update the afk position of the speaker
 

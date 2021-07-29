@@ -30,7 +30,18 @@ module.exports = {
     ],
 
     cheersMessages: [
-        "@senderUsername raises their glass for a toast"
+        "@senderUsername raises their glass for a toast",
+        "Cheers!",
+        "I'll drink to that",
+        "Thanks"
+    ],
+
+    cheersPics: [
+        "https://media.giphy.com/media/g9582DNuQppxC/giphy-downsized-large.gif",
+        "https://media.giphy.com/media/Zw3oBUuOlDJ3W/giphy.gif",
+        "https://media.giphy.com/media/4qfccBawqdr9K/giphy.gif",
+        "https://media.giphy.com/media/xUA7bceFLbFZb02UZa/giphy.gif",
+        "https://media.giphy.com/media/8mkykXIicXOVms2xYE/giphy.gif"
     ],
 
     danceMessages: [
