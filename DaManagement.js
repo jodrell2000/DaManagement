@@ -135,17 +135,15 @@ bot.on('roomChanged', function (data)
         userFunctions.botStartReset(botFunctions, songFunctions);
 
         userFunctions.resetAllWarnMe(data);
-        userFunctions.resetModerators(data);
         userFunctions.resetDJs(data);
 
         //get & set information
         roomFunctions.setRoomDefaults(data);
 
         userFunctions.rebuildUserList(data);
+        userFunctions.resetModerators(data);
 
         userFunctions.clearDJList(data);
-
-        userFunctions.resetModerators(data);
 
         userFunctions.resetAllSpamCounts();
 
@@ -308,8 +306,6 @@ bot.on('speak', function (data) {
     userFunctions.name = data.name; //name of latest person to say something
     botFunctions.recordActivity();
 
-    userFunctions.isUserModerator(theUserID); //check to see if speaker is a moderator or not
-
     userFunctions.updateUserLastSpoke(theUserID); //update the afk position of the speaker
 
     if (commandFunctions.wasThisACommand(data)) {
@@ -360,7 +356,6 @@ bot.on('snagged', function (data)
 //this activates when a user joins the stage.
 bot.on('add_dj', function (data)
 {
-
     let OKToDJ;
     let theMessage;
     const theUserID = data.user[0].userid;
@@ -370,7 +365,7 @@ bot.on('add_dj', function (data)
     if ( !OKToDJ ) {
         bot.remDj(theUserID);
         userFunctions.incrementSpamCounter(theUserID);
-        chatFunctions.botSpeak( theMessage, theUserID );
+        chatFunctions.botSpeak( data, theMessage );
     }
 
     //sets dj's songcount to zero when they enter the stage.

@@ -41,6 +41,9 @@ const commandFunctions = (bot) => {
     generalCommands.help.help = "Display how to use an individual command";
     generalCommands.help.sampleArguments = [ "[command]" ]
 
+    generalCommands.q = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { userFunctions.readQueue( data, chatFunctions ); }
+    generalCommands.q.help = "Tells you who's in the queue";
+
     // #############################################
     // Chat commands...make the bot post silly stuff
     // #############################################
@@ -51,7 +54,7 @@ const commandFunctions = (bot) => {
     chatCommands.shade = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.shadeMessages, userFunctions ); }
     chatCommands.shade.help = "lovingly, and randomly, diss the DJ ;-)";
 
-    chatCommands.cheers = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.cheersMessages, userFunctions ); }
+    chatCommands.cheers = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.cheersMessages, chatCommandItems.cheersPics, userFunctions ); }
     chatCommands.cheers.help = "raise a glass";
 
     chatCommands.dance = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.danceMessages, chatCommandItems.dancePics, userFunctions ); }
@@ -164,7 +167,9 @@ const commandFunctions = (bot) => {
     
     moderatorCommands.lengthLimit = ( data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { songFunctions.switchLengthLimit( data, args, chatFunctions ) }
     moderatorCommands.lengthLimit.argumentCount = 1;
-    moderatorCommands.lengthLimit.help = "Roll some dice";
+    moderatorCommands.lengthLimit.help = "Switch the song length limit on or off. Sent with a number it changes the limit";
+    moderatorCommands.lengthLimit.sampleArguments = [ "20" ]
+
 
     // #############################
     // end of fully checked commands
@@ -850,10 +855,6 @@ const commandFunctions = (bot) => {
                     bot.speak('The queue is currently empty.');
                 } else {
                     bot.speak('There is currently no queue.');
-                }
-            } else if (text.match(/^\/queue$/)) {
-                if (roomDefaults.queueActive === true) {
-                    bot.speak( userFunctions.buildQueueMessage() );
                 }
             } else if (text.match(/^\/playminus/) && userFunctions.isUserModerator(speaker) === true) {
                 if (musicDefaults.PLAYLIMIT === true) //is the play limit on?
@@ -1718,23 +1719,6 @@ const commandFunctions = (bot) => {
                             temp95 += userFunctions.queueName()[kl] + ' [' + (kl + 1) + ']' + ', ';
                         } else if (kl === (userFunctions.queueName().length - 1)) {
                             temp95 += userFunctions.queueName()[kl] + ' [' + (kl + 1) + ']';
-                        }
-                    }
-                    bot.pm(temp95, speaker);
-
-                } else if (roomDefaults.queueActive === true) {
-                    bot.pm('The queue is currently empty.', speaker);
-                } else {
-                    bot.pm('There is currently no queue.', speaker);
-                }
-            } else if (text.match(/^\/queue$/) && isInRoom === true) {
-                if (roomDefaults.queueActive === true && userFunctions.queueName().length !== 0) {
-                    let temp95 = 'The queue is now: ';
-                    for (let kl = 0; kl < userFunctions.queueName().length; kl++) {
-                        if (kl !== (userFunctions.queueName().length - 1)) {
-                            temp95 += userFunctions.queueName()[kl] + ', ';
-                        } else if (kl === (userFunctions.queueName().length - 1)) {
-                            temp95 += userFunctions.queueName()[kl];
                         }
                     }
                     bot.pm(temp95, speaker);
