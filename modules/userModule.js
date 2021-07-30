@@ -61,16 +61,6 @@ const userFunctions = (bot, roomDefaults) => {
         informTimer: () => informTimer,
         warnme: () => warnme,
 
-        isUserIDStageBanned: function ( userID ) {
-            const stageBanned = permanentStageBan.findIndex( ( { id } ) => id === userID );
-            return stageBanned !== 0;
-        },
-
-        isUserBannedFromRoom: function ( userID ) {
-            const banned = bannedUsers.findIndex( ( { id} ) => id === userID);
-            return banned !== -1;
-        },
-
         resetModPM: function () {
             modPM = []
         },
@@ -547,9 +537,21 @@ const userFunctions = (bot, roomDefaults) => {
         // DJ Helper Functions
         // ========================================================
 
+        isUserIDStageBanned: function ( userID ) {
+            const stageBanned = permanentStageBan.findIndex( ( { id } ) => id === userID );
+            return stageBanned !== -1;
+        },
+
+        isUserBannedFromRoom: function ( userID ) {
+            logMe('debug', '================================ isUserBannedFromRoom, bannedUsers:' + JSON.stringify(bannedUsers) );
+            const banned = bannedUsers.findIndex( ( { id} ) => id === userID);
+            return banned !== -1;
+        },
+
         isUserIDOnStage: function ( userID ) {
-            const onStage = djList.findIndex( ( { userID } ) => userID === userID );
-            return onStage !== 0;
+            logMe('debug', '================================ isUserIDOnStage, djList:' + JSON.stringify(djList) );
+            const onStage = djList.indexOf( userID );
+            return onStage !== -1;
         },
 
         isCurrentDJ: function ( userID ) {
@@ -707,6 +709,7 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         isUserIDInQueue: function ( userID ) {
+            logMe('debug', '================================ isUserIDInQueue, queueList:' + JSON.stringify(queueList) );
             const inQueue = queueList.indexOf( userID );
             return inQueue !== -1;
         },

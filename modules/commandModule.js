@@ -33,12 +33,12 @@ const commandFunctions = (bot) => {
     // General commands
     // #############################################
 
-    generalCommands.list = ( data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { listCommands( data, args, chatFunctions ) }
+    generalCommands.list = ( { data, args, chatFunctions } ) => { listCommands( data, args, chatFunctions ) }
     generalCommands.list.argumentCount = 1;
     generalCommands.list.help = "Lists all available commands";
     generalCommands.list.sampleArguments = [ "[command type]" ]
 
-    generalCommands.help = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { displayHelp( data, command, chatFunctions ); }
+    generalCommands.help = ( { data, command, chatFunctions } ) => { displayHelp( data, command, chatFunctions ); }
     generalCommands.help.argumentCount = 1;
     generalCommands.help.help = "Display how to use an individual command";
     generalCommands.help.sampleArguments = [ "[command]" ]
@@ -47,111 +47,111 @@ const commandFunctions = (bot) => {
     // General user Queue commands
     // #############################################
 
-    userQueueCommands.q = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { userFunctions.readQueue( data, chatFunctions ); }
+    userQueueCommands.q = ( { data, userFunctions, chatFunctions } ) => { userFunctions.readQueue( data, chatFunctions ); }
     userQueueCommands.q.help = "Tells you who's in the queue";
 
-    userQueueCommands.addme = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { userFunctions.addme( data, chatFunctions ); }
+    userQueueCommands.addme = ( { data, userFunctions, chatFunctions } ) => { userFunctions.addme( data, chatFunctions ); }
     userQueueCommands.addme.help = "Join the queue for the decks";
 
-    userQueueCommands.removeme = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { userFunctions.removeme( data, chatFunctions ); }
+    userQueueCommands.removeme = ( { data, userFunctions, chatFunctions } ) => { userFunctions.removeme( data, chatFunctions ); }
     userQueueCommands.removeme.help = "Remove yourself from the queue";
 
-    userQueueCommands.position = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { userFunctions.whatsMyQueuePosition( data, chatFunctions ); }
+    userQueueCommands.position = ( { data, userFunctions, chatFunctions } ) => { userFunctions.whatsMyQueuePosition( data, chatFunctions ); }
     userQueueCommands.position.help = "Tells a user where they are in the queue";
 
     // #############################################
     // Chat commands...make the bot post silly stuff
     // #############################################
 
-    chatCommands.props = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.propsMessages, chatCommandItems.propsPics, userFunctions ); }
+    chatCommands.props = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.propsMessages, chatCommandItems.propsPics, userFunctions ); }
     chatCommands.props.help = "congratulate the current DJ on playing an absolute banger";
 
-    chatCommands.shade = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.shadeMessages, userFunctions ); }
+    chatCommands.shade = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.shadeMessages, userFunctions ); }
     chatCommands.shade.help = "lovingly, and randomly, diss the DJ ;-)";
 
-    chatCommands.cheers = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.cheersMessages, chatCommandItems.cheersPics, userFunctions ); }
+    chatCommands.cheers = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.cheersMessages, chatCommandItems.cheersPics, userFunctions ); }
     chatCommands.cheers.help = "raise a glass";
 
-    chatCommands.dance = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.danceMessages, chatCommandItems.dancePics, userFunctions ); }
+    chatCommands.dance = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.danceMessages, chatCommandItems.dancePics, userFunctions ); }
     chatCommands.dance.help = "w00t!";
 
-    chatCommands.frankie = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.frankieMessages, userFunctions ); }
+    chatCommands.frankie = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.frankieMessages, userFunctions ); }
     chatCommands.frankie.help = "what does Frankie say?";
 
-    chatCommands.hair = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.hairMessages, chatCommandItems.hairPics, userFunctions ); }
+    chatCommands.hair = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.hairMessages, chatCommandItems.hairPics, userFunctions ); }
     chatCommands.hair.help = "80s hair time";
 
-    chatCommands.eddie = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.eddieMessages, chatCommandItems.eddiePics, userFunctions ); }
+    chatCommands.eddie = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.eddieMessages, chatCommandItems.eddiePics, userFunctions ); }
     chatCommands.eddie.help = "it's Eddie Murphy time!";
 
-    chatCommands.lonely = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.lonelyMessages, userFunctions ); }
+    chatCommands.lonely = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.lonelyMessages, userFunctions ); }
     chatCommands.lonely.help = "we all feel lonely sometimes...";
 
-    chatCommands.suggestions = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.suggestionsMessages, userFunctions ); }
+    chatCommands.suggestions = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.suggestionsMessages, userFunctions ); }
     chatCommands.suggestions.help = "find out how to make suggestions";
 
-    chatCommands.rules = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.rulesMessages, userFunctions ); }
+    chatCommands.rules = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.rulesMessages, userFunctions ); }
     chatCommands.rules.help = "get a link to the room rules";
 
-    chatCommands.wc = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.wcMessages, userFunctions ); }
+    chatCommands.wc = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.wcMessages, userFunctions ); }
     chatCommands.wc.help = "how do you Wang Chung?";
 
-    chatCommands.jump = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.jumpMessages, chatCommandItems.jumpPics, userFunctions ); }
+    chatCommands.jump = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.jumpMessages, chatCommandItems.jumpPics, userFunctions ); }
     chatCommands.jump.help = "Van Halen Rulez!";
 
-    chatCommands.flirt = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.flirtMessages, chatCommandItems.flirtPics, userFunctions ); }
+    chatCommands.flirt = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.flirtMessages, chatCommandItems.flirtPics, userFunctions ); }
     chatCommands.flirt.help = "you know...";
 
-    chatCommands.rub = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.rubMessages, userFunctions ); }
+    chatCommands.rub = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.rubMessages, userFunctions ); }
     chatCommands.rub.help = "is Buffalo Bill in?!?";
 
-    chatCommands.alice = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.aliceMessages, chatCommandItems.alicePics, userFunctions ); }
+    chatCommands.alice = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.aliceMessages, chatCommandItems.alicePics, userFunctions ); }
     chatCommands.alice.help = "are you? No, you're not...";
 
-    chatCommands.feart = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.feartMessages, userFunctions ); }
+    chatCommands.feart = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.feartMessages, userFunctions ); }
     chatCommands.feart.help = "there's some snagging going on in here";
 
-    chatCommands.beer = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.beerMessages, chatCommandItems.beerPics, userFunctions ); }
+    chatCommands.beer = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.beerMessages, chatCommandItems.beerPics, userFunctions ); }
     chatCommands.beer.help = "it's 5 o'clock somewhere, right?";
 
-    chatCommands.surf = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.surfMessages, chatCommandItems.surfPics, userFunctions ); }
+    chatCommands.surf = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.surfMessages, chatCommandItems.surfPics, userFunctions ); }
     chatCommands.surf.help = "Hang 10 dudes!";
 
-    chatCommands.hello = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.helloMessages, userFunctions ); }
+    chatCommands.hello = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.helloMessages, userFunctions ); }
     chatCommands.hello.help = "just saying hello...probably testing the bot tho' init";
 
-    chatCommands.macho = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.machoMessages, chatCommandItems.machoPics, userFunctions ); }
+    chatCommands.macho = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.machoMessages, chatCommandItems.machoPics, userFunctions ); }
     chatCommands.macho.help = "Randy Savage!!!";
 
-    chatCommands.ferris = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.ferrisMessages, chatCommandItems.ferrisPics, userFunctions ); }
+    chatCommands.ferris = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.ferrisMessages, chatCommandItems.ferrisPics, userFunctions ); }
     chatCommands.ferris.help = "Bueller? Bueller? Bueller?";
 
-    chatCommands.lighter = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.lighterMessages, chatCommandItems.lighterPics, userFunctions ); }
+    chatCommands.lighter = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.lighterMessages, chatCommandItems.lighterPics, userFunctions ); }
     chatCommands.lighter.help = "One for the ballads...";
 
-    chatCommands.couplesSkate = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.couplesSkateMessages, chatCommandItems.couplesSkatePics, userFunctions ); }
+    chatCommands.couplesSkate = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.couplesSkateMessages, chatCommandItems.couplesSkatePics, userFunctions ); }
     chatCommands.couplesSkate.help = "Time for a slow dance?";
 
-    chatCommands.noice = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.noiceMessages, chatCommandItems.noicePics, userFunctions ); }
+    chatCommands.noice = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.noiceMessages, chatCommandItems.noicePics, userFunctions ); }
     chatCommands.noice.help = "very nice...";
 
-    chatCommands.shimmy = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.shimmyMessages, chatCommandItems.shimmyPics, userFunctions ); }
+    chatCommands.shimmy = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.shimmyMessages, chatCommandItems.shimmyPics, userFunctions ); }
     chatCommands.shimmy.help = "Pat Benatar time";
 
-    chatCommands.metal = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.metalMessages, chatCommandItems.metalPics, userFunctions ); }
+    chatCommands.metal = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.metalMessages, chatCommandItems.metalPics, userFunctions ); }
     chatCommands.metal.help = ":metal: ";
 
-    chatCommands.birthday = ( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.birthdayMessages, chatCommandItems.birthdayPics, userFunctions ); }
+    chatCommands.birthday = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.birthdayMessages, chatCommandItems.birthdayPics, userFunctions ); }
     chatCommands.birthday.help = "Happy Birthday!!!";
 
     // ######################################################
     // Advanced chat commands...more than just basic messages
     // ######################################################
 
-    chatCommands.coinflip =( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.coinflip( data, userFunctions ); }
+    chatCommands.coinflip =( { data, userFunctions, chatFunctions } ) => { chatFunctions.coinflip( data, userFunctions ); }
     chatCommands.coinflip.help = "Flip a coin and return heads or tails?";
 
-    chatCommands.dice =( data, command, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.dice( data, command, userFunctions ); }
+    chatCommands.dice =( { data, command, userFunctions, chatFunctions } ) => { chatFunctions.dice( data, command, userFunctions ); }
     chatCommands.dice.argumentCount = 2;
     chatCommands.dice.help = "Roll some dice";
     chatCommands.dice.sampleArguments = [ "1", "d20" ]
@@ -160,30 +160,30 @@ const commandFunctions = (bot) => {
     // Bot control commands
     // #############################################
 
-    botCommands.uptime = ( data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { botFunctions.uptime(data, chatFunctions); }
+    botCommands.uptime = ( { data, botFunctions, chatFunctions } ) => { botFunctions.uptime(data, chatFunctions); }
     botCommands.uptime.help = "Tells you how long the bot has been running for";
 
-    botCommands.playlist = ( data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { chatFunctions.readPlaylistStats( data ); }
+    botCommands.playlist = ( { data, chatFunctions } ) => { chatFunctions.readPlaylistStats( data ); }
     botCommands.playlist.help = "Tells you how many songs are in the Bot playlist";
 
     // #############################################
     // User comamnds
     // #############################################
 
-    userCommands.afk = ( data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { userFunctions.switchUserAFK ( data, chatFunctions ); }
+    userCommands.afk = ( { data, userFunctions, chatFunctions } ) => { userFunctions.switchUserAFK ( data, chatFunctions ); }
     userCommands.afk.help = "Switches the senders AFK state";
 
     // #############################################
     // Moderator Only comamnds
     // #############################################
 
-    moderatorCommands.randomisePlaylist = ( data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { songFunctions.randomisePlaylist() }
+    moderatorCommands.randomisePlaylist = ( { songFunctions } ) => { songFunctions.randomisePlaylist() }
     moderatorCommands.randomisePlaylist.help = () => {  }
 
     moderatorCommands.autodj = () => { bot.addDj(); }
     moderatorCommands.autodj.help = "Starts the Bot DJing";
     
-    moderatorCommands.lengthLimit = ( data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { songFunctions.switchLengthLimit( data, args, chatFunctions ) }
+    moderatorCommands.lengthLimit = ( { data, args, songFunctions, chatFunctions } ) => { songFunctions.switchLengthLimit( data, args, chatFunctions ) }
     moderatorCommands.lengthLimit.argumentCount = 1;
     moderatorCommands.lengthLimit.help = "Switch the song length limit on or off. Sent with a number it changes the limit";
     moderatorCommands.lengthLimit.sampleArguments = [ "20" ];
@@ -192,20 +192,20 @@ const commandFunctions = (bot) => {
     // Moderator Only Queue commands
     // #############################################
 
-    moderatorQueueCommands.move = ( data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { userFunctions.changeUsersQueuePosition ( data, args, chatFunctions ) };
+    moderatorQueueCommands.move = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.changeUsersQueuePosition ( data, args, chatFunctions ) };
     moderatorQueueCommands.move.argumentCount = 2;
     moderatorQueueCommands.move.help = "Change a users position in the queue";
     moderatorQueueCommands.move.sampleArguments = [ 'jodrell', 1 ];
 
-    moderatorQueueCommands.bumptop = ( data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { userFunctions.moveUserToHeadOfQueue ( data, args, chatFunctions ) };
+    moderatorQueueCommands.bumptop = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.moveUserToHeadOfQueue ( data, args, chatFunctions ) };
     moderatorQueueCommands.bumptop.argumentCount = 1;
     moderatorQueueCommands.bumptop.help = "Move a user to the head of the queue";
     moderatorQueueCommands.bumptop.sampleArguments = [ 'jodrell' ];
 
-    moderatorQueueCommands.queueOn = ( data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { userFunctions.enableQueue( data, chatFunctions ) }
+    moderatorQueueCommands.queueOn = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.enableQueue( data, chatFunctions ) }
     moderatorQueueCommands.queueOn.help = "Enables the queue";
 
-    moderatorQueueCommands.queueOff = ( data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) => { userFunctions.disableQueue( data, chatFunctions ) }
+    moderatorQueueCommands.queueOff = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.disableQueue( data, chatFunctions ) }
     moderatorQueueCommands.queueOff.help = "Disables the queue";
 
     // #############################
@@ -327,7 +327,7 @@ const commandFunctions = (bot) => {
             if ( moderatorOnly && !userFunctions.isUserModerator(senderID) ) {
                 chatFunctions.botSpeak( data,"Sorry, that function is only available to moderators");
             } else if ( command ) {
-                command.call( null, data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions );
+                command.call( null, { data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions } );
             } else {
                 chatFunctions.botSpeak( data,"Sorry, that's not a command I recognise. Try " + chatDefaults.commandIdentifier + "list to find out more.");
             }
