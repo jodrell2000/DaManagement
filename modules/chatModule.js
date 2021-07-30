@@ -178,9 +178,10 @@ const chatFunctions = (bot, roomDefaults) => {
             }
         },
 
-        readSongStats: function (songFunctions, roomDefaults) {
+        readSongStats: function ( data, songFunctions, roomDefaults ) {
             if (roomDefaults.SONGSTATS) {
-                bot.speak('Stats for ' + songFunctions.song() + ' by ' + songFunctions.artist() + ': ' + ':thumbsup:' + songFunctions.upVotes() + ':thumbsdown:' + songFunctions.downVotes() + ':heart:' + songFunctions.whoSnagged());
+                this.botSpeak( data, 'Stats for ' + songFunctions.song() + ' by ' + songFunctions.artist() + ':');
+                this.botSpeak( data, ':thumbsup:' + songFunctions.upVotes() + ':thumbsdown:' + songFunctions.downVotes() + ':heart:' + songFunctions.whoSnagged());
             }
         },
 

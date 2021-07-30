@@ -55,7 +55,7 @@ module.exports = {
 
     detail: null, //the discription given in the "room" tab of the room that the bot is in
 
-    removeIdleDJs: true, //afk limit(on by default), this is for the dj's on stage
+    removeIdleDJs: false, //afk limit(on by default), this is for the dj's on stage
     djIdleLimit: 20, // idle (minutes) limit for DJs
     warnIdlePM: true, //choose whether idle warnings(for dj's on stage) will be given through the pm or the chatbox (false = chatbox, true = pm message)
 
@@ -67,7 +67,7 @@ module.exports = {
     snagMeansActive: true, // does snagging a track count as user being active
     djingMeansActive: true, // does starting to DJ mean someone is active...disable if you think people are scripting a lot
 
-    queueActive: true, //queue(on by default)
+    queueActive: false, //queue(on by default)
     queueWaitTime: 60, /*how many second's does a dj have to get on stage when it's their turn to dj after waiting in the queue.
 						 The value must be entered in seconds in order to display the correct message, i.e 3 mins = 180 seconds.
 						 Note that people are not removed from the queue when they leave the room so a lower number is preferable in high pop rooms to avoid backup.

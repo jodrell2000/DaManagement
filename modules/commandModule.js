@@ -38,7 +38,7 @@ const commandFunctions = (bot) => {
     generalCommands.list.help = "Lists all available commands";
     generalCommands.list.sampleArguments = [ "[command type]" ]
 
-    generalCommands.help = ( { data, command, chatFunctions } ) => { displayHelp( data, command, chatFunctions ); }
+    generalCommands.help = ( { data, args, chatFunctions } ) => { displayHelp( data, args, chatFunctions ); }
     generalCommands.help.argumentCount = 1;
     generalCommands.help.help = "Display how to use an individual command";
     generalCommands.help.sampleArguments = [ "[command]" ]
@@ -277,9 +277,10 @@ const commandFunctions = (bot) => {
 
     function displayHelp( data, command, chatFunctions ) {
         let theMessage = "";
+        logMe('debug', '=========================== displayHelp, command:' + command[0] );
 
         if (command[0] === undefined) {
-            command = "help"
+            command[0] = "help"
         }
 
         if (allCommands[command] === undefined) {
@@ -311,11 +312,13 @@ const commandFunctions = (bot) => {
 
         getCommandAndArguments: function(text, allCommands) {
             const [sentCommand, ...args] = text.split(" ");
+            logMe( 'debug', '=========================== getCommandAndArguments, sentCommand:' + sentCommand );
+            logMe( 'debug', '=========================== getCommandAndArguments, args:' + JSON.stringify(args) );
             let theCommand = sentCommand.substring(1, sentCommand.length)
             const commandObj = allCommands[theCommand];
             if (commandObj) {
                 const moderatorOnly = !!moderatorCommands[theCommand];
-                return [commandObj, args, moderatorOnly];
+                return [commandObj, args, moderatorOnly]; 
             } else {
                 return [null, null];
             }
@@ -324,10 +327,14 @@ const commandFunctions = (bot) => {
         parseCommands: function(data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) {
             const senderID = data.userid;
             const [ command, args, moderatorOnly ] = this.getCommandAndArguments( data.text, allCommands );
+            logMe( 'debug', '=========================== parseCommands, command:' + command );
+            logMe( 'debug', '=========================== parseCommands, args:' + JSON.stringify(args) );
             if ( moderatorOnly && !userFunctions.isUserModerator(senderID) ) {
                 chatFunctions.botSpeak( data,"Sorry, that function is only available to moderators");
             } else if ( command ) {
-                command.call( null, { data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions } );
+                logMe( 'debug', '=========================== parseCommands, command:' + command );
+                logMe( 'debug', '=========================== parseCommands, args:' + JSON.stringify(args) );
+                    command.call( null, { data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions } );
             } else {
                 chatFunctions.botSpeak( data,"Sorry, that's not a command I recognise. Try " + chatDefaults.commandIdentifier + "list to find out more.");
             }

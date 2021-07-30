@@ -475,7 +475,7 @@ bot.on('endsong', function (data)
     userFunctions.removeDJsOverPlaylimit(chatFunctions, djID);
 
     //bot says song stats for each song
-    chatFunctions.readSongStats(songFunctions, roomDefaults)
+    chatFunctions.readSongStats(data, songFunctions, roomDefaults)
 
     roomFunctions.escortDJsDown(djID, botFunctions, userFunctions, chatFunctions);
 

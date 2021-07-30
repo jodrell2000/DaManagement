@@ -318,7 +318,9 @@ const userFunctions = (bot, roomDefaults) => {
         },
 
         updateUserLastVoted: function ( userID ) {
-            theUsersList[this.getPositionOnUsersList( userID )]['lastVoted'] = Date.now();
+            if ( theUsersList[this.getPositionOnUsersList( userID )] !== undefined) {
+                theUsersList[this.getPositionOnUsersList( userID )]['lastVoted'] = Date.now();
+            }
         },
 
         updateUserLastSnagged: function ( userID ) {

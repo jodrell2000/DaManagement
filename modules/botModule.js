@@ -39,7 +39,6 @@ const botFunctions = (bot) => {
         botStartTime: () => botStartTime,
         setBotStartTime:  function () {
             botStartTime = Date.now()
-            logMe('debug', 'setBotStartTime: Setting bot start time to ' + botStartTime );
         },
 
         skipOn: () => skipOn,
@@ -52,15 +51,11 @@ const botFunctions = (bot) => {
         setUptimeTime: function (value) { uptimeTime = value; },
 
         uptime: function (data, chatFunctions) {
-            logMe('debug', 'botCommands.uptime')
             let msecPerMinute = 1000 * 60;
             let msecPerHour = msecPerMinute * 60;
             let msecPerDay = msecPerHour * 24;
             this.setUptimeTime(Date.now());
             let currentTime = this.uptimeTime() - this.botStartTime();
-            logMe('debug', 'botCommands.uptime, uptimeTime:' + this.uptimeTime() )
-            logMe('debug', 'botCommands.uptime, botStartTime:' + this.botStartTime() )
-            logMe('debug', 'botCommands.uptime, currentTime:' + currentTime )
 
             let days = Math.floor(currentTime / msecPerDay);
             currentTime = currentTime - (days * msecPerDay);
@@ -105,10 +100,10 @@ const botFunctions = (bot) => {
                 let whichMessage;
                 if (bot._isAuthenticated) {
                     whichMessage = true;
-                    logMe('error', 'it looks like your bot is not in it\'s room. attempting to reconnect now....');
+                    logMe('error', '+++++++++++++++++++++++++ BotModule Error: it looks like your bot is not in it\'s room. attempting to reconnect now....');
                 } else {
                     whichMessage = false;
-                    logMe('error', 'connection with turntable lost, waiting for connection to come back...');
+                    logMe('error', '+++++++++++++++++++++++++ BotModule Error: connection with turntable lost, waiting for connection to come back...');
                 }
 
                 bot.roomRegister(authModule.ROOMID, function (data) {
@@ -117,13 +112,6 @@ const botFunctions = (bot) => {
                         clearInterval(attemptToReconnect);
                         module.exports.attemptToReconnect = null;
                         checkActivity = Date.now();
-
-                        if (whichMessage) {
-                            logMe('the bot has reconnected to the room ' +
-                                'specified by your choosen roomid');
-                        } else {
-                            logMe('connection with turntable is back!');
-                        }
                     } else {
                         if (roomDefaults.errorMessage === null && typeof data.err === 'string') {
                             roomDefaults.errorMessage = data.err;
@@ -138,13 +126,11 @@ const botFunctions = (bot) => {
         },
 
         isBotOnStage: function (userFunctions) {
-            logMe("debug", "Check if the bot is already on stage")
             let isBotAlreadyOnStage = userFunctions.djList().indexOf(authModule.USERID);
             return isBotAlreadyOnStage !== -1;
         },
 
         shouldTheBotDJ: function (userFunctions, roomFunctions) {
-            logMe("debug", "Check if the bot should DJ or not")
             return userFunctions.djList().length >= 1 && // is there at least one DJ on stage
                 userFunctions.djList().length <= botDefaults.whenToGetOnStage && // are there fewer than the limit of DJs on stage
                 userFunctions.queueList().length === 0 && // is the queue empty
@@ -153,13 +139,11 @@ const botFunctions = (bot) => {
         },
 
         shouldStopBotDJing: function (userFunctions, roomFunctions) {
-            logMe("debug", "Check if the bot stop DJing")
             return userFunctions.djList().length >= botDefaults.whenToGetOffStage && // are there enough DJs onstage
                 roomFunctions.checkWhoIsDj() !== authModule.USERID; // check the Bot isn't currently DJing
         },
 
         checkAutoDJing: function (userFunctions, roomFunctions) {
-            logMe("debug", "Check if the bot should DJ and start it, or remove if required")
             if (autoDjingTimer != null)
             {
                 clearTimeout(autoDjingTimer);
