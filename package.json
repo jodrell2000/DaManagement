@@ -1,5 +1,5 @@
 {
-	"name": "Da_Management",
+	"name": "the_management",
 	"private": true,
 	"dependencies": {
 		"ttapi": "^4.0.3"
