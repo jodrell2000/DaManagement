@@ -56,7 +56,7 @@ module.exports = {
     detail: null, //the discription given in the "room" tab of the room that the bot is in
 
     removeIdleDJs: false, //afk limit(on by default), this is for the dj's on stage
-    djIdleLimit: 20, // idle (minutes) limit for DJs
+    djIdleLimit: 6, // idle (minutes) limit for DJs
     warnIdlePM: true, //choose whether idle warnings(for dj's on stage) will be given through the pm or the chatbox (false = chatbox, true = pm message)
 
     roomIdle: false, //audience afk limit(off by default)

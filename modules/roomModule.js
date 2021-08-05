@@ -18,7 +18,7 @@ let roomJoinMessage = ''; //the message users will see when they join the room, 
 
 const roomFunctions = (bot) => {
     function logMe(logLevel, message) {
-        if (logLevel === 'error') {
+        if ( logLevel === 'error' || logLevel === 'info' ) {
             console.log("roomFunctions:" + logLevel + "->" + message + "\n");
         } else {
             if (bot.debug) {

@@ -3,6 +3,7 @@ let botDefaults     = require('../defaultSettings/botDefaults.js');
 let musicDefaults   = require('../defaultSettings/musicDefaults.js');
 
 let authModule = require('../auth.js');
+const userFunctions = require('./userModule.js');
 
 let checkActivity = Date.now();
 let skipOn = null; //if true causes the bot to skip every song it plays, toggled on and off by commands
@@ -49,6 +50,19 @@ const botFunctions = (bot) => {
 
         uptimeTime: () => uptimeTime,
         setUptimeTime: function (value) { uptimeTime = value; },
+
+        // ========================================================
+        // Bot Command Functions
+        // ========================================================
+
+        shutdown: function ( data, userFunctions, chatFunctions ) {
+            chatFunctions.botSpeak( data, "Going away now..." );
+            logMe('info', 'Users:' + JSON.stringify(userFunctions.theUsersList) );
+
+            exit();
+        },
+
+        // ========================================================
 
         uptime: function (data, chatFunctions) {
             let msecPerMinute = 1000 * 60;

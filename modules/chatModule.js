@@ -2,7 +2,7 @@ let botDefaults         = require('../defaultSettings/botDefaults.js');
 
 const chatFunctions = (bot, roomDefaults) => {
     function logMe(logLevel, message) {
-        if (logLevel === 'error') {
+        if ( logLevel === 'error' || logLevel === 'info' ) {
             console.log("chatFunctions:" + logLevel + "->" + message + "\n");
         } else {
             if (bot.debug) {
@@ -169,7 +169,7 @@ const chatFunctions = (bot, roomDefaults) => {
                     theMessage = theMessage +
                         userFunctions.getUsername(userFunctions.djList()[djLoop]) +
                         ': ' +
-                        userFunctions.theUsersList()[theUserPosition]['songCount'] +
+                        userFunctions.theUsersList()[theUserPosition]['currentPlayCount'] +
                         ', ';
                 }
 

@@ -53,7 +53,8 @@ module.exports = {
         "https://media.giphy.com/media/SGkufeMafyuBhIw796/giphy.gif",
         "https://media.giphy.com/media/XIabMPeqK75PG/giphy.gif",
         "https://media.giphy.com/media/j3gsT2RsH9K0w/giphy.gif",
-        "https://media.giphy.com/media/14kqI3Y4urS3rG/giphy.gif"
+        "https://media.giphy.com/media/14kqI3Y4urS3rG/giphy.gif",
+        "https://i.gifer.com/9sS9.gif"
     ],
 
     frankieMessages: [
@@ -201,7 +202,7 @@ module.exports = {
 
     ],
 
-    coupleSkateMessages: [
+    couplesSkateMessages: [
         "Slow dance"
     ],
 

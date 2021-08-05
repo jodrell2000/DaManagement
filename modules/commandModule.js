@@ -4,6 +4,7 @@ let roomDefaults = require('../defaultSettings/roomDefaults.js');
 let musicDefaults = require('../defaultSettings/musicDefaults.js');
 let chatDefaults = require('../defaultSettings/chatDefaults.js');
 let chatCommandItems    = require('../defaultSettings/chatCommandItems.js');
+const botFunctions = require('./botModule.js');
 
 
 const generalCommands = {};
@@ -16,7 +17,7 @@ const moderatorQueueCommands = {};
 
 const commandFunctions = (bot) => {
     function logMe(logLevel, message) {
-        if (logLevel === 'error') {
+        if ( logLevel === 'error' || logLevel === 'info' ) {
             console.log("commandFunctions:" + logLevel + "->" + message + "\n");
         } else {
             if (bot.debug) {
@@ -41,7 +42,10 @@ const commandFunctions = (bot) => {
     generalCommands.help = ( { data, args, chatFunctions } ) => { displayHelp( data, args, chatFunctions ); }
     generalCommands.help.argumentCount = 1;
     generalCommands.help.help = "Display how to use an individual command";
-    generalCommands.help.sampleArguments = [ "[command]" ]
+    generalCommands.help.sampleArguments = [ "[command]" ];
+
+    generalCommands.shutdown = ( { data, botFunctions, userFunctions, chatFunctions } ) => {  botFunctions.shutdown( data, userFunctions, chatFunctions ); }
+    generalCommands.shutdown.help = "Shut down the Bot if it's causing problems";
 
     // #############################################
     // General user Queue commands
@@ -188,6 +192,11 @@ const commandFunctions = (bot) => {
     moderatorCommands.lengthLimit.help = "Switch the song length limit on or off. Sent with a number it changes the limit";
     moderatorCommands.lengthLimit.sampleArguments = [ "20" ];
 
+    moderatorCommands.userStatus = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.readUserStatus( data, args, chatFunctions ) } 
+    moderatorCommands.userStatus.argumentCount = 1;
+    moderatorCommands.userStatus.help = "Read out the activity summary of a specified user";
+    moderatorCommands.userStatus.sampleArguments = [ "Jodrell" ];
+
     // #############################################
     // Moderator Only Queue commands
     // #############################################
@@ -202,10 +211,10 @@ const commandFunctions = (bot) => {
     moderatorQueueCommands.bumptop.help = "Move a user to the head of the queue";
     moderatorQueueCommands.bumptop.sampleArguments = [ 'jodrell' ];
 
-    moderatorQueueCommands.queueOn = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.enableQueue( data, chatFunctions ) }
+    moderatorQueueCommands.queueOn = ( { data, userFunctions, chatFunctions } ) => { userFunctions.enableQueue( data, chatFunctions ) }
     moderatorQueueCommands.queueOn.help = "Enables the queue";
 
-    moderatorQueueCommands.queueOff = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.disableQueue( data, chatFunctions ) }
+    moderatorQueueCommands.queueOff = ( { data, userFunctions, chatFunctions } ) => { userFunctions.disableQueue( data, chatFunctions ) }
     moderatorQueueCommands.queueOff.help = "Disables the queue";
 
     // #############################
@@ -277,7 +286,6 @@ const commandFunctions = (bot) => {
 
     function displayHelp( data, command, chatFunctions ) {
         let theMessage = "";
-        logMe('debug', '=========================== displayHelp, command:' + command[0] );
 
         if (command[0] === undefined) {
             command[0] = "help"
@@ -312,8 +320,6 @@ const commandFunctions = (bot) => {
 
         getCommandAndArguments: function(text, allCommands) {
             const [sentCommand, ...args] = text.split(" ");
-            logMe( 'debug', '=========================== getCommandAndArguments, sentCommand:' + sentCommand );
-            logMe( 'debug', '=========================== getCommandAndArguments, args:' + JSON.stringify(args) );
             let theCommand = sentCommand.substring(1, sentCommand.length)
             const commandObj = allCommands[theCommand];
             if (commandObj) {
@@ -327,13 +333,9 @@ const commandFunctions = (bot) => {
         parseCommands: function(data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions) {
             const senderID = data.userid;
             const [ command, args, moderatorOnly ] = this.getCommandAndArguments( data.text, allCommands );
-            logMe( 'debug', '=========================== parseCommands, command:' + command );
-            logMe( 'debug', '=========================== parseCommands, args:' + JSON.stringify(args) );
             if ( moderatorOnly && !userFunctions.isUserModerator(senderID) ) {
                 chatFunctions.botSpeak( data,"Sorry, that function is only available to moderators");
             } else if ( command ) {
-                logMe( 'debug', '=========================== parseCommands, command:' + command );
-                logMe( 'debug', '=========================== parseCommands, args:' + JSON.stringify(args) );
                     command.call( null, { data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions } );
             } else {
                 chatFunctions.botSpeak( data,"Sorry, that's not a command I recognise. Try " + chatDefaults.commandIdentifier + "list to find out more.");
