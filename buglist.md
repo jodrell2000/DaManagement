@@ -1,20 +1,20 @@
 Bugs
-- sending !addme in PM incorrectly adds the Bot to the queue rather than the user
-- check commands for correct number of arguments
--- return help description with example command rather than the Bot crashing
-- queue disabled, kicking people because holding a spot for the refresh list
--- inconsistent and unrepeatable, needs more info
+* sending !addme in PM incorrectly adds the Bot to the queue rather than the user
+* check commands for correct number of arguments
+  * return help description with example command rather than the Bot crashing
+* queue disabled, kicking people because holding a spot for the refresh list
+  * inconsistent and unrepeatable, needs more info
 
 Feature Requests
 * parse "region": [] from current_song data to tell people if their songs are unavailable in certain countries?
-** configurable list of countries
-** by users?
+  * configurable list of countries
+  * by users?
 * Switching playlists on should not reset playcounters
-    * unless you want it to?
+  * unless you want it to?
 * remove someone from the queue if they leave the room and don’t use /refresh
 * commands shouldn’t be case sensitive
 * Msg DJs when they’re going to be taken down while playlist is on, before their track
-    * give people the chance to pick their last track properly
+  * give people the chance to pick their last track properly
 * room boot when advertising other rooms
 ** sometimes boots when sending other link types
 * Can the bot check and report when vids are region restricted?
