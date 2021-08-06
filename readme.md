@@ -26,7 +26,7 @@ There are 2 bots in this repo. The actuall turntable.fm bot called <strong>DaMan
   node DaManagement.js
   ```
 * or start it with the bash script to restart it following any crashes after 30 seconds of innactivity
-** this does mean that if the bot is shutdown using the sarahConner command it will be restarted...probably means you shouldn't use this command if you suspect your bot has disruptive bugs ;-)
+ * this does mean that if the bot is shutdown using the sarahConner command it will be restarted...probably means you shouldn't use this command if you suspect your bot has disruptive bugs ;-)
   ```
   ./startManagement.sh
   ```
