@@ -163,9 +163,7 @@ const userFunctions = ( bot ) => {
 
         getUsername: function ( userID ) {
             logMe( 'info', '====================== getUsername, userID:' + userID );
-            if ( userID !== undefined ) {
-                theUsersList.forEach( function ( theUser ) {
-                } );
+            if ( this.userExists( userID ) ) {
                 let theUser = theUsersList.find( ( { id } ) => id === userID );
                 return theUser.username;
             }
@@ -1022,7 +1020,7 @@ const userFunctions = ( bot ) => {
 
         readQueue: function ( data, chatFunctions ) {
             if ( roomDefaults.queueActive === true ) {
-                chatFunctions.botSpeak( data, this.buildQueueMessage(), true );
+                chatFunctions.botSpeak( data, this.buildQueueMessage() );
             } else {
                 chatFunctions.botSpeak( data, "The queue is not active" );
             }

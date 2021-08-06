@@ -54,7 +54,10 @@ module.exports = {
         "https://media.giphy.com/media/XIabMPeqK75PG/giphy.gif",
         "https://media.giphy.com/media/j3gsT2RsH9K0w/giphy.gif",
         "https://media.giphy.com/media/14kqI3Y4urS3rG/giphy.gif",
-        "https://i.gifer.com/9sS9.gif"
+        "https://i.gifer.com/9sS9.gif",
+        "https://media.giphy.com/media/yO2MZhtwxAC2Y/giphy.gif",
+        "https://media.giphy.com/media/b208NXXad0mfS/giphy.gif",
+        "https://media.tenor.com/images/466a11fbb26ed3162b02c5ef21971012/tenor.gif"
     ],
 
     frankieMessages: [
@@ -220,6 +223,8 @@ module.exports = {
         "https://media.giphy.com/media/huyVJYSKcArLiu8J5g/giphy.gif",
         "https://media.giphy.com/media/l3mZfxgPWhmuXa8Cc/giphy.gif",
         "https://media.giphy.com/media/d2Z0zWe67TDcbCzC/giphy.gif",
+        "https://media.giphy.com/media/KxiRwO7tqXCTDVKobo/giphy.gif",
+        "https://media.giphy.com/media/26FPqAHtgCBzKG9mo/giphy.gif"
     ],
 
     shimmyMessages: [
@@ -253,5 +258,16 @@ module.exports = {
         "https://media.giphy.com/media/xT0BKqk8FSsAgRQ0SY/giphy.gif",
         "https://media.giphy.com/media/Be9nOh8wsow8Kvt8Jx/giphy.gif",
         "https://media.giphy.com/media/IFjSbBHETzzr6GJdwW/giphy-downsized-large.gif"
+    ],
+
+    tumbleWeedMessages: [
+        "..............",
+        "..............wow"
+    ],
+
+    tumbleweedPics: [
+        "https://media.giphy.com/media/d8lUKXD00IXSw/giphy.gif",
+        "https://media.giphy.com/media/xUA7b30EbtkaMHvRgk/giphy.gif",
+        "https://media.giphy.com/media/xT5LMBIW4I7671tqX6/giphy.gif"
     ]
 }
