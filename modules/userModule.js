@@ -756,31 +756,31 @@ const userFunctions = ( bot ) => {
 
                 if ( this.isUserIDInQueue( theUserID ) ) {
                     if ( theUserID !== this.headOfQueue() ) {
-                        return [ false, 'Sorry, but you are not first in queue. please wait your turn.' ];
+                        return [ false, '@' + this.getUsername( theUserID ) + ', sorry, but you are not first in queue. please wait your turn.' ];
                     } else {
                         return [ true, '' ];
                     }
                 } else {
-                    return [ false, 'The queue is currently active. To add yourself to the queue type ' + chatDefaults.commandIdentifier + 'addme. To remove yourself from the queue type ' + chatDefaults.commandIdentifier + 'removeme.' ];
+                    return [ false, '@' + this.getUsername( theUserID ) + ', the queue is currently active. To add yourself to the queue type ' + chatDefaults.commandIdentifier + 'addme. To remove yourself from the queue type ' + chatDefaults.commandIdentifier + 'removeme.' ];
                 }
             }
 
             if ( this.refreshDJCount() + this.djList().length >= 5 ) {
-                return [ false, 'Sorry, but I\'m holding that spot for someone in the refresh list' ];
+                return [ false, '@' + this.getUsername( theUserID ) + ', sorry, but I\'m holding that spot for someone in the refresh list' ];
             }
 
             for ( let banLoop = 0; banLoop < roomFunctions.tempBanList().length; banLoop++ ) {
                 if ( theUserID === roomFunctions.tempBanList()[ banLoop ] ) {
-                    return [ false, 'You are banned from djing. Please speak to a Mod to find out why' ];
+                    return [ false, '@' + this.getUsername( theUserID ) + ', you are banned from djing. Please speak to a Mod to find out why' ];
                 }
             }
 
             if ( this.isUserIDStageBanned( theUserID ) ) {
-                return [ false, 'You are banned from djing. Please speak to a Mod to find out why' ];
+                return [ false, '@' + this.getUsername( theUserID ) + ', you are banned from djing. Please speak to a Mod to find out why' ];
             }
 
             if ( this.getUserSpamCount( theUserID ) >= roomDefaults.spamLimit ) {
-                return [ false, 'You been SPAMming too much...please want a few minutes before trying again' ];
+                return [ false, '@' + this.getUsername( theUserID ) + ', you\'ve been SPAMming too much...please want a few minutes before trying again' ];
             }
 
             return [ true, '' ];
