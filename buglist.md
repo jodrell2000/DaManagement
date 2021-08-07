@@ -7,6 +7,7 @@ Bugs
 * ~~after adding a user to the queue and joining, the bot eventually sends a message "Sorry @undefined you have run out of time."~~
 
 Feature Requests
+* make comamnds case insensitive
 * if a DJ leaves the room, and hasn't used the refresh command they should be removed from the queue
 * restart command to not disrupt the room when changes are made
   * have the bot save the user/queue states as JSON(?) and reload them
@@ -16,7 +17,6 @@ Feature Requests
 * Switching playlists on should not reset playcounters
   * unless you want it to?
 * remove someone from the queue if they leave the room and don’t use /refresh
-* commands shouldn’t be case sensitive
 * Msg DJs when they’re going to be taken down while playlist is on, before their track
   * give people the chance to pick their last track properly
 * room boot when advertising other rooms

@@ -816,6 +816,7 @@ const userFunctions = ( bot ) => {
         },
 
         setDJCurrentPlayCount: function ( userID, theCount ) {
+            if ( theCount === undefined ) { theCount = 0 }
             if ( this.userExists( userID ) ) {
                 theUsersList[ this.getPositionOnUsersList( userID ) ][ 'currentPlayCount' ] = theCount;
             }
@@ -849,6 +850,42 @@ const userFunctions = ( bot ) => {
         getDJTotalPlayCount: function ( userID ) {
             if ( this.userExists( userID ) ) {
                 return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'totalPlayCount' ];
+            }
+        },
+
+        djPlaysCommand: function ( data, chatFunctions ) {
+            chatFunctions.botSpeak( data, this.buildDJPlaysMessage( ) );
+        },
+
+
+        buildDJPlaysMessage: function ( ) {
+            if ( this.djList().length === 0 ) {
+                return 'There are no dj\'s on stage.';
+            } else {
+                let theMessage = '';
+                let theUserID;
+                let theUserPosition;
+                let theUsername;
+                let theCurrentPlayCount;
+                let theTotalPlayCount;
+
+                for ( let djLoop = 0; djLoop < this.djList().length; djLoop++ ) {
+                    theUserID = this.djList()[ djLoop ];
+                    theUsername = this.getUsername( theUserID );
+                    theUserPosition = this.getPositionOnUsersList( theUserID );
+                    theCurrentPlayCount = this.theUsersList()[ theUserPosition ][ 'currentPlayCount' ];
+                    theTotalPlayCount = this.theUsersList()[ theUserPosition ][ 'totalPlayCount' ];
+
+                    theMessage += theUsername + ': ' + theCurrentPlayCount;
+                    if ( theCurrentPlayCount !== theTotalPlayCount && theTotalPlayCount !== undefined ) {
+                        theMessage += '(' + theTotalPlayCount + '), ';
+                    } else {
+                        theMessage += ', ';
+                    }
+                }
+
+                theMessage = 'The play counts are now ' + theMessage.substring( 0, theMessage.length - 2 );
+                return theMessage;
             }
         },
 
