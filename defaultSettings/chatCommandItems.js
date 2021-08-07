@@ -57,7 +57,8 @@ module.exports = {
         "https://i.gifer.com/9sS9.gif",
         "https://media.giphy.com/media/yO2MZhtwxAC2Y/giphy.gif",
         "https://media.giphy.com/media/b208NXXad0mfS/giphy.gif",
-        "https://media.tenor.com/images/466a11fbb26ed3162b02c5ef21971012/tenor.gif"
+        "https://media.tenor.com/images/466a11fbb26ed3162b02c5ef21971012/tenor.gif",
+        "https://media.giphy.com/media/94oj4dwuJfDKE/giphy.gif"
     ],
 
     frankieMessages: [
@@ -108,6 +109,12 @@ module.exports = {
     wcMessages: [
         "Everybody Wang Chung tonight.  Everybody have fun tonight.",
         "Everybody have fun tonight, Everybody Wang Chung!"
+    ],
+
+    wcPics: [
+        "https://media.giphy.com/media/iDIjE5ktG70WR28MiD/giphy.gif",
+        "https://media.giphy.com/media/cV3tHFa69CNj2/giphy.gif",
+        "https://thumbs.gfycat.com/DismalWhoppingIntermediateegret-max-1mb.gif"
     ],
 
     jumpMessages: [

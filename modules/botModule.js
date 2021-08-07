@@ -56,19 +56,15 @@ const botFunctions = ( bot ) => {
         // ========================================================
 
         sarahConner: function ( data, userFunctions, chatFunctions ) {
-            logMe( 'info', 'Users:' + JSON.stringify( userFunctions.theUsersList ) );
-            exit();
+            const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
 
-            // const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
-
-            // const shutMeDown = async () => {
-            //     chatFunctions.botSpeak( data, "Going away now..." );
-            //     await sleep( 100 )
-            //     logMe( 'info', 'Users:' + JSON.stringify( userFunctions.theUsersList ) );
-            //     await sleep( 100 )
-            //     exit( 1 );
-            // }
-            // shutMeDown();
+            const shutMeDown = async () => {
+                chatFunctions.botSpeak( data, "Going away now...", true );
+                await sleep( 100 )
+                logMe( 'info', 'Users:' + JSON.stringify( userFunctions.theUsersList ) );
+                await sleep( 100 )
+            }
+            shutMeDown().then(r => exit( ) );
         },
 
         // ========================================================

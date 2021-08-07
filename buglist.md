@@ -1,10 +1,10 @@
 Bugs
 * sending !addme in PM incorrectly adds the Bot to the queue rather than the user
-* after adding a user to the queue and joining, the bot eventually sends a message "Sorry @undefined you have run out of time."
 * check commands for correct number of arguments
   * return help description with example command rather than the Bot crashing
-* queue disabled, kicking people because holding a spot for the refresh list
-  * inconsistent and unrepeatable, needs more info
+* ~~queue disabled, kicking people because holding a spot for the refresh list~~
+  * ~~inconsistent and unrepeatable, needs more info~~
+* ~~after adding a user to the queue and joining, the bot eventually sends a message "Sorry @undefined you have run out of time."~~
 
 Feature Requests
 * if a DJ leaves the room, and hasn't used the refresh command they should be removed from the queue
