@@ -104,7 +104,7 @@ const roomFunctions = ( bot ) => {
             }
         },
 
-        escortDJsDown: function ( currentDJ, botFunctions, userFunctions, chatFunctions ) {
+        escortDJsDown: function ( data, currentDJ, botFunctions, userFunctions, chatFunctions ) {
             //iterates through the escort list and escorts all djs on the list off the stage.
 
             if ( userFunctions.escortMeIsEnabled( currentDJ ) === true ) {
@@ -112,7 +112,7 @@ const roomFunctions = ( bot ) => {
                 userFunctions.removeEscortMeFromUser( currentDJ );
 
                 const theMessage = '@' + userFunctions.getUsername( currentDJ ) + ' had enabled escortme';
-                chatFunctions.botSpeak( null, theMessage );
+                chatFunctions.botSpeak( data, theMessage );
             }
         },
 

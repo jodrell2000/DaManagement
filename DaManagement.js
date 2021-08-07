@@ -448,5 +448,5 @@ bot.on( 'endsong', function ( data ) {
     //bot says song stats for each song
     chatFunctions.readSongStats( data, songFunctions, roomDefaults )
 
-    roomFunctions.escortDJsDown( djID, botFunctions, userFunctions, chatFunctions );
+    roomFunctions.escortDJsDown( data, djID, botFunctions, userFunctions, chatFunctions );
 } );

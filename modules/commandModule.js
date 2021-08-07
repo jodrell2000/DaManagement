@@ -47,6 +47,12 @@ const commandFunctions = ( bot ) => {
     generalCommands.djplays = ( { data, userFunctions, chatFunctions } ) => { userFunctions.djPlaysCommand( data, chatFunctions ); }
     generalCommands.djplays.help = "How many track has each DJ played = current(total if different)";
 
+    generalCommands.escortme = ( { data, userFunctions, chatFunctions } ) => { userFunctions.enableEscortMe( data, chatFunctions ); }
+    generalCommands.escortme.help = "Have yourself removed from the decks after your track finishes playing";
+
+    generalCommands.stopescortme = ( { data, userFunctions, chatFunctions } ) => { userFunctions.disableEscortMe( data, chatFunctions ); }
+    generalCommands.stopescortme.help = "Stop yourself from being removed from the decks after your track finishes playing";
+
     generalCommands.sarahConner = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.sarahConner( data, userFunctions, chatFunctions ); }
     generalCommands.sarahConner.help = "Shut down the Bot if it's causing problems";
 
@@ -713,12 +719,6 @@ const commandFunctions = ( bot ) => {
                 } else if ( botDefaults.getonstage === true ) {
                     bot.speak( 'I am no longer auto djing' );
                     botDefaults.getonstage = false;
-                }
-            } else if ( data.text === '/escortme' ) {
-                let theUserID = data.userid;
-                if ( !userFunctions.escortMeIsEnabled() && userFunctions.isCurrentDJ( theUserID ) ) {
-                    userFunctions.addEscortMeToUser( theUserID );
-                    bot.speak( '@' + userFunctions.getUsername( theUserID ) + ' you will be escorted after you play your song' );
                 }
             } else if ( data.text === '/stopescortme' ) {
                 bot.speak( '@' + userFunctions.name() + ' you will no longer be escorted after you play your song' );
@@ -1736,13 +1736,6 @@ const commandFunctions = ( bot ) => {
                 let escortIndex = userFunctions.escortMeList().indexOf( speaker );
                 if ( escortIndex !== -1 ) {
                     userFunctions.escortMeList().splice( escortIndex, 1 );
-                }
-            } else if ( data.text === '/escortme' && isInRoom === true ) {
-                let djListIndex = userFunctions.djList().indexOf( speaker );
-                let escortmeIndex = userFunctions.escortMeList().indexOf( speaker );
-                if ( djListIndex !== -1 && escortmeIndex === -1 ) {
-                    userFunctions.escortMeList().push( speaker );
-                    bot.pm( 'you will be escorted after you play your song', speaker );
                 }
             } else if ( text.match( /^\/snag/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
                 if ( songFunctions.getSong() !== null && botDefaults.botPlaylist !== null ) {
