@@ -181,6 +181,34 @@ const userFunctions = ( bot ) => {
             }
         },
 
+        enableEscortMe: function ( data, chatFunctions ) {
+            let theUserID = data.userid;
+            let theError = '';
+            if ( this.escortMeIsEnabled( theUserID ) ) { theError += ", you've already enabled Escort Me..."; logMe( 'info', 'enableEscortMe, escort already enabled' ); }
+            if ( !this.isUserIDOnStage( theUserID ) ) { theError += ", you're not on stage..."; logMe( 'info', 'enableEscortMe, not on stage' ); }
+
+            if ( theError === '' ) {
+                this.addEscortMeToUser( theUserID );
+                chatFunctions.botSpeak( data, '@' + this.getUsername( theUserID ) + ' you will be escorted after you play your song' );
+            } else {
+                chatFunctions.botSpeak( data, '@' + this.getUsername( theUserID ) + theError );
+            }
+        },
+
+        disableEscortMe: function ( data, chatFunctions ) {
+            let theUserID = data.userid;
+            let theError = '';
+            if ( !this.escortMeIsEnabled( theUserID ) ) { theError += ", you haven't enabled Escort Me..." }
+            if ( !this.isUserIDOnStage( theUserID ) ) { theError += ", you're not on stage..." }
+
+            if ( theError === '' ) {
+                this.removeEscortMeFromUser( theUserID );
+                chatFunctions.botSpeak( data, '@' + this.getUsername( theUserID ) + ' you will no longer be escorted after you play your song' );
+            } else {
+                chatFunctions.botSpeak( data, '@' + this.getUsername( theUserID ) + theError );
+            }
+        },
+
         // ========================================================
         // User Helper Functions
         // ========================================================
@@ -399,7 +427,7 @@ const userFunctions = ( bot ) => {
         addRefreshToUser: function ( userID ) {
             if ( roomDefaults.refreshingEnabled ) {
                 if ( this.isUserInUsersList( userID ) ) {
-                    if ( this.isCurrentDJ( userID ) ) {
+                    if ( this.isUserIDOnStage( userID ) ) {
                         if ( !this.isUserInRefreshList( userID ) ) {
                             let listPosition = this.getPositionOnUsersList( userID );
                             theUsersList[ listPosition ][ 'Refresh' ] = Date.now();
@@ -705,10 +733,7 @@ const userFunctions = ( bot ) => {
         },
 
         isCurrentDJ: function ( userID ) {
-            const findDJ = ( dj ) => dj === userID;
-            const listPosition = djList.findIndex( findDJ );
-
-            return listPosition !== -1;
+            // is this ID currently playing a track???
         },
 
         resetDJs: function ( data ) {
