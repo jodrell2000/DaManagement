@@ -44,6 +44,9 @@ const commandFunctions = ( bot ) => {
     generalCommands.help.help = "Display how to use an individual command";
     generalCommands.help.sampleArguments = [ "[command]" ];
 
+    generalCommands.djplays = ( { data, userFunctions, chatFunctions } ) => { userFunctions.djPlaysCommand( data, chatFunctions ); }
+    generalCommands.djplays.help = "How many track has each DJ played = current(total if different)";
+
     generalCommands.sarahConner = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.sarahConner( data, userFunctions, chatFunctions ); }
     generalCommands.sarahConner.help = "Shut down the Bot if it's causing problems";
 
@@ -568,8 +571,6 @@ const commandFunctions = ( bot ) => {
                 userFunctions.disableRoomIdle();
                 bot.speak( 'the audience afk list is now inactive.' );
 
-            } else if ( text.match( /^\/djplays/ ) ) {
-                chatFunctions.botSpeak( null, chatFunctions.buildDJPlaysMessage( userFunctions ) );
             } else if ( text.match( /^\/skipsong/ ) && userFunctions.isUserModerator( speaker ) === true ) {
                 if ( roomFunctions.checkWhoIsDj() === authModule.USERID ) {
                     bot.speak( "Sorry...I'll play something better next time!" );
@@ -1661,9 +1662,6 @@ const commandFunctions = ( bot ) => {
                 }
 
                 bot.pm( whatsOn, speaker );
-
-            } else if ( text.match( /^\/djplays/ ) ) {
-                chatFunctions.botSpeak( chatFunctions.buildDJPlaysMessage( userFunctions ), speaker );
 
             } else if ( text.match( '/banstage' ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
                 let ban12 = data.text.slice( 11 );

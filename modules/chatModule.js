@@ -155,30 +155,6 @@ const chatFunctions = ( bot, roomDefaults ) => {
             }
         },
 
-        buildDJPlaysMessage: function ( userFunctions ) {
-            if ( userFunctions.djList().length === 0 ) {
-                return 'There are no dj\'s on stage.';
-            } else {
-                let theMessage = '';
-                let theUserID;
-                let theUserPosition;
-                let theUsername;
-                for ( let djLoop = 0; djLoop < userFunctions.djList().length; djLoop++ ) {
-                    theUserID = userFunctions.djList()[ djLoop ];
-                    theUsername = userFunctions.getUsername( theUserID );
-                    theUserPosition = userFunctions.getPositionOnUsersList( theUserID );
-                    theMessage = theMessage +
-                        userFunctions.getUsername( userFunctions.djList()[ djLoop ] ) +
-                        ': ' +
-                        userFunctions.theUsersList()[ theUserPosition ][ 'currentPlayCount' ] +
-                        ', ';
-                }
-
-                theMessage = 'The play counts are now ' + theMessage.substring( 0, theMessage.length - 2 );;
-                return theMessage;
-            }
-        },
-
         readSongStats: function ( data, songFunctions, roomDefaults ) {
             if ( roomDefaults.SONGSTATS ) {
                 this.botSpeak( data, 'Stats for ' + songFunctions.song() + ' by ' + songFunctions.artist() + ':' );
