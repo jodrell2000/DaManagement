@@ -102,10 +102,11 @@ const chatFunctions = ( bot, roomDefaults ) => {
             }
         },
 
-        dice: function ( data, command, userFunctions ) {
+        dice: function ( data, args, userFunctions ) {
+            logMe( 'info', 'dice, command:' + JSON.stringify( args ) );
             const theUsername = userFunctions.getUsername( data.userid );
-            const diceCount = command[ 0 ];
-            const diceType = command[ 1 ].split( "d" )[ 1 ];
+            const diceCount = args[ 0 ];
+            const diceType = args[ 1 ].split( "d" )[ 1 ];
 
             let theMessage = "@" + theUsername + ", you rolled";
             let theCount = 0;

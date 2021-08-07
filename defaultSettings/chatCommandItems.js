@@ -260,7 +260,7 @@ module.exports = {
         "https://media.giphy.com/media/IFjSbBHETzzr6GJdwW/giphy-downsized-large.gif"
     ],
 
-    tumbleWeedMessages: [
+    tumbleweedMessages: [
         "..............",
         "..............wow"
     ],

@@ -8,6 +8,8 @@ Bugs
 
 Feature Requests
 * if a DJ leaves the room, and hasn't used the refresh command they should be removed from the queue
+* restart command to not disrupt the room when changes are made
+  * have the bot save the user/queue states as JSON(?) and reload them
 * parse "region": [] from current_song data to tell people if their songs are unavailable in certain countries?
   * configurable list of countries
   * by users?

@@ -162,7 +162,6 @@ const userFunctions = ( bot ) => {
         },
 
         getUsername: function ( userID ) {
-            logMe( 'info', '====================== getUsername, userID:' + userID );
             if ( this.userExists( userID ) ) {
                 let theUser = theUsersList.find( ( { id } ) => id === userID );
                 return theUser.username;
@@ -191,7 +190,6 @@ const userFunctions = ( bot ) => {
                 theUsername += args[ userLoop ] + ' ';
             }
             theUsername = theUsername.substring( 0, theUsername.length - 1 );
-            logMe( 'info', '------------------------------------ readUserStatus, theUsername:' + theUsername + ':' );
 
             const theUserID = this.getUserIDFromUsername( theUsername );
             const roomJoined = formatRelativeTime( ( Date.now() - this.getUserJoinedRoom( theUserID ) ) / 1000 );
@@ -204,8 +202,6 @@ const userFunctions = ( bot ) => {
             const spamCount = this.getUserSpamCount( theUserID );
             const currentPlayCount = this.getDJCurrentPlayCount( theUserID );
             const totalPlayCount = this.getDJTotalPlayCount( theUserID );
-            logMe( 'info', '------------------------------------ readUserStatus, currentPlayCount:' + currentPlayCount + ':' );
-            logMe( 'info', '------------------------------------ readUserStatus, totalPlayCount:' + totalPlayCount + ':' );
 
             if ( theUserID !== undefined ) {
 
@@ -497,13 +493,11 @@ const userFunctions = ( bot ) => {
 
         getIdleTime: function ( userID ) {
             let userLastActive = this.getUserJoinedRoom( userID );
-            logMe( 'info', '============================ getIdleTime, joined room userLastActive:' + userLastActive );
 
             if ( roomDefaults.voteMeansActive ) {
                 let lastVoted = this.getUserLastVoted( userID );
                 if ( lastVoted > userLastActive ) {
                     userLastActive = lastVoted;
-                    logMe( 'info', '============================ getIdleTime, last voted more recent userLastActive:' + userLastActive );
                 }
             }
 
@@ -511,7 +505,6 @@ const userFunctions = ( bot ) => {
                 let lastSpoke = this.getUserLastSpoke( userID );
                 if ( lastSpoke > userLastActive ) {
                     userLastActive = lastSpoke;
-                    logMe( 'info', '============================ getIdleTime, spoke more recent userLastActive:' + userLastActive );
                 }
             }
 
@@ -519,7 +512,6 @@ const userFunctions = ( bot ) => {
                 let lastSnagged = this.getUserLastSnagged( userID );
                 if ( lastSnagged > userLastActive ) {
                     userLastActive = lastSnagged;
-                    logMe( 'info', '============================ getIdleTime, snagged more recent userLastActive:' + userLastActive );
                 }
             }
 
@@ -527,10 +519,8 @@ const userFunctions = ( bot ) => {
                 let joinedStage = this.getUserJoinedStage( userID );
                 if ( joinedStage > userLastActive ) {
                     userLastActive = joinedStage;
-                    logMe( 'info', '============================ getIdleTime, DJed recent userLastActive:' + userLastActive );
                 }
             }
-            logMe( 'info', '============================ getIdleTime, (Date.now() - userLastActive) / 1000: ' + ( Date.now() - userLastActive ) / 1000 + ' seconds' );
 
             return ( Date.now() - userLastActive ) / 1000; // return usersAFK time in seconds
         },
@@ -683,8 +673,6 @@ const userFunctions = ( bot ) => {
         },
 
         getCurrentDJID: function () {
-            this.debugPrintTheUsersList();
-
             for ( let userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
                 if ( theUsersList[ userLoop ][ 'currentDJ' ] === true ) {
                     return theUsersList[ userLoop ][ 'id' ];
@@ -706,13 +694,11 @@ const userFunctions = ( bot ) => {
         },
 
         isUserBannedFromRoom: function ( userID ) {
-            logMe( 'info', '================================ isUserBannedFromRoom, bannedUsers:' + JSON.stringify( bannedUsers ) );
             const banned = bannedUsers.findIndex( ( { id } ) => id === userID );
             return banned !== -1;
         },
 
         isUserIDOnStage: function ( userID ) {
-            logMe( 'info', '================================ isUserIDOnStage, djList:' + JSON.stringify( djList ) );
             const onStage = djList.indexOf( userID );
             return onStage !== -1;
         },
@@ -725,14 +711,12 @@ const userFunctions = ( bot ) => {
         },
 
         resetDJs: function ( data ) {
-            logMe( 'info', 'resetDJs, clear the DJ list' );
             this.clearDJList();
             let djID;
             if ( data.room !== undefined ) {
                 for ( let djLoop = 0; djLoop < data.room.metadata.djs.length; djLoop++ ) {
                     djID = data.room.metadata.djs[ djLoop ];
                     if ( typeof djID !== 'undefined' ) {
-                        logMe( 'info', 'resetDJs, add DJ ' + djID + ' and initialise playcount' );
                         this.initialiseAllDJPlayCounts( djID );
                         this.addDJToList( djID );
                     }
@@ -793,14 +777,12 @@ const userFunctions = ( bot ) => {
         // ========================================================
 
         deleteAllDJsPlayCounts: function () {
-            logMe( 'info', 'deleteAllDJPlayCounts!' );
             for ( let userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
                 this.deleteAllDJPlayCounts( theUsersList[ userLoop ][ 'id' ] );
             }
         },
 
         initialiseAllDJPlayCounts: function ( userID ) {
-            logMe( 'info', 'initialiseAllDJPlayCounts for userID:' + userID );
             if ( this.isUserInUsersList( userID ) ) {
                 this.setDJCurrentPlayCount( userID, 0 );
                 this.setDJTotalPlayCount( userID, 0 );
@@ -808,7 +790,6 @@ const userFunctions = ( bot ) => {
         },
 
         incrementDJPlayCount: function ( userID ) {
-            logMe( 'info', 'incrementDJPlayCount. Incrementing playcount for ' + userID );
             if ( this.userExists( userID ) ) {
                 if ( isNaN( theUsersList[ this.getPositionOnUsersList( userID ) ][ 'currentPlayCount' ] ) ) {
                     this.setDJCurrentPlayCount( userID, 1 );
@@ -821,10 +802,7 @@ const userFunctions = ( bot ) => {
                 } else {
                     ++theUsersList[ this.getPositionOnUsersList( userID ) ][ 'totalPlayCount' ];
                 }
-            }
-            logMe( 'info', 'incrementDJPlayCount. Current count is now ' + theUsersList[ this.getPositionOnUsersList( userID ) ][ 'currentPlayCount' ] );
-            logMe( 'info', 'incrementDJPlayCount. Total count is now ' + theUsersList[ this.getPositionOnUsersList( userID ) ][ 'totalPlayCount' ] );
-        },
+            }},
 
         decrementDJCurrentPlayCount: function ( userID ) {
             --theUsersList[ this.getPositionOnUsersList( userID ) ][ 'currentPlayCount' ]
@@ -837,7 +815,6 @@ const userFunctions = ( bot ) => {
         },
 
         setDJCurrentPlayCount: function ( userID, theCount ) {
-            logMe( 'info', 'setDJPlayCount. Setting Playcount for ' + userID + ' to ' + theCount );
             if ( this.userExists( userID ) ) {
                 theUsersList[ this.getPositionOnUsersList( userID ) ][ 'currentPlayCount' ] = theCount;
             }
@@ -850,14 +827,12 @@ const userFunctions = ( bot ) => {
         },
 
         setDJTotalPlayCount: function ( userID, theCount ) {
-            logMe( 'info', 'setDJPlayCount. Setting Playcount for ' + userID + ' to ' + theCount );
             if ( this.userExists( userID ) ) {
                 theUsersList[ this.getPositionOnUsersList( userID ) ][ 'totalPlayCount' ] = theCount;
             }
         },
 
         deleteAllDJPlayCounts: function ( userID ) {
-            logMe( 'info', 'deleteAllDJPlayCounts. Deleting Playcounts for ' + userID );
             if ( this.userExists( userID ) ) {
                 delete theUsersList[ this.getPositionOnUsersList( userID ) ][ 'currentPlayCount' ];
                 delete theUsersList[ this.getPositionOnUsersList( userID ) ][ 'totalPlayCount' ];
@@ -920,7 +895,6 @@ const userFunctions = ( bot ) => {
         },
 
         isUserIDInQueue: function ( userID ) {
-            logMe( 'info', '================================ isUserIDInQueue, queueList:' + JSON.stringify( queueList ) );
             const inQueue = queueList.indexOf( userID );
             return inQueue !== -1;
         },

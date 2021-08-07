@@ -161,7 +161,7 @@ const commandFunctions = ( bot ) => {
     chatCommands.coinflip = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.coinflip( data, userFunctions ); }
     chatCommands.coinflip.help = "Flip a coin and return heads or tails?";
 
-    chatCommands.dice = ( { data, command, userFunctions, chatFunctions } ) => { chatFunctions.dice( data, command, userFunctions ); }
+    chatCommands.dice = ( { data, args, userFunctions, chatFunctions } ) => { chatFunctions.dice( data, args, userFunctions ); }
     chatCommands.dice.argumentCount = 2;
     chatCommands.dice.help = "Roll some dice";
     chatCommands.dice.sampleArguments = [ "1", "d20" ]
