@@ -269,5 +269,17 @@ module.exports = {
         "https://media.giphy.com/media/d8lUKXD00IXSw/giphy.gif",
         "https://media.giphy.com/media/xUA7b30EbtkaMHvRgk/giphy.gif",
         "https://media.giphy.com/media/xT5LMBIW4I7671tqX6/giphy.gif"
+    ],
+
+    klausMessages: [
+        "I'm a simple man...",
+        "It's a total eclipse of the sun"
+    ],
+
+    klausPics: [
+        "https://i.imgur.com/MeZOr9v.gif",
+        "https://media.giphy.com/media/56Q6HgVZ5hEJi/giphy.gif",
+        "https://thumbs.gfycat.com/DarlingOnlyJay-max-1mb.gif",
+        "https://media.giphy.com/media/Kg2m6dUxdpv8I/giphy.gif"
     ]
 }

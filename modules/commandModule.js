@@ -151,6 +151,9 @@ const commandFunctions = ( bot ) => {
     chatCommands.tumbleweed = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.tumbleweedMessages, chatCommandItems.tumbleweedPics, userFunctions ); }
     chatCommands.tumbleweed.help = "..........";
 
+    chatCommands.klaus = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.klausMessages, chatCommandItems.klausPics, userFunctions ); }
+    chatCommands.klaus.help = "It's Klaus Nomi...what more is there to know? ;-)";
+
     // ######################################################
     // Advanced chat commands...more than just basic messages
     // ######################################################

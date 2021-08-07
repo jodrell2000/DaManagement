@@ -7,6 +7,7 @@ Bugs
   * inconsistent and unrepeatable, needs more info
 
 Feature Requests
+* if a DJ leaves the room, and hasn't used the refresh command they should be removed from the queue
 * parse "region": [] from current_song data to tell people if their songs are unavailable in certain countries?
   * configurable list of countries
   * by users?
