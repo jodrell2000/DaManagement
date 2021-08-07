@@ -97,7 +97,7 @@ const commandFunctions = ( bot ) => {
     chatCommands.rules = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.rulesMessages, userFunctions ); }
     chatCommands.rules.help = "get a link to the room rules";
 
-    chatCommands.wc = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.wcMessages, userFunctions ); }
+    chatCommands.wc = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.wcMessages, chatCommandItems.wcPics, userFunctions ); }
     chatCommands.wc.help = "how do you Wang Chung?";
 
     chatCommands.jump = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.jumpMessages, chatCommandItems.jumpPics, userFunctions ); }

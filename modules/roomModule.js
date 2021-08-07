@@ -61,13 +61,7 @@ const roomFunctions = ( bot ) => {
                 thisMessage = ' you have ' + minutes + ' minutes to get on stage.';
             }
 
-            bot.speak( '@' + userFunctions.getUsername( userFunctions.queueList( 0 ).toString() ) + thisMessage );
-        },
-
-        removeFirstDJFromQueue: function ( botFunctions, userFunctions ) {
-            bot.speak( 'Sorry @' + userFunctions.getUsername( userFunctions.queueList( 0 ).toString() ) + ' you have run out of time.' );
-            userFunctions.queueList().splice( 0, 2 );
-            botFunctions.setSayOnce( true );
+            bot.speak( '@' + userFunctions.getUsername( userFunctions.notifyThisDJ().toString() ) + thisMessage );
         },
 
         readQueueMembers: function ( userFunctions ) {

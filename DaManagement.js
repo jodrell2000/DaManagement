@@ -59,15 +59,18 @@ setInterval( function () {
 
 // every 5 seconds, check if the there's an empty DJ slot, and promt the next in the queue to join the decks, remove them if they don't
 setInterval( function () {
-    if ( roomDefaults.queueActive === true && userFunctions.queueList().length !== 0 ) {
-        if ( botFunctions.sayOnce() === true && ( userFunctions.refreshDJCount() + userFunctions.djList().length ) < 5 ) {
+    if ( roomDefaults.queueActive === true && userFunctions.queueList().length !== 0 && ( userFunctions.refreshDJCount() + userFunctions.djList().length ) < 5 ) {
+        userFunctions.setDJToNotify( userFunctions.headOfQueue() );
+        if ( botFunctions.sayOnce() === true ) {
             botFunctions.setSayOnce( false );
 
             roomFunctions.queuePromptToDJ( userFunctions );
 
             // start a timer to remove the DJ from the queue if they don't DJ
             roomFunctions.queueTimer = setTimeout( function () {
-                roomFunctions.removeFirstDJFromQueue( botFunctions, userFunctions );
+                if ( userFunctions.notifyThisDJ() !== null ) {
+                    userFunctions.removeNotifyDJFromQueue(botFunctions, userFunctions);
+                }
             }, roomDefaults.queueWaitTime * 1000 );
         }
     }
@@ -342,7 +345,7 @@ bot.on( 'add_dj', function ( data ) {
         chatFunctions.botSpeak( data, theMessage );
     }
 
-    //sets dj's songcount to zero when they enter the stage.
+    //sets dj's current songcount to zero when they enter the stage.
     //unless they used the refresh command, in which case its set to
     //what it was before they left the room
     userFunctions.setDJCurrentPlayCount( theUserID, userFunctions.getUsersRefreshPlayCount[ theUserID ] );
@@ -355,6 +358,7 @@ bot.on( 'add_dj', function ( data ) {
 
     if ( userFunctions.isUserIDInQueue( theUserID ) ) {
         userFunctions.removeUserFromQueue( theUserID );
+        userFunctions.clearDJToNotify();
     }
 
     if ( userFunctions.isUserInRefreshList( theUserID ) ) {

@@ -13,6 +13,7 @@ let people = []; //holds the userid's of everyone who is kicked off stage for th
 let myTime = []; //holds a date object for everyone in the room, which represents the time when they joined the room, resets every time the person rejoins
 let timer = []; //holds the timeout of everyone who has been spamming the stage, resets their spam count if their timer completes
 let myID = null; //the userid of the person using the /fanme command, speak event only
+let notifyThisDJ = null; // holds the ID of the DJ being told they're next in the queue
 
 let bannedUsers = [ { id: 636473737373 }, { id: 535253533353 } ]; //banned users list, put userids in string form here for permanent banning(put their name after their userid to tell who is banned).
 let permanentStageBan = [ { id: 636473737373 }, { id: 535253533353 } ]; //put userids in here to ban from djing permanently(put their name after their userid to tell who is banned)
@@ -899,10 +900,6 @@ const userFunctions = ( bot ) => {
             return inQueue !== -1;
         },
 
-        headOfQueue: function () {
-            return queueList[ 0 ];
-        },
-
         changeUsersQueuePosition: function ( data, args, chatFunctions ) {
             const username = args[ 0 ];
             const userID = this.getUserIDFromUsername( username );
@@ -936,6 +933,20 @@ const userFunctions = ( bot ) => {
         // DJ Queue Helper Functions
         // ========================================================
 
+        headOfQueue: function () {
+            return queueList[ 0 ];
+        },
+
+        notifyThisDJ: () => notifyThisDJ,
+
+        setDJToNotify: function ( userID ) {
+            notifyThisDJ = userID;
+        },
+
+        clearDJToNotify: function ( ) {
+            notifyThisDJ = null;
+        },
+
         whatsMyQueuePosition: function ( data, chatFunctions ) {
             const userID = data.userid;
 
@@ -961,6 +972,13 @@ const userFunctions = ( bot ) => {
             } else {
                 chatFunctions.botSpeak( data, theMessage );
             }
+        },
+
+        removeNotifyDJFromQueue: function (botFunctions, userFunctions ) {
+            bot.speak( 'Sorry @' + userFunctions.getUsername( this.notifyThisDJ().toString() ) + ' you have run out of time.' );
+            this.removeUserFromQueue( this.notifyThisDJ() );
+            this.clearDJToNotify();
+            botFunctions.setSayOnce( true );
         },
 
         removeme: function ( data, chatFunctions ) {
