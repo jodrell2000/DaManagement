@@ -7,6 +7,8 @@ Bugs
   * inconsistent and unrepeatable, needs more info
 
 Feature Requests
+* restart command to not disrupt the room when changes are made
+  * have the bot save the user/queue states as JSON(?) and reload them
 * parse "region": [] from current_song data to tell people if their songs are unavailable in certain countries?
   * configurable list of countries
   * by users?
