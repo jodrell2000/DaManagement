@@ -933,50 +933,6 @@ const commandFunctions = ( bot ) => {
                 } else {
                     bot.speak( 'The banned from stage list is currently empty.' );
                 }
-            } else if ( text.match( /^\/whatsplaylimit/ ) ) {
-                if ( musicDefaults.DJPlaysLimit === true ) {
-                    bot.speak( 'the play limit is currently set to: ' + musicDefaults.playLimit + ' songs.' );
-                } else {
-                    bot.speak( 'the play limit is currently turned off' );
-                }
-            } else if ( text.match( /^\/playLimitOn/ ) && userFunctions.isUserModerator( speaker ) === true ) {
-                let playLimitNumber = Number( data.text.slice( 13 ) ); //holds given number
-
-                if ( playLimitNumber !== '' ) //if an additional arguement was given
-                {
-                    if ( !isNaN( playLimitNumber ) && playLimitNumber > 0 ) //if parameter given is a number and greater than zero
-                    {
-                        musicDefaults.playLimit = Math.ceil( playLimitNumber ); // round play limit to make sure its not a fraction
-
-                        bot.speak( 'the play limit is now active and has been set to ' +
-                            musicDefaults.playLimit + ' songs. dj song counters have been reset.' );
-
-                        //reset song counters
-                        for ( let ig = 0; ig < userFunctions.djList().length; ig++ ) {
-                            userFunctions.initialiseDJPlayCount( userFunctions.djList()[ ig ] );
-                        }
-
-                        musicDefaults.DJPlaysLimit = true; //mark playlimit as being on
-                    } else {
-                        bot.pm( 'invalid arguement given, the play limit must be set to an integer. ' +
-                            'it can either be used as /playLimitOn or /playLimitOn #.', data.userid );
-
-                        musicDefaults.DJPlaysLimit = false; // on failure turn it off
-                    }
-                } else {
-                    bot.speak( 'the play limit is now active and has been set to the default value of ' +
-                        musicDefaults.playLimit + ' songs. dj song counters have been reset.' );
-
-                    //reset song counters
-                    for ( let ig = 0; ig < userFunctions.djList().length; ig++ ) {
-                        userFunctions.initialiseDJPlayCount( userFunctions.djList()[ ig ] );
-                    }
-
-                    musicDefaults.DJPlaysLimit = true; //mark playlimit as being on
-                }
-            } else if ( text.match( /^\/playLimitOff$/ ) && userFunctions.isUserModerator( speaker ) === true ) {
-                musicDefaults.DJPlaysLimit = false;
-                bot.speak( 'the play limit is now inactive.' );
             } else if ( text.match( /^\/warnme/ ) ) {
                 let areTheyBeingWarned = userFunctions.warnme().indexOf( data.userid );
                 let areTheyDj80 = userFunctions.djList().indexOf( data.userid );
@@ -1328,50 +1284,6 @@ const commandFunctions = ( bot ) => {
                 } else {
                     bot.pm( 'error, the play limit must be turned on in order for me to decrement play counts', speaker );
                 }
-            } else if ( text.match( /^\/whatsplaylimit/ ) && isInRoom === true ) {
-                if ( musicDefaults.DJPlaysLimit === true ) {
-                    bot.pm( 'the play limit is currently set to: ' + musicDefaults.playLimit + ' songs.', speaker );
-                } else {
-                    bot.pm( 'the play limit is currently turned off', speaker );
-                }
-            } else if ( text.match( /^\/playLimitOn/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                let playLimitNumber = Number( data.text.slice( 13 ) ); //holds given number
-
-                if ( playLimitNumber !== '' ) //if an additional arguement was given
-                {
-                    if ( !isNaN( playLimitNumber ) && playLimitNumber > 0 ) //if parameter given is a number and greater than zero
-                    {
-                        musicDefaults.playLimit = Math.ceil( playLimitNumber ); // round play limit to make sure its not a fraction
-
-                        bot.pm( 'the play limit is now active and has been set to ' +
-                            musicDefaults.playLimit + ' songs. dj song counters have been reset.', speaker );
-
-                        //reset song counters
-                        for ( let ig = 0; ig < userFunctions.djList().length; ig++ ) {
-                            userFunctions.initialiseDJPlayCount( userFunctions.djList()[ ig ] );
-                        }
-
-                        musicDefaults.DJPlaysLimit = true; //mark playlimit as being on
-                    } else {
-                        bot.pm( 'invalid arguement given, the play limit must be set to an integer. ' +
-                            'it can either be used as /playLimitOn or /playLimitOn #.', speaker );
-
-                        musicDefaults.DJPlaysLimit = false; //on failure turn it off
-                    }
-                } else {
-                    bot.pm( 'the play limit is now active and has been set to the default value of ' +
-                        musicDefaults.playLimit + ' songs. dj song counters have been reset.', speaker );
-
-                    //reset song counters
-                    for ( let ig = 0; ig < userFunctions.djList().length; ig++ ) {
-                        userFunctions.initialiseDJPlayCount( userFunctions.djList()[ ig ] );
-                    }
-
-                    musicDefaults.DJPlaysLimit = true; //mark playlimit as being on
-                }
-            } else if ( text.match( /^\/playLimitOff$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                musicDefaults.DJPlaysLimit = false;
-                bot.pm( 'the play limit is now inactive.', speaker );
             } else if ( text.match( /^\/snagevery$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
                 if ( songFunctions.snagSong() === true ) {
                     songFunctions.snagSong = false;

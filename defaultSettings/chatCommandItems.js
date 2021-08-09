@@ -25,8 +25,9 @@ module.exports = {
 
     shadeMessages: [
         "seriously @receiverUsername...you think this counts as decent 80s? @senderUsername is very disappointed with you",
-        "@receiverUsername, @senderUsername thinks ur momma sooo fat she sat on her iPhone and turned it into an iPad",
-        "@receiverUsername, @senderUsername thinks ur momma sooo poor she had to leave a deposit for a thick shake",
+        "@receiverUsername, @senderUsername thinks ur momma sooo fat she sat on her iPhone and turned it into an iPad!",
+        "@receiverUsername, @senderUsername thinks ur momma sooo poor she had to leave a deposit for a thick shake!",
+        "@receiverUsername, @senderUsername thinks ur momma sooo so fat she has to wear two watches because she covers two time zones!",
     ],
 
     cheersMessages: [
