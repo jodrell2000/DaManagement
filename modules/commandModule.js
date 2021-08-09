@@ -56,6 +56,9 @@ const commandFunctions = ( bot ) => {
     generalCommands.sarahConner = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.sarahConner( data, userFunctions, chatFunctions ); }
     generalCommands.sarahConner.help = "Shut down the Bot if it's causing problems";
 
+    generalCommands.whatsPlayLimit = ( { data, botFunctions, userFunctions, chatFunctions } ) => { userFunctions.whatsPlayLimit( data, chatFunctions ); }
+    generalCommands.whatsPlayLimit.help = "Is the DJ Play Limit enabled, and if so what it's set to";
+
     // #############################################
     // General user Queue commands
     // #############################################
@@ -217,7 +220,7 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.playLimitOn.help = "Enable the DJ play limits";
     moderatorCommands.playLimitOn.sampleArguments = [ "10" ];
 
-    moderatorCommands.playLimitOff = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.playLimitOffCommand( data, args, chatFunctions ) }
+    moderatorCommands.playLimitOff = ( { data, userFunctions, chatFunctions } ) => { userFunctions.playLimitOffCommand( data, chatFunctions ) }
     moderatorCommands.playLimitOff.help = "Disable the DJ play limits";
 
     // #############################################

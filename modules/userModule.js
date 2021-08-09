@@ -60,24 +60,24 @@ const userFunctions = ( bot ) => {
     }
 
 
-    function formatSeconds( seconds ) {
+    function formatSeconds ( seconds ) {
         return ( Math.floor( seconds / 60 ) ).toString() + ' minutes';
     }
 
-    function formatHours( seconds ) {
+    function formatHours ( seconds ) {
         const theHours = Math.floor( seconds / ( 60 * 60 ) );
         const theMinutes = Math.floor( ( ( seconds / ( 60 * 60 ) ) - theHours ) * 60 );
         return ( theHours ).toString() + ' hours ' + ( theMinutes ).toString() + ' minutes';
     }
 
-    function formatDays( seconds ) {
+    function formatDays ( seconds ) {
         const theDays = Math.floor( seconds / ( 60 * 60 * 24 ) );
         const theHours = Math.floor( seconds / ( 60 * 60 ) );
         const theMinutes = Math.floor( ( ( seconds / ( 60 * 60 ) ) - theHours ) * 60 );
         return ( theDays ).toString() + ' days, ' + ( theHours ).toString() + ' hours ' + ( theMinutes ).toString() + ' and minutes';
     }
 
-    function formatRelativeTime( seconds ) {
+    function formatRelativeTime ( seconds ) {
         if ( isNaN( seconds ) ) {
             return false
         } else {
@@ -822,8 +822,9 @@ const userFunctions = ( bot ) => {
 
         isCurrentDJ: function ( data, userID ) {
             logMe( 'info', 'isCurrentDJ, data:' + data );
-            // const currentDJ = data.room.metadata.current_dj
-            // return userID === currentDJ;
+            logMe( 'info', 'isCurrentDJ, data.room.metadata.current_dj:' + data.room.metadata.current_dj );
+            const currentDJ = data.room.metadata.current_dj
+            return userID === currentDJ;
         },
 
         resetDJs: function ( data ) {
@@ -887,7 +888,7 @@ const userFunctions = ( bot ) => {
         },
 
         resetDJFlags: function ( userID ) {
-            if ( this.userExists( (userID) ) ) {
+            if ( this.userExists( ( userID ) ) ) {
                 this.resetDJCurrentPlayCount( userID );
                 this.clearDJFirstIdleWarning( userID );
                 this.clearDJSecondIdleWarning( userID );
@@ -921,25 +922,33 @@ const userFunctions = ( bot ) => {
         },
 
         DJPlaysLimited: () => DJPlaysLimited,
-        enablePlayLimit: function ( ) { DJPlaysLimited = true; },
-        disablePlayLimit: function ( ) { DJPlaysLimited = false; },
+        enablePlayLimit: function () { DJPlaysLimited = true; },
+        disablePlayLimit: function () { DJPlaysLimited = false; },
 
         DJsPlayLimit: () => DJsPlayLimit,
         setDJsPlayLimit: function ( value ) { DJsPlayLimit = value; },
 
         playLimitOnCommand: function ( data, args, chatFunctions ) {
-            logMe( 'info', 'playLimitOnCommand, args:' + JSON.stringify(args) );
+            logMe( 'info', 'playLimitOnCommand, args:' + JSON.stringify( args ) );
             let theNewPlayLimit = args[ 0 ];
             if ( isNaN( theNewPlayLimit ) ) { theNewPlayLimit = musicDefaults.DJsPlayLimit }
             logMe( 'info', 'playLimitOnCommand, theNewPlayLimit:' + theNewPlayLimit );
             this.enablePlayLimit();
             this.setDJsPlayLimit( theNewPlayLimit );
-            chatFunctions.botSpeak( data, 'The play limit is now set to ' + this.DJsPlayLimit(), true );
+            chatFunctions.botSpeak( data, 'The play limit is now set to ' + this.DJsPlayLimit() );
         },
 
         playLimitOffCommand: function ( data, chatFunctions ) {
             this.disablePlayLimit();
-            chatFunctions.botSpeak( data, 'The play limit is now disabled', true );
+            chatFunctions.botSpeak( data, 'The play limit is now disabled' );
+        },
+
+        whatsPlayLimit: function ( data, chatFunctions ) {
+            if ( this.DJPlaysLimited() ) {
+                chatFunctions.botSpeak( data, 'The play limit is currently set to ' + this.DJsPlayLimit() );
+            } else {
+                chatFunctions.botSpeak( data, 'The play limit is not currently active' );
+            }
         },
 
         // ========================================================
@@ -1557,13 +1566,13 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        addWarnMeToUser( userID ) {
+        addWarnMeToUser ( userID ) {
             if ( this.isUserInUsersList( userID ) ) {
                 theUsersList[ this.getPositionOnUsersList( userID ) ][ 'WarnMe' ] = true;
             }
         },
 
-        removeWarnMeFromUser( userID ) {
+        removeWarnMeFromUser ( userID ) {
             if ( this.isUserInUsersList( userID ) ) {
                 delete theUsersList[ this.getPositionOnUsersList( userID ) ][ 'WarnMe' ];
             }
