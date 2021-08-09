@@ -29,8 +29,6 @@ module.exports = {
     ],
 
     // other stuff
-    playLimit: 3, //set the playlimit here (default 4 songs)
-
     refreshingEnabled: true, //whether or not /refresh can be used or not (true = yes, false = no)
     amountOfTimeToRefresh: 30, //the amount of seconds someone has to use the refresh command(if enabled)
 
@@ -55,14 +53,14 @@ module.exports = {
 
     detail: null, //the discription given in the "room" tab of the room that the bot is in
 
-    removeIdleDJs: false, //afk limit(on by default), this is for the dj's on stage
-    djIdleLimit: 6, // idle (minutes) limit for DJs
-    warnIdlePM: true, //choose whether idle warnings(for dj's on stage) will be given through the pm or the chatbox (false = chatbox, true = pm message)
-
     roomIdle: false, //audience afk limit(off by default)
     roomIdleLimit: 60, // idle (minutes) limit for DJs
 
-    voteMeansActive: false, // does voting/bopping count as user being active (too many user autoBop)
+    removeIdleDJs: true, // are the DJ idle checks active, this is for the dj's on stage
+    djIdleLimitThresholds: [ 20, 15, 19 ], /* Total idle allowed, first warnign time then second warning time for DJs idling out
+                                        [ 20, 15, 19 ] would be 20 minutes idle allowed with the first warning at 15 minutes and the second at 19 minutes */
+    warnIdlePM: true, //choose whether idle warnings(for dj's on stage) will be given through the pm or the chatbox (false = chatbox, true = pm message)
+    voteMeansActive: true, // does voting/bopping count as user being active (too many user autoBop)
     speechMeansActive: true, // does chatting count as user being active
     snagMeansActive: true, // does snagging a track count as user being active
     djingMeansActive: true, // does starting to DJ mean someone is active...disable if you think people are scripting a lot

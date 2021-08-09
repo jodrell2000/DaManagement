@@ -168,8 +168,8 @@ const chatFunctions = ( bot, roomDefaults ) => {
             }
         },
 
-        overPlayLimit: function ( username, playLimit ) {
-            bot.speak( '@' + username + ' the  playlimit is currently ' + playLimit + '. Time for another DJ.' );
+        overPlayLimit: function ( data, username, playLimit ) {
+            this.botSpeak( data, '@' + username + ' the  playlimit is currently ' + playLimit + '. Time for another DJ.' );
         },
 
         eventMessageIterator: function ( botFunctions, userFunctions ) {
