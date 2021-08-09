@@ -195,6 +195,9 @@ const commandFunctions = ( bot ) => {
     userCommands.afk = ( { data, userFunctions, chatFunctions } ) => { userFunctions.switchUserAFK( data, chatFunctions ); }
     userCommands.afk.help = "Switches the senders AFK state";
 
+    userCommands.whosafk = ( { data, userFunctions, chatFunctions } ) => { userFunctions.whosAFK( data, chatFunctions ); }
+    userCommands.whosafk.help = "Tells you which users have enabled AFK";
+
     // #############################################
     // Moderator Only comamnds
     // #############################################
@@ -667,18 +670,6 @@ const commandFunctions = ( bot ) => {
             } else if ( text.match( /^\/messageOff/ ) && userFunctions.isUserModerator( speaker ) === true ) {
                 bot.speak( 'message: Off' );
                 roomDefaults.MESSAGE = false;
-            } else if ( text.match( /^\/pmcommands/ ) ) {
-                bot.pm( 'that command only works in the pm', data.userid );
-            } else if ( text.match( /^\/commands/ ) ) {
-                bot.speak( 'the commands are  /awesome, ' +
-                    ' /mom, /cheers, /fanratio @, /whosrefreshing, /refresh, /whatsplaylimit, /warnme, /theme, /up?, /djafk, /mytime, /playlist, /afk, /whosafk, /coinflip, /hello, /escortme, /stopescortme, /fanme, /unfanme, /roominfo, /beer, /dice, /props, /m, /getTags, ' +
-                    '/skip, /dive, /dance, /surf, /uptime, /djplays, /admincommands, /queuecommands, /pmcommands' );
-            } else if ( text.match( /^\/queuecommands/ ) ) {
-                bot.speak( 'the commands are /queue, /position, /queuewithnumbers, /removefromqueue @, /removeme, /move, /addme, /queueOn, /queueOff, /bumptop @' );
-            } else if ( text.match( /^\/admincommands/ ) && userFunctions.isUserModerator( speaker ) === true ) {
-                bot.speak( 'the mod commands are /ban @, /unban @, /whosinmodpm, /whosrefreshing, /refreshon, /refreshoff, /move, /eventmessageOn, /eventmessageOff, /boot, /playminus @, /skipon, /snagevery, /autosnag, /botstatus, /skipoff, /noTheme, /lengthLimit, /stalk @, /setTheme, /stage @, /randomSong, /messageOn, /messageOff, /afkon, /afkoff, /skipsong, /autodj, /removedj, /lame, ' +
-                    '/snag, /removesong, /playLimitOn, /playLimitOff, /voteskipon #, /voteskipoff, /greeton, /greetoff, /getonstage, /banstage @, /unbanstage @, /userid @, /inform, /whobanned, ' +
-                    '/whostagebanned, /roomafkon, /roomafkoff, /songstats, /username, /modpm' );
             } else if ( text.match( /^\/tableflip/ ) ) {
                 bot.speak( '/tablefix' );
             } else if ( text.match( '/awesome' ) ) {
@@ -1084,20 +1075,6 @@ const commandFunctions = ( bot ) => {
                     bot.speak( 'anybody want up?' );
                 } else {
                     bot.pm( 'error, you must be on stage to use that command', data.userid );
-                }
-            } else if ( text.match( /^\/whosafk/ ) ) {
-                if ( userFunctions.afkPeople().length !== 0 ) {
-                    let whosAfk = 'marked as afk: ';
-                    for ( let f = 0; f < userFunctions.afkPeople().length; f++ ) {
-                        if ( f !== ( userFunctions.afkPeople().length - 1 ) ) {
-                            whosAfk = whosAfk + userFunctions.afkPeople()[ f ] + ', ';
-                        } else {
-                            whosAfk = whosAfk + userFunctions.afkPeople()[ f ];
-                        }
-                    }
-                    bot.speak( whosAfk );
-                } else {
-                    bot.speak( 'No one is currently marked as afk' );
                 }
             }
         },
@@ -1850,43 +1827,8 @@ const commandFunctions = ( bot ) => {
                     bot.pm( 'error, that user was not found in the room. multi word names must be specified in the command usage, example: /boot 3 first middle last.' +
                         ' if the name is only one word long then you do not need to specify its length', speaker );
                 }
-            } else if ( text.match( /^\/whosafk/ ) && isInRoom === true ) {
-                if ( userFunctions.afkPeople().length !== 0 ) {
-                    let whosAfk = 'marked as afk: ';
-                    for ( let f = 0; f < userFunctions.afkPeople().length; f++ ) {
-                        if ( f !== ( userFunctions.afkPeople().length - 1 ) ) {
-                            whosAfk = whosAfk + userFunctions.afkPeople()[ f ] + ', ';
-                        } else {
-                            whosAfk = whosAfk + userFunctions.afkPeople()[ f ];
-                        }
-                    }
-                    bot.pm( whosAfk, speaker );
-                } else {
-                    bot.pm( 'No one is currently marked as afk', speaker );
-                }
-            } else if ( text.match( /^\/commands/ ) && isInRoom === true ) {
-                bot.pm( 'the commands are  /awesome, ' +
-                    '/frankie, /hair, /eddie, /lonely, /jump, /flirt, /rub, /wc, /alice, /feart, /rules, /suggestions, /mom, /cheers, /fanratio @, /whosrefreshing, /refresh, /whatsplaylimit, /warnme, /theme, /up?, /djafk, /mytime, /playlist, /afk, /whosafk, /coinflip, /moon, /hello, /escortme, /stopescortme, /fanme, /unfanme, /roominfo, /beer, /dice, /props, /m, /getTags, ' +
-                    '/skip, /dive, /dance, /surf, /uptime, /djplays, /admincommands, /queuecommands, /pmcommands', speaker );
-            } else if ( text.match( /^\/queuecommands/ ) && isInRoom === true ) {
-                bot.pm( 'the commands are /queue, /queuewithnumbers, /position, /removefromqueue @, /removeme, /addme, /move, /queueOn, /queueOff, /bumptop @', speaker );
-            } else if ( text.match( /^\/pmcommands/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) //the moderators see this
-            {
-                bot.pm( '/modpm, /whatsplaylimit, /whosrefreshing, /refreshon, /refreshoff, /warnme, /whosinmodpm, /playlist, /move, /eventmessageOn, /eventmessageOff, /boot, /roominfo, /djafk, /playminus @, /snagevery, /autosnag, /position, /theme, /mytime, /uptime, /m, /stage @, /botstatus, /djplays, /banstage @, /unbanstage @, ' +
-                    '/userid @, /ban @, /unban @, /stalk @, /whobanned, /whostagebanned, /stopescortme, /escortme, /snag, /inform, ' +
-                    '/removesong, /username, /afk, /whosafk, /commands, /admincommands', speaker );
-            } else if ( text.match( /^\/pmcommands/ ) && !userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) //non - moderators see this
-            {
-                bot.pm( '/addme, /whosrefreshing, /whatsplaylimit, /warnme, /removeme, /djafk, /position, /dive, /getTags, /roominfo, /awesome, ' + '/theme, /mytime, /uptime, /queue, /djplays, /stopescortme, /escortme, /afk, ' + '/whosafk, /commands, /queuecommands', speaker );
-            } else if ( text.match( /^\/admincommands/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                bot.pm( 'the mod commands are /ban @, /whosinmodpm, /refreshon, /refreshoff, /unban @, /eventmessageOn, /eventmessageOff, /boot, /move, /playminus @, /snagevery, /autosnag, /skipon, /playLimitOn, /playLimitOff, /skipoff, /stalk @, /lengthLimit, /setTheme, /noTheme, /stage @, /randomSong, /messageOn, /messageOff, /afkon, /afkoff, /skipsong, /autodj, /removedj, /lame, ' +
-                    '/snag, /botstatus, /removesong, /voteskipon #, /voteskipoff, /greeton, /greetoff, /getonstage, /banstage @, /unbanstage @, /userid @, /inform, ' +
-                    '/whobanned, /whostagebanned, /roomafkon, /roomafkoff, /songstats, /username, /modpm', speaker );
-                userFunctions.removeAsModerator();
             }
         }
-
     }
 }
-
 module.exports = commandFunctions;

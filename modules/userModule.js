@@ -710,6 +710,33 @@ const userFunctions = ( bot ) => {
             afkPeople = []
         },
 
+        whosAFK: function ( data, chatFunctions ) {
+            let userList = '';
+            let afkCount = 0;
+            for ( let userLoop = 0; userLoop < this.afkPeople().length; userLoop++ ) {
+                afkCount++;
+                userList += this.getUsername( this.afkPeople()[ userLoop ] ) + ', ';
+            }
+
+            userList = userList.substring( 0, userList.length - 2 );
+            const lastComma = userList.lastIndexOf( ',' );
+            if ( lastComma !== -1 ) {
+                userList = userList.substring( 0, lastComma ) + ' and' + userList.substring( lastComma + 1 )
+            }
+
+            if ( afkCount > 0 ) {
+                if ( afkCount === 1 ) {
+                    userList += ' is';
+                } else {
+                    userList += ' are';
+                }
+                userList += ' marked as AFK';
+                chatFunctions.botSpeak( data, userList )
+            } else {
+                chatFunctions.botSpeak( data, "No one...everyone's here :-)" )
+            }
+        },
+
         isUserAFK: function ( userID ) {
             let isAlreadyAfk = afkPeople.indexOf( userID );
             return isAlreadyAfk !== -1;
@@ -903,15 +930,9 @@ const userFunctions = ( bot ) => {
 
 
         removeDJsOverPlaylimit: function ( data, chatFunctions, userID ) {
-            logMe( 'info', 'removeDJsOverPlaylimit' );
             if ( this.DJPlaysLimited() === true ) {
-                logMe( 'info', 'removeDJsOverPlaylimit, DJPlaysLimited = true' );
-                logMe( 'info', 'removeDJsOverPlaylimit, getDJCurrentPlayCount:' + this.getDJCurrentPlayCount( userID ) );
-                logMe( 'info', 'removeDJsOverPlaylimit, DJsPlayLimit:' + this.DJsPlayLimit() );
-                logMe( 'info', 'this.isCurrentDJ( userID ):' + this.isCurrentDJ( data, userID ) );
 
                 if ( userID !== authModule.USERID && this.isCurrentDJ( data, userID ) && this.getDJCurrentPlayCount( userID ) >= this.DJsPlayLimit() ) {
-                    logMe( 'info', 'removeDJsOverPlaylimit, remove them' );
                     if ( this.userExists( userID ) ) {
                         chatFunctions.overPlayLimit( data, this.getUsername( userID ), this.DJsPlayLimit() );
 
@@ -929,10 +950,8 @@ const userFunctions = ( bot ) => {
         setDJsPlayLimit: function ( value ) { DJsPlayLimit = value; },
 
         playLimitOnCommand: function ( data, args, chatFunctions ) {
-            logMe( 'info', 'playLimitOnCommand, args:' + JSON.stringify( args ) );
             let theNewPlayLimit = args[ 0 ];
             if ( isNaN( theNewPlayLimit ) ) { theNewPlayLimit = musicDefaults.DJsPlayLimit }
-            logMe( 'info', 'playLimitOnCommand, theNewPlayLimit:' + theNewPlayLimit );
             this.enablePlayLimit();
             this.setDJsPlayLimit( theNewPlayLimit );
             chatFunctions.botSpeak( data, 'The play limit is now set to ' + this.DJsPlayLimit() );
