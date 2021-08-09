@@ -1076,289 +1076,274 @@ const commandFunctions = ( bot ) => {
                 } else {
                     bot.pm( 'error, you must be on stage to use that command', data.userid );
                 }
-            },
+            }
+        },
 
-            parsePM: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) {
+        parsePM: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions ) {
 
-                let speaker = speaker; //the userid of the person who just pmmed the bot
-                let text = data.text; //the text sent to the bot in a pm
-                let name1 = userFunctions.theUsersList().indexOf( speaker ) + 1; //the name of the person who sent the bot a pm
-                let isInRoom = userFunctions.isPMerInRoom( senderid ); //check to see whether pmmer is in the same room as the bot
+            let speaker = speaker; //the userid of the person who just pmmed the bot
+            let text = data.text; //the text sent to the bot in a pm
+            let name1 = userFunctions.theUsersList().indexOf( speaker ) + 1; //the name of the person who sent the bot a pm
+            let isInRoom = userFunctions.isPMerInRoom( senderid ); //check to see whether pmmer is in the same room as the bot
 
-                userFunctions.isUserModerator( speaker ); //check to see if person pming the bot a command is a moderator or not
+            userFunctions.isUserModerator( speaker ); //check to see if person pming the bot a command is a moderator or not
 
-                //if no commands match, the pmmer is a moderator and theres more than zero people in the modpm chat
-                if ( userFunctions.modPM.length !== 0 && data.text.charAt( 0 ) !== '/' && userFunctions.isUserModerator( speaker ) === true ) //if no other commands match, send dpm
-                {
-                    let areTheyInModPm = userFunctions.modPM.indexOf( speaker );
+            //if no commands match, the pmmer is a moderator and theres more than zero people in the modpm chat
+            if ( userFunctions.modPM.length !== 0 && data.text.charAt( 0 ) !== '/' && userFunctions.isUserModerator( speaker ) === true ) //if no other commands match, send dpm
+            {
+                let areTheyInModPm = userFunctions.modPM.indexOf( speaker );
 
-                    if ( areTheyInModPm !== -1 ) {
-                        for ( let jhg = 0; jhg < userFunctions.modPM.length; jhg++ ) {
-                            if ( userFunctions.modPM[ jhg ] !== speaker && userFunctions.modPM[ jhg ] !== authModule.USERID ) //this will prevent you from messaging yourself
-                            {
-                                bot.pm( userFunctions.theUsersList()[ name1 ] + ' said: ' + data.text, userFunctions.modPM[ jhg ] );
-                            }
-                        }
-                    }
-                } else if ( text.match( /^\/modpm/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    let areTheyInModPm = userFunctions.modPM.indexOf( speaker );
-
-                    if ( areTheyInModPm === -1 ) //are they already in modpm? no
-                    {
-                        userFunctions.modPM.unshift( speaker );
-                        bot.pm( 'you have now entered into modpm mode, your messages ' +
-                            'will go to other moderators currently in the modpm', speaker );
-                        if ( userFunctions.modPM.length !== 0 ) {
-                            for ( let jk = 0; jk < userFunctions.modPM.length; jk++ ) {
-                                if ( userFunctions.modPM[ jk ] !== speaker ) {
-                                    bot.pm( userFunctions.theUsersList()[ name1 ] + ' has entered the modpm chat', userFunctions.modPM[ jk ] ); //declare user has entered chat
-                                }
-                            }
-                        }
-                    } else if ( areTheyInModPm !== -1 ) //yes
-                    {
-                        userFunctions.modPM.splice( areTheyInModPm, 1 );
-                        bot.pm( 'you have now left modpm mode', speaker );
-                        if ( userFunctions.modPM.length !== 0 ) {
-                            for ( let jk = 0; jk < userFunctions.modPM.length; jk++ ) {
-                                bot.pm( userFunctions.theUsersList()[ name1 ] + ' has left the modpm chat', userFunctions.modPM[ jk ] ); //declare user has entered chat
-                            }
-                        }
-                    }
-                } else if ( text.match( /^\/whosrefreshing/ ) && isInRoom === true ) {
-                    if ( userFunctions.refreshList().length !== 0 ) {
-                        let whosRefreshing = 'refreshing: ';
-                        let namesOfRefresher;
-
-                        for ( let i = 0; i < userFunctions.refreshList().length; i++ ) {
-                            namesOfRefresher = userFunctions.theUsersList().indexOf( speaker ) + 1;
-
-                            if ( i < userFunctions.refreshList().length - 1 ) {
-                                whosRefreshing += userFunctions.theUsersList()[ namesOfRefresher ] + ', ';
-                            } else {
-                                whosRefreshing += userFunctions.theUsersList()[ namesOfRefresher ];
-                            }
-                        }
-
-                        bot.pm( whosRefreshing, speaker );
-                    } else {
-                        bot.pm( 'no one is currently refreshing', speaker );
-                    }
-                } else if ( text.match( /^\/refreshoff/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    bot.pm( 'refreshing has been disabled', speaker );
-                    roomDefaults.refreshingEnabled = false;
-                } else if ( text.match( /^\/refreshon/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    bot.pm( 'refreshing has been enabled', speaker );
-                    roomDefaults.refreshingEnabled = true;
-                } else if ( text.match( /^\/whosinmodpm/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    if ( userFunctions.modPM.length !== 0 ) {
-                        let temper = "Users in modpm: "; //holds names
-
-                        for ( let gfh = 0; gfh < userFunctions.modPM.length; gfh++ ) {
-                            let whatAreTheirNames = userFunctions.theUsersList().indexOf( userFunctions.modPM[ gfh ] ) + 1;
-
-                            if ( gfh !== ( userFunctions.modPM.length - 1 ) ) {
-                                temper += userFunctions.theUsersList()[ whatAreTheirNames ] + ', ';
-
-                            } else {
-                                temper += userFunctions.theUsersList()[ whatAreTheirNames ];
-                            }
-                        }
-                        bot.pm( temper, speaker );
-                    } else {
-                        bot.pm( 'no one is currently in modpm', speaker );
-                    }
-                } else if ( text.match( /^\/warnme/ ) && isInRoom === true ) {
-                    let areTheyBeingWarned = userFunctions.warnme().indexOf( speaker );
-                    let areTheyDj80 = userFunctions.djList().indexOf( speaker );
-                    let Position56 = userFunctions.djList().indexOf( roomFunctions.checkWhoIsDj() ); //current djs index
-
-                    if ( areTheyDj80 !== -1 ) //are they on stage?
-                    {
-                        if ( roomFunctions.checkWhoIsDj() != null ) {
-                            if ( roomFunctions.checkWhoIsDj() === speaker ) {
-                                bot.pm( 'you are currently playing a song!', speaker );
-                            } else if ( userFunctions.djList()[ Position56 ] === userFunctions.djList()[ userFunctions.djList().length - 1 ] &&
-                                userFunctions.djList()[ 0 ] === speaker ||
-                                userFunctions.djList()[ Position56 + 1 ] === speaker ) //if they aren't the next person to play a song
-                            {
-                                bot.pm( 'your song is up next!', speaker );
-                            } else {
-                                if ( areTheyBeingWarned === -1 ) //are they already being warned? no
-                                {
-                                    userFunctions.warnme().unshift( speaker );
-                                    bot.pm( 'you will be warned when your song is up next', speaker );
-                                } else if ( areTheyBeingWarned !== -1 ) //yes
-                                {
-                                    userFunctions.warnme().splice( areTheyBeingWarned, 1 );
-                                    bot.pm( 'you will no longer be warned', speaker );
-                                }
-                            }
-                        } else {
-                            bot.pm( 'you must wait one song since the bot has started up to use this command', speaker );
-                        }
-                    } else {
-                        bot.pm( 'error, you must be on stage to use that command', speaker );
-                    }
-                } else if ( text.match( /^\/move/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    let moveName = data.text.slice( 5 );
-                    let tempName = moveName.split( " " );
-                    let areTheyInTheQueue = userFunctions.queueName().indexOf( tempName[ 1 ] ); //name in queueName
-                    let areTheyInTheQueueList = userFunctions.queueList().indexOf( tempName[ 1 ] ); //name in queuList
-                    let whatIsTheirUserid2 = userFunctions.theUsersList().indexOf( tempName[ 1 ] ); //userid
-
-                    //if either name or userid is undefined, do not perform a move operation
-                    if ( typeof userFunctions.theUsersList()[ whatIsTheirUserid2 - 1 ] == 'undefined' || typeof tempName[ 1 ] == 'undefined' ) {
-                        if ( typeof userFunctions.theUsersList()[ whatIsTheirUserid2 - 1 ] != 'undefined' ) {
-                            bot.pm( 'failed to perform move operation, please try the command again', userFunctions.theUsersList()[ whatIsTheirUserid2 - 1 ] );
-                        } else {
-                            bot.speak( 'failed to perform move operation, please try the command again' );
-                        }
-                    } else {
-                        if ( roomDefaults.queueActive === true ) //if queue is turned on
+                if ( areTheyInModPm !== -1 ) {
+                    for ( let jhg = 0; jhg < userFunctions.modPM.length; jhg++ ) {
+                        if ( userFunctions.modPM[ jhg ] !== speaker && userFunctions.modPM[ jhg ] !== authModule.USERID ) //this will prevent you from messaging yourself
                         {
-                            if ( tempName.length === 3 && areTheyInTheQueue !== -1 ) //if three parameters, and name found
+                            bot.pm( userFunctions.theUsersList()[ name1 ] + ' said: ' + data.text, userFunctions.modPM[ jhg ] );
+                        }
+                    }
+                }
+            } else if ( text.match( /^\/modpm/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                let areTheyInModPm = userFunctions.modPM.indexOf( speaker );
+
+                if ( areTheyInModPm === -1 ) //are they already in modpm? no
+                {
+                    userFunctions.modPM.unshift( speaker );
+                    bot.pm( 'you have now entered into modpm mode, your messages ' +
+                        'will go to other moderators currently in the modpm', speaker );
+                    if ( userFunctions.modPM.length !== 0 ) {
+                        for ( let jk = 0; jk < userFunctions.modPM.length; jk++ ) {
+                            if ( userFunctions.modPM[ jk ] !== speaker ) {
+                                bot.pm( userFunctions.theUsersList()[ name1 ] + ' has entered the modpm chat', userFunctions.modPM[ jk ] ); //declare user has entered chat
+                            }
+                        }
+                    }
+                } else if ( areTheyInModPm !== -1 ) //yes
+                {
+                    userFunctions.modPM.splice( areTheyInModPm, 1 );
+                    bot.pm( 'you have now left modpm mode', speaker );
+                    if ( userFunctions.modPM.length !== 0 ) {
+                        for ( let jk = 0; jk < userFunctions.modPM.length; jk++ ) {
+                            bot.pm( userFunctions.theUsersList()[ name1 ] + ' has left the modpm chat', userFunctions.modPM[ jk ] ); //declare user has entered chat
+                        }
+                    }
+                }
+            } else if ( text.match( /^\/whosrefreshing/ ) && isInRoom === true ) {
+                if ( userFunctions.refreshList().length !== 0 ) {
+                    let whosRefreshing = 'refreshing: ';
+                    let namesOfRefresher;
+
+                    for ( let i = 0; i < userFunctions.refreshList().length; i++ ) {
+                        namesOfRefresher = userFunctions.theUsersList().indexOf( speaker ) + 1;
+
+                        if ( i < userFunctions.refreshList().length - 1 ) {
+                            whosRefreshing += userFunctions.theUsersList()[ namesOfRefresher ] + ', ';
+                        } else {
+                            whosRefreshing += userFunctions.theUsersList()[ namesOfRefresher ];
+                        }
+                    }
+
+                    bot.pm( whosRefreshing, speaker );
+                } else {
+                    bot.pm( 'no one is currently refreshing', speaker );
+                }
+            } else if ( text.match( /^\/refreshoff/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                bot.pm( 'refreshing has been disabled', speaker );
+                roomDefaults.refreshingEnabled = false;
+            } else if ( text.match( /^\/refreshon/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                bot.pm( 'refreshing has been enabled', speaker );
+                roomDefaults.refreshingEnabled = true;
+            } else if ( text.match( /^\/whosinmodpm/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                if ( userFunctions.modPM.length !== 0 ) {
+                    let temper = "Users in modpm: "; //holds names
+
+                    for ( let gfh = 0; gfh < userFunctions.modPM.length; gfh++ ) {
+                        let whatAreTheirNames = userFunctions.theUsersList().indexOf( userFunctions.modPM[ gfh ] ) + 1;
+
+                        if ( gfh !== ( userFunctions.modPM.length - 1 ) ) {
+                            temper += userFunctions.theUsersList()[ whatAreTheirNames ] + ', ';
+
+                        } else {
+                            temper += userFunctions.theUsersList()[ whatAreTheirNames ];
+                        }
+                    }
+                    bot.pm( temper, speaker );
+                } else {
+                    bot.pm( 'no one is currently in modpm', speaker );
+                }
+            } else if ( text.match( /^\/warnme/ ) && isInRoom === true ) {
+                let areTheyBeingWarned = userFunctions.warnme().indexOf( speaker );
+                let areTheyDj80 = userFunctions.djList().indexOf( speaker );
+                let Position56 = userFunctions.djList().indexOf( roomFunctions.checkWhoIsDj() ); //current djs index
+
+                if ( areTheyDj80 !== -1 ) //are they on stage?
+                {
+                    if ( roomFunctions.checkWhoIsDj() != null ) {
+                        if ( roomFunctions.checkWhoIsDj() === speaker ) {
+                            bot.pm( 'you are currently playing a song!', speaker );
+                        } else if ( userFunctions.djList()[ Position56 ] === userFunctions.djList()[ userFunctions.djList().length - 1 ] &&
+                            userFunctions.djList()[ 0 ] === speaker ||
+                            userFunctions.djList()[ Position56 + 1 ] === speaker ) //if they aren't the next person to play a song
+                        {
+                            bot.pm( 'your song is up next!', speaker );
+                        } else {
+                            if ( areTheyBeingWarned === -1 ) //are they already being warned? no
                             {
-                                if ( !isNaN( tempName[ 2 ] ) ) {
-                                    if ( tempName[ 2 ] <= 1 ) {
-                                        userFunctions.queueName().splice( areTheyInTheQueue, 1 ); //remove them
-                                        userFunctions.queueList().splice( areTheyInTheQueueList, 2 ); //remove them
-                                        userFunctions.queueName().splice( 0, 0, tempName[ 1 ] ); //add them to beggining
-                                        userFunctions.queueList().splice( 0, 0, tempName[ 1 ], userFunctions.theUsersList()[ whatIsTheirUserid2 - 1 ] ); //add them to beggining
+                                userFunctions.warnme().unshift( speaker );
+                                bot.pm( 'you will be warned when your song is up next', speaker );
+                            } else if ( areTheyBeingWarned !== -1 ) //yes
+                            {
+                                userFunctions.warnme().splice( areTheyBeingWarned, 1 );
+                                bot.pm( 'you will no longer be warned', speaker );
+                            }
+                        }
+                    } else {
+                        bot.pm( 'you must wait one song since the bot has started up to use this command', speaker );
+                    }
+                } else {
+                    bot.pm( 'error, you must be on stage to use that command', speaker );
+                }
+            } else if ( text.match( /^\/move/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                let moveName = data.text.slice( 5 );
+                let tempName = moveName.split( " " );
+                let areTheyInTheQueue = userFunctions.queueName().indexOf( tempName[ 1 ] ); //name in queueName
+                let areTheyInTheQueueList = userFunctions.queueList().indexOf( tempName[ 1 ] ); //name in queuList
+                let whatIsTheirUserid2 = userFunctions.theUsersList().indexOf( tempName[ 1 ] ); //userid
+
+                //if either name or userid is undefined, do not perform a move operation
+                if ( typeof userFunctions.theUsersList()[ whatIsTheirUserid2 - 1 ] == 'undefined' || typeof tempName[ 1 ] == 'undefined' ) {
+                    if ( typeof userFunctions.theUsersList()[ whatIsTheirUserid2 - 1 ] != 'undefined' ) {
+                        bot.pm( 'failed to perform move operation, please try the command again', userFunctions.theUsersList()[ whatIsTheirUserid2 - 1 ] );
+                    } else {
+                        bot.speak( 'failed to perform move operation, please try the command again' );
+                    }
+                } else {
+                    if ( roomDefaults.queueActive === true ) //if queue is turned on
+                    {
+                        if ( tempName.length === 3 && areTheyInTheQueue !== -1 ) //if three parameters, and name found
+                        {
+                            if ( !isNaN( tempName[ 2 ] ) ) {
+                                if ( tempName[ 2 ] <= 1 ) {
+                                    userFunctions.queueName().splice( areTheyInTheQueue, 1 ); //remove them
+                                    userFunctions.queueList().splice( areTheyInTheQueueList, 2 ); //remove them
+                                    userFunctions.queueName().splice( 0, 0, tempName[ 1 ] ); //add them to beggining
+                                    userFunctions.queueList().splice( 0, 0, tempName[ 1 ], userFunctions.theUsersList()[ whatIsTheirUserid2 - 1 ] ); //add them to beggining
+                                    clearTimeout( roomFunctions.queueTimer() ); //clear timeout because first person has been replaced
+                                    botFunctions.setSayOnce( true );
+                                    bot.pm( tempName[ 1 ] + ' has been moved to position 1 in the queue', speaker );
+                                } else if ( tempName[ 2 ] >= userFunctions.queueName().length ) {
+                                    if ( userFunctions.queueName()[ areTheyInTheQueue ] === userFunctions.queueName()[ 0 ] ) {
                                         clearTimeout( roomFunctions.queueTimer() ); //clear timeout because first person has been replaced
                                         botFunctions.setSayOnce( true );
-                                        bot.pm( tempName[ 1 ] + ' has been moved to position 1 in the queue', speaker );
-                                    } else if ( tempName[ 2 ] >= userFunctions.queueName().length ) {
-                                        if ( userFunctions.queueName()[ areTheyInTheQueue ] === userFunctions.queueName()[ 0 ] ) {
-                                            clearTimeout( roomFunctions.queueTimer() ); //clear timeout because first person has been replaced
-                                            botFunctions.setSayOnce( true );
-                                        }
-                                        userFunctions.queueName().splice( areTheyInTheQueue, 1 ); //remove them
-                                        userFunctions.queueList().splice( areTheyInTheQueueList, 2 ); //remove them
-                                        userFunctions.queueName().splice( userFunctions.queueName().length + 1, 0, tempName[ 1 ] ); //add them to end
-                                        userFunctions.queueList().splice( userFunctions.queueName().length + 1, 0, tempName[ 1 ], userFunctions.theUsersList()[ whatIsTheirUserid2 - 1 ] ); //add them to end
-
-                                        bot.pm( tempName[ 1 ] + ' has been moved to position ' + userFunctions.queueName().length + ' in the queue', speaker );
-                                    } else {
-                                        if ( userFunctions.queueName()[ areTheyInTheQueue ] === userFunctions.queueName()[ 0 ] ) {
-                                            clearTimeout( roomFunctions.queueTimer() ); //clear timeout because first person has been replaced
-                                            botFunctions.setSayOnce( true );
-                                        }
-
-                                        userFunctions.queueName().splice( areTheyInTheQueue, 1 ); //remove them
-                                        userFunctions.queueList().splice( areTheyInTheQueueList, 2 ); //remove them
-                                        userFunctions.queueName().splice( ( Math.round( tempName[ 2 ] ) - 1 ), 0, tempName[ 1 ] ); //add them to given position shift left 1 because array starts at 0
-                                        userFunctions.queueList().splice( ( ( Math.round( tempName[ 2 ] ) - 1 ) * 2 ), 0, tempName[ 1 ], userFunctions.theUsersList()[ whatIsTheirUserid2 - 1 ] ); //same as above
-
-                                        bot.pm( tempName[ 1 ] + ' has been moved to position ' + Math.round( tempName[ 2 ] ) + ' in the queue', speaker );
                                     }
+                                    userFunctions.queueName().splice( areTheyInTheQueue, 1 ); //remove them
+                                    userFunctions.queueList().splice( areTheyInTheQueueList, 2 ); //remove them
+                                    userFunctions.queueName().splice( userFunctions.queueName().length + 1, 0, tempName[ 1 ] ); //add them to end
+                                    userFunctions.queueList().splice( userFunctions.queueName().length + 1, 0, tempName[ 1 ], userFunctions.theUsersList()[ whatIsTheirUserid2 - 1 ] ); //add them to end
+
+                                    bot.pm( tempName[ 1 ] + ' has been moved to position ' + userFunctions.queueName().length + ' in the queue', speaker );
                                 } else {
-                                    bot.pm( 'error, position parameter passed was not a number, please pass a valid integer arguement', speaker );
-                                }
-                            } else if ( tempName.length !== 3 ) //if invalid number of parameters
-                            {
-                                bot.pm( 'error, invalid number of parameters, must have /move name #', speaker );
-                            } else if ( areTheyInTheQueue === -1 ) //if name not found
-                            {
-                                bot.pm( 'error, name not found', speaker );
-                            }
-                        } else {
-                            bot.pm( 'error, queue must turned on to use this command', speaker );
-                        }
-                    }
-                } else if ( text.match( /^\/djafk/ ) && isInRoom === true ) {
-                    if ( userFunctions.AFK() === true ) //afk limit turned on?
-                    {
-                        if ( userFunctions.djList().length !== 0 ) //any dj's on stage?
-                        {
-                            let afkDjs = 'dj afk time: ';
-
-                            for ( let ijhp = 0; ijhp < userFunctions.djList().length; ijhp++ ) {
-                                let lastUpdate = Math.floor( ( Date.now() - userFunctions.lastSeen()[ userFunctions.djList()[ ijhp ] ] ) / 1000 / 60 ); //their afk time in minutes
-                                let whatIsTheName = userFunctions.theUsersList().indexOf( userFunctions.djList()[ ijhp ] ); //their name
-
-                                if ( userFunctions.djList()[ ijhp ] !== userFunctions.djList()[ userFunctions.djList().length - 1 ] ) {
-                                    afkDjs += userFunctions.theUsersList()[ whatIsTheName + 1 ] + ': ' + lastUpdate + ' mins, ';
-                                } else {
-                                    afkDjs += userFunctions.theUsersList()[ whatIsTheName + 1 ] + ': ' + lastUpdate + ' mins';
-                                }
-                            }
-                            bot.pm( afkDjs, speaker );
-                        } else {
-                            bot.pm( 'error, there are currently no dj\'s on stage.', speaker );
-                        }
-                    } else {
-                        bot.pm( 'error, the dj afk timer has to be active for me to report afk time.', speaker );
-                    }
-                } else if ( text.match( /^\/playminus/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    if ( musicDefaults.DJPlaysLimit === true ) //is the play limit on?
-                    {
-                        let playMinus = data.text.slice( 12 );
-                        let areTheyInRoom = userFunctions.theUsersList().indexOf( playMinus );
-                        let areTheyDj = userFunctions.djList().indexOf( userFunctions.theUsersList()[ areTheyInRoom - 1 ] );
-                        if ( areTheyInRoom !== -1 ) //are they in the room?
-                        {
-                            if ( areTheyDj !== -1 ) //are they a dj?
-                            {
-                                if ( typeof ( userFunctions.djSongCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ] ) ) != 'undefined' ) {
-
-                                    if ( !userFunctions.djSongCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ] ).nbSong <= 0 ) //is their play count already 0 or lower?
-                                    {
-                                        userFunctions.decrementDJPlayCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ] );
-                                        bot.pm( userFunctions.theUsersList()[ areTheyInRoom ] + '\'s play count has been reduced by one', speaker );
-                                    } else {
-                                        bot.pm( 'error, that user\'s play count is already at zero', speaker );
+                                    if ( userFunctions.queueName()[ areTheyInTheQueue ] === userFunctions.queueName()[ 0 ] ) {
+                                        clearTimeout( roomFunctions.queueTimer() ); //clear timeout because first person has been replaced
+                                        botFunctions.setSayOnce( true );
                                     }
-                                } else {
-                                    bot.pm( 'something weird happened!, attemping to recover now', speaker );
 
-                                    if ( userFunctions.theUsersList()[ areTheyInRoom - 1 ] !== 'undefined' ) //only recover if userid given is not undefined
-                                    {
-                                        //recover here
-                                        userFunctions.initialiseDJPlayCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ] );
-                                    }
+                                    userFunctions.queueName().splice( areTheyInTheQueue, 1 ); //remove them
+                                    userFunctions.queueList().splice( areTheyInTheQueueList, 2 ); //remove them
+                                    userFunctions.queueName().splice( ( Math.round( tempName[ 2 ] ) - 1 ), 0, tempName[ 1 ] ); //add them to given position shift left 1 because array starts at 0
+                                    userFunctions.queueList().splice( ( ( Math.round( tempName[ 2 ] ) - 1 ) * 2 ), 0, tempName[ 1 ], userFunctions.theUsersList()[ whatIsTheirUserid2 - 1 ] ); //same as above
+
+                                    bot.pm( tempName[ 1 ] + ' has been moved to position ' + Math.round( tempName[ 2 ] ) + ' in the queue', speaker );
                                 }
                             } else {
-                                bot.pm( 'error, that user is not currently djing', speaker );
+                                bot.pm( 'error, position parameter passed was not a number, please pass a valid integer arguement', speaker );
                             }
-                        } else {
-                            bot.pm( 'error, that user is not currently in the room', speaker );
-                        }
-                    } else {
-                        bot.pm( 'error, the play limit must be turned on in order for me to decrement play counts', speaker );
-                    }
-                } else if ( text.match( /^\/whatsplaylimit/ ) && isInRoom === true ) {
-                    if ( musicDefaults.DJPlaysLimit === true ) {
-                        bot.pm( 'the play limit is currently set to: ' + musicDefaults.playLimit + ' songs.', speaker );
-                    } else {
-                        bot.pm( 'the play limit is currently turned off', speaker );
-                    }
-                } else if ( text.match( /^\/playLimitOn/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    let playLimitNumber = Number( data.text.slice( 13 ) ); //holds given number
-
-                    if ( playLimitNumber !== '' ) //if an additional arguement was given
-                    {
-                        if ( !isNaN( playLimitNumber ) && playLimitNumber > 0 ) //if parameter given is a number and greater than zero
+                        } else if ( tempName.length !== 3 ) //if invalid number of parameters
                         {
-                            musicDefaults.playLimit = Math.ceil( playLimitNumber ); // round play limit to make sure its not a fraction
-
-                            bot.pm( 'the play limit is now active and has been set to ' +
-                                musicDefaults.playLimit + ' songs. dj song counters have been reset.', speaker );
-
-                            //reset song counters
-                            for ( let ig = 0; ig < userFunctions.djList().length; ig++ ) {
-                                userFunctions.initialiseDJPlayCount( userFunctions.djList()[ ig ] );
-                            }
-
-                            musicDefaults.DJPlaysLimit = true; //mark playlimit as being on
-                        } else {
-                            bot.pm( 'invalid arguement given, the play limit must be set to an integer. ' +
-                                'it can either be used as /playLimitOn or /playLimitOn #.', speaker );
-
-                            musicDefaults.DJPlaysLimit = false; //on failure turn it off
+                            bot.pm( 'error, invalid number of parameters, must have /move name #', speaker );
+                        } else if ( areTheyInTheQueue === -1 ) //if name not found
+                        {
+                            bot.pm( 'error, name not found', speaker );
                         }
                     } else {
-                        bot.pm( 'the play limit is now active and has been set to the default value of ' +
+                        bot.pm( 'error, queue must turned on to use this command', speaker );
+                    }
+                }
+            } else if ( text.match( /^\/djafk/ ) && isInRoom === true ) {
+                if ( userFunctions.AFK() === true ) //afk limit turned on?
+                {
+                    if ( userFunctions.djList().length !== 0 ) //any dj's on stage?
+                    {
+                        let afkDjs = 'dj afk time: ';
+
+                        for ( let ijhp = 0; ijhp < userFunctions.djList().length; ijhp++ ) {
+                            let lastUpdate = Math.floor( ( Date.now() - userFunctions.lastSeen()[ userFunctions.djList()[ ijhp ] ] ) / 1000 / 60 ); //their afk time in minutes
+                            let whatIsTheName = userFunctions.theUsersList().indexOf( userFunctions.djList()[ ijhp ] ); //their name
+
+                            if ( userFunctions.djList()[ ijhp ] !== userFunctions.djList()[ userFunctions.djList().length - 1 ] ) {
+                                afkDjs += userFunctions.theUsersList()[ whatIsTheName + 1 ] + ': ' + lastUpdate + ' mins, ';
+                            } else {
+                                afkDjs += userFunctions.theUsersList()[ whatIsTheName + 1 ] + ': ' + lastUpdate + ' mins';
+                            }
+                        }
+                        bot.pm( afkDjs, speaker );
+                    } else {
+                        bot.pm( 'error, there are currently no dj\'s on stage.', speaker );
+                    }
+                } else {
+                    bot.pm( 'error, the dj afk timer has to be active for me to report afk time.', speaker );
+                }
+            } else if ( text.match( /^\/playminus/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                if ( musicDefaults.DJPlaysLimit === true ) //is the play limit on?
+                {
+                    let playMinus = data.text.slice( 12 );
+                    let areTheyInRoom = userFunctions.theUsersList().indexOf( playMinus );
+                    let areTheyDj = userFunctions.djList().indexOf( userFunctions.theUsersList()[ areTheyInRoom - 1 ] );
+                    if ( areTheyInRoom !== -1 ) //are they in the room?
+                    {
+                        if ( areTheyDj !== -1 ) //are they a dj?
+                        {
+                            if ( typeof ( userFunctions.djSongCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ] ) ) != 'undefined' ) {
+
+                                if ( !userFunctions.djSongCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ] ).nbSong <= 0 ) //is their play count already 0 or lower?
+                                {
+                                    userFunctions.decrementDJPlayCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ] );
+                                    bot.pm( userFunctions.theUsersList()[ areTheyInRoom ] + '\'s play count has been reduced by one', speaker );
+                                } else {
+                                    bot.pm( 'error, that user\'s play count is already at zero', speaker );
+                                }
+                            } else {
+                                bot.pm( 'something weird happened!, attemping to recover now', speaker );
+
+                                if ( userFunctions.theUsersList()[ areTheyInRoom - 1 ] !== 'undefined' ) //only recover if userid given is not undefined
+                                {
+                                    //recover here
+                                    userFunctions.initialiseDJPlayCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ] );
+                                }
+                            }
+                        } else {
+                            bot.pm( 'error, that user is not currently djing', speaker );
+                        }
+                    } else {
+                        bot.pm( 'error, that user is not currently in the room', speaker );
+                    }
+                } else {
+                    bot.pm( 'error, the play limit must be turned on in order for me to decrement play counts', speaker );
+                }
+            } else if ( text.match( /^\/whatsplaylimit/ ) && isInRoom === true ) {
+                if ( musicDefaults.DJPlaysLimit === true ) {
+                    bot.pm( 'the play limit is currently set to: ' + musicDefaults.playLimit + ' songs.', speaker );
+                } else {
+                    bot.pm( 'the play limit is currently turned off', speaker );
+                }
+            } else if ( text.match( /^\/playLimitOn/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                let playLimitNumber = Number( data.text.slice( 13 ) ); //holds given number
+
+                if ( playLimitNumber !== '' ) //if an additional arguement was given
+                {
+                    if ( !isNaN( playLimitNumber ) && playLimitNumber > 0 ) //if parameter given is a number and greater than zero
+                    {
+                        musicDefaults.playLimit = Math.ceil( playLimitNumber ); // round play limit to make sure its not a fraction
+
+                        bot.pm( 'the play limit is now active and has been set to ' +
                             musicDefaults.playLimit + ' songs. dj song counters have been reset.', speaker );
 
                         //reset song counters
@@ -1367,468 +1352,483 @@ const commandFunctions = ( bot ) => {
                         }
 
                         musicDefaults.DJPlaysLimit = true; //mark playlimit as being on
-                    }
-                } else if ( text.match( /^\/playLimitOff$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    musicDefaults.DJPlaysLimit = false;
-                    bot.pm( 'the play limit is now inactive.', speaker );
-                } else if ( text.match( /^\/snagevery$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    if ( songFunctions.snagSong() === true ) {
-                        songFunctions.snagSong = false;
-                        bot.pm( 'I am no longer adding every song that plays', speaker );
-                    } else if ( songFunctions.snagSong() === false ) {
-                        songFunctions.snagSong = true; //this is for /snagevery
-                        botDefaults.autoSnag = false; //this turns off /autosnag
-                        bot.pm( 'I am now adding every song that plays, /autosnag has been turned off', speaker );
-                    }
-                } else if ( text.match( /^\/autosnag/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    if ( botDefaults.autoSnag === false ) {
-                        botDefaults.autoSnag = true; //this is for /autosnag
-                        songFunctions.snagSong = false; //this is for /snagevery
-                        bot.pm( 'I am now adding every song that gets at least (' + botDefaults.howManyVotes + ') awesome\'s, /snagevery has been turned off', speaker );
-                    } else if ( botDefaults.autoSnag === true ) {
-                        botDefaults.autoSnag = false;
-                        bot.pm( 'vote snagging has been turned off', speaker );
-                    }
-                } else if ( text.match( /^\/dive/ ) && isInRoom === true ) {
-                    let checkDj = userFunctions.djList().indexOf( speaker );
-                    if ( checkDj !== -1 ) {
-                        bot.remDj( speaker );
                     } else {
-                        bot.pm( 'you must be on stage to use that command.', speaker );
+                        bot.pm( 'invalid arguement given, the play limit must be set to an integer. ' +
+                            'it can either be used as /playLimitOn or /playLimitOn #.', speaker );
+
+                        musicDefaults.DJPlaysLimit = false; //on failure turn it off
                     }
-                } else if ( data.text === '/getTags' && isInRoom === true ) {
-                    bot.pm( 'artist name: ' + songFunctions.artist() + ', song name: ' + songFunctions.song() + ', album: ' + songFunctions.album() + ', genre: ' + songFunctions.genre(), speaker );
-                } else if ( data.text === '/roominfo' && isInRoom === true ) {
-                    if ( typeof roomDefaults.detail !== 'undefined' ) {
-                        bot.pm( roomDefaults.detail, speaker );
+                } else {
+                    bot.pm( 'the play limit is now active and has been set to the default value of ' +
+                        musicDefaults.playLimit + ' songs. dj song counters have been reset.', speaker );
+
+                    //reset song counters
+                    for ( let ig = 0; ig < userFunctions.djList().length; ig++ ) {
+                        userFunctions.initialiseDJPlayCount( userFunctions.djList()[ ig ] );
                     }
-                } else if ( text.match( /^\/getonstage$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    if ( botDefaults.getonstage === false ) {
-                        bot.pm( 'I am now auto djing', speaker );
-                        botDefaults.getonstage = true;
-                    } else if ( botDefaults.getonstage === true ) {
-                        bot.pm( 'I am no longer auto djing', speaker );
-                        botDefaults.getonstage = false;
+
+                    musicDefaults.DJPlaysLimit = true; //mark playlimit as being on
+                }
+            } else if ( text.match( /^\/playLimitOff$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                musicDefaults.DJPlaysLimit = false;
+                bot.pm( 'the play limit is now inactive.', speaker );
+            } else if ( text.match( /^\/snagevery$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                if ( songFunctions.snagSong() === true ) {
+                    songFunctions.snagSong = false;
+                    bot.pm( 'I am no longer adding every song that plays', speaker );
+                } else if ( songFunctions.snagSong() === false ) {
+                    songFunctions.snagSong = true; //this is for /snagevery
+                    botDefaults.autoSnag = false; //this turns off /autosnag
+                    bot.pm( 'I am now adding every song that plays, /autosnag has been turned off', speaker );
+                }
+            } else if ( text.match( /^\/autosnag/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                if ( botDefaults.autoSnag === false ) {
+                    botDefaults.autoSnag = true; //this is for /autosnag
+                    songFunctions.snagSong = false; //this is for /snagevery
+                    bot.pm( 'I am now adding every song that gets at least (' + botDefaults.howManyVotes + ') awesome\'s, /snagevery has been turned off', speaker );
+                } else if ( botDefaults.autoSnag === true ) {
+                    botDefaults.autoSnag = false;
+                    bot.pm( 'vote snagging has been turned off', speaker );
+                }
+            } else if ( text.match( /^\/dive/ ) && isInRoom === true ) {
+                let checkDj = userFunctions.djList().indexOf( speaker );
+                if ( checkDj !== -1 ) {
+                    bot.remDj( speaker );
+                } else {
+                    bot.pm( 'you must be on stage to use that command.', speaker );
+                }
+            } else if ( data.text === '/getTags' && isInRoom === true ) {
+                bot.pm( 'artist name: ' + songFunctions.artist() + ', song name: ' + songFunctions.song() + ', album: ' + songFunctions.album() + ', genre: ' + songFunctions.genre(), speaker );
+            } else if ( data.text === '/roominfo' && isInRoom === true ) {
+                if ( typeof roomDefaults.detail !== 'undefined' ) {
+                    bot.pm( roomDefaults.detail, speaker );
+                }
+            } else if ( text.match( /^\/getonstage$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                if ( botDefaults.getonstage === false ) {
+                    bot.pm( 'I am now auto djing', speaker );
+                    botDefaults.getonstage = true;
+                } else if ( botDefaults.getonstage === true ) {
+                    bot.pm( 'I am no longer auto djing', speaker );
+                    botDefaults.getonstage = false;
+                }
+            } else if ( text.match( /^\/skipoff$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                bot.pm( 'i am no longer skipping my songs', speaker );
+                botFunctions.setSkipOn( false );
+            } else if ( text.match( /^\/skipon$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                bot.pm( 'i am now skipping my songs', speaker );
+                botFunctions.setSkipOn( true );
+            } else if ( text.match( '/awesome' ) && isInRoom === true ) {
+                bot.vote( 'up' );
+            } else if ( text.match( '/lame' ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                bot.vote( 'down' );
+            } else if ( text.match( /^\/eventmessageOn/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                bot.pm( 'event message: On', speaker );
+                roomDefaults.EVENTMESSAGE = true;
+            } else if ( text.match( /^\/eventmessageOff/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                bot.pm( 'event message: Off', speaker );
+                roomDefaults.EVENTMESSAGE = false;
+            } else if ( text.match( /^\/messageOff/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                bot.pm( 'message: Off', speaker );
+                roomDefaults.MESSAGE = false;
+            } else if ( text.match( /^\/messageOn/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                bot.pm( 'message: On', speaker );
+                roomDefaults.MESSAGE = true;
+            } else if ( text.match( /^\/greetoff/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                bot.pm( 'room greeting: Off', speaker );
+                roomFunctions.disableGreet();
+            } else if ( text.match( /^\/greeton/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                bot.pm( 'room greeting: On', speaker );
+                roomFunctions.enableGreet();
+            } else if ( text.match( /^\/songstats/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                if ( roomDefaults.SONGSTATS === true ) {
+                    roomDefaults.SONGSTATS = false;
+                    bot.pm( 'song stats is now inactive', speaker );
+                } else if ( roomDefaults.SONGSTATS === false ) {
+                    roomDefaults.SONGSTATS = true;
+                    bot.pm( 'song stats is now active', speaker );
+                }
+            } else if ( text.match( /^\/setTheme/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                whatIsTheme = data.text.slice( 10 );
+                roomDefaults.THEME = true;
+                bot.pm( 'The theme is now set to: ' + whatIsTheme, speaker );
+            } else if ( text.match( /^\/noTheme/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                roomDefaults.THEME = false;
+                bot.pm( 'The theme is now inactive', speaker );
+            } else if ( text.match( /^\/theme/ ) && isInRoom === true ) {
+                if ( roomDefaults.THEME === false ) {
+                    bot.pm( 'There is currently no theme, standard rules apply', speaker );
+                } else {
+                    bot.pm( 'The theme is currently set to: ' + whatIsTheme, speaker );
+                }
+            } else if ( text.match( /^\/skipsong/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                if ( roomFunctions.checkWhoIsDj() === authModule.USERID ) {
+                    bot.skip();
+                } else {
+                    bot.pm( 'error, that command only skips the bots currently playing song', speaker );
+                }
+            } else if ( text.match( /^\/roomafkoff/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                userFunctions.disableRoomIdle();
+                bot.pm( 'the audience afk list is now inactive.', speaker );
+            } else if ( text.match( /^\/roomafkon/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                userFunctions.enableRoomIdle();
+                bot.pm( 'the audience afk list is now active.', speaker );
+                for ( let zh = 0; zh < userFunctions.userIDs().length; zh++ ) {
+                    let isDj2 = userFunctions.djList().indexOf( userFunctions.userIDs()[ zh ] )
+                    if ( isDj2 === -1 ) {
+                        userFunctions.justSaw( userFunctions.userIDs()[ zh ], 'justSaw3' );
+                        userFunctions.justSaw( userFunctions.userIDs()[ zh ], 'justSaw4' );
                     }
-                } else if ( text.match( /^\/skipoff$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    bot.pm( 'i am no longer skipping my songs', speaker );
-                    botFunctions.setSkipOn( false );
-                } else if ( text.match( /^\/skipon$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    bot.pm( 'i am now skipping my songs', speaker );
-                    botFunctions.setSkipOn( true );
-                } else if ( text.match( '/awesome' ) && isInRoom === true ) {
-                    bot.vote( 'up' );
-                } else if ( text.match( '/lame' ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    bot.vote( 'down' );
-                } else if ( text.match( /^\/eventmessageOn/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    bot.pm( 'event message: On', speaker );
-                    roomDefaults.EVENTMESSAGE = true;
-                } else if ( text.match( /^\/eventmessageOff/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    bot.pm( 'event message: Off', speaker );
-                    roomDefaults.EVENTMESSAGE = false;
-                } else if ( text.match( /^\/messageOff/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    bot.pm( 'message: Off', speaker );
-                    roomDefaults.MESSAGE = false;
-                } else if ( text.match( /^\/messageOn/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    bot.pm( 'message: On', speaker );
-                    roomDefaults.MESSAGE = true;
-                } else if ( text.match( /^\/greetoff/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    bot.pm( 'room greeting: Off', speaker );
-                    roomFunctions.disableGreet();
-                } else if ( text.match( /^\/greeton/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    bot.pm( 'room greeting: On', speaker );
-                    roomFunctions.enableGreet();
-                } else if ( text.match( /^\/songstats/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    if ( roomDefaults.SONGSTATS === true ) {
-                        roomDefaults.SONGSTATS = false;
-                        bot.pm( 'song stats is now inactive', speaker );
-                    } else if ( roomDefaults.SONGSTATS === false ) {
-                        roomDefaults.SONGSTATS = true;
-                        bot.pm( 'song stats is now active', speaker );
-                    }
-                } else if ( text.match( /^\/setTheme/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    whatIsTheme = data.text.slice( 10 );
-                    roomDefaults.THEME = true;
-                    bot.pm( 'The theme is now set to: ' + whatIsTheme, speaker );
-                } else if ( text.match( /^\/noTheme/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    roomDefaults.THEME = false;
-                    bot.pm( 'The theme is now inactive', speaker );
-                } else if ( text.match( /^\/theme/ ) && isInRoom === true ) {
-                    if ( roomDefaults.THEME === false ) {
-                        bot.pm( 'There is currently no theme, standard rules apply', speaker );
-                    } else {
-                        bot.pm( 'The theme is currently set to: ' + whatIsTheme, speaker );
-                    }
-                } else if ( text.match( /^\/skipsong/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    if ( roomFunctions.checkWhoIsDj() === authModule.USERID ) {
-                        bot.skip();
-                    } else {
-                        bot.pm( 'error, that command only skips the bots currently playing song', speaker );
-                    }
-                } else if ( text.match( /^\/roomafkoff/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    userFunctions.disableRoomIdle();
-                    bot.pm( 'the audience afk list is now inactive.', speaker );
-                } else if ( text.match( /^\/roomafkon/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    userFunctions.enableRoomIdle();
-                    bot.pm( 'the audience afk list is now active.', speaker );
-                    for ( let zh = 0; zh < userFunctions.userIDs().length; zh++ ) {
-                        let isDj2 = userFunctions.djList().indexOf( userFunctions.userIDs()[ zh ] )
-                        if ( isDj2 === -1 ) {
-                            userFunctions.justSaw( userFunctions.userIDs()[ zh ], 'justSaw3' );
-                            userFunctions.justSaw( userFunctions.userIDs()[ zh ], 'justSaw4' );
-                        }
-                    }
-                } else if ( text.match( /^\/afkoff/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    userFunctions.disableDJIdle();
-                    bot.pm( 'the afk list is now inactive.', speaker );
-                } else if ( text.match( /^\/afkon/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    userFunctions.enableDJIdle();
-                    bot.pm( 'the afk list is now active.', speaker );
-                    for ( let z = 0; z < userFunctions.djList().length; z++ ) {
-                        userFunctions.justSaw( userFunctions.djList()[ z ], 'justSaw' );
-                        userFunctions.justSaw( userFunctions.djList()[ z ], 'justSaw1' );
-                        userFunctions.justSaw( userFunctions.djList()[ z ], 'justSaw2' );
-                    }
-                } else if ( text.match( /^\/removedj$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    bot.remDj();
-                } else if ( text.match( /^\/voteskipoff$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    bot.pm( "vote skipping is now inactive", speaker );
-                    musicDefaults.voteSkip = false;
+                }
+            } else if ( text.match( /^\/afkoff/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                userFunctions.disableDJIdle();
+                bot.pm( 'the afk list is now inactive.', speaker );
+            } else if ( text.match( /^\/afkon/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                userFunctions.enableDJIdle();
+                bot.pm( 'the afk list is now active.', speaker );
+                for ( let z = 0; z < userFunctions.djList().length; z++ ) {
+                    userFunctions.justSaw( userFunctions.djList()[ z ], 'justSaw' );
+                    userFunctions.justSaw( userFunctions.djList()[ z ], 'justSaw1' );
+                    userFunctions.justSaw( userFunctions.djList()[ z ], 'justSaw2' );
+                }
+            } else if ( text.match( /^\/removedj$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                bot.remDj();
+            } else if ( text.match( /^\/voteskipoff$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                bot.pm( "vote skipping is now inactive", speaker );
+                musicDefaults.voteSkip = false;
+                songFunctions.resetVoteCountSkip();
+                songFunctions.setVotesLeft( roomDefaults.HowManyVotesToSkip );
+            } else if ( text.match( /^\/mytime/ ) && isInRoom === true ) {
+                let msecPerMinute1 = 1000 * 60;
+                let msecPerHour1 = msecPerMinute1 * 60;
+                let msecPerDay1 = msecPerHour1 * 24;
+                let endTime1 = Date.now();
+                let currentTime1 = endTime1 - userFunctions.myTime()[ speaker ];
+
+                let days1 = Math.floor( currentTime1 / msecPerDay1 );
+                currentTime1 = currentTime1 - ( days1 * msecPerDay1 );
+
+                let hours1 = Math.floor( currentTime1 / msecPerHour1 );
+                currentTime1 = currentTime1 - ( hours1 * msecPerHour1 );
+
+                let minutes1 = Math.floor( currentTime1 / msecPerMinute1 );
+
+
+                bot.pm( 'you have been in the room for: ' + days1 + ' days, ' + hours1 + ' hours, ' + minutes1 + ' minutes', speaker );
+
+            } else if ( text.match( /^\/voteskipon/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                userFunctions.resetSkipVoteUsers();
+                roomDefaults.HowManyVotesToSkip = Number( data.text.slice( 12 ) )
+                if ( isNaN( roomDefaults.HowManyVotesToSkip ) || roomDefaults.HowManyVotesToSkip === 0 ) {
+                    bot.pm( "error, please enter a valid number", speaker );
+                }
+
+                if ( !isNaN( roomDefaults.HowManyVotesToSkip ) && roomDefaults.HowManyVotesToSkip !== 0 ) {
+                    bot.pm( "vote skipping is now active, current votes needed to pass " + "the vote is " + roomDefaults.HowManyVotesToSkip, speaker );
+                    musicDefaults.voteSkip = true;
                     songFunctions.resetVoteCountSkip();
                     songFunctions.setVotesLeft( roomDefaults.HowManyVotesToSkip );
-                } else if ( text.match( /^\/mytime/ ) && isInRoom === true ) {
-                    let msecPerMinute1 = 1000 * 60;
-                    let msecPerHour1 = msecPerMinute1 * 60;
-                    let msecPerDay1 = msecPerHour1 * 24;
-                    let endTime1 = Date.now();
-                    let currentTime1 = endTime1 - userFunctions.myTime()[ speaker ];
-
-                    let days1 = Math.floor( currentTime1 / msecPerDay1 );
-                    currentTime1 = currentTime1 - ( days1 * msecPerDay1 );
-
-                    let hours1 = Math.floor( currentTime1 / msecPerHour1 );
-                    currentTime1 = currentTime1 - ( hours1 * msecPerHour1 );
-
-                    let minutes1 = Math.floor( currentTime1 / msecPerMinute1 );
-
-
-                    bot.pm( 'you have been in the room for: ' + days1 + ' days, ' + hours1 + ' hours, ' + minutes1 + ' minutes', speaker );
-
-                } else if ( text.match( /^\/voteskipon/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    userFunctions.resetSkipVoteUsers();
-                    roomDefaults.HowManyVotesToSkip = Number( data.text.slice( 12 ) )
-                    if ( isNaN( roomDefaults.HowManyVotesToSkip ) || roomDefaults.HowManyVotesToSkip === 0 ) {
-                        bot.pm( "error, please enter a valid number", speaker );
-                    }
-
-                    if ( !isNaN( roomDefaults.HowManyVotesToSkip ) && roomDefaults.HowManyVotesToSkip !== 0 ) {
-                        bot.pm( "vote skipping is now active, current votes needed to pass " + "the vote is " + roomDefaults.HowManyVotesToSkip, speaker );
-                        musicDefaults.voteSkip = true;
-                        songFunctions.resetVoteCountSkip();
-                        songFunctions.setVotesLeft( roomDefaults.HowManyVotesToSkip );
-                    }
-                } else if ( text.match( /^\/queuewithnumbers$/ ) && isInRoom === true ) {
-                    if ( roomDefaults.queueActive === true && userFunctions.queueName().length !== 0 ) {
-                        let temp95 = 'The queue is now: ';
-                        for ( let kl = 0; kl < userFunctions.queueName().length; kl++ ) {
-                            if ( kl !== ( userFunctions.queueName().length - 1 ) ) {
-                                temp95 += userFunctions.queueName()[ kl ] + ' [' + ( kl + 1 ) + ']' + ', ';
-                            } else if ( kl === ( userFunctions.queueName().length - 1 ) ) {
-                                temp95 += userFunctions.queueName()[ kl ] + ' [' + ( kl + 1 ) + ']';
-                            }
+                }
+            } else if ( text.match( /^\/queuewithnumbers$/ ) && isInRoom === true ) {
+                if ( roomDefaults.queueActive === true && userFunctions.queueName().length !== 0 ) {
+                    let temp95 = 'The queue is now: ';
+                    for ( let kl = 0; kl < userFunctions.queueName().length; kl++ ) {
+                        if ( kl !== ( userFunctions.queueName().length - 1 ) ) {
+                            temp95 += userFunctions.queueName()[ kl ] + ' [' + ( kl + 1 ) + ']' + ', ';
+                        } else if ( kl === ( userFunctions.queueName().length - 1 ) ) {
+                            temp95 += userFunctions.queueName()[ kl ] + ' [' + ( kl + 1 ) + ']';
                         }
-                        bot.pm( temp95, speaker );
+                    }
+                    bot.pm( temp95, speaker );
 
-                    } else if ( roomDefaults.queueActive === true ) {
-                        bot.pm( 'The queue is currently empty.', speaker );
-                    } else {
-                        bot.pm( 'There is currently no queue.', speaker );
-                    }
-                } else if ( text.match( /^\/m/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    bot.speak( text.substring( 3 ) );
-                } else if ( text.match( /^\/stage/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    let ban = data.text.slice( 8 );
-                    let checkUser = userFunctions.theUsersList().indexOf( ban ) - 1;
-                    if ( checkUser !== -1 ) {
-                        bot.remDj( userFunctions.theUsersList()[ checkUser ] );
-                        userFunctions.setAsModerator();
-                    }
-                } else if ( text.match( /^\/botstatus/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    let whatsOn = '';
+                } else if ( roomDefaults.queueActive === true ) {
+                    bot.pm( 'The queue is currently empty.', speaker );
+                } else {
+                    bot.pm( 'There is currently no queue.', speaker );
+                }
+            } else if ( text.match( /^\/m/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                bot.speak( text.substring( 3 ) );
+            } else if ( text.match( /^\/stage/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                let ban = data.text.slice( 8 );
+                let checkUser = userFunctions.theUsersList().indexOf( ban ) - 1;
+                if ( checkUser !== -1 ) {
+                    bot.remDj( userFunctions.theUsersList()[ checkUser ] );
+                    userFunctions.setAsModerator();
+                }
+            } else if ( text.match( /^\/botstatus/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                let whatsOn = '';
 
-                    if ( roomDefaults.queueActive === true ) {
-                        whatsOn += 'queue: On, ';
-                    } else {
-                        whatsOn += 'queue: Off, ';
-                    }
-                    if ( userFunctions.AFK() === true ) {
-                        whatsOn += 'dj afk limit: On, ';
-                    } else {
-                        whatsOn += 'dj afk limit: Off, ';
-                    }
-                    if ( botDefaults.getonstage === true ) {
-                        whatsOn += 'autodjing: On, ';
-                    } else {
-                        whatsOn += 'autodjing: Off, ';
-                    }
-                    if ( roomDefaults.EVENTMESSAGE === true ) {
-                        whatsOn += 'event message: On, ';
-                    } else {
-                        whatsOn += 'event message: Off, ';
-                    }
-                    if ( roomDefaults.MESSAGE === true ) {
-                        whatsOn += 'room message: On, ';
-                    } else {
-                        whatsOn += 'room message: Off, ';
-                    }
-                    if ( roomFunctions.GREET() === true ) {
-                        whatsOn += 'greeting message: On, ';
-                    } else {
-                        whatsOn += 'greeting message: Off, ';
-                    }
-                    if ( musicDefaults.voteSkip === true ) {
-                        whatsOn += 'voteskipping: On, ';
-                    } else {
-                        whatsOn += 'voteskipping: Off, ';
-                    }
-                    if ( userFunctions.roomIdle() === true ) {
-                        whatsOn += 'audience afk limit: On, ';
-                    } else {
-                        whatsOn += 'audience afk limit: Off, ';
-                    }
-                    if ( roomDefaults.SONGSTATS === true ) {
-                        whatsOn += 'song stats: On, ';
-                    } else {
-                        whatsOn += 'song stats: Off, ';
-                    }
-                    if ( roomDefaults.kickTTSTAT === true ) {
-                        whatsOn += 'auto ttstat kick: On, ';
-                    } else {
-                        whatsOn += 'auto ttstat kick: Off, ';
-                    }
-                    if ( musicDefaults.removeIdleDJs === true ) {
-                        whatsOn += 'song length limit: On, ';
-                    } else {
-                        whatsOn += 'song length limit: Off, ';
-                    }
-                    if ( musicDefaults.DJPlaysLimit === true ) {
-                        whatsOn += 'song play limit: On, ';
-                    } else {
-                        whatsOn += 'song play limit: Off, ';
-                    }
-                    if ( roomDefaults.refreshingEnabled === true ) {
-                        whatsOn += 'refreshing: On, ';
-                    } else {
-                        whatsOn += 'refreshing: Off, ';
-                    }
-                    if ( botFunctions.skipOn() === true ) {
-                        whatsOn += 'autoskipping: On, ';
-                    } else {
-                        whatsOn += 'autoskipping: Off, ';
-                    }
-                    if ( songFunctions.snagSong() === true ) {
-                        whatsOn += 'every song adding: On, ';
-                    } else {
-                        whatsOn += 'every song adding: Off, ';
-                    }
-                    if ( botDefaults.autoSnag === true ) {
-                        whatsOn += 'vote based song adding: On, ';
-                    } else {
-                        whatsOn += 'vote based song adding: Off, ';
-                    }
-                    if ( botFunctions.randomOnce() === 0 ) {
-                        whatsOn += 'playlist reordering in progress?: No';
-                    } else {
-                        whatsOn += 'playlist reordering in progress?: Yes';
-                    }
+                if ( roomDefaults.queueActive === true ) {
+                    whatsOn += 'queue: On, ';
+                } else {
+                    whatsOn += 'queue: Off, ';
+                }
+                if ( userFunctions.AFK() === true ) {
+                    whatsOn += 'dj afk limit: On, ';
+                } else {
+                    whatsOn += 'dj afk limit: Off, ';
+                }
+                if ( botDefaults.getonstage === true ) {
+                    whatsOn += 'autodjing: On, ';
+                } else {
+                    whatsOn += 'autodjing: Off, ';
+                }
+                if ( roomDefaults.EVENTMESSAGE === true ) {
+                    whatsOn += 'event message: On, ';
+                } else {
+                    whatsOn += 'event message: Off, ';
+                }
+                if ( roomDefaults.MESSAGE === true ) {
+                    whatsOn += 'room message: On, ';
+                } else {
+                    whatsOn += 'room message: Off, ';
+                }
+                if ( roomFunctions.GREET() === true ) {
+                    whatsOn += 'greeting message: On, ';
+                } else {
+                    whatsOn += 'greeting message: Off, ';
+                }
+                if ( musicDefaults.voteSkip === true ) {
+                    whatsOn += 'voteskipping: On, ';
+                } else {
+                    whatsOn += 'voteskipping: Off, ';
+                }
+                if ( userFunctions.roomIdle() === true ) {
+                    whatsOn += 'audience afk limit: On, ';
+                } else {
+                    whatsOn += 'audience afk limit: Off, ';
+                }
+                if ( roomDefaults.SONGSTATS === true ) {
+                    whatsOn += 'song stats: On, ';
+                } else {
+                    whatsOn += 'song stats: Off, ';
+                }
+                if ( roomDefaults.kickTTSTAT === true ) {
+                    whatsOn += 'auto ttstat kick: On, ';
+                } else {
+                    whatsOn += 'auto ttstat kick: Off, ';
+                }
+                if ( musicDefaults.removeIdleDJs === true ) {
+                    whatsOn += 'song length limit: On, ';
+                } else {
+                    whatsOn += 'song length limit: Off, ';
+                }
+                if ( musicDefaults.DJPlaysLimit === true ) {
+                    whatsOn += 'song play limit: On, ';
+                } else {
+                    whatsOn += 'song play limit: Off, ';
+                }
+                if ( roomDefaults.refreshingEnabled === true ) {
+                    whatsOn += 'refreshing: On, ';
+                } else {
+                    whatsOn += 'refreshing: Off, ';
+                }
+                if ( botFunctions.skipOn() === true ) {
+                    whatsOn += 'autoskipping: On, ';
+                } else {
+                    whatsOn += 'autoskipping: Off, ';
+                }
+                if ( songFunctions.snagSong() === true ) {
+                    whatsOn += 'every song adding: On, ';
+                } else {
+                    whatsOn += 'every song adding: Off, ';
+                }
+                if ( botDefaults.autoSnag === true ) {
+                    whatsOn += 'vote based song adding: On, ';
+                } else {
+                    whatsOn += 'vote based song adding: Off, ';
+                }
+                if ( botFunctions.randomOnce() === 0 ) {
+                    whatsOn += 'playlist reordering in progress?: No';
+                } else {
+                    whatsOn += 'playlist reordering in progress?: Yes';
+                }
 
-                    bot.pm( whatsOn, speaker );
+                bot.pm( whatsOn, speaker );
 
-                } else if ( text.match( '/banstage' ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    let ban12 = data.text.slice( 11 );
-                    let checkBan = roomFunctions.tempBanList().indexOf( ban12 );
-                    let checkUser12 = userFunctions.theUsersList().indexOf( ban12 );
-                    if ( checkBan === -1 && checkUser12 !== -1 ) {
-                        roomFunctions.tempBanList().push( userFunctions.theUsersList()[ checkUser12 - 1 ], userFunctions.theUsersList()[ checkUser12 ] );
-                        bot.remDj( userFunctions.theUsersList()[ checkUser12 - 1 ] );
+            } else if ( text.match( '/banstage' ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                let ban12 = data.text.slice( 11 );
+                let checkBan = roomFunctions.tempBanList().indexOf( ban12 );
+                let checkUser12 = userFunctions.theUsersList().indexOf( ban12 );
+                if ( checkBan === -1 && checkUser12 !== -1 ) {
+                    roomFunctions.tempBanList().push( userFunctions.theUsersList()[ checkUser12 - 1 ], userFunctions.theUsersList()[ checkUser12 ] );
+                    bot.remDj( userFunctions.theUsersList()[ checkUser12 - 1 ] );
+                    userFunctions.removeAsModerator();
+                }
+            } else if ( text.match( '/unbanstage' ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                let ban2 = data.text.slice( 13 );
+                userFunctions.index = roomFunctions.tempBanList().indexOf( ban2 );
+                if ( userFunctions.index !== -1 ) {
+                    roomFunctions.tempBanList().splice( roomFunctions.tempBanList()[ userFunctions.index - 1 ], 2 );
+                    userFunctions.removeAsModerator();
+                    userFunctions.index = null;
+                }
+            } else if ( text.match( '/userid' ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                let ban86 = data.text.slice( 9 );
+                let checkUser9 = bot.getUserId( ban86, function ( data ) {
+                    let userid59 = data.userid;
+                    if ( typeof ( userid59 ) !== 'undefined' ) {
+                        bot.pm( userid59, senderid );
                         userFunctions.removeAsModerator();
+                    } else {
+                        bot.pm( 'I\'m sorry that userid is undefined', senderid );
                     }
-                } else if ( text.match( '/unbanstage' ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    let ban2 = data.text.slice( 13 );
-                    userFunctions.index = roomFunctions.tempBanList().indexOf( ban2 );
-                    if ( userFunctions.index !== -1 ) {
-                        roomFunctions.tempBanList().splice( roomFunctions.tempBanList()[ userFunctions.index - 1 ], 2 );
-                        userFunctions.removeAsModerator();
-                        userFunctions.index = null;
-                    }
-                } else if ( text.match( '/userid' ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    let ban86 = data.text.slice( 9 );
-                    let checkUser9 = bot.getUserId( ban86, function ( data ) {
-                        let userid59 = data.userid;
-                        if ( typeof ( userid59 ) !== 'undefined' ) {
-                            bot.pm( userid59, senderid );
-                            userFunctions.removeAsModerator();
+                } );
+            } else if ( text.match( '/ban' ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                let ban17 = data.text.slice( 6 );
+                let checkBan17 = roomDefaults.blackList.indexOf( ban17 );
+                let checkUser17 = userFunctions.theUsersList().indexOf( ban17 );
+                if ( checkBan17 === -1 && checkUser17 !== -1 ) {
+                    roomDefaults.blackList.push( userFunctions.theUsersList()[ checkUser17 - 1 ], userFunctions.theUsersList()[ checkUser17 ] );
+                    bot.boot( userFunctions.theUsersList()[ checkUser17 - 1 ] );
+                    userFunctions.removeAsModerator();
+                }
+            } else if ( text.match( '/unban' ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                let ban20 = data.text.slice( 8 );
+                userFunctions.index = roomDefaults.blackList.indexOf( ban20 );
+                if ( userFunctions.index !== -1 ) {
+                    roomDefaults.blackList.splice( roomDefaults.blackList[ userFunctions.index - 1 ], 2 );
+                    userFunctions.removeAsModerator();
+                    userFunctions.index = null;
+                }
+            } else if ( text.match( /^\/stalk/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                let stalker = text.substring( 8 );
+                bot.getUserId( stalker, function ( data6 ) {
+                    bot.stalk( data6.userid, allInformations = true, function ( data4 ) {
+                        if ( data4.success !== false ) {
+                            bot.pm( 'User found in room: http://turntable.fm/' + data4.room.shortcut, speaker );
                         } else {
-                            bot.pm( 'I\'m sorry that userid is undefined', senderid );
+                            bot.pm( 'User not found, they may be offline or in the lobby, they may also have just joined a room, or they may not exist', speaker );
                         }
                     } );
-                } else if ( text.match( '/ban' ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    let ban17 = data.text.slice( 6 );
-                    let checkBan17 = roomDefaults.blackList.indexOf( ban17 );
-                    let checkUser17 = userFunctions.theUsersList().indexOf( ban17 );
-                    if ( checkBan17 === -1 && checkUser17 !== -1 ) {
-                        roomDefaults.blackList.push( userFunctions.theUsersList()[ checkUser17 - 1 ], userFunctions.theUsersList()[ checkUser17 ] );
-                        bot.boot( userFunctions.theUsersList()[ checkUser17 - 1 ] );
-                        userFunctions.removeAsModerator();
+                } );
+            } else if ( text.match( /^\/whobanned$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                if ( roomDefaults.blackList.length !== 0 ) {
+                    bot.pm( 'ban list: ' + roomDefaults.blackList, speaker );
+                } else {
+                    bot.pm( 'The ban list is empty.', speaker );
+                }
+            } else if ( text.match( /^\/whostagebanned$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                if ( roomFunctions.tempBanList().length !== 0 ) {
+                    bot.pm( 'banned from stage: ' + roomFunctions.tempBanList(), speaker );
+                } else {
+                    bot.pm( 'The banned from stage list is currently empty.', speaker );
+                }
+            } else if ( text.match( /^\/snag/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                if ( songFunctions.getSong() !== null && botDefaults.botPlaylist !== null ) {
+                    let found = false;
+                    for ( let igh = 0; igh < botDefaults.botPlaylist.length; igh++ ) {
+                        if ( botDefaults.botPlaylist[ igh ]._id === songFunctions.getSong() ) {
+                            found = true;
+                            bot.pm( 'I already have that song', speaker );
+                            break;
+                        }
                     }
-                } else if ( text.match( '/unban' ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    let ban20 = data.text.slice( 8 );
-                    userFunctions.index = roomDefaults.blackList.indexOf( ban20 );
-                    if ( userFunctions.index !== -1 ) {
-                        roomDefaults.blackList.splice( roomDefaults.blackList[ userFunctions.index - 1 ], 2 );
-                        userFunctions.removeAsModerator();
-                        userFunctions.index = null;
+                    if ( !found ) {
+                        bot.playlistAdd( songFunctions.getSong(), -1 ); //add song to the end of the playlist
+                        bot.pm( 'song added', speaker );
+                        let tempSongHolder = {
+                            _id: songFunctions.getSong()
+                        };
+                        botDefaults.botPlaylist.push( tempSongHolder );
                     }
-                } else if ( text.match( /^\/stalk/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    let stalker = text.substring( 8 );
-                    bot.getUserId( stalker, function ( data6 ) {
-                        bot.stalk( data6.userid, allInformations = true, function ( data4 ) {
-                            if ( data4.success !== false ) {
-                                bot.pm( 'User found in room: http://turntable.fm/' + data4.room.shortcut, speaker );
+                } else {
+                    bot.pm( 'error, you can\'t snag the song that\'s playing when the bot enters the room', speaker );
+                }
+            } else if ( text.match( /^\/inform$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                if ( roomFunctions.checkWhoIsDj() !== null ) {
+                    if ( userFunctions.informTimer === null ) {
+                        let checkDjsName = userFunctions.theUsersList().indexOf( roomFunctions.lastdj() ) + 1;
+                        bot.speak( '@' + userFunctions.theUsersList()[ checkDjsName ] + ' your song is not the appropriate genre for this room, please skip or you will be removed in 20 seconds' );
+                        userFunctions.informTimer = setTimeout( function () {
+                            bot.pm( 'you took too long to skip your song', roomFunctions.lastdj() );
+                            bot.remDj( roomFunctions.lastdj() );
+                            userFunctions.informTimer = null;
+                        }, 20 * 1000 );
+                    } else {
+                        bot.pm( 'the /inform timer has already been activated, it may be used only once per song', speaker );
+                    }
+                } else {
+                    bot.pm( 'you must wait one song since the bot has started to use that command', speaker );
+                }
+            } else if ( text.match( /^\/removesong$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                if ( roomFunctions.checkWhoIsDj() === authModule.USERID ) {
+                    bot.skip();
+                    bot.playlistRemove( -1 );
+                    botDefaults.botPlaylist.splice( botDefaults.botPlaylist.length - 1, 1 );
+                    bot.pm( 'the last snagged song has been removed.', speaker );
+                } else {
+                    botDefaults.botPlaylist.splice( botDefaults.botPlaylist.length - 1, 1 );
+                    bot.playlistRemove( -1 );
+                    bot.pm( 'the last snagged song has been removed.', speaker );
+                }
+            } else if ( text.match( '/username' ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
+                let ban7 = data.text.slice( 10 );
+                let tmp94 = bot.getProfile( ban7, function ( data ) {
+                    bot.pm( data.name, senderid );
+                } );
+            } else if ( text.match( /^\/boot/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) //admin only
+            {
+                let bootName = data.text.slice( 5 ); //holds their name
+                let tempArray = bootName.split( " " );
+                let reason = "";
+                let whatIsTheirUserid = userFunctions.theUsersList().indexOf( tempArray[ 1 ] );
+                let theirName = ""; //holds the person's name
+                let isNameValid; //if second param is int value this is used to hold name index
+
+
+                //if second arg is a number and that number is not a name of someone in the room
+                //then that number represents the word length of the name given, which means
+                //that they are going to print a message with the boot command
+                if ( !isNaN( tempArray[ 1 ] ) && whatIsTheirUserid === -1 ) {
+                    //if arg given will not produce index of bounds error
+                    if ( tempArray[ 1 ] < tempArray.length - 1 ) {
+                        for ( let gj = 2; gj <= ( 2 + Math.round( tempArray[ 1 ] ) ) - 1; gj++ ) {
+                            theirName += tempArray[ gj ] + " ";
+                        }
+
+                        isNameValid = userFunctions.theUsersList().indexOf( theirName.trim() ); //find the index
+
+                        //if the name you provided was valid
+                        if ( isNameValid !== -1 ) {
+                            //get the message
+                            for ( let gyj = 2 + Math.round( tempArray[ 1 ] ); gyj < tempArray.length; gyj++ ) {
+                                reason += tempArray[ gyj ] + " ";
+                            }
+
+
+                            //if their name is multi word, then a number must be given in order
+                            //to know when their name ends and their message begins, however
+                            //this command can be used with a multi name word and no message
+                            //in which case there would be no reason parameter
+                            if ( reason !== "" ) {
+                                bot.boot( userFunctions.theUsersList()[ isNameValid - 1 ], reason );
                             } else {
-                                bot.pm( 'User not found, they may be offline or in the lobby, they may also have just joined a room, or they may not exist', speaker );
-                            }
-                        } );
-                    } );
-                } else if ( text.match( /^\/whobanned$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    if ( roomDefaults.blackList.length !== 0 ) {
-                        bot.pm( 'ban list: ' + roomDefaults.blackList, speaker );
-                    } else {
-                        bot.pm( 'The ban list is empty.', speaker );
-                    }
-                } else if ( text.match( /^\/whostagebanned$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    if ( roomFunctions.tempBanList().length !== 0 ) {
-                        bot.pm( 'banned from stage: ' + roomFunctions.tempBanList(), speaker );
-                    } else {
-                        bot.pm( 'The banned from stage list is currently empty.', speaker );
-                    }
-                } else if ( text.match( /^\/snag/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    if ( songFunctions.getSong() !== null && botDefaults.botPlaylist !== null ) {
-                        let found = false;
-                        for ( let igh = 0; igh < botDefaults.botPlaylist.length; igh++ ) {
-                            if ( botDefaults.botPlaylist[ igh ]._id === songFunctions.getSong() ) {
-                                found = true;
-                                bot.pm( 'I already have that song', speaker );
-                                break;
-                            }
-                        }
-                        if ( !found ) {
-                            bot.playlistAdd( songFunctions.getSong(), -1 ); //add song to the end of the playlist
-                            bot.pm( 'song added', speaker );
-                            let tempSongHolder = {
-                                _id: songFunctions.getSong()
-                            };
-                            botDefaults.botPlaylist.push( tempSongHolder );
-                        }
-                    } else {
-                        bot.pm( 'error, you can\'t snag the song that\'s playing when the bot enters the room', speaker );
-                    }
-                } else if ( text.match( /^\/inform$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    if ( roomFunctions.checkWhoIsDj() !== null ) {
-                        if ( userFunctions.informTimer === null ) {
-                            let checkDjsName = userFunctions.theUsersList().indexOf( roomFunctions.lastdj() ) + 1;
-                            bot.speak( '@' + userFunctions.theUsersList()[ checkDjsName ] + ' your song is not the appropriate genre for this room, please skip or you will be removed in 20 seconds' );
-                            userFunctions.informTimer = setTimeout( function () {
-                                bot.pm( 'you took too long to skip your song', roomFunctions.lastdj() );
-                                bot.remDj( roomFunctions.lastdj() );
-                                userFunctions.informTimer = null;
-                            }, 20 * 1000 );
-                        } else {
-                            bot.pm( 'the /inform timer has already been activated, it may be used only once per song', speaker );
-                        }
-                    } else {
-                        bot.pm( 'you must wait one song since the bot has started to use that command', speaker );
-                    }
-                } else if ( text.match( /^\/removesong$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    if ( roomFunctions.checkWhoIsDj() === authModule.USERID ) {
-                        bot.skip();
-                        bot.playlistRemove( -1 );
-                        botDefaults.botPlaylist.splice( botDefaults.botPlaylist.length - 1, 1 );
-                        bot.pm( 'the last snagged song has been removed.', speaker );
-                    } else {
-                        botDefaults.botPlaylist.splice( botDefaults.botPlaylist.length - 1, 1 );
-                        bot.playlistRemove( -1 );
-                        bot.pm( 'the last snagged song has been removed.', speaker );
-                    }
-                } else if ( text.match( '/username' ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                    let ban7 = data.text.slice( 10 );
-                    let tmp94 = bot.getProfile( ban7, function ( data ) {
-                        bot.pm( data.name, senderid );
-                    } );
-                } else if ( text.match( /^\/boot/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) //admin only
-                {
-                    let bootName = data.text.slice( 5 ); //holds their name
-                    let tempArray = bootName.split( " " );
-                    let reason = "";
-                    let whatIsTheirUserid = userFunctions.theUsersList().indexOf( tempArray[ 1 ] );
-                    let theirName = ""; //holds the person's name
-                    let isNameValid; //if second param is int value this is used to hold name index
-
-
-                    //if second arg is a number and that number is not a name of someone in the room
-                    //then that number represents the word length of the name given, which means
-                    //that they are going to print a message with the boot command
-                    if ( !isNaN( tempArray[ 1 ] ) && whatIsTheirUserid === -1 ) {
-                        //if arg given will not produce index of bounds error
-                        if ( tempArray[ 1 ] < tempArray.length - 1 ) {
-                            for ( let gj = 2; gj <= ( 2 + Math.round( tempArray[ 1 ] ) ) - 1; gj++ ) {
-                                theirName += tempArray[ gj ] + " ";
-                            }
-
-                            isNameValid = userFunctions.theUsersList().indexOf( theirName.trim() ); //find the index
-
-                            //if the name you provided was valid
-                            if ( isNameValid !== -1 ) {
-                                //get the message
-                                for ( let gyj = 2 + Math.round( tempArray[ 1 ] ); gyj < tempArray.length; gyj++ ) {
-                                    reason += tempArray[ gyj ] + " ";
-                                }
-
-
-                                //if their name is multi word, then a number must be given in order
-                                //to know when their name ends and their message begins, however
-                                //this command can be used with a multi name word and no message
-                                //in which case there would be no reason parameter
-                                if ( reason !== "" ) {
-                                    bot.boot( userFunctions.theUsersList()[ isNameValid - 1 ], reason );
-                                } else {
-                                    bot.boot( userFunctions.theUsersList()[ isNameValid - 1 ] );
-                                }
-                            } else {
-                                bot.pm( 'sorry but the name you provided was not found in the room', speaker );
+                                bot.boot( userFunctions.theUsersList()[ isNameValid - 1 ] );
                             }
                         } else {
-                            bot.pm( 'error, the number provided must be the number of words that make up the person\'s name', speaker );
+                            bot.pm( 'sorry but the name you provided was not found in the room', speaker );
                         }
-                    } //if their name is just 1 single word and a message is given
-                    //it comes to here
-                    else if ( tempArray.length > 2 && whatIsTheirUserid !== -1 ) {
-                        for ( let ikp = 2; ikp < tempArray.length; ikp++ ) {
-                            reason += tempArray[ ikp ] + " ";
-                        }
-
-                        bot.boot( userFunctions.theUsersList()[ whatIsTheirUserid - 1 ], reason );
-                    }
-                    //if their name is a single word and no message is given it comes to here
-                    else if ( whatIsTheirUserid !== -1 ) {
-                        bot.boot( userFunctions.theUsersList()[ whatIsTheirUserid - 1 ] );
                     } else {
-                        bot.pm( 'error, that user was not found in the room. multi word names must be specified in the command usage, example: /boot 3 first middle last.' +
-                            ' if the name is only one word long then you do not need to specify its length', speaker );
+                        bot.pm( 'error, the number provided must be the number of words that make up the person\'s name', speaker );
                     }
+                } //if their name is just 1 single word and a message is given
+                //it comes to here
+                else if ( tempArray.length > 2 && whatIsTheirUserid !== -1 ) {
+                    for ( let ikp = 2; ikp < tempArray.length; ikp++ ) {
+                        reason += tempArray[ ikp ] + " ";
+                    }
+
+                    bot.boot( userFunctions.theUsersList()[ whatIsTheirUserid - 1 ], reason );
+                }
+                //if their name is a single word and no message is given it comes to here
+                else if ( whatIsTheirUserid !== -1 ) {
+                    bot.boot( userFunctions.theUsersList()[ whatIsTheirUserid - 1 ] );
+                } else {
+                    bot.pm( 'error, that user was not found in the room. multi word names must be specified in the command usage, example: /boot 3 first middle last.' +
+                        ' if the name is only one word long then you do not need to specify its length', speaker );
                 }
             }
         }
     }
-
-    module.exports = commandFunctions;
+}
+module.exports = commandFunctions;
