@@ -15,7 +15,7 @@ module.exports = {
     songLengthLimitOn: true, //song length limit (on by default)
     songLengthLimitDefault: 10.0, //set song limit default in minutes
 
-    PLAYLIMIT: false, //song play limit, this is for the playLimit variable up above(off by default)
-
+    DJPlaysLimited: false, //song play limit, this is for the playLimit variable up above(off by default)
+    DJsPlayLimit: 3, //set the playlimit here (default 4 songs)
 
 }

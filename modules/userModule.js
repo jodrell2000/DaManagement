@@ -34,16 +34,31 @@ let warnme = []; //holds the userid's of everyone using the /warnme feature
 
 let queueList = []; //holds the userid of everyone in the queue
 
+let DJPlaysLimited = musicDefaults.DJPlaysLimited; //song play limit, this is for the playLimit variable up above(off by default)
+let DJsPlayLimit = musicDefaults.DJsPlayLimit; //set the playlimit here (default 4 songs)
+
+
 const userFunctions = ( bot ) => {
     function logMe ( logLevel, message ) {
-        if ( logLevel === 'error' || logLevel === 'info' ) {
-            console.log( "userFunctions:" + logLevel + "->" + message + "\n" );
-        } else {
-            if ( bot.debug ) {
-                console.log( "userFunctions:" + logLevel + "->" + message + "\n" );
-            }
+        switch ( logLevel ) {
+            case "error":
+                console.log( "!!!!!!!!!!! userFunctions:" + logLevel + "->" + message + "\n" );
+                break;
+            case "warn":
+                console.log( "+++++++++++ userFunctions:" + logLevel + "->" + message + "\n" );
+                break;
+            case "info":
+                console.log( "----------- userFunctions:" + logLevel + "->" + message + "\n" );
+                break;
+            default:
+                if ( bot.debug ) {
+                    console.log( "userFunctions:" + logLevel + "->" + message + "\n" );
+                }
+                break;
         }
+
     }
+
 
     function formatSeconds ( seconds ) {
         return ( Math.floor( seconds / 60 ) ).toString() + ' minutes';
@@ -120,22 +135,6 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        removeDJsOverPlaylimit: function ( chatFunctions, djID ) {
-            if ( musicDefaults.PLAYLIMIT === true ) //is playlimit on?
-            {
-                if ( djID !== authModule.USERID && djID === djList[ 0 ] && roomDefaults.playLimit === 1 ) //if person is in the far left seat and limit is set to one
-                {
-                    let checklist33 = theUsersList.indexOf( djID ) + 1;
-
-                    if ( checklist33 !== -1 ) {
-                        chatFunctions.overPlayLimit( theUsersList[ checklist33 ], roomDefaults.playLimit )
-                    }
-
-                    bot.remDj( djID );
-                }
-            }
-        },
-
         isPMerInRoom: function ( userID ) {
             let isInRoom = theUsersList.indexOf( userID );
             isInRoom = isInRoom !== -1;
@@ -184,8 +183,12 @@ const userFunctions = ( bot ) => {
         enableEscortMe: function ( data, chatFunctions ) {
             let theUserID = data.userid;
             let theError = '';
-            if ( this.escortMeIsEnabled( theUserID ) ) { theError += ", you've already enabled Escort Me..."; logMe( 'info', 'enableEscortMe, escort already enabled' ); }
-            if ( !this.isUserIDOnStage( theUserID ) ) { theError += ", you're not on stage..."; logMe( 'info', 'enableEscortMe, not on stage' ); }
+            if ( this.escortMeIsEnabled( theUserID ) ) {
+                theError += ", you've already enabled Escort Me...";
+            }
+            if ( !this.isUserIDOnStage( theUserID ) ) {
+                theError += ", you're not on stage...";
+            }
 
             if ( theError === '' ) {
                 this.addEscortMeToUser( theUserID );
@@ -198,8 +201,12 @@ const userFunctions = ( bot ) => {
         disableEscortMe: function ( data, chatFunctions ) {
             let theUserID = data.userid;
             let theError = '';
-            if ( !this.escortMeIsEnabled( theUserID ) ) { theError += ", you haven't enabled Escort Me..." }
-            if ( !this.isUserIDOnStage( theUserID ) ) { theError += ", you're not on stage..." }
+            if ( !this.escortMeIsEnabled( theUserID ) ) {
+                theError += ", you haven't enabled Escort Me..."
+            }
+            if ( !this.isUserIDOnStage( theUserID ) ) {
+                theError += ", you're not on stage..."
+            }
 
             if ( theError === '' ) {
                 this.removeEscortMeFromUser( theUserID );
@@ -223,7 +230,9 @@ const userFunctions = ( bot ) => {
             const theUserID = this.getUserIDFromUsername( theUsername );
             const roomJoined = formatRelativeTime( ( Date.now() - this.getUserJoinedRoom( theUserID ) ) / 1000 );
             let modText = '';
-            if ( this.isUserModerator( theUserID ) !== true ) { modText = 'not ' }
+            if ( this.isUserModerator( theUserID ) !== true ) {
+                modText = 'not '
+            }
             const lastSpoke = formatRelativeTime( ( Date.now() - this.getUserLastSpoke( theUserID ) ) / 1000 );
             const lastVoted = formatRelativeTime( ( Date.now() - this.getUserLastVoted( theUserID ) ) / 1000 );
             const lastSnagged = formatRelativeTime( ( Date.now() - this.getUserLastSnagged( theUserID ) ) / 1000 );
@@ -292,28 +301,38 @@ const userFunctions = ( bot ) => {
         },
 
         getUserJoinedRoom: function ( userID ) {
-            let userPosition = this.getPositionOnUsersList( userID );
-            return theUsersList[ userPosition ][ 'joinTime' ];
+            if ( this.userExists( userID ) ) {
+                let userPosition = this.getPositionOnUsersList( userID );
+                return theUsersList[ userPosition ][ 'joinTime' ];
+            }
         },
 
         getUserLastVoted: function ( userID ) {
-            let userPosition = this.getPositionOnUsersList( userID );
-            return theUsersList[ userPosition ][ 'lastVoted' ];
+            if ( this.userExists( userID ) ) {
+                let userPosition = this.getPositionOnUsersList( userID );
+                return theUsersList[ userPosition ][ 'lastVoted' ];
+            }
         },
 
         getUserLastSpoke: function ( userID ) {
-            let userPosition = this.getPositionOnUsersList( userID );
-            return theUsersList[ userPosition ][ 'lastSpoke' ];
+            if ( this.userExists( userID ) ) {
+                let userPosition = this.getPositionOnUsersList( userID );
+                return theUsersList[ userPosition ][ 'lastSpoke' ];
+            }
         },
 
         getUserLastSnagged: function ( userID ) {
-            let userPosition = this.getPositionOnUsersList( userID );
-            return theUsersList[ userPosition ][ 'lastSnagged' ];
+            if ( this.userExists( userID ) ) {
+                let userPosition = this.getPositionOnUsersList( userID );
+                return theUsersList[ userPosition ][ 'lastSnagged' ];
+            }
         },
 
         getUserJoinedStage: function ( userID ) {
-            let userPosition = this.getPositionOnUsersList( userID );
-            return theUsersList[ userPosition ][ 'joinedStage' ];
+            if ( this.userExists( userID ) ) {
+                let userPosition = this.getPositionOnUsersList( userID );
+                return theUsersList[ userPosition ][ 'joinedStage' ];
+            }
         },
 
         // "songCount":0
@@ -489,12 +508,20 @@ const userFunctions = ( bot ) => {
         // ========================================================
 
         roomIdle: () => roomDefaults.roomIdle,
-        enableRoomIdle: function () { roomDefaults.roomIdle = true; },
-        disableRoomIdle: function () { roomDefaults.roomIdle = false; },
+        enableRoomIdle: function () {
+            roomDefaults.roomIdle = true;
+        },
+        disableRoomIdle: function () {
+            roomDefaults.roomIdle = false;
+        },
 
-        djIdleLimit: () => roomDefaults.djIdleLimit,
-        enableDJIdle: function () { roomDefaults.djIdleLimit = true; },
-        disableDJIdle: function () { roomDefaults.djIdleLimit = false; },
+        djIdleLimit: () => roomDefaults.djIdleLimitThresholds[ 0 ],
+        enableDJIdle: function () {
+            roomDefaults.removeIdleDJs = true;
+        },
+        disableDJIdle: function () {
+            roomDefaults.removeIdleDJs = false;
+        },
 
         updateUserLastSpoke: function ( userID ) {
             if ( this.userExists( userID ) === true ) {
@@ -554,58 +581,119 @@ const userFunctions = ( bot ) => {
             return ( Date.now() - userLastActive ) / 1000; // return usersAFK time in seconds
         },
 
-        idleWarning: function ( userID, minutesRemaining, idleLimit, chatFunctions ) {
+        idleWarning: function ( userID, threshold, chatFunctions ) {
             let theMessage;
+            let theActions = '';
+            let idleLimit = roomDefaults.djIdleLimitThresholds[ 0 ];
+            let minutesRemaining = idleLimit - threshold;
 
             if ( minutesRemaining !== 0 ) {
-                theMessage = 'you have less than ' + minutesRemaining + ' minutes left of idle, chat or awesome please.';
+                theMessage = 'You have less than ' + minutesRemaining + ' minutes left of idle left.';
+                if ( roomDefaults.voteMeansActive === true ) { theActions += ' Awesome,'; }
+                if ( roomDefaults.speechMeansActive === true ) { theActions += ' Chat,'; }
+                if ( roomDefaults.snagMeansActive === true ) { theActions += ' Grab a song,'; }
+                theActions = theActions.substring( 0, theActions.length - 1 );
+                const lastComma = theActions.lastIndexOf( ',' );
+                if ( lastComma !== -1 ) {
+                    theActions = theActions.substring( 0, lastComma ) + ' or' + theActions.substring( lastComma + 1 )
+                }
+
+                theActions += ' to show that you\'re awake';
+                theMessage += theActions;
             } else {
-                theMessage = 'you are over the idle limit of ' + idleLimit + ' minutes.';
+                theMessage = 'You are over the idle limit of ' + idleLimit + ' minutes.';
             }
 
             if ( roomDefaults.warnIdlePM === false ) {
-                chatFunctions.botChat( '@' + this.getUsername( userID ) + ' ' + theMessage );
+                chatFunctions.botSpeak( '@' + this.getUsername( userID ) + ' ' + theMessage );
             } else {
                 chatFunctions.botPM( userID, theMessage );
             }
         },
 
-        checkHasUserIdledOut: function ( userID, idleLimit, threshold ) {
-            return this.getIdleTime( userID ) / 60 > idleLimit - threshold;
+        checkHasUserIdledOut: function ( userID, threshold ) {
+            let totalIdleAllowed = roomDefaults.djIdleLimitThresholds[ 0 ];
+            return this.getIdleTime( userID ) / 60 > ( totalIdleAllowed - threshold );
         },
 
         //removes idle dj's after roomDefaultsModule.djIdleLimit is up.
         idledOutDJCheck: function ( roomDefaults, chatFunctions ) {
-            let djID;
-            for ( let i = 0; i < djList.length; i++ ) {
-                djID = djList[ i ]; //Pick a DJ
-                if ( djID !== authModule.USERID ) {
-                    if ( this.checkHasUserIdledOut( djID, roomDefaults.djIdleLimit, 0 ) ) {
-                        this.idleWarning( djID, 0, roomDefaults.djIdleLimit, chatFunctions );
-                        bot.remDj( djID ); //remove them
-                    } else if ( this.checkHasUserIdledOut( djID, roomDefaults.djIdleLimit, 1 ) ) {
-                        this.idleWarning( djID, 1, roomDefaults.djIdleLimit, chatFunctions );
-                    } else if ( this.checkHasUserIdledOut( djID, roomDefaults.djIdleLimit, 5 ) ) {
-                        this.idleWarning( djID, 5, roomDefaults.djIdleLimit, chatFunctions );
+            let totalIdleAllowed = roomDefaults.djIdleLimitThresholds[ 0 ];
+            let firstWarning = roomDefaults.djIdleLimitThresholds[ 1 ];
+            let finalWarning = roomDefaults.djIdleLimitThresholds[ 2 ];
+            let userID;
+
+            for ( let djLoop = 0; djLoop < djList.length; djLoop++ ) {
+                userID = djList[ djLoop ]; //Pick a DJ
+                if ( userID !== authModule.USERID ) {
+                    let idleTImeInMinutes = this.getIdleTime( userID ) / 60;
+                    if ( idleTImeInMinutes > totalIdleAllowed ) {
+                        this.idleWarning( userID, 0, chatFunctions );
+                        bot.remDj( userID ); //remove them
+                        chatFunctions.botChat( 'The user' + '@' + this.getUsername( userID ) + ' was removed for being over the ' + totalIdleAllowed + ' minute idle limit.' );
+                    } else if ( ( idleTImeInMinutes > finalWarning ) && !this.hasDJHadSecondIdleWarning( userID ) ) {
+                        this.setDJSecondIdleWarning( userID );
+                        this.idleWarning( userID, finalWarning, chatFunctions );
+                    } else if ( ( idleTImeInMinutes > firstWarning ) && !this.hasDJHadFirstIdleWarning( userID ) ) {
+                        this.setDJFirstIdleWarning( userID );
+                        this.idleWarning( userID, firstWarning, chatFunctions );
                     }
                 }
             }
         },
 
+        setDJFirstIdleWarning: function ( userID ) {
+            if ( this.userExists( userID ) ) {
+                theUsersList[ this.getPositionOnUsersList( userID ) ][ 'firstIdleWarning' ] = true;
+            }
+        },
+
+        clearDJFirstIdleWarning: function ( userID ) {
+            if ( this.userExists( userID ) ) {
+                theUsersList[ this.getPositionOnUsersList( userID ) ][ 'firstIdleWarning' ] = false;
+            }
+        },
+
+        hasDJHadFirstIdleWarning: function ( userID ) {
+            if ( this.userExists( userID ) ) {
+                return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'firstIdleWarning' ];
+            }
+        },
+
+        setDJSecondIdleWarning: function ( userID ) {
+            if ( this.userExists( userID ) ) {
+                theUsersList[ this.getPositionOnUsersList( userID ) ][ 'secondIdleWarning' ] = true;
+            }
+        },
+
+        clearDJSecondIdleWarning: function ( userID ) {
+            if ( this.userExists( userID ) ) {
+                theUsersList[ this.getPositionOnUsersList( userID ) ][ 'secondIdleWarning' ] = false;
+            }
+        },
+
+        hasDJHadSecondIdleWarning: function ( userID ) {
+            if ( this.userExists( userID ) ) {
+                return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'secondIdleWarning' ];
+            }
+        },
+
         //this removes people on the floor, not the djs
         roomIdleCheck: function ( roomDefaults, chatFunctions ) {
-            let theUserID;
-            for ( let userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
-                theUserID = theUsersList[ userLoop ].id;
+            if ( roomDefaults.roomIdle === true ) {
+                let theUserID;
+                for ( let userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
+                    theUserID = theUsersList[ userLoop ].id;
 
-                if ( roomDefaults.roomIdle === true && theUserID !== authModule.USERID ) {
-                    if ( this.checkHasUserIdledOut( theUserID, roomDefaults.roomIdleLimit, 0 ) ) {
-                        this.idleWarning( theUserID, 0, roomDefaults.roomIdleLimit, chatFunctions )
-                        bot.boot( theUserID, 'you are over the idle limit' );
-                    } else if ( this.checkHasUserIdledOut( theUserID, roomDefaults.roomIdleLimit, 1 ) ) {
-                        this.idleWarning( theUserID, 1, roomDefaults.roomIdleLimit, chatFunctions )
-                    } else if ( this.checkHasUserIdledOut( theUserID, roomDefaults.roomIdleLimit, 5 ) ) {
-                        this.idleWarning( theUserID, 5, roomDefaults.roomIdleLimit, chatFunctions )
+                    if ( theUserID !== authModule.USERID ) {
+                        if ( this.checkHasUserIdledOut( theUserID, roomDefaults.roomIdleLimit, 0 ) ) {
+                            this.idleWarning( theUserID, 0, roomDefaults.roomIdleLimit, chatFunctions )
+                            bot.boot( theUserID, 'you are over the idle limit' );
+                        } else if ( this.checkHasUserIdledOut( theUserID, roomDefaults.roomIdleLimit, 1 ) ) {
+                            this.idleWarning( theUserID, 1, roomDefaults.roomIdleLimit, chatFunctions )
+                        } else if ( this.checkHasUserIdledOut( theUserID, roomDefaults.roomIdleLimit, 5 ) ) {
+                            this.idleWarning( theUserID, 5, roomDefaults.roomIdleLimit, chatFunctions )
+                        }
                     }
                 }
             }
@@ -732,8 +820,11 @@ const userFunctions = ( bot ) => {
             return onStage !== -1;
         },
 
-        isCurrentDJ: function ( userID ) {
-            // is this ID currently playing a track???
+        isCurrentDJ: function ( data, userID ) {
+            logMe( 'info', 'isCurrentDJ, data:' + data );
+            logMe( 'info', 'isCurrentDJ, data.room.metadata.current_dj:' + data.room.metadata.current_dj );
+            const currentDJ = data.room.metadata.current_dj
+            return userID === currentDJ;
         },
 
         resetDJs: function ( data ) {
@@ -796,6 +887,70 @@ const userFunctions = ( bot ) => {
             return [ true, '' ];
         },
 
+        resetDJFlags: function ( userID ) {
+            if ( this.userExists( ( userID ) ) ) {
+                this.resetDJCurrentPlayCount( userID );
+                this.clearDJFirstIdleWarning( userID );
+                this.clearDJSecondIdleWarning( userID );
+            }
+        },
+
+        // ========================================================
+
+        // ========================================================
+        // DJ Play Limit Functions
+        // ========================================================
+
+
+        removeDJsOverPlaylimit: function ( data, chatFunctions, userID ) {
+            logMe( 'info', 'removeDJsOverPlaylimit' );
+            if ( this.DJPlaysLimited() === true ) {
+                logMe( 'info', 'removeDJsOverPlaylimit, DJPlaysLimited = true' );
+                logMe( 'info', 'removeDJsOverPlaylimit, getDJCurrentPlayCount:' + this.getDJCurrentPlayCount( userID ) );
+                logMe( 'info', 'removeDJsOverPlaylimit, DJsPlayLimit:' + this.DJsPlayLimit() );
+                logMe( 'info', 'this.isCurrentDJ( userID ):' + this.isCurrentDJ( data, userID ) );
+
+                if ( userID !== authModule.USERID && this.isCurrentDJ( data, userID ) && this.getDJCurrentPlayCount( userID ) >= this.DJsPlayLimit() ) {
+                    logMe( 'info', 'removeDJsOverPlaylimit, remove them' );
+                    if ( this.userExists( userID ) ) {
+                        chatFunctions.overPlayLimit( data, this.getUsername( userID ), this.DJsPlayLimit() );
+
+                        bot.remDj( userID );
+                    }
+                }
+            }
+        },
+
+        DJPlaysLimited: () => DJPlaysLimited,
+        enablePlayLimit: function () { DJPlaysLimited = true; },
+        disablePlayLimit: function () { DJPlaysLimited = false; },
+
+        DJsPlayLimit: () => DJsPlayLimit,
+        setDJsPlayLimit: function ( value ) { DJsPlayLimit = value; },
+
+        playLimitOnCommand: function ( data, args, chatFunctions ) {
+            logMe( 'info', 'playLimitOnCommand, args:' + JSON.stringify( args ) );
+            let theNewPlayLimit = args[ 0 ];
+            if ( isNaN( theNewPlayLimit ) ) { theNewPlayLimit = musicDefaults.DJsPlayLimit }
+            logMe( 'info', 'playLimitOnCommand, theNewPlayLimit:' + theNewPlayLimit );
+            this.enablePlayLimit();
+            this.setDJsPlayLimit( theNewPlayLimit );
+            chatFunctions.botSpeak( data, 'The play limit is now set to ' + this.DJsPlayLimit() );
+        },
+
+        playLimitOffCommand: function ( data, chatFunctions ) {
+            this.disablePlayLimit();
+            chatFunctions.botSpeak( data, 'The play limit is now disabled' );
+        },
+
+        whatsPlayLimit: function ( data, chatFunctions ) {
+            if ( this.DJPlaysLimited() ) {
+                chatFunctions.botSpeak( data, 'The play limit is currently set to ' + this.DJsPlayLimit() );
+            } else {
+                chatFunctions.botSpeak( data, 'The play limit is not currently active' );
+            }
+        },
+
         // ========================================================
 
         // ========================================================
@@ -828,7 +983,8 @@ const userFunctions = ( bot ) => {
                 } else {
                     ++theUsersList[ this.getPositionOnUsersList( userID ) ][ 'totalPlayCount' ];
                 }
-            }},
+            }
+        },
 
         decrementDJCurrentPlayCount: function ( userID ) {
             --theUsersList[ this.getPositionOnUsersList( userID ) ][ 'currentPlayCount' ]
@@ -841,7 +997,9 @@ const userFunctions = ( bot ) => {
         },
 
         setDJCurrentPlayCount: function ( userID, theCount ) {
-            if ( theCount === undefined ) { theCount = 0 }
+            if ( theCount === undefined ) {
+                theCount = 0
+            }
             if ( this.userExists( userID ) ) {
                 theUsersList[ this.getPositionOnUsersList( userID ) ][ 'currentPlayCount' ] = theCount;
             }
@@ -879,11 +1037,11 @@ const userFunctions = ( bot ) => {
         },
 
         djPlaysCommand: function ( data, chatFunctions ) {
-            chatFunctions.botSpeak( data, this.buildDJPlaysMessage( ) );
+            chatFunctions.botSpeak( data, this.buildDJPlaysMessage() );
         },
 
 
-        buildDJPlaysMessage: function ( ) {
+        buildDJPlaysMessage: function () {
             if ( this.djList().length === 0 ) {
                 return 'There are no dj\'s on stage.';
             } else {
@@ -1005,7 +1163,7 @@ const userFunctions = ( bot ) => {
             notifyThisDJ = userID;
         },
 
-        clearDJToNotify: function ( ) {
+        clearDJToNotify: function () {
             notifyThisDJ = null;
         },
 
@@ -1036,7 +1194,7 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        removeNotifyDJFromQueue: function (botFunctions, userFunctions ) {
+        removeNotifyDJFromQueue: function ( botFunctions, userFunctions ) {
             bot.speak( 'Sorry @' + userFunctions.getUsername( this.notifyThisDJ().toString() ) + ' you have run out of time.' );
             this.removeUserFromQueue( this.notifyThisDJ() );
             this.clearDJToNotify();

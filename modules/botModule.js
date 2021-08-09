@@ -177,15 +177,15 @@ const botFunctions = ( bot ) => {
                         }
                     } else { //else it is on stage
                         if ( this.shouldStopBotDJing( userFunctions, roomFunctions ) ) {
-                            this.removeDJ( authModule.USERID ); // remove the Bot from stage
+                            this.removeBotFromStage(  ); // remove the Bot from stage
                         }
                     }
                 }, 1000 * 10 ); //delay for 10 seconds
             }
         },
 
-        removeDJ: function ( userID ) {
-            bot.remDj( userID ); // remove the Bot from stage
+        removeBotFromStage: function (  ) {
+            bot.remDj( authModule.USERID ); // remove the Bot from stage
         },
 
         startBotDJing: function () {

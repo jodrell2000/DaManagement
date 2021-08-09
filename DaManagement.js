@@ -32,13 +32,23 @@ const roomFunctions = roomModule( bot );
 const commandFunctions = commandModule( bot );
 
 function logMe ( logLevel, message ) {
-    if ( logLevel === 'error' || logLevel === 'info' ) {
-        console.log( "Main File:" + logLevel + "->" + message + "\n" );
-    } else {
-        if ( bot.debug ) {
-            console.log( "Main File:" + logLevel + "->" + message + "\n" );
-        }
+    switch ( logLevel ) {
+        case "error":
+            console.log( "!!!!!!!!!!! Main File:" + logLevel + "->" + message + "\n" );
+            break;
+        case "warn":
+            console.log( "+++++++++++ Main File:" + logLevel + "->" + message + "\n" );
+            break;
+        case "info":
+            console.log( "----------- Main File:" + logLevel + "->" + message + "\n" );
+            break;
+        default:
+            if ( bot.debug ) {
+                console.log( "Main File:" + logLevel + "->" + message + "\n" );
+            }
+            break;
     }
+
 }
 
 // do something when the bot disconnects?
@@ -52,10 +62,14 @@ setInterval( function () {
 }, 5 * 1000 );
 
 // check if DJs are idle every minute
-//setInterval( function() { userFunctions.idledOutDJCheck( roomDefaults, chatFunctions ) }, 60 * 1000);
+setInterval(function () {
+    if (roomDefaults.removeIdleDJs === true) {
+        userFunctions.idledOutDJCheck(roomDefaults, chatFunctions);
+    }
+}, 10 * 1000);
 
 // check if the users are idle every minute
-// setInterval( function() { userFunctions.roomIdleCheck( roomDefaults, chatFunctions ) }, 60 * 1000)
+setInterval( function() { userFunctions.roomIdleCheck( roomDefaults, chatFunctions ) }, 60 * 1000)
 
 // every 5 seconds, check if the there's an empty DJ slot, and promt the next in the queue to join the decks, remove them if they don't
 setInterval( function () {
@@ -174,7 +188,7 @@ bot.on( 'newsong', function ( data ) {
     songFunctions.getSongTags( data.room.metadata.current_song )
 
     //set information
-    roomFunctions.setDJCount( data.room.metadata.djcount ); //the number of dj's on stage
+    roomFunctions.setDJCount( data.room.metadata.djs.length ); //the number of dj's on stage
     roomDefaults.detail = data.room.description; //set room description again in case it was changed
 
     // set user as current DJ
@@ -261,8 +275,9 @@ bot.on( 'newsong', function ( data ) {
 
     //quality control check, if current dj's information is somehow wrong because
     //of some event not firing, remake currentDj's array
-    // data.room.metadata.djcount is index 0 so add 1 to compare
-    if ( data.room.metadata.djcount + 1 !== userFunctions.howManyDJs() ) {
+    // data.room.metadata.djs.length is index 0 so add 1 to compare
+    if ( data.room.metadata.djs.length !== userFunctions.howManyDJs() ) {
+        logMe( 'warn', 'The DJ counts don\'t match...resetting them. Count from data is ' + data.room.metadata.djs.length + ', count from Bot is ' + userFunctions.howManyDJs() );
         userFunctions.resetDJs( data ); //reset current djs array
     }
 } );
@@ -373,20 +388,15 @@ bot.on( 'add_dj', function ( data ) {
 bot.on( 'rem_dj', function ( data ) {
     let theUserID = data.user[ 0 ].userid;
     //removes user from the dj list when they leave the stage
-    userFunctions.resetDJCurrentPlayCount( theUserID );
+    userFunctions.resetDJFlags( theUserID );
 
     //gives them one chance to get off stage then after that theyre play limit is treated as normal
     if ( typeof userFunctions.getUsersRefreshPlayCount[ theUserID ] == 'number' && userFunctions.refreshList().indexOf( theUserID ) === -1 ) {
         delete userFunctions.getUsersRefreshPlayCount[ theUserID ]
     }
 
-
-    //updates the current dj's list.
-    let check30 = userFunctions.djList().indexOf( theUserID );
-    if ( check30 !== -1 ) {
-        userFunctions.djList().splice( check30, 1 );
-    }
-
+    //remove from the current dj's list.
+    userFunctions.removeDJFromList( theUserID )
 
     //this is for /warnme
     if ( userFunctions.warnme().length !== 0 ) {
@@ -435,15 +445,10 @@ bot.on( 'deregistered', function ( data ) {
 bot.on( 'endsong', function ( data ) {
     const djID = data.room.metadata.current_dj;
 
-    if ( typeof ( userFunctions.getDJCurrentPlayCount( djID ) ) === 'undefined' ) {
-        // increase the playcount for the current DJ
-        userFunctions.resetDJCurrentPlayCount( djID );
-    } else {
-        userFunctions.incrementDJPlayCount( djID );
-    }
+    userFunctions.incrementDJPlayCount( djID );
 
     // check the playlimit and remove the current DJ if they've reached it
-    userFunctions.removeDJsOverPlaylimit( chatFunctions, djID );
+    userFunctions.removeDJsOverPlaylimit( data, chatFunctions, djID );
 
     //bot says song stats for each song
     chatFunctions.readSongStats( data, songFunctions, roomDefaults )
