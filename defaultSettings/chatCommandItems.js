@@ -58,7 +58,8 @@ module.exports = {
         "https://media.giphy.com/media/yO2MZhtwxAC2Y/giphy.gif",
         "https://media.giphy.com/media/b208NXXad0mfS/giphy.gif",
         "https://media.tenor.com/images/466a11fbb26ed3162b02c5ef21971012/tenor.gif",
-        "https://media.giphy.com/media/94oj4dwuJfDKE/giphy.gif"
+        "https://media.giphy.com/media/94oj4dwuJfDKE/giphy.gif",
+        "https://thumbs.gfycat.com/AdorableFrankKiwi-max-1mb.gif"
     ],
 
     frankieMessages: [
