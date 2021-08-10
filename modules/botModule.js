@@ -56,15 +56,20 @@ const botFunctions = ( bot ) => {
         // ========================================================
 
         sarahConner: function ( data, userFunctions, chatFunctions ) {
-            const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
+            const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve( "done" ), delay ) )
 
             const shutMeDown = async () => {
-                chatFunctions.botSpeak( data, "Going away now...", true );
+                // chatFunctions.botSpeak( data, "Going away now...", true );
                 await sleep( 100 )
-                logMe( 'info', 'Users:' + JSON.stringify( userFunctions.theUsersList ) );
+                logMe( 'error', 'The !sarahConner command was issued by @' + userFunctions.getUsername( data.userid ) + ' at ' + Date() );
                 await sleep( 100 )
+                logMe( 'error', 'Users:' + userFunctions.debugPrintTheUsersList() );
+                await sleep( 100 )
+                logMe( 'error', 'Users:' + JSON.stringify( data ) );
+                await sleep( 100 )
+                process.exit( 1 );
             }
-            shutMeDown().then(r => exit( ) );
+            shutMeDown();
         },
 
         // ========================================================
@@ -177,14 +182,14 @@ const botFunctions = ( bot ) => {
                         }
                     } else { //else it is on stage
                         if ( this.shouldStopBotDJing( userFunctions, roomFunctions ) ) {
-                            this.removeBotFromStage(  ); // remove the Bot from stage
+                            this.removeBotFromStage(); // remove the Bot from stage
                         }
                     }
                 }, 1000 * 10 ); //delay for 10 seconds
             }
         },
 
-        removeBotFromStage: function (  ) {
+        removeBotFromStage: function () {
             bot.remDj( authModule.USERID ); // remove the Bot from stage
         },
 

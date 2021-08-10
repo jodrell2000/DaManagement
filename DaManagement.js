@@ -62,14 +62,14 @@ setInterval( function () {
 }, 5 * 1000 );
 
 // check if DJs are idle every minute
-setInterval(function () {
-    if (roomDefaults.removeIdleDJs === true) {
-        userFunctions.idledOutDJCheck(roomDefaults, chatFunctions);
+setInterval( function () {
+    if ( roomDefaults.removeIdleDJs === true ) {
+        userFunctions.idledOutDJCheck( roomDefaults, chatFunctions );
     }
-}, 10 * 1000);
+}, 10 * 1000 );
 
 // check if the users are idle every minute
-setInterval( function() { userFunctions.roomIdleCheck( roomDefaults, chatFunctions ) }, 60 * 1000)
+setInterval( function () { userFunctions.roomIdleCheck( roomDefaults, chatFunctions ) }, 60 * 1000 )
 
 // every 5 seconds, check if the there's an empty DJ slot, and promt the next in the queue to join the decks, remove them if they don't
 setInterval( function () {
@@ -83,7 +83,7 @@ setInterval( function () {
             // start a timer to remove the DJ from the queue if they don't DJ
             roomFunctions.queueTimer = setTimeout( function () {
                 if ( userFunctions.notifyThisDJ() !== null ) {
-                    userFunctions.removeNotifyDJFromQueue(botFunctions, userFunctions);
+                    userFunctions.removeNotifyDJFromQueue( botFunctions, userFunctions );
                 }
             }, roomDefaults.queueWaitTime * 1000 );
         }
@@ -277,7 +277,7 @@ bot.on( 'newsong', function ( data ) {
     //of some event not firing, remake currentDj's array
     // data.room.metadata.djs.length is index 0 so add 1 to compare
     if ( data.room.metadata.djs.length !== userFunctions.howManyDJs() ) {
-        logMe( 'warn', 'The DJ counts don\'t match...resetting them. Count from data is ' + data.room.metadata.djs.length + ', count from Bot is ' + userFunctions.howManyDJs() );
+        logMe( 'error', Date.now() + ' The DJ counts don\'t match...resetting them. Count from data is ' + data.room.metadata.djs.length + ', count from Bot is ' + userFunctions.howManyDJs() );
         userFunctions.resetDJs( data ); //reset current djs array
     }
 } );
@@ -363,7 +363,8 @@ bot.on( 'add_dj', function ( data ) {
     //sets dj's current songcount to zero when they enter the stage.
     //unless they used the refresh command, in which case its set to
     //what it was before they left the room
-    userFunctions.setDJCurrentPlayCount( theUserID, userFunctions.getUsersRefreshPlayCount[ theUserID ] );
+    userFunctions.setDJCurrentPlayCount( theUserID, userFunctions.getUsersRefreshCurrentPlayCount[ theUserID ] );
+    userFunctions.setDJTotalPlayCount( theUserID, userFunctions.getUsersRefreshTotalPlayCount[ theUserID ] );
 
     //updates the afk position of the person who joins the stage.
     userFunctions.updateUserJoinedStage( theUserID );
@@ -391,8 +392,8 @@ bot.on( 'rem_dj', function ( data ) {
     userFunctions.resetDJFlags( theUserID );
 
     //gives them one chance to get off stage then after that theyre play limit is treated as normal
-    if ( typeof userFunctions.getUsersRefreshPlayCount[ theUserID ] == 'number' && userFunctions.refreshList().indexOf( theUserID ) === -1 ) {
-        delete userFunctions.getUsersRefreshPlayCount[ theUserID ]
+    if ( typeof userFunctions.getUsersRefreshCurrentPlayCount[ theUserID ] == 'number' && userFunctions.isUserInRefreshList( theUserID ) === -1 ) {
+        delete userFunctions.getUsersRefreshCurrentPlayCount[ theUserID ]
     }
 
     //remove from the current dj's list.

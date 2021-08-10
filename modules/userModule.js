@@ -441,7 +441,24 @@ const userFunctions = ( bot ) => {
         // Refresh Functions
         // ========================================================
 
-        refreshDJCount: () => refreshDJCount,
+        refreshCommand: function ( data, chatFunctions ) {
+            let theUserID = data.userid;
+            let [ _, theMessage ] = this.addRefreshToUser( theUserID );
+
+            chatFunctions.botSpeak( data, theMessage );
+        },
+
+        refreshDJCount: function ( ) {
+            let theUserID;
+            let theCount = 0;
+            for ( let userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
+                theUserID = theUsersList[ userLoop ].id;
+                if ( theUsersList[ userLoop ][ 'RefreshStart' ] !== undefined ) {
+                    theCount ++;
+                }
+            }
+            return theCount;
+        },
 
         addRefreshToUser: function ( userID ) {
             if ( roomDefaults.refreshingEnabled ) {
@@ -449,16 +466,17 @@ const userFunctions = ( bot ) => {
                     if ( this.isUserIDOnStage( userID ) ) {
                         if ( !this.isUserInRefreshList( userID ) ) {
                             let listPosition = this.getPositionOnUsersList( userID );
-                            theUsersList[ listPosition ][ 'Refresh' ] = Date.now();
+                            theUsersList[ listPosition ][ 'RefreshStart' ] = Date.now();
                             ++theUsersList[ listPosition ][ 'RefreshCount' ];
-                            theUsersList[ listPosition ][ 'RefreshPlayCount' ] = this.getDJCurrentPlayCount( userID );
+                            theUsersList[ listPosition ][ 'RefreshCurrentPlayCount' ] = this.getDJCurrentPlayCount( userID );
+                            theUsersList[ listPosition ][ 'RefreshTotalPlayCount' ] = this.getDJTotalPlayCount( userID );
                             theUsersList[ listPosition ][ 'RefreshTimer' ] = setTimeout( function ( userID ) {
                                 this.removeRefreshFromUser( userID );
-                            }.bind( this ), 60 * 1000 );
+                            }.bind( this ), roomDefaults.amountOfTimeToRefresh * 1000 );
 
                             ++refreshDJCount;
 
-                            let message = '@' + this.getUsername( userID ) + ' i\'ll hold your spot on stage for the next ' + roomDefaults.amountOfTimeToRefresh + ' minutes';
+                            let message = '@' + this.getUsername( userID ) + ' i\'ll hold your spot on stage for the next ' + roomDefaults.amountOfTimeToRefresh / 60 + ' minutes';
                             return [ true, message ]
                         } else {
                             return [ false, "You're already using the refresh command" ];
@@ -477,8 +495,9 @@ const userFunctions = ( bot ) => {
         removeRefreshFromUser: function ( userID ) {
             if ( this.userExists( userID ) ) {
                 let listPosition = this.getPositionOnUsersList( userID );
-                delete theUsersList[ listPosition ][ 'Refresh' ];
-                delete theUsersList[ listPosition ][ 'RefreshPlayCount' ]
+                delete theUsersList[ listPosition ][ 'RefreshStart' ];
+                delete theUsersList[ listPosition ][ 'RefreshCurrentPlayCount' ]
+                delete theUsersList[ listPosition ][ 'RefreshTotalPlayCount' ]
                 delete theUsersList[ listPosition ][ 'RefreshTimer' ]
                 --refreshDJCount;
             }
@@ -486,15 +505,26 @@ const userFunctions = ( bot ) => {
 
         isUserInRefreshList: function ( userID ) {
             if ( this.userExists( userID ) ) {
-                return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'Refresh' ] !== undefined;
+                return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'RefreshStart' ] !== undefined;
             }
         },
 
-        getUsersRefreshPlayCount: function ( userID ) {
+        getUsersRefreshCurrentPlayCount: function ( userID ) {
             if ( this.userExists( userID ) ) {
                 let listPosition = this.getPositionOnUsersList( userID );
-                if ( theUsersList[ listPosition ][ 'RefreshPlayCount' ] !== undefined ) {
-                    return theUsersList[ listPosition ][ 'RefreshPlayCount' ];
+                if ( theUsersList[ listPosition ][ 'RefreshCurrentPlayCount' ] !== undefined ) {
+                    return theUsersList[ listPosition ][ 'RefreshCurrentPlayCount' ];
+                } else {
+                    return 0;
+                }
+            }
+        },
+
+        getUsersRefreshTotalPlayCount: function ( userID ) {
+            if ( this.userExists( userID ) ) {
+                let listPosition = this.getPositionOnUsersList( userID );
+                if ( theUsersList[ listPosition ][ 'RefreshTotalPlayCount' ] !== undefined ) {
+                    return theUsersList[ listPosition ][ 'RefreshTotalPlayCount' ];
                 } else {
                     return 0;
                 }
