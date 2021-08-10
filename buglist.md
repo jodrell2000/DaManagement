@@ -1,5 +1,6 @@
 Bugs
 * sending !addme in PM incorrectly adds the Bot to the queue rather than the user
+* sending !sarahConner in PM reports that the Bot sent the command, not the user
 * check commands for correct number of arguments
   * return help description with example command rather than the Bot crashing
 * ~~queue disabled, kicking people because holding a spot for the refresh list~~
