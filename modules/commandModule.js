@@ -59,6 +59,9 @@ const commandFunctions = ( bot ) => {
     generalCommands.whatsPlayLimit = ( { data, botFunctions, userFunctions, chatFunctions } ) => { userFunctions.whatsPlayLimit( data, chatFunctions ); }
     generalCommands.whatsPlayLimit.help = "Is the DJ Play Limit enabled, and if so what it's set to";
 
+    generalCommands.refresh = ( { data, botFunctions, userFunctions, chatFunctions } ) => { userFunctions.refreshCommand( data, chatFunctions ); }
+    generalCommands.refresh.help = "Hold your spot on stage for one minute if you need to refresh your browser";
+
     // #############################################
     // General user Queue commands
     // #############################################

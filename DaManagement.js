@@ -363,7 +363,8 @@ bot.on( 'add_dj', function ( data ) {
     //sets dj's current songcount to zero when they enter the stage.
     //unless they used the refresh command, in which case its set to
     //what it was before they left the room
-    userFunctions.setDJCurrentPlayCount( theUserID, userFunctions.getUsersRefreshPlayCount[ theUserID ] );
+    userFunctions.setDJCurrentPlayCount( theUserID, userFunctions.getUsersRefreshCurrentPlayCount[ theUserID ] );
+    userFunctions.setDJTotalPlayCount( theUserID, userFunctions.getUsersRefreshTotalPlayCount[ theUserID ] );
 
     //updates the afk position of the person who joins the stage.
     userFunctions.updateUserJoinedStage( theUserID );
@@ -391,8 +392,8 @@ bot.on( 'rem_dj', function ( data ) {
     userFunctions.resetDJFlags( theUserID );
 
     //gives them one chance to get off stage then after that theyre play limit is treated as normal
-    if ( typeof userFunctions.getUsersRefreshPlayCount[ theUserID ] == 'number' && userFunctions.refreshList().indexOf( theUserID ) === -1 ) {
-        delete userFunctions.getUsersRefreshPlayCount[ theUserID ]
+    if ( typeof userFunctions.getUsersRefreshCurrentPlayCount[ theUserID ] == 'number' && userFunctions.isUserInRefreshList( theUserID ) === -1 ) {
+        delete userFunctions.getUsersRefreshCurrentPlayCount[ theUserID ]
     }
 
     //remove from the current dj's list.
