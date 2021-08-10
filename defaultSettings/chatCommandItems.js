@@ -290,5 +290,19 @@ module.exports = {
         "https://media.giphy.com/media/56Q6HgVZ5hEJi/giphy.gif",
         "https://thumbs.gfycat.com/DarlingOnlyJay-max-1mb.gif",
         "https://media.giphy.com/media/Kg2m6dUxdpv8I/giphy.gif"
+    ],
+
+    carefulNowMessages: [
+        "Careful now...",
+        "Down with this sort of thing",
+        "We're watching you..."
+    ],
+
+    carefulNowPics: [
+        "https://media.giphy.com/media/3ohc12kVQyyYvWHdCM/giphy.gif",
+        "https://media.giphy.com/media/l2Je7a6s6zNKXPD1e/giphy.gif",
+        "https://media.giphy.com/media/H42aesEqaLy4hITnlH/giphy.gif",
+        "https://media.giphy.com/media/cLAJqFwAuuLnQR7WKH/giphy.gif",
+        "https://media.giphy.com/media/H8DietxBNO5YvxjLk7/giphy.gif"
     ]
 }
