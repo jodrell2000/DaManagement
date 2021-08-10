@@ -169,6 +169,9 @@ const commandFunctions = ( bot ) => {
     chatCommands.klaus = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.klausMessages, chatCommandItems.klausPics, userFunctions ); }
     chatCommands.klaus.help = "It's Klaus Nomi...what more is there to know? ;-)";
 
+    chatCommands.carefulNow = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.carefulNowMessages, chatCommandItems.carefulNowPics, userFunctions ); }
+    chatCommands.carefulNow.help = "Woah there...careful";
+
     // ######################################################
     // Advanced chat commands...more than just basic messages
     // ######################################################
