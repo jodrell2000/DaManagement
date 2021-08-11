@@ -7,7 +7,15 @@ Bugs
   * ~~inconsistent and unrepeatable, needs more info~~
 * ~~after adding a user to the queue and joining, the bot eventually sends a message "Sorry @undefined you have run out of time."~~
 
+Worklist (in order)
+* add djIdle on/off commands
+* add getOnStage command
+* add botStatus command
+* add /m (rename to say??) command
+
 Feature Requests
+* create rommSummary command
+  * useful for mods just entering the room to know what's what
 * make comamnds case insensitive
 * if a DJ leaves the room, and hasn't used the refresh command they should be removed from the queue
 * restart command to not disrupt the room when changes are made
