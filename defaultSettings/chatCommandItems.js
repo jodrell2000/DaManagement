@@ -325,4 +325,14 @@ module.exports = {
         "https://media.giphy.com/media/1L5YuA6wpKkNO/giphy.gif"
     ],
 
+    rushMessages: [
+        "WHAT A RUSH!!",
+        "Neil Peart RIP"
+    ],
+
+    rushPics: [
+        "https://media.tenor.com/images/db411cbfbf07da7f2b10f2d58b807d89/tenor.gif",
+        "https://media.giphy.com/media/9zZlVISU1yDIqCvsKF/giphy.gif"
+    ],
+
 }
