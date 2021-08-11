@@ -173,7 +173,10 @@ const commandFunctions = ( bot ) => {
     chatCommands.carefulNow.help = "Woah there...careful";
 
     chatCommands.martika = ( { data, chatFunctions } ) => { chatFunctions.martikaCommand( data, chatCommandItems.martikaPics ); }
-    chatCommands.martika.help = "Woah there...careful";
+    chatCommands.martika.help = "M A R T I K A";
+
+    chatCommands.mindBlown = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.mindBlownMessages, chatCommandItems.mindBlownPics, userFunctions ); }
+    chatCommands.mindBlown.help = "Huh?!? I didn't know that!";
 
     // ######################################################
     // Advanced chat commands...more than just basic messages

@@ -308,5 +308,21 @@ module.exports = {
 
     martikaPics: [
         "https://media.giphy.com/media/TiVjsGVRBBb7GBzszq/giphy.gif",
-    ]
+    ],
+
+    mindBlownMessages: [
+        "Whaaa!!",
+        "What, seriously?!?",
+        "Well I'll be blown",
+        "Wow!!"
+    ],
+
+    mindBlownPics: [
+        "https://media.giphy.com/media/SACoDGYTvVNhZYNb5a/giphy.gif",
+        "https://media.giphy.com/media/2sddCIZRYfiPlNeLZn/giphy.gif",
+        "https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif",
+        "https://media.giphy.com/media/l0NhZ0aUSE8fXag12/giphy.gif",
+        "https://media.giphy.com/media/1L5YuA6wpKkNO/giphy.gif"
+    ],
+
 }
