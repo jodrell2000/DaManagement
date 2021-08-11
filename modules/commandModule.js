@@ -172,6 +172,9 @@ const commandFunctions = ( bot ) => {
     chatCommands.carefulNow = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.carefulNowMessages, chatCommandItems.carefulNowPics, userFunctions ); }
     chatCommands.carefulNow.help = "Woah there...careful";
 
+    chatCommands.martika = ( { data, chatFunctions } ) => { chatFunctions.martikaCommand( data, chatCommandItems.martikaPics ); }
+    chatCommands.martika.help = "Woah there...careful";
+
     // ######################################################
     // Advanced chat commands...more than just basic messages
     // ######################################################

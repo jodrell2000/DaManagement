@@ -84,6 +84,36 @@ const chatFunctions = ( bot, roomDefaults ) => {
             }
         },
 
+        martikaCommand: function ( data, pictureVariable ) {
+            const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
+            const readInOrder = async () => {
+                this.botSpeak( data, 'M' );
+                await sleep( 1000 )
+
+                this.botSpeak( data, 'A' );
+                await sleep( 1000 )
+
+                this.botSpeak( data, 'R' );
+                await sleep( 1000 )
+
+                this.botSpeak( data, 'T' );
+                await sleep( 1000 )
+
+                this.botSpeak( data, 'I' );
+                await sleep( 1000 )
+
+                this.botSpeak( data, 'K' );
+                await sleep( 1000 )
+
+                this.botSpeak( data, 'A' );
+                await sleep( 1000 )
+
+                const randomPic = pictureVariable[ Math.floor( Math.random() * pictureVariable.length ) ];
+                this.botSpeak( data, randomPic, true );
+            }
+            readInOrder();
+        },
+
         coinflip: function ( data, userFunctions ) {
             const theUsername = userFunctions.getUsername( data.userid )
             let randomNumber = Math.random();

@@ -304,5 +304,9 @@ module.exports = {
         "https://media.giphy.com/media/H42aesEqaLy4hITnlH/giphy.gif",
         "https://media.giphy.com/media/cLAJqFwAuuLnQR7WKH/giphy.gif",
         "https://media.giphy.com/media/H8DietxBNO5YvxjLk7/giphy.gif"
+    ],
+
+    martikaPics: [
+        "https://media.giphy.com/media/TiVjsGVRBBb7GBzszq/giphy.gif",
     ]
 }
