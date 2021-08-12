@@ -159,7 +159,7 @@ const botFunctions = ( bot ) => {
                 userFunctions.djList().length <= botDefaults.whenToGetOnStage && // are there fewer than the limit of DJs on stage
                 userFunctions.queueList().length === 0 && // is the queue empty
                 userFunctions.vipList.length === 0 && // there no VIPs
-                userFunctions.refreshList().length === 0; // is there someone currently using the refresh command
+                userFunctions.refreshDJCount() === 0; // is there someone currently using the refresh command
         },
 
         shouldStopBotDJing: function ( userFunctions, roomFunctions ) {
@@ -168,6 +168,7 @@ const botFunctions = ( bot ) => {
         },
 
         checkAutoDJing: function ( userFunctions, roomFunctions ) {
+            logMe( 'info', 'checkAutoDJing' );
             if ( autoDjingTimer != null ) {
                 clearTimeout( autoDjingTimer );
                 autoDjingTimer = null;
@@ -185,7 +186,7 @@ const botFunctions = ( bot ) => {
                             this.removeBotFromStage(); // remove the Bot from stage
                         }
                     }
-                }, 1000 * 10 ); //delay for 10 seconds
+                }.bind( this ), 1000 * 10 ); //delay for 10 seconds
             }
         },
 

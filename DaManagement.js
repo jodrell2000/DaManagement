@@ -287,7 +287,7 @@ bot.on( 'nosong', function () {
     if ( botDefaults.getonstage === true &&
         userFunctions.vipList().length === 0 &&
         userFunctions.queueList().length === 0 &&
-        userFunctions.refreshList().length === 0 ) {
+        userFunctions.refreshDJCount() === 0 ) {
         bot.addDj();
     }
 
