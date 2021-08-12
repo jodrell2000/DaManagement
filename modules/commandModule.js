@@ -640,14 +640,14 @@ const commandFunctions = ( bot ) => {
                     bot.speak( 'song stats is now active' );
                 }
             } else if ( text.match( /^\/whosrefreshing/ ) ) {
-                if ( userFunctions.refreshList().length !== 0 ) {
+                if ( userFunctions.refreshDJCount() !== 0 ) {
                     let whosRefreshing = 'refreshing: ';
                     let namesOfRefresher;
 
-                    for ( let i = 0; i < userFunctions.refreshList().length; i++ ) {
+                    for ( let i = 0; i < userFunctions.refreshDJCount(); i++ ) {
                         namesOfRefresher = userFunctions.theUsersList().indexOf( data.userid ) + 1;
 
-                        if ( i < userFunctions.refreshList().length - 1 ) {
+                        if ( i < userFunctions.refreshDJCount() - 1 ) {
                             whosRefreshing += userFunctions.theUsersList()[ namesOfRefresher ] + ', ';
                         } else {
                             whosRefreshing += userFunctions.theUsersList()[ namesOfRefresher ];
@@ -1098,14 +1098,14 @@ const commandFunctions = ( bot ) => {
                     }
                 }
             } else if ( text.match( /^\/whosrefreshing/ ) && isInRoom === true ) {
-                if ( userFunctions.refreshList().length !== 0 ) {
+                if ( userFunctions.refreshDJCount() !== 0 ) {
                     let whosRefreshing = 'refreshing: ';
                     let namesOfRefresher;
 
-                    for ( let i = 0; i < userFunctions.refreshList().length; i++ ) {
+                    for ( let i = 0; i < userFunctions.refreshDJCount(); i++ ) {
                         namesOfRefresher = userFunctions.theUsersList().indexOf( speaker ) + 1;
 
-                        if ( i < userFunctions.refreshList().length - 1 ) {
+                        if ( i < userFunctions.refreshDJCount() - 1 ) {
                             whosRefreshing += userFunctions.theUsersList()[ namesOfRefresher ] + ', ';
                         } else {
                             whosRefreshing += userFunctions.theUsersList()[ namesOfRefresher ];
