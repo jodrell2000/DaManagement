@@ -48,7 +48,6 @@ function logMe ( logLevel, message ) {
             }
             break;
     }
-
 }
 
 // do something when the bot disconnects?
@@ -209,12 +208,12 @@ bot.on( 'newsong', function ( data ) {
 
     //if the bot is the only one on stage and they are skipping their songs
     //they will stop skipping
-    if ( roomFunctions.djCount() === 1 && roomFunctions.checkWhoIsDj() === authModule.USERID && botFunctions.skipOn === true ) {
+    if ( roomFunctions.djCount() === 1 && roomFunctions.whoIsCurrentDJ() === authModule.USERID && botFunctions.skipOn === true ) {
         botFunctions.setSkipOn( false );
     }
 
     //used to have the bot skip its song if its the current player and skipOn command was used
-    if ( authModule.USERID === roomFunctions.checkWhoIsDj() && botFunctions.skipOn() === true ) {
+    if ( authModule.USERID === roomFunctions.whoIsCurrentDJ() && botFunctions.skipOn() === true ) {
         bot.skip();
     }
 
@@ -223,7 +222,7 @@ bot.on( 'newsong', function ( data ) {
 
     //removes current dj from stage if they play a banned song or artist.
     if ( musicDefaults.bannedArtists.length !== 0 && typeof songFunctions.artist() !== 'undefined' && typeof songFunctions.song() !== 'undefined' ) {
-        const djCheck = roomFunctions.checkWhoIsDj();
+        const djCheck = roomFunctions.whoIsCurrentDJ();
         let checkIfAdmin = userFunctions.masterIds().indexOf( djCheck ); //is user an exempt admin?
         let nameDj = userFunctions.theUsersList().indexOf( djCheck ) + 1; //the currently playing dj's name
 
@@ -244,7 +243,7 @@ bot.on( 'newsong', function ( data ) {
             else if ( musicDefaults.matchArtists ) //if just artist matching is enabled
             {
                 if ( songFunctions.artist().match( roomFunctions.bannedArtistsMatcher() ) ) {
-                    bot.remDj( roomFunctions.checkWhoIsDj() );
+                    bot.remDj( roomFunctions.whoIsCurrentDJ() );
 
                     if ( typeof userFunctions.theUsersList()[ nameDj ] !== 'undefined' ) {
                         bot.speak( '@' + userFunctions.theUsersList()[ nameDj ] + ' you have played a banned artist.' );

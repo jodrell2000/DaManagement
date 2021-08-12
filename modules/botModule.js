@@ -19,14 +19,24 @@ let autoDjingTimer = null; //governs the timer for the bot's auto djing
 
 const botFunctions = ( bot ) => {
     function logMe ( logLevel, message ) {
-        if ( logLevel === 'error' ) {
-            console.log( "botFunctions:" + logLevel + "->" + message + "\n" );
-        } else {
-            if ( bot.debug ) {
-                console.log( "botFunctions:" + logLevel + "->" + message + "\n" );
-            }
+        switch ( logLevel ) {
+            case "error":
+                console.log( "!!!!!!!!!!! botFunctions:" + logLevel + "->" + message + "\n" );
+                break;
+            case "warn":
+                console.log( "+++++++++++ botFunctions:" + logLevel + "->" + message + "\n" );
+                break;
+            case "info":
+                console.log( "----------- botFunctions:" + logLevel + "->" + message + "\n" );
+                break;
+            default:
+                if ( bot.debug ) {
+                    console.log( "botFunctions:" + logLevel + "->" + message + "\n" );
+                }
+                break;
         }
     }
+
 
     return {
         checkActivity: () => checkActivity,
@@ -150,11 +160,18 @@ const botFunctions = ( bot ) => {
         },
 
         isBotOnStage: function ( userFunctions ) {
-            let isBotAlreadyOnStage = userFunctions.djList().indexOf( authModule.USERID );
-            return isBotAlreadyOnStage !== -1;
+            logMe('info', 'isBotOnStage');
+            let isBotAlreadyOnStage = userFunctions.isUserIDOnStage( authModule.USERID );
+            logMe('info', 'isBotOnStage, isBotAlreadyOnStage:' + isBotAlreadyOnStage );
+            return isBotAlreadyOnStage;
         },
 
         shouldTheBotDJ: function ( userFunctions, roomFunctions ) {
+            logMe( 'info', 'shouldTheBotDJ, userFunctions.djList().length:' + userFunctions.djList().length );
+            logMe( 'info', 'shouldTheBotDJ, botDefaults.whenToGetOnStage:' + botDefaults.whenToGetOnStage );
+            logMe( 'info', 'shouldTheBotDJ, userFunctions.queueList().length:' + userFunctions.queueList().length );
+            logMe( 'info', 'shouldTheBotDJ, userFunctions.vipList.length:' + userFunctions.vipList.length );
+            logMe( 'info', 'shouldTheBotDJ, userFunctions.refreshDJCount():' + userFunctions.refreshDJCount() );
             return userFunctions.djList().length >= 1 && // is there at least one DJ on stage
                 userFunctions.djList().length <= botDefaults.whenToGetOnStage && // are there fewer than the limit of DJs on stage
                 userFunctions.queueList().length === 0 && // is the queue empty
@@ -164,21 +181,25 @@ const botFunctions = ( bot ) => {
 
         shouldStopBotDJing: function ( userFunctions, roomFunctions ) {
             return userFunctions.djList().length >= botDefaults.whenToGetOffStage && // are there enough DJs onstage
-                roomFunctions.checkWhoIsDj() !== authModule.USERID; // check the Bot isn't currently DJing
+                userFunctions.getCurrentDJID() !== authModule.USERID; // check the Bot isn't currently DJing
         },
 
         checkAutoDJing: function ( userFunctions, roomFunctions ) {
             logMe( 'info', 'checkAutoDJing' );
+            logMe( 'info', 'checkAutoDJing, autoDjingTimer:' + autoDjingTimer );
             if ( autoDjingTimer != null ) {
                 clearTimeout( autoDjingTimer );
                 autoDjingTimer = null;
             }
 
+            logMe( 'info', 'checkAutoDJing, botDefaults.getonstage' + botDefaults.getonstage );
             if ( botDefaults.getonstage === true ) {
 
                 autoDjingTimer = setTimeout( function () {
-                    if ( !this.isBotOnStage ) { //if the bot is not already on stage
+                    if ( !this.isBotOnStage( userFunctions ) ) { //if the bot is not already on stage
+                        logMe( 'info', 'checkAutoDJing, bot not on stage' );
                         if ( this.shouldTheBotDJ( userFunctions, roomFunctions ) ) {
+                            logMe( 'info', 'checkAutoDJing, start DJing' );
                             this.startBotDJing();
                         }
                     } else { //else it is on stage
@@ -208,7 +229,6 @@ const botFunctions = ( bot ) => {
 
             return foundSong;
         },
-
 
         getPlaylistCount: function () {
             return botDefaults.botPlaylist.length;
