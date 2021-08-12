@@ -36,6 +36,10 @@ let queueList = []; //holds the userid of everyone in the queue
 
 let DJPlaysLimited = musicDefaults.DJPlaysLimited; //song play limit, this is for the playLimit variable up above(off by default)
 let DJsPlayLimit = musicDefaults.DJsPlayLimit; //set the playlimit here (default 4 songs)
+let removeIdleDJs = roomDefaults.removeIdleDJs;
+let djIdleLimit = roomDefaults.djIdleLimitThresholds[ 0 ]; // how long can DJs be idle before being removed
+let idleFirstWarningTime = roomDefaults.djIdleLimitThresholds[ 1 ];
+let idleSecondWarningTime = roomDefaults.djIdleLimitThresholds[ 2 ];
 
 
 const userFunctions = ( bot ) => {
@@ -545,12 +549,38 @@ const userFunctions = ( bot ) => {
             roomDefaults.roomIdle = false;
         },
 
-        djIdleLimit: () => roomDefaults.djIdleLimitThresholds[ 0 ],
-        enableDJIdle: function () {
-            roomDefaults.removeIdleDJs = true;
+        djIdleLimit: () => djIdleLimit,
+
+        removeIdleDJs: () => removeIdleDJs,
+        enableDJIdle: function ( data, chatFunctions ) {
+            removeIdleDJs = true;
+            chatFunctions.botSpeak( data, 'DJs who have been idle for longer than ' + this.djIdleLimit() + ' will be removed from the decks' )
         },
-        disableDJIdle: function () {
-            roomDefaults.removeIdleDJs = false;
+        disableDJIdle: function ( data, chatFunctions ) {
+            removeIdleDJs = false;
+            chatFunctions.botSpeak( data, 'Automatic removle of idle DJs has been disabled' )
+        },
+
+        idleFirstWarningTime: () => idleFirstWarningTime,
+        setIdleFirstWarningTime: function ( data, args, chatFunctions ) {
+            const newWarningTime = args[0];
+            if ( isNaN( newWarningTime ) ) {
+                chatFunctions.botSpeak( data, 'I can\'t set the First Idle Warning time to ' + newWarningTime + ' minutes' );
+            } else {
+                idleFirstWarningTime = newWarningTime;
+                chatFunctions.botSpeak( data, 'DJs will now be given their first Idle warning after ' + newWarningTime + ' minutes' );
+            }
+        },
+
+        idleSecondWarningTime: () => idleSecondWarningTime,
+        setIdleSecondWarningTime: function ( data, args, chatFunctions ) {
+            const newWarningTime = args[0];
+            if ( isNaN( newWarningTime ) ) {
+                chatFunctions.botSpeak( data, 'I can\'t set the Second Idle Warning time to ' + newWarningTime + ' minutes' );
+            } else {
+                idleSecondWarningTime = newWarningTime;
+                chatFunctions.botSpeak( data, 'DJs will now be given their Second Idle Warning after ' + newWarningTime + ' minutes' );
+            }
         },
 
         updateUserLastSpoke: function ( userID ) {
@@ -614,7 +644,7 @@ const userFunctions = ( bot ) => {
         idleWarning: function ( userID, threshold, chatFunctions ) {
             let theMessage;
             let theActions = '';
-            let idleLimit = roomDefaults.djIdleLimitThresholds[ 0 ];
+            let idleLimit = this.djIdleLimit();
             let minutesRemaining = idleLimit - threshold;
 
             if ( minutesRemaining !== 0 ) {
@@ -642,15 +672,15 @@ const userFunctions = ( bot ) => {
         },
 
         checkHasUserIdledOut: function ( userID, threshold ) {
-            let totalIdleAllowed = roomDefaults.djIdleLimitThresholds[ 0 ];
+            let totalIdleAllowed = this.djIdleLimit();
             return this.getIdleTime( userID ) / 60 > ( totalIdleAllowed - threshold );
         },
 
         //removes idle dj's after roomDefaultsModule.djIdleLimit is up.
         idledOutDJCheck: function ( roomDefaults, chatFunctions ) {
-            let totalIdleAllowed = roomDefaults.djIdleLimitThresholds[ 0 ];
-            let firstWarning = roomDefaults.djIdleLimitThresholds[ 1 ];
-            let finalWarning = roomDefaults.djIdleLimitThresholds[ 2 ];
+            let totalIdleAllowed = this.djIdleLimit();
+            let firstWarning = this.idleFirstWarningTime();
+            let finalWarning = this.idleSecondWarningTime();
             let userID;
 
             for ( let djLoop = 0; djLoop < djList.length; djLoop++ ) {

@@ -8,6 +8,7 @@ let genre = null; // info for the currently playing song, so default to null
 let artist = null; // info for the currently playing song, so default to null
 let getSong = null; // info for the currently playing song, so default to null
 let dj = null; // info for the currently playing song, so default to null
+let regions = []; // region info for the cuurrently playing song
 
 let snagSong = false; //if true causes the bot to add every song that plays to its queue
 
@@ -22,15 +23,25 @@ let takedownTimer = null; //used to hold the timer that fires after curSongWatch
 let votesLeft = roomDefaults.HowManyVotesToSkip;
 
 const songFunctions = (bot) => {
-    function logMe(logLevel, message) {
-        if (logLevel==='error') {
-            console.log("songFunctions:" + logLevel + "->" + message + "\n");
-        } else {
-            if (bot.debug) {
-                console.log("songFunctions:" + logLevel + "->" + message + "\n");
-            }
+    function logMe ( logLevel, message ) {
+        switch ( logLevel ) {
+            case "error":
+                console.log( "!!!!!!!!!!! songFunctions:" + logLevel + "->" + message + "\n" );
+                break;
+            case "warn":
+                console.log( "+++++++++++ songFunctions:" + logLevel + "->" + message + "\n" );
+                break;
+            case "info":
+                console.log( "----------- songFunctions:" + logLevel + "->" + message + "\n" );
+                break;
+            default:
+                if ( bot.debug ) {
+                    console.log( "songFunctions:" + logLevel + "->" + message + "\n" );
+                }
+                break;
         }
     }
+
 
     return {
         song: () => song,
@@ -39,6 +50,7 @@ const songFunctions = (bot) => {
         artist: () => artist,
         getSong: () => getSong,
         dj: () => dj,
+        regions: () => regions,
 
         snagSong: () => snagSong,
         upVotes: () => upVotes,
@@ -110,14 +122,17 @@ const songFunctions = (bot) => {
 
         // ========================================================
 
-        getSongTags: function (current_song) {
-            logMe('info', "getSongs:" + JSON.stringify(current_song));
+        getSongTags: function ( current_song ) {
+            logMe('info', "getSongTags:" + JSON.stringify( current_song ) );
             song = current_song.metadata.song;
             album = current_song.metadata.album;
             genre = current_song.metadata.genre;
             artist = current_song.metadata.artist;
             getSong = current_song._id;
             dj = current_song.djname;
+            regions = current_song.metadata.region;
+            logMe('info', "getSongTags, regions:" + JSON.stringify( regions ) );
+
         },
 
         recordUpVotes: function (data) {

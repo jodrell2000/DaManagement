@@ -2,6 +2,8 @@
 	"name": "the_management",
 	"private": true,
 	"dependencies": {
+		"google-auth-library": "^7.5.0",
+		"googleapis": "^84.0.0",
 		"ttapi": "^4.0.3"
 	},
 	"devDependencies": {

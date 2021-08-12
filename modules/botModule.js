@@ -16,6 +16,10 @@ let attemptToReconnect = null; //used for reconnecting to the bots room if its n
 let returnToRoom = true; //used to toggle on and off the bot reconnecting to its room(it toggles off when theres no internet connection because it only works when its connected to turntable.fm)
 let wserrorTimeout = null; //this is for the setTimeout in ws error
 let autoDjingTimer = null; //governs the timer for the bot's auto djing
+let readSongStats = roomDefaults.SONGSTATS;
+let autoDJEnabled = botDefaults.autoDJEnabled; //autodjing(on by default)
+let whenToGetOnStage = botDefaults.whenToGetOnStage; //when this many or less people djing the bot will get on stage(only if autodjing is enabled)
+let whenToGetOffStage = botDefaults.whenToGetOffStage;
 
 const botFunctions = ( bot ) => {
     function logMe ( logLevel, message ) {
@@ -82,8 +86,6 @@ const botFunctions = ( bot ) => {
             shutMeDown();
         },
 
-        // ========================================================
-
         uptime: function ( data, chatFunctions ) {
             let msecPerMinute = 1000 * 60;
             let msecPerHour = msecPerMinute * 60;
@@ -100,6 +102,74 @@ const botFunctions = ( bot ) => {
             let minutes = Math.floor( currentTime / msecPerMinute );
 
             chatFunctions.botSpeak( data, 'bot uptime: ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes' );
+        },
+
+        songStatsCommand: function ( data, chatFunctions ) {
+            if ( this.readSongStats() ) {
+                this.disableReadSongStats( data, chatFunctions );
+            } else  {
+                this.enableReadSongStats( data, chatFunctions );
+            }
+        },
+
+        autoDJCommand: function ( data, chatFunctions ) {
+            if ( this.autoDJEnabled() ) {
+                this.disableautoDJ( data, chatFunctions );
+            } else  {
+                this.enableautoDJ( data, chatFunctions );
+            }
+        },
+
+        removeIdleDJsCommand: function ( data, userFunctions, chatFunctions ) {
+            if ( userFunctions.removeIdleDJs() ) {
+                userFunctions.disableDJIdle( data, chatFunctions );
+            } else  {
+                userFunctions.enableDJIdle( data, chatFunctions );
+            }
+        },
+
+        // ========================================================
+
+        autoDJEnabled: () => autoDJEnabled,
+        enableautoDJ: function ( data, chatFunctions ) {
+            autoDJEnabled = true;
+            chatFunctions.botSpeak( data, 'Auto DJing is now enabled. The Bot will DJ when the DJ Count gets to ' + this.whenToGetOnStage() + ' and will stop when there are ' + this.whenToGetOffStage() + ' DJs playing' );
+        },
+        disableautoDJ: function ( data, chatFunctions ) {
+            autoDJEnabled = false;
+            chatFunctions.botSpeak( data, 'Auto DJing is now disabled' )
+        },
+
+        whenToGetOnStage: () => whenToGetOnStage,
+        setWhenToGetOnStage: function ( data, args, chatFunctions ) {
+            const numberOfDJs = args[0];
+            if ( isNaN(numberOfDJs) ) {
+                chatFunctions.botSpeak( data, 'Don\'t be silly. I can\'t set the auto-DJing start value to ' + numberOfDJs );
+            } else {
+                whenToGetOnStage = numberOfDJs;
+                chatFunctions.botSpeak( data, 'Auto-DJing will now start at ' + numberOfDJs + ' and stop at ' + this.whenToGetOffStage() );
+            }
+        },
+
+        whenToGetOffStage: () =>  whenToGetOffStage,
+        setWhenToGetOffStage: function ( data, args, chatFunctions ) {
+            const numberOfDJs = args[0];
+            if ( isNaN(numberOfDJs) ) {
+                chatFunctions.botSpeak( data, 'Don\'t be silly. I can\'t set the auto-DJing stop value to ' + numberOfDJs );
+            } else {
+                whenToGetOffStage = numberOfDJs;
+                chatFunctions.botSpeak( data, 'Auto-DJing will now start at ' + this.whenToGetOnStage() + ' and stop at ' + numberOfDJs );
+            }
+        },
+
+        readSongStats: () => readSongStats,
+        enableReadSongStats: function ( data, chatFunctions ) {
+            readSongStats = true;
+            chatFunctions.botSpeak( data, 'Song stats are now enabled')
+        },
+        disableReadSongStats: function ( data, chatFunctions ) {
+            readSongStats = false;
+            chatFunctions.botSpeak( data, 'Song stats are now disabled')
         },
 
         checkIfConnected: function () {
@@ -160,46 +230,34 @@ const botFunctions = ( bot ) => {
         },
 
         isBotOnStage: function ( userFunctions ) {
-            logMe('info', 'isBotOnStage');
             let isBotAlreadyOnStage = userFunctions.isUserIDOnStage( authModule.USERID );
-            logMe('info', 'isBotOnStage, isBotAlreadyOnStage:' + isBotAlreadyOnStage );
             return isBotAlreadyOnStage;
         },
 
         shouldTheBotDJ: function ( userFunctions, roomFunctions ) {
-            logMe( 'info', 'shouldTheBotDJ, userFunctions.djList().length:' + userFunctions.djList().length );
-            logMe( 'info', 'shouldTheBotDJ, botDefaults.whenToGetOnStage:' + botDefaults.whenToGetOnStage );
-            logMe( 'info', 'shouldTheBotDJ, userFunctions.queueList().length:' + userFunctions.queueList().length );
-            logMe( 'info', 'shouldTheBotDJ, userFunctions.vipList.length:' + userFunctions.vipList.length );
-            logMe( 'info', 'shouldTheBotDJ, userFunctions.refreshDJCount():' + userFunctions.refreshDJCount() );
-            return userFunctions.djList().length >= 1 && // is there at least one DJ on stage
-                userFunctions.djList().length <= botDefaults.whenToGetOnStage && // are there fewer than the limit of DJs on stage
+            return userFunctions.howManyDJs() >= 1 && // is there at least one DJ on stage
+                userFunctions.howManyDJs() <= this.whenToGetOnStage() && // are there fewer than the limit of DJs on stage
                 userFunctions.queueList().length === 0 && // is the queue empty
                 userFunctions.vipList.length === 0 && // there no VIPs
                 userFunctions.refreshDJCount() === 0; // is there someone currently using the refresh command
         },
 
         shouldStopBotDJing: function ( userFunctions, roomFunctions ) {
-            return userFunctions.djList().length >= botDefaults.whenToGetOffStage && // are there enough DJs onstage
+            return userFunctions.howManyDJs() >= this.whenToGetOffStage() && // are there enough DJs onstage
                 userFunctions.getCurrentDJID() !== authModule.USERID; // check the Bot isn't currently DJing
         },
 
         checkAutoDJing: function ( userFunctions, roomFunctions ) {
-            logMe( 'info', 'checkAutoDJing' );
-            logMe( 'info', 'checkAutoDJing, autoDjingTimer:' + autoDjingTimer );
             if ( autoDjingTimer != null ) {
                 clearTimeout( autoDjingTimer );
                 autoDjingTimer = null;
             }
 
-            logMe( 'info', 'checkAutoDJing, botDefaults.getonstage' + botDefaults.getonstage );
-            if ( botDefaults.getonstage === true ) {
+            if ( this.autoDJEnabled() === true ) {
 
                 autoDjingTimer = setTimeout( function () {
                     if ( !this.isBotOnStage( userFunctions ) ) { //if the bot is not already on stage
-                        logMe( 'info', 'checkAutoDJing, bot not on stage' );
                         if ( this.shouldTheBotDJ( userFunctions, roomFunctions ) ) {
-                            logMe( 'info', 'checkAutoDJing, start DJing' );
                             this.startBotDJing();
                         }
                     } else { //else it is on stage
@@ -274,15 +332,15 @@ const botFunctions = ( bot ) => {
             songFunctions.startSongWatchdog( data, userFunctions, roomFunctions );
 
             //this boots the user if their song is over the length limit
-            if ( ( length / 60 ) >= roomDefaults.songLengthLimit ) {
+            if ( ( length / 60 ) >= musicDefaults.songLengthLimit ) {
                 if ( roomFunctions.lastdj() === authModule.USERID || masterIndex === -1 ) //if dj is the bot or not a master
                 {
-                    if ( musicDefaults.LIMIT === true ) {
+                    if ( musicDefaults.songLengthLimitOn === true ) {
                         if ( typeof userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( roomFunctions.lastdj ) + 1 ] !== 'undefined' ) {
                             bot.speak( "@" + userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( roomFunctions.lastdj ) + 1 ] + ", your song is over " + roomDefaults.songLengthLimit + " mins long, you have 20 seconds to skip before being removed." );
                         }
                         else {
-                            bot.speak( 'current dj, your song is over ' + roomDefaults.songLengthLimit + ' mins long, you have 20 seconds to skip before being removed.' );
+                            bot.speak( 'current dj, your song is over ' + musicDefaults.songLengthLimit + ' mins long, you have 20 seconds to skip before being removed.' );
                         }
 
                         //START THE 20 SEC TIMER

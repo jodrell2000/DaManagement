@@ -185,8 +185,8 @@ const chatFunctions = ( bot, roomDefaults ) => {
             }
         },
 
-        readSongStats: function ( data, songFunctions, roomDefaults ) {
-            if ( roomDefaults.SONGSTATS ) {
+        readSongStats: function ( data, songFunctions, botFunctions ) {
+            if ( botFunctions.readSongStats() ) {
                 this.botSpeak( data, 'Stats for ' + songFunctions.song() + ' by ' + songFunctions.artist() + ':' );
                 this.botSpeak( data, ':thumbsup:' + songFunctions.upVotes() + ':thumbsdown:' + songFunctions.downVotes() + ':heart:' + songFunctions.whoSnagged() );
             }

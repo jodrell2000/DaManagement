@@ -68,8 +68,8 @@ const roomFunctions = ( bot ) => {
         },
 
         clearDecksForVIPs: function ( userFunctions, authModule ) {
-            if ( userFunctions.vipList.length !== 0 && userFunctions.djList().length !== userFunctions.vipList.length ) {
-                for ( let p = 0; p < userFunctions.djList().length; p++ ) {
+            if ( userFunctions.vipList.length !== 0 && userFunctions.howManyDJs() !== userFunctions.vipList.length ) {
+                for ( let p = 0; p < userFunctions.howManyDJs(); p++ ) {
                     let checkIfVip = userFunctions.vipList.indexOf( userFunctions.djList()[ p ] );
                     if ( checkIfVip === -1 && userFunctions.djList()[ p ] !== authModule.USERID ) {
                         bot.remDj( userFunctions.djList()[ p ] );
@@ -77,7 +77,6 @@ const roomFunctions = ( bot ) => {
                 }
             }
         },
-
 
         formatBannedArtists: function () {
             if ( musicDefaults.bannedArtists.length !== 0 ) {

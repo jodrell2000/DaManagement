@@ -21,6 +21,18 @@ There are 2 bots in this repo. The actuall turntable.fm bot called <strong>DaMan
 * uses the file *authChat.js* for its authentication details
 
 ### DaManagement
+* prerequisit installs
+  ```
+  npm install -g npm-check-updates
+  ncu -u
+  npm install
+  ```
+  
+* install the Google APIs (for the youTube Region checker)
+  ```
+  npm install googleapis --save
+  npm install google-auth-library --save
+  ```
 * start it directly using:
   ```
   node DaManagement.js
