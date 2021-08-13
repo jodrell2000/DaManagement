@@ -1,10 +1,11 @@
 // load the googleAPI
-let fs = require('fs');
-let readline = require('readline');
-let {google} = require('googleapis');
+let fs = require( 'fs/promises' );
+let readline = require( 'readline' );
+let { google } = require( 'googleapis' );
+const { check } = require( 'prettier' );
 let OAuth2 = google.auth.OAuth2;
-let SCOPES = ['https://www.googleapis.com/auth/youtube.readonly'];
-let TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ) + '/.credentials/';
+let SCOPES = [ 'https://www.googleapis.com/auth/youtube.readonly' ];
+let TOKEN_DIR = ( process.env.HOME || process.env.HOMEPATH ) + '/.credentials/';
 let TOKEN_PATH = TOKEN_DIR + 'theManagementCredentials.json';
 
 let clientSecret;
@@ -69,7 +70,7 @@ const videoFunctions = ( bot ) => {
                 console.log( JSON.stringify( videoData[ 0 ].contentDetails.regionRestriction ) );
                 return videoData[ 0 ].contentDetails.regionRestriction;
             } else {
-                console.log('Didn\'t find any regions:' + JSON.stringify( videoData ) );
+                console.log( 'Didn\'t find any regions:' + JSON.stringify( videoData ) );
             }
 
             // for ( let regionLoop = 0;  regionLoop < videoData.regionRestriction.allowed.length; regionLoop++ ) {
@@ -77,7 +78,6 @@ const videoFunctions = ( bot ) => {
             // }
         } );
     }
-
     function authorize ( credentials, callback, videoID ) {
         clientSecret = credentials.installed.client_secret;
         clientId = credentials.installed.client_id;
@@ -96,7 +96,7 @@ const videoFunctions = ( bot ) => {
     }
 
     function checkVideo ( videoID ) {
-        fs.readFile( 'client_secret.json', function processClientSecrets( err, content ) {
+        fs.readFile( 'client_secret.json', function processClientSecrets ( err, content ) {
             if ( err ) {
                 console.log( 'Error loading client secret file: ' + err );
             }
@@ -105,11 +105,47 @@ const videoFunctions = ( bot ) => {
         } );
     }
 
+    //allow undefined blocked undefined - allowed everywhere
+    //allow undefined blocked emptyList - blocked nowhere
+
+    //allow list blocked undefined - allowed somewhere
+    //allow undefined blocked list - blocked somewhere
+
+    //allow emptyList blocked undefined - allowed nowhere
+
+    async function ensureToken ( credentials ) {
+        const clientSecret = credentials.installed.client_secret;
+        const clientId = credentials.installed.client_id;
+        const redirectUrl = credentials.installed.redirect_uris[ 0 ];
+        const oauth2Client = new OAuth2( clientId, clientSecret, redirectUrl );
+        fs.readFile( TOKEN_PATH )
+            .then( JSON.parse )
+            .catch( ( err ) = {
+                return getNewToken( oauth2Client )
+            } )
+    }
+
+    async function authorize2 () {
+        const contents = await fs.readFile( 'client_secret.json' )
+        const token = await ensureToken( JSON.parse( contents ) )
+        return await buildClient( token );
+    }
+
     return {
 
         readRegions: function ( data, args, chatFunctions ) {
-            const videoID = args[0];
-            checkVideo( videoID )
+            const videoID = args[ 0 ];
+            authorize2()
+                .then( ( oauthClient ) => checkVideo2( oauthClient, videoId ) )
+                .then( ( blocked, hasRestrictions, restrictionDescription ) => {
+                    if ( blocked ) {
+                        console.log( "Video is blocked everywhere" )
+                    } else if ( hasRestrictions ) {
+                        console.log( "Video is restricted to " + restrictionDescription );
+                    } else {
+                        console.log( "Mum's the word" )
+                    }
+                } )
         },
 
     }
