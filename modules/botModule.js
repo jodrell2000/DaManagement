@@ -41,7 +41,6 @@ const botFunctions = ( bot ) => {
         }
     }
 
-
     return {
         checkActivity: () => checkActivity,
         messageCounter: () => messageCounter,
