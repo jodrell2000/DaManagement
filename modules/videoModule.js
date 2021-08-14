@@ -32,7 +32,7 @@ const videoFunctions = ( bot ) => {
         }
     }
 
-    async function queryVideoDetails( auth, videoID ) {
+    async function queryVideoDetails ( auth, videoID ) {
         let service = google.youtube( "v3" );
         return service.videos
             .list( {
@@ -41,22 +41,21 @@ const videoFunctions = ( bot ) => {
                 id: videoID,
             } )
             .then( ( { data } ) => {
-                console.log( "Found video data", data );
                 return data.items[ 0 ].contentDetails;
             } );
     }
 
-    async function checkVideo( auth, videoID ) {
+    async function checkVideo ( auth, videoID ) {
         const { regionRestriction } = await queryVideoDetails( auth, videoID );
         if ( regionRestriction !== undefined ) {
-            return videoData[ 0 ].contentDetails.regionRestriction;
+            return regionRestriction;
         } else {
             console.log( "Didn't find any regions:" + JSON.stringify( videoData ) );
             return null;
         }
     }
 
-    async function askUserForCredentials( oauth2Client ) {
+    async function askUserForCredentials ( oauth2Client ) {
         let authUrl = oauth2Client.generateAuthUrl( {
             access_type: "offline",
             scope: SCOPES,
@@ -74,7 +73,7 @@ const videoFunctions = ( bot ) => {
                         console.log( "Error while trying to retrieve access token", err );
                         reject( err );
                     } else {
-                        resolve( oauth2Client );
+                        resolve( token );
                     }
                 } );
             } );
@@ -82,7 +81,7 @@ const videoFunctions = ( bot ) => {
         return promise;
     }
 
-    function buildClient( credentials ) {
+    function buildClient ( credentials ) {
         const clientSecret = credentials.installed.client_secret;
         const clientId = credentials.installed.client_id;
         const redirectUrl = credentials.installed.redirect_uris[ 0 ];
@@ -90,7 +89,7 @@ const videoFunctions = ( bot ) => {
         return new OAuth2( clientId, clientSecret, redirectUrl );
     }
 
-    async function getAuthorizedClient( credentials ) {
+    async function getAuthorizedClient ( credentials ) {
         let oauth2Client = buildClient( credentials );
         const storedCredentials = await loadJSONFromFile( TOKEN_DIR, TOKEN_PATH );
         if ( storedCredentials ) {
@@ -103,7 +102,7 @@ const videoFunctions = ( bot ) => {
         return oauth2Client;
     }
 
-    async function loadJSONFromFile( dir, path ) {
+    async function loadJSONFromFile ( dir, path ) {
         try {
             const contents = await fs.readFile( dir + path );
             return JSON.parse( contents );
@@ -113,7 +112,7 @@ const videoFunctions = ( bot ) => {
         }
     }
 
-    async function ensureDirectoryExists( dir ) {
+    async function ensureDirectoryExists ( dir ) {
         try {
             await fs.mkdir( dir );
         } catch ( err ) {
@@ -124,7 +123,7 @@ const videoFunctions = ( bot ) => {
         }
     }
 
-    async function storeJSONToFile( dir, path, content ) {
+    async function storeJSONToFile ( dir, path, content ) {
         await ensureDirectoryExists( dir );
         try {
             return fs.writeFile( dir + path, JSON.stringify( content ) );
@@ -142,10 +141,43 @@ const videoFunctions = ( bot ) => {
 
     //allow emptyList blocked undefined - allowed nowhere
 
-    async function authorize() {
+    async function authorize () {
         const clientAuth = await loadJSONFromFile( "", "client_secret.json" );
-        logMe('info', 'authorize, clientAuth:' + JSON.stringify(clientAuth) );
-        return await getAuthorizedClient( JSON.parse( clientAuth ) );
+        return await getAuthorizedClient( clientAuth );
+    }
+
+    function areAnyAlertRegionsBlocked ( alertRegions, blockedRegions ) {
+        let blockedRegionsWeCareAbout = '';
+        for ( checkRegionLoop = 0; checkRegionLoop < alertRegions.length; checkRegionLoop++ ) {
+            for ( blockedRegionLoop = 0; blockedRegionLoop < allowedRegions.length; blockedRegionLoop++ ) {
+                if ( alertRegions[ checkRegionLoop ] === blockedRegions[ blockedRegionLoop ] ) {
+                    blockedRegionsWeCareAbout.push( alertRegions[ checkRegionLoop ] );
+                }
+            }
+        }
+
+        if ( blockedRegionsWeCareAbout.length === alertRegions.length ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function areAllAlertRegionsAllowed ( alertRegions, allowedRegions ) {
+        let allowedRegionsWeCareAbout = [];
+        for ( checkRegionLoop = 0; checkRegionLoop < alertRegions.length; checkRegionLoop++ ) {
+            for ( allowedRegionLoop = 0; allowedRegionLoop < allowedRegions.length; allowedRegionLoop++ ) {
+                if ( alertRegions[ checkRegionLoop ] === allowedRegions[ allowedRegionLoop ] ) {
+                    allowedRegionsWeCareAbout.push( alertRegions[ checkRegionLoop ] );
+                }
+            }
+        }
+
+        if ( allowedRegionsWeCareAbout.length === alertRegions.length ) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     return {
@@ -199,7 +231,19 @@ const videoFunctions = ( bot ) => {
             authorize()
                 .then( ( oauthClient ) => checkVideo( oauthClient, videoID ) )
                 .then( ( restrictions ) => {
-                    console.log( restrictions );
+                    if ( restrictions.allowed !== undefined ) {
+                        logMe( 'info', 'readRegions, restrictions: allowed found' + JSON.stringify( restrictions.allowed ) );
+                        logMe( 'info', 'readRegions, restrictions: ' + restrictions.allowed.length + ' found' );
+                        if ( !areAllAlertRegionsAllowed( this.alertIfRegionBlocked(), restrictions.allowed ) ) {
+                            chatFunctions.botSpeak( data, 'This video can\'t be played in one of the regions we care about. Please consider skipping' );
+                        }
+                    }
+                    if ( restrictions.blocked !== undefined ) {
+                        logMe( 'info', 'readRegions, restrictions: blocked found' + JSON.stringify( restrictions.blocked ) );
+                        if ( areAnyAlertRegionsBlocked( this.alertIfRegionBlocked(), restrictions.allowed ) ) {
+                            chatFunctions.botSpeak( data, 'This video can\'t be played in one of the regions we care about. Please consider skipping' );
+                        }
+                    }
                 } );
             //  .then((blocked, hasRestrictions, restrictionDescription) => {
             //    if (blocked) {
