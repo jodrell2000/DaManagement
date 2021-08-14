@@ -16,15 +16,28 @@ let attemptToReconnect = null; //used for reconnecting to the bots room if its n
 let returnToRoom = true; //used to toggle on and off the bot reconnecting to its room(it toggles off when theres no internet connection because it only works when its connected to turntable.fm)
 let wserrorTimeout = null; //this is for the setTimeout in ws error
 let autoDjingTimer = null; //governs the timer for the bot's auto djing
+let readSongStats = roomDefaults.SONGSTATS;
+let autoDJEnabled = botDefaults.autoDJEnabled; //autodjing(on by default)
+let whenToGetOnStage = botDefaults.whenToGetOnStage; //when this many or less people djing the bot will get on stage(only if autodjing is enabled)
+let whenToGetOffStage = botDefaults.whenToGetOffStage;
 
 const botFunctions = ( bot ) => {
     function logMe ( logLevel, message ) {
-        if ( logLevel === 'error' ) {
-            console.log( "botFunctions:" + logLevel + "->" + message + "\n" );
-        } else {
-            if ( bot.debug ) {
-                console.log( "botFunctions:" + logLevel + "->" + message + "\n" );
-            }
+        switch ( logLevel ) {
+            case "error":
+                console.log( "!!!!!!!!!!! botFunctions:" + logLevel + "->" + message + "\n" );
+                break;
+            case "warn":
+                console.log( "+++++++++++ botFunctions:" + logLevel + "->" + message + "\n" );
+                break;
+            case "info":
+                console.log( "----------- botFunctions:" + logLevel + "->" + message + "\n" );
+                break;
+            default:
+                if ( bot.debug ) {
+                    console.log( "botFunctions:" + logLevel + "->" + message + "\n" );
+                }
+                break;
         }
     }
 
@@ -72,9 +85,7 @@ const botFunctions = ( bot ) => {
             shutMeDown();
         },
 
-        // ========================================================
-
-        uptime: function ( data, chatFunctions ) {
+        reportUptime: function ( data, userFunctions, chatFunctions ) {
             let msecPerMinute = 1000 * 60;
             let msecPerHour = msecPerMinute * 60;
             let msecPerDay = msecPerHour * 24;
@@ -89,7 +100,104 @@ const botFunctions = ( bot ) => {
 
             let minutes = Math.floor( currentTime / msecPerMinute );
 
-            chatFunctions.botSpeak( data, 'bot uptime: ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes' );
+            chatFunctions.botSpeak( data, userFunctions.getUsername( authModule.USERID ) + ' has been up for: ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes' );
+        },
+
+        songStatsCommand: function ( data, chatFunctions ) {
+            if ( this.readSongStats() ) {
+                this.disableReadSongStats( data, chatFunctions );
+            } else  {
+                this.enableReadSongStats( data, chatFunctions );
+            }
+        },
+
+        autoDJCommand: function ( data, chatFunctions ) {
+            if ( this.autoDJEnabled() ) {
+                this.disableautoDJ( data, chatFunctions );
+            } else  {
+                this.enableautoDJ( data, chatFunctions );
+            }
+        },
+
+        removeIdleDJsCommand: function ( data, userFunctions, chatFunctions ) {
+            if ( userFunctions.removeIdleDJs() ) {
+                userFunctions.disableDJIdle( data, chatFunctions );
+            } else  {
+                userFunctions.enableDJIdle( data, chatFunctions );
+            }
+        },
+
+        reportRoomStatus: function ( data, chatFunctions, userFunctions ) {
+            const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
+            const doInOrder = async () => {
+                this.reportUptime( data, userFunctions, chatFunctions ); await sleep( 100 );
+                this.reportAutoDJStatus( data, chatFunctions ); await sleep( 100 );
+                this.reportSongStats( data, chatFunctions ); await sleep( 100 );
+                userFunctions.readQueue( data, chatFunctions ); await sleep( 100 );
+                userFunctions.whatsPlayLimit( data, chatFunctions ); await sleep( 100 );
+                userFunctions.reportDJIdleStatus( data, chatFunctions ); await sleep( 100 );
+                userFunctions.reportRefreshStatus( data, chatFunctions ); await sleep( 100 );
+            }
+            doInOrder();
+        },
+
+        // ========================================================
+
+        autoDJEnabled: () => autoDJEnabled,
+        enableautoDJ: function ( data, chatFunctions ) {
+            autoDJEnabled = true;
+            this.reportAutoDJStatus( data, chatFunctions );
+            },
+        disableautoDJ: function ( data, chatFunctions ) {
+            autoDJEnabled = false;
+            this.reportAutoDJStatus( data, chatFunctions );
+        },
+
+        whenToGetOnStage: () => whenToGetOnStage,
+        setWhenToGetOnStage: function ( data, args, chatFunctions ) {
+            const numberOfDJs = args[0];
+            if ( isNaN(numberOfDJs) ) {
+                chatFunctions.botSpeak( data, 'Don\'t be silly. I can\'t set the auto-DJing start value to ' + numberOfDJs );
+            } else {
+                whenToGetOnStage = numberOfDJs;
+                this.reportAutoDJStatus( data, chatFunctions )
+            }
+        },
+
+        whenToGetOffStage: () =>  whenToGetOffStage,
+        setWhenToGetOffStage: function ( data, args, chatFunctions ) {
+            const numberOfDJs = args[0];
+            if ( isNaN(numberOfDJs) ) {
+                chatFunctions.botSpeak( data, 'Don\'t be silly. I can\'t set the auto-DJing stop value to ' + numberOfDJs );
+            } else {
+                whenToGetOffStage = numberOfDJs;
+                this.reportAutoDJStatus( data, chatFunctions )
+            }
+        },
+
+        reportAutoDJStatus: function ( data, chatFunctions ) {
+            if ( this.autoDJEnabled() ) {
+                chatFunctions.botSpeak( data, 'Auto-DJing is enabled and will start at ' + this.whenToGetOnStage() + ' and stop at ' + this.whenToGetOffStage() );
+            } else {
+                chatFunctions.botSpeak( data, 'Auto DJing is disabled' )
+            }
+        },
+
+        readSongStats: () => readSongStats,
+        enableReadSongStats: function ( data, chatFunctions ) {
+            readSongStats = true;
+            this.reportSongStats( data, chatFunctions );
+        },
+        disableReadSongStats: function ( data, chatFunctions ) {
+            readSongStats = false;
+            this.reportSongStats( data, chatFunctions );
+        },
+        reportSongStats: function ( data, chatFunctions ) {
+            if ( this.readSongStats() ) {
+                chatFunctions.botSpeak( data, 'Song stat reporting is enabled' );
+            } else {
+                chatFunctions.botSpeak( data, 'Song stats reporting is enabled' );
+            }
         },
 
         checkIfConnected: function () {
@@ -150,21 +258,21 @@ const botFunctions = ( bot ) => {
         },
 
         isBotOnStage: function ( userFunctions ) {
-            let isBotAlreadyOnStage = userFunctions.djList().indexOf( authModule.USERID );
-            return isBotAlreadyOnStage !== -1;
+            let isBotAlreadyOnStage = userFunctions.isUserIDOnStage( authModule.USERID );
+            return isBotAlreadyOnStage;
         },
 
         shouldTheBotDJ: function ( userFunctions, roomFunctions ) {
-            return userFunctions.djList().length >= 1 && // is there at least one DJ on stage
-                userFunctions.djList().length <= botDefaults.whenToGetOnStage && // are there fewer than the limit of DJs on stage
+            return userFunctions.howManyDJs() >= 1 && // is there at least one DJ on stage
+                userFunctions.howManyDJs() <= this.whenToGetOnStage() && // are there fewer than the limit of DJs on stage
                 userFunctions.queueList().length === 0 && // is the queue empty
                 userFunctions.vipList.length === 0 && // there no VIPs
-                userFunctions.refreshList().length === 0; // is there someone currently using the refresh command
+                userFunctions.refreshDJCount() === 0; // is there someone currently using the refresh command
         },
 
         shouldStopBotDJing: function ( userFunctions, roomFunctions ) {
-            return userFunctions.djList().length >= botDefaults.whenToGetOffStage && // are there enough DJs onstage
-                roomFunctions.checkWhoIsDj() !== authModule.USERID; // check the Bot isn't currently DJing
+            return userFunctions.howManyDJs() >= this.whenToGetOffStage() && // are there enough DJs onstage
+                userFunctions.getCurrentDJID() !== authModule.USERID; // check the Bot isn't currently DJing
         },
 
         checkAutoDJing: function ( userFunctions, roomFunctions ) {
@@ -173,10 +281,10 @@ const botFunctions = ( bot ) => {
                 autoDjingTimer = null;
             }
 
-            if ( botDefaults.getonstage === true ) {
+            if ( this.autoDJEnabled() === true ) {
 
                 autoDjingTimer = setTimeout( function () {
-                    if ( !this.isBotOnStage ) { //if the bot is not already on stage
+                    if ( !this.isBotOnStage( userFunctions ) ) { //if the bot is not already on stage
                         if ( this.shouldTheBotDJ( userFunctions, roomFunctions ) ) {
                             this.startBotDJing();
                         }
@@ -185,7 +293,7 @@ const botFunctions = ( bot ) => {
                             this.removeBotFromStage(); // remove the Bot from stage
                         }
                     }
-                }, 1000 * 10 ); //delay for 10 seconds
+                }.bind( this ), 1000 * 10 ); //delay for 10 seconds
             }
         },
 
@@ -207,7 +315,6 @@ const botFunctions = ( bot ) => {
 
             return foundSong;
         },
-
 
         getPlaylistCount: function () {
             return botDefaults.botPlaylist.length;
@@ -253,15 +360,15 @@ const botFunctions = ( bot ) => {
             songFunctions.startSongWatchdog( data, userFunctions, roomFunctions );
 
             //this boots the user if their song is over the length limit
-            if ( ( length / 60 ) >= roomDefaults.songLengthLimit ) {
+            if ( ( length / 60 ) >= musicDefaults.songLengthLimit ) {
                 if ( roomFunctions.lastdj() === authModule.USERID || masterIndex === -1 ) //if dj is the bot or not a master
                 {
-                    if ( musicDefaults.LIMIT === true ) {
+                    if ( musicDefaults.songLengthLimitOn === true ) {
                         if ( typeof userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( roomFunctions.lastdj ) + 1 ] !== 'undefined' ) {
                             bot.speak( "@" + userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( roomFunctions.lastdj ) + 1 ] + ", your song is over " + roomDefaults.songLengthLimit + " mins long, you have 20 seconds to skip before being removed." );
                         }
                         else {
-                            bot.speak( 'current dj, your song is over ' + roomDefaults.songLengthLimit + ' mins long, you have 20 seconds to skip before being removed.' );
+                            bot.speak( 'current dj, your song is over ' + musicDefaults.songLengthLimit + ' mins long, you have 20 seconds to skip before being removed.' );
                         }
 
                         //START THE 20 SEC TIMER

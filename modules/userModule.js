@@ -36,6 +36,10 @@ let queueList = []; //holds the userid of everyone in the queue
 
 let DJPlaysLimited = musicDefaults.DJPlaysLimited; //song play limit, this is for the playLimit variable up above(off by default)
 let DJsPlayLimit = musicDefaults.DJsPlayLimit; //set the playlimit here (default 4 songs)
+let removeIdleDJs = roomDefaults.removeIdleDJs;
+let djIdleLimit = roomDefaults.djIdleLimitThresholds[ 0 ]; // how long can DJs be idle before being removed
+let idleFirstWarningTime = roomDefaults.djIdleLimitThresholds[ 1 ];
+let idleSecondWarningTime = roomDefaults.djIdleLimitThresholds[ 2 ];
 
 
 const userFunctions = ( bot ) => {
@@ -492,6 +496,14 @@ const userFunctions = ( bot ) => {
             }
         },
 
+        reportRefreshStatus: function ( data, chatFunctions ) {
+            if ( roomDefaults.refreshingEnabled ) {
+                chatFunctions.botSpeak( data, 'The refresh function is enabled' )
+            } else {
+                chatFunctions.botSpeak( data, 'The refresh function is disabled' )
+            }
+        },
+
         removeRefreshFromUser: function ( userID ) {
             if ( this.userExists( userID ) ) {
                 let listPosition = this.getPositionOnUsersList( userID );
@@ -545,12 +557,45 @@ const userFunctions = ( bot ) => {
             roomDefaults.roomIdle = false;
         },
 
-        djIdleLimit: () => roomDefaults.djIdleLimitThresholds[ 0 ],
-        enableDJIdle: function () {
-            roomDefaults.removeIdleDJs = true;
+        djIdleLimit: () => djIdleLimit,
+
+        removeIdleDJs: () => removeIdleDJs,
+        enableDJIdle: function ( data, chatFunctions ) {
+            removeIdleDJs = true;
+            this.reportDJIdleStatus( data, chatFunctions );
         },
-        disableDJIdle: function () {
-            roomDefaults.removeIdleDJs = false;
+        disableDJIdle: function ( data, chatFunctions ) {
+            removeIdleDJs = false;
+            this.reportDJIdleStatus( data, chatFunctions );
+        },
+        reportDJIdleStatus: function ( data, chatFunctions ) {
+            if ( this.removeIdleDJs() ) {
+                chatFunctions.botSpeak( data, 'DJs who have been idle for longer than ' + this.djIdleLimit() + ' will be removed from the decks' )
+            } else {
+                chatFunctions.botSpeak( data, 'Automatic removal of idle DJs is disabled' )
+            }
+        },
+
+        idleFirstWarningTime: () => idleFirstWarningTime,
+        setIdleFirstWarningTime: function ( data, args, chatFunctions ) {
+            const newWarningTime = args[0];
+            if ( isNaN( newWarningTime ) ) {
+                chatFunctions.botSpeak( data, 'I can\'t set the First Idle Warning time to ' + newWarningTime + ' minutes' );
+            } else {
+                idleFirstWarningTime = newWarningTime;
+                chatFunctions.botSpeak( data, 'DJs will now be given their first Idle warning after ' + newWarningTime + ' minutes' );
+            }
+        },
+
+        idleSecondWarningTime: () => idleSecondWarningTime,
+        setIdleSecondWarningTime: function ( data, args, chatFunctions ) {
+            const newWarningTime = args[0];
+            if ( isNaN( newWarningTime ) ) {
+                chatFunctions.botSpeak( data, 'I can\'t set the Second Idle Warning time to ' + newWarningTime + ' minutes' );
+            } else {
+                idleSecondWarningTime = newWarningTime;
+                chatFunctions.botSpeak( data, 'DJs will now be given their Second Idle Warning after ' + newWarningTime + ' minutes' );
+            }
         },
 
         updateUserLastSpoke: function ( userID ) {
@@ -614,7 +659,7 @@ const userFunctions = ( bot ) => {
         idleWarning: function ( userID, threshold, chatFunctions ) {
             let theMessage;
             let theActions = '';
-            let idleLimit = roomDefaults.djIdleLimitThresholds[ 0 ];
+            let idleLimit = this.djIdleLimit();
             let minutesRemaining = idleLimit - threshold;
 
             if ( minutesRemaining !== 0 ) {
@@ -642,15 +687,15 @@ const userFunctions = ( bot ) => {
         },
 
         checkHasUserIdledOut: function ( userID, threshold ) {
-            let totalIdleAllowed = roomDefaults.djIdleLimitThresholds[ 0 ];
+            let totalIdleAllowed = this.djIdleLimit();
             return this.getIdleTime( userID ) / 60 > ( totalIdleAllowed - threshold );
         },
 
         //removes idle dj's after roomDefaultsModule.djIdleLimit is up.
         idledOutDJCheck: function ( roomDefaults, chatFunctions ) {
-            let totalIdleAllowed = roomDefaults.djIdleLimitThresholds[ 0 ];
-            let firstWarning = roomDefaults.djIdleLimitThresholds[ 1 ];
-            let finalWarning = roomDefaults.djIdleLimitThresholds[ 2 ];
+            let totalIdleAllowed = this.djIdleLimit();
+            let firstWarning = this.idleFirstWarningTime();
+            let finalWarning = this.idleSecondWarningTime();
             let userID;
 
             for ( let djLoop = 0; djLoop < djList.length; djLoop++ ) {
@@ -994,9 +1039,9 @@ const userFunctions = ( bot ) => {
 
         whatsPlayLimit: function ( data, chatFunctions ) {
             if ( this.DJPlaysLimited() ) {
-                chatFunctions.botSpeak( data, 'The play limit is currently set to ' + this.DJsPlayLimit() );
+                chatFunctions.botSpeak( data, 'The DJ play limit is currently set to ' + this.DJsPlayLimit() );
             } else {
-                chatFunctions.botSpeak( data, 'The play limit is not currently active' );
+                chatFunctions.botSpeak( data, 'The DJ play limit is not currently active' );
             }
         },
 
@@ -1283,7 +1328,7 @@ const userFunctions = ( bot ) => {
             if ( roomDefaults.queueActive === true ) {
                 chatFunctions.botSpeak( data, this.buildQueueMessage() );
             } else {
-                chatFunctions.botSpeak( data, "The queue is not active" );
+                chatFunctions.botSpeak( data, "The DJ queue is not active" );
             }
         },
 
@@ -1302,9 +1347,9 @@ const userFunctions = ( bot ) => {
             }.bind( this ) );
 
             if ( listOfUsers !== '' ) {
-                message = "The queue is currently: " + listOfUsers;
+                message = "The DJ queue is currently: " + listOfUsers;
             } else {
-                message = "The queue is empty...";
+                message = "The DJ queue is empty...";
             }
 
             return message;

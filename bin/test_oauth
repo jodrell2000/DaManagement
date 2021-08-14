@@ -1,0 +1,13 @@
+#!/usr/bin/env node
+
+// to test you'll beed a client_secret.json file in this directory
+// and run ./test_oauth
+
+let SCOPES = [ "https://www.googleapis.com/auth/youtube.readonly" ];
+let authorize = require('../modules/oauth2lib');
+authorize('client_secret.json', 'client_token.json', SCOPES)
+  .then((client) => {
+    console.log("AUTHED", client);
+});
+
+

@@ -20,13 +20,37 @@ There are 2 bots in this repo. The actuall turntable.fm bot called <strong>DaMan
 * uses the modules in the folder *chatbot*
 * uses the file *authChat.js* for its authentication details
 
+### linting and code formating
+* use eslint to find code problems:
+  ```
+  npm run lint
+  ```
+
+* use prettier to check code:
+  ```
+  npm run tidy
+  ```
+  
+* use prettier to tidy code:
+  ```
+  npm run tidy:fix
+  ```
+  
 ### DaManagement
+* prerequisite installs
+  ```
+  npm install -g npm-check-updates
+  ncu -u
+  npm ci 
+  ```
+  
 * start it directly using:
   ```
   node DaManagement.js
   ```
 * or start it with the bash script to restart it following any crashes after 30 seconds of innactivity
   * this does mean that if the bot is shutdown using the sarahConner command it will be restarted...probably means you shouldn't use this command if you suspect your bot has disruptive bugs ;-)
+  * 
   ```
   ./startManagement.sh
   ```

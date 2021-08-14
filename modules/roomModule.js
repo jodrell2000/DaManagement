@@ -3,7 +3,6 @@ let musicDefaults = require( '../defaultSettings/musicDefaults.js' );
 let botDefaults = require( '../defaultSettings/botDefaults.js' );
 
 let djCount = null; //the number of dj's on stage, gets reset every song
-let checkWhoIsDj = null; //the userid of the currently playing dj
 let bannedArtistsMatcher = ''; //holds the regular expression for banned artist / song matching
 let tempBanList = []; //holds the userid of everyone who is in the command based banned from stage list
 let skipVoteUsers = []; //holds the userid's of everyone who has voted for the currently playing song to be skipped, is cleared every song
@@ -29,7 +28,7 @@ const roomFunctions = ( bot ) => {
 
     return {
         djCount: () => djCount, setDJCount: function ( theCount ) { djCount = theCount; },
-        checkWhoIsDj: () => checkWhoIsDj, setCheckWhoIsDj: function ( currentDJ ) { checkWhoIsDj = currentDJ; },
+
         bannedArtistsMatcher: () => bannedArtistsMatcher,
         tempBanList: () => tempBanList,
         skipVoteUsers: () => skipVoteUsers,
@@ -69,8 +68,8 @@ const roomFunctions = ( bot ) => {
         },
 
         clearDecksForVIPs: function ( userFunctions, authModule ) {
-            if ( userFunctions.vipList.length !== 0 && userFunctions.djList().length !== userFunctions.vipList.length ) {
-                for ( let p = 0; p < userFunctions.djList().length; p++ ) {
+            if ( userFunctions.vipList.length !== 0 && userFunctions.howManyDJs() !== userFunctions.vipList.length ) {
+                for ( let p = 0; p < userFunctions.howManyDJs(); p++ ) {
                     let checkIfVip = userFunctions.vipList.indexOf( userFunctions.djList()[ p ] );
                     if ( checkIfVip === -1 && userFunctions.djList()[ p ] !== authModule.USERID ) {
                         bot.remDj( userFunctions.djList()[ p ] );
@@ -78,7 +77,6 @@ const roomFunctions = ( bot ) => {
                 }
             }
         },
-
 
         formatBannedArtists: function () {
             if ( musicDefaults.bannedArtists.length !== 0 ) {

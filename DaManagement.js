@@ -5,6 +5,7 @@
 */
 
 /*******************************BeginSetUp*****************************************************************************/
+/* load the ttapi */
 let Bot = require( 'ttapi' );
 
 let authModule = require( './auth.js' );
@@ -18,6 +19,7 @@ let roomModule = require( './modules/roomModule.js' );
 let chatModule = require( './modules/chatModule.js' );
 let songModule = require( './modules/songModule.js' );
 let commandModule = require( './modules/commandModule.js' );
+let videoModule = require( './modules/videoModule.js' );
 /************************************EndSetUp**********************************************************************/
 
 let bot = new Bot( authModule.AUTH, authModule.USERID, authModule.ROOMID ); //initializes the bot
@@ -30,6 +32,7 @@ const chatFunctions = chatModule( bot, roomDefaults );
 const songFunctions = songModule( bot );
 const roomFunctions = roomModule( bot );
 const commandFunctions = commandModule( bot );
+const videoFunctions = videoModule( bot );
 
 function logMe ( logLevel, message ) {
     switch ( logLevel ) {
@@ -48,7 +51,6 @@ function logMe ( logLevel, message ) {
             }
             break;
     }
-
 }
 
 // do something when the bot disconnects?
@@ -63,7 +65,7 @@ setInterval( function () {
 
 // check if DJs are idle every minute
 setInterval( function () {
-    if ( roomDefaults.removeIdleDJs === true ) {
+    if ( userFunctions.removeIdleDJs() === true ) {
         userFunctions.idledOutDJCheck( roomDefaults, chatFunctions );
     }
 }, 10 * 1000 );
@@ -73,7 +75,7 @@ setInterval( function () { userFunctions.roomIdleCheck( roomDefaults, chatFuncti
 
 // every 5 seconds, check if the there's an empty DJ slot, and promt the next in the queue to join the decks, remove them if they don't
 setInterval( function () {
-    if ( roomDefaults.queueActive === true && userFunctions.queueList().length !== 0 && ( userFunctions.refreshDJCount() + userFunctions.djList().length ) < 5 ) {
+    if ( roomDefaults.queueActive === true && userFunctions.queueList().length !== 0 && ( userFunctions.refreshDJCount() + userFunctions.howManyDJs() ) < 5 ) {
         userFunctions.setDJToNotify( userFunctions.headOfQueue() );
         if ( botFunctions.sayOnce() === true ) {
             botFunctions.setSayOnce( false );
@@ -125,7 +127,7 @@ bot.on( 'registered', function ( data ) {
         userFunctions.bootThisUser( theUserID, bootMessage );
     } else {
         //if there are 5 dj's on stage and the queue is turned on when a user enters the room
-        if ( roomDefaults.queueActive === true && userFunctions.djList().length === 5 ) {
+        if ( roomDefaults.queueActive === true && userFunctions.howManyDJs() === 5 ) {
             bot.pm( 'The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.', userFunctions.getUsername( theUserID ) );
         }
 
@@ -209,12 +211,12 @@ bot.on( 'newsong', function ( data ) {
 
     //if the bot is the only one on stage and they are skipping their songs
     //they will stop skipping
-    if ( roomFunctions.djCount() === 1 && roomFunctions.checkWhoIsDj() === authModule.USERID && botFunctions.skipOn === true ) {
+    if ( roomFunctions.djCount() === 1 && userFunctions.getCurrentDJID() === authModule.USERID && botFunctions.skipOn === true ) {
         botFunctions.setSkipOn( false );
     }
 
     //used to have the bot skip its song if its the current player and skipOn command was used
-    if ( authModule.USERID === roomFunctions.checkWhoIsDj() && botFunctions.skipOn() === true ) {
+    if ( authModule.USERID === userFunctions.getCurrentDJID() && botFunctions.skipOn() === true ) {
         bot.skip();
     }
 
@@ -223,7 +225,7 @@ bot.on( 'newsong', function ( data ) {
 
     //removes current dj from stage if they play a banned song or artist.
     if ( musicDefaults.bannedArtists.length !== 0 && typeof songFunctions.artist() !== 'undefined' && typeof songFunctions.song() !== 'undefined' ) {
-        const djCheck = roomFunctions.checkWhoIsDj();
+        const djCheck = userFunctions.getCurrentDJID();
         let checkIfAdmin = userFunctions.masterIds().indexOf( djCheck ); //is user an exempt admin?
         let nameDj = userFunctions.theUsersList().indexOf( djCheck ) + 1; //the currently playing dj's name
 
@@ -244,7 +246,7 @@ bot.on( 'newsong', function ( data ) {
             else if ( musicDefaults.matchArtists ) //if just artist matching is enabled
             {
                 if ( songFunctions.artist().match( roomFunctions.bannedArtistsMatcher() ) ) {
-                    bot.remDj( roomFunctions.checkWhoIsDj() );
+                    bot.remDj( userFunctions.getCurrentDJID() );
 
                     if ( typeof userFunctions.theUsersList()[ nameDj ] !== 'undefined' ) {
                         bot.speak( '@' + userFunctions.theUsersList()[ nameDj ] + ' you have played a banned artist.' );
@@ -284,10 +286,10 @@ bot.on( 'newsong', function ( data ) {
 
 //bot gets on stage and starts djing if no song is playing.
 bot.on( 'nosong', function () {
-    if ( botDefaults.getonstage === true &&
+    if ( botFunctions.autoDJEnabled() === true &&
         userFunctions.vipList().length === 0 &&
         userFunctions.queueList().length === 0 &&
-        userFunctions.refreshList().length === 0 ) {
+        userFunctions.refreshDJCount() === 0 ) {
         bot.addDj();
     }
 
@@ -305,7 +307,7 @@ bot.on( 'speak', function ( data ) {
     userFunctions.updateUserLastSpoke( theUserID ); //update the afk position of the speaker
 
     if ( commandFunctions.wasThisACommand( data ) ) {
-        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions );
+        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions );
     }
 
     //checks to see if someone is trying to speak to an afk person or not.
@@ -323,7 +325,7 @@ bot.on( 'speak', function ( data ) {
 //checks when the bot recieves a pm
 bot.on( 'pmmed', function ( data ) {
     if ( commandFunctions.wasThisACommand( data ) ) {
-        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions );
+        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions );
     }
 } );
 
@@ -452,7 +454,7 @@ bot.on( 'endsong', function ( data ) {
     userFunctions.removeDJsOverPlaylimit( data, chatFunctions, djID );
 
     //bot says song stats for each song
-    chatFunctions.readSongStats( data, songFunctions, roomDefaults )
+    chatFunctions.readSongStats( data, songFunctions, botFunctions )
 
     roomFunctions.escortDJsDown( data, djID, botFunctions, userFunctions, chatFunctions );
 } );
