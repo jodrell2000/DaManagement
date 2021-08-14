@@ -13,6 +13,9 @@ let clientId;
 let redirectUrl;
 let oauth2Client;
 
+let musicDefaults = require( '../defaultSettings/musicDefaults.js' );
+let alertIfRegionBlocked = musicDefaults.alertIfRegionBlocked; //song play limit, this is for the playLimit variable up above(off by default)
+
 const videoFunctions = ( bot ) => {
     function getNewToken ( oauth2Client, callback ) {
         let authUrl = oauth2Client.generateAuthUrl( {
@@ -121,7 +124,7 @@ const videoFunctions = ( bot ) => {
         fs.readFile( TOKEN_PATH )
             .then( JSON.parse )
             .catch( ( err ) = {
-                return getNewToken( oauth2Client )
+//                return getNewToken( oauth2Client )
             } )
     }
 
@@ -133,17 +136,47 @@ const videoFunctions = ( bot ) => {
 
     return {
 
-        readRegions: function ( data, args, chatFunctions ) {
+        alertIfRegionBlocked: () => alertIfRegionBlocked,
+
+        listAlertRegions: function ( data, chatFunctions ) {
+            chatFunctions.botSpeak( data, 'The list of regions that will triger a blocked alert is currently ' + this.alertIfRegionBlocked() );
+        },
+
+        addAlertRegion: function ( data, args, chatFunctions ) {
+            const region = args[0];
+            if ( this.alertIfRegionBlocked().indexOf( region ) === -1 ) {
+                alertIfRegionBlocked.push( region )
+                chatFunctions.botSpeak( data, region + ' has been added to the region alerts list' );
+            } else {
+                chatFunctions.botSpeak( data, region + ' is already in the reggion alerts list' );
+            }
+        },
+
+        removeAlertRegion: function ( data, args, chatFunctions ) {
+            const region = args[0];
+            if ( this.alertIfRegionBlocked().indexOf( region ) === -1 ) {
+                chatFunctions.botSpeak( data, region + ' is not in the region alerts list' );
+            } else {
+                const listPosition = this.alertIfRegionBlocked().indexOf( region );
+                alertIfRegionBlocked.splice( listPosition, 1 );
+                chatFunctions.botSpeak( data, region + ' has been removed from the reggion alerts list' );
+            }
+        },
+
+        readRegions: function ( data, args, userFunctions, chatFunctions ) {
+            const theDJID = data.room.metadata.current_dj;
             const videoID = args[ 0 ];
+
             authorize2()
                 .then( ( oauthClient ) => checkVideo2( oauthClient, videoId ) )
                 .then( ( blocked, hasRestrictions, restrictionDescription ) => {
                     if ( blocked ) {
-                        console.log( "Video is blocked everywhere" )
+                        chatFunctions.botSpeak( data, '@' + userFunctions.getUsername( theDJID ) + ' that video is blocked everywhere' );
                     } else if ( hasRestrictions ) {
-                        console.log( "Video is restricted to " + restrictionDescription );
+                        chatFunctions.botSpeak( data, '@' + userFunctions.getUsername( theDJID ) +
+                            ' that video is blocked in the following important places' + '' );
                     } else {
-                        console.log( "Mum's the word" )
+                        console.log( "Mum's the word...video has no restrictions" )
                     }
                 } )
         },
