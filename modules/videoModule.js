@@ -1,166 +1,125 @@
 // load the googleAPI
-let { google } = require( "googleapis" );
-let authorize = require( "./oauth2lib" )
+let { google } = require("googleapis");
+let authorize = require("./oauth2lib");
 
-let SCOPES = [ "https://www.googleapis.com/auth/youtube.readonly" ];
-let TOKEN_DIR = ( process.env.HOME || process.env.HOMEPATH ) + "/.credentials/";
+let { setIntersection, setDifference } = require("../modules/setlib");
+
+let SCOPES = ["https://www.googleapis.com/auth/youtube.readonly"];
+let TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH) + "/.credentials/";
 let TOKEN_PATH = TOKEN_DIR + "theManagementCredentials.json";
 
-let musicDefaults = require( "../defaultSettings/musicDefaults.js" );
-let alertIfRegionBlocked = musicDefaults.alertIfRegionBlocked; //song play limit, this is for the playLimit variable up above(off by default)
+let musicDefaults = require("../defaultSettings/musicDefaults.js");
+let regionsWeCareAbout = new Set(musicDefaults.alertIfRegionBlocked); //song play limit, this is for the playLimit variable up above(off by default)
 
-const videoFunctions = ( bot ) => {
-    function logMe ( logLevel, message ) {
-        const theFile = 'videoFunctions';
-        switch ( logLevel ) {
-            case "error":
-                console.log( "!!!!!!!!!!! " + theFile + ":" + logLevel + "->" + message + "\n" );
-                break;
-            case "warn":
-                console.log( "+++++++++++ " + theFile + ":" + logLevel + "->" + message + "\n" );
-                break;
-            case "info":
-                console.log( "----------- " + theFile + ":" + logLevel + "->" + message + "\n" );
-                break;
-            default:
-                if ( bot.debug ) {
-                    console.log( theFile + ":" + logLevel + "->" + message + "\n" );
-                }
-                break;
-        }
+const videoFunctions = () => {
+  function alertIfRegionsNotAllowed(restrictions, notifier) {
+    let missingRegions = setDifference(
+      regionsWeCareAbout,
+      restrictions.allowed
+    );
+    if (missingRegions.length) {
+      notifier(
+        `This video can't be played in ${missingRegions}. Please consider skipping.`
+      );
     }
+  }
 
-    async function queryVideoDetails ( auth, videoID ) {
-        let service = google.youtube( "v3" );
-        return service.videos
-            .list( {
-                auth: auth,
-                part: "snippet,contentDetails,statistics",
-                id: videoID,
-            } )
-            .then( ( { data } ) => {
-                return data.items[ 0 ].contentDetails;
-            } );
+  function alertIfRegionsBlocked(restrictions, notifier) {
+    let blockedRegions = setIntersection(
+      regionsWeCareAbout,
+      restrictions.blocked
+    );
+    if (blockedRegions.length) {
+      notifier(
+        `This video can't be played in ${blockedRegions}. Please consider skipping.`
+      );
     }
+  }
 
-    async function checkVideo ( auth, videoID ) {
-        const { regionRestriction } = await queryVideoDetails( auth, videoID );
-        if ( regionRestriction !== undefined ) {
-            return regionRestriction;
-        } else {
-            return null;
-        }
-    }
+  async function queryVideoDetails(auth, videoID) {
+    let service = google.youtube("v3");
+    return service.videos
+      .list({
+        auth: auth,
+        part: "snippet,contentDetails,statistics",
+        id: videoID,
+      })
+      .then(({ data }) => {
+        return data.items[0].contentDetails;
+      });
+  }
 
-    //allow undefined blocked undefined - allowed everywhere
-    //allow undefined blocked emptyList - blocked nowhere
+  async function getRegionRestrictions(auth, videoID) {
+    const { regionRestriction } = await queryVideoDetails(auth, videoID);
+    return regionRestriction;
+  }
 
-    //allow list blocked undefined - allowed somewhere
-    //allow undefined blocked list - blocked somewhere
+  return {
+    listAlertRegions: function (data, chatFunctions) {
+      chatFunctions.botSpeak(
+        data,
+        `The list of regions that will triger a blocked alert is currently ${Array.from(
+          regionsWeCareAbout
+        )}`
+      );
+    },
 
-    //allow emptyList blocked undefined - allowed nowhere
+    addAlertRegion: function (data, args, chatFunctions) {
+      const region = args[0];
+      if (regionsWeCareAbout.has(region)) {
+        chatFunctions.botSpeak(
+          data,
+          `${region} is already in the region alerts list`
+        );
+      } else {
+        regionsWeCareAbout.add(region);
+        chatFunctions.botSpeak(
+          data,
+          `${region} has been added to the region alerts list`
+        );
+      }
+    },
 
+    removeAlertRegion: function (data, args, chatFunctions) {
+      const region = args[0];
+      const removed = regionsWeCareAbout.delete(region);
+      if (!removed) {
+        chatFunctions.botSpeak(
+          data,
+          `${region} is not in the region alerts list`
+        );
+      } else {
+        chatFunctions.botSpeak(
+          data,
+          `${region} has been removed from the region alerts list`
+        );
+      }
+    },
 
-    function areAnyAlertRegionsBlocked ( alertRegions, blockedRegions ) {
-        let blockedRegionsWeCareAbout = '';
-        for ( let checkRegionLoop = 0; checkRegionLoop < alertRegions.length; checkRegionLoop++ ) {
-            for ( let blockedRegionLoop = 0; blockedRegionLoop < blockedRegions.length; blockedRegionLoop++ ) {
-                if ( alertRegions[ checkRegionLoop ] === blockedRegions[ blockedRegionLoop ] ) {
-                    blockedRegionsWeCareAbout.push( alertRegions[ checkRegionLoop ] );
-                }
-            }
-        }
+    readRegions: function (data, args, userFunctions, chatFunctions) {
+      // const theDJID = userFunctions.getCurrentDJID()
+      const videoID = args[0];
 
-        if ( blockedRegionsWeCareAbout.length === alertRegions.length ) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    function areAllAlertRegionsAllowed ( alertRegions, allowedRegions ) {
-        let missingRegions = [];
-        for ( checkRegionLoop = 0; checkRegionLoop < alertRegions.length; checkRegionLoop++ ) {
-            if ( allowedRegions.indexOf( alertRegions[ checkRegionLoop ] ) === -1 ) {
-                missingRegions.push( alertRegions[ checkRegionLoop ] );
-            }
-        }
-
-        if ( missingRegions.length !== 0 ) {
-            return [ true, missingRegions ];
-        } else {
-            return [ false, nil ];
-        }
-    }
-
-    return {
-        alertIfRegionBlocked: () => alertIfRegionBlocked,
-
-        listAlertRegions: function ( data, chatFunctions ) {
-            chatFunctions.botSpeak(
-                data,
-                "The list of regions that will triger a blocked alert is currently " +
-                this.alertIfRegionBlocked()
+      authorize("client_secret.json", TOKEN_PATH, SCOPES)
+        .then((oauthClient) => getRegionRestrictions(oauthClient, videoID))
+        .then((restrictions) => {
+          if (restrictions.allowed !== undefined) {
+            alertIfRegionsNotAllowed(restrictions, (msg) =>
+              chatFunctions.botSpeak(data, msg)
             );
-        },
+          }
+          if (restrictions.blocked !== undefined) {
+            alertIfRegionsBlocked(restrictions, (msg) =>
+              chatFunctions.botSpeak(data, msg)
+            );
+          }
+        });
+    },
 
-        addAlertRegion: function ( data, args, chatFunctions ) {
-            const region = args[ 0 ];
-            if ( this.alertIfRegionBlocked().indexOf( region ) === -1 ) {
-                alertIfRegionBlocked.push( region );
-                chatFunctions.botSpeak(
-                    data,
-                    region + " has been added to the region alerts list"
-                );
-            } else {
-                chatFunctions.botSpeak(
-                    data,
-                    region + " is already in the reggion alerts list"
-                );
-            }
-        },
-
-        removeAlertRegion: function ( data, args, chatFunctions ) {
-            const region = args[ 0 ];
-            if ( this.alertIfRegionBlocked().indexOf( region ) === -1 ) {
-                chatFunctions.botSpeak(
-                    data,
-                    region + " is not in the region alerts list"
-                );
-            } else {
-                const listPosition = this.alertIfRegionBlocked().indexOf( region );
-                alertIfRegionBlocked.splice( listPosition, 1 );
-                chatFunctions.botSpeak(
-                    data,
-                    region + " has been removed from the reggion alerts list"
-                );
-            }
-        },
-
-        readRegions: function ( data, args, userFunctions, chatFunctions ) {
-            // const theDJID = userFunctions.getCurrentDJID()
-            const videoID = args[ 0 ];
-
-            authorize( "client_secret.json", TOKEN_PATH, SCOPES )
-                .then( ( oauthClient ) => checkVideo( oauthClient, videoID ) )
-                .then( ( restrictions ) => {
-                    if ( restrictions.allowed !== undefined ) {
-                        let [ err, regions ] = areAllAlertRegionsAllowed( this.alertIfRegionBlocked(), restrictions.allowed );
-                        logMe( 'info', 'readRegions, err: ' + err );
-                        logMe( 'info', 'readRegions, regions: ' + regions );
-                        if ( err ) {
-                            chatFunctions.botSpeak( data, 'This video can\'t be played in ' + regions + '. Please consider skipping' );
-                        }
-                    }
-                    if ( restrictions.blocked !== undefined ) {
-                        logMe( 'info', 'readRegions, restrictions: blocked found' + JSON.stringify( restrictions.blocked ) );
-                        if ( areAnyAlertRegionsBlocked( this.alertIfRegionBlocked(), restrictions.allowed ) ) {
-                            chatFunctions.botSpeak( data, 'This video can\'t be played in one of the regions we care about. Please consider skipping' );
-                        }
-                    }
-                } );
-        },
-    };
+    // this is pretty horrible, but nothing in here is easy to test
+    test_alertIfRegionsNotAllowed: alertIfRegionsNotAllowed,
+    test_alertIfRegionsBlocked: alertIfRegionsBlocked,
+  };
 };
 
 module.exports = videoFunctions;
