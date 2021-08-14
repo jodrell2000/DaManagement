@@ -1,12 +1,10 @@
 // load the googleAPI
-let fs = require( "fs/promises" );
-let readline = require( "readline" );
 let { google } = require( "googleapis" );
+let authorize = require( "./oauth2lib" )
 
-let OAuth2 = google.auth.OAuth2;
 let SCOPES = [ "https://www.googleapis.com/auth/youtube.readonly" ];
 let TOKEN_DIR = ( process.env.HOME || process.env.HOMEPATH ) + "/.credentials/";
-let TOKEN_PATH = "theManagementCredentials.json";
+let TOKEN_PATH = TOKEN_DIR + "theManagementCredentials.json";
 
 let musicDefaults = require( "../defaultSettings/musicDefaults.js" );
 let alertIfRegionBlocked = musicDefaults.alertIfRegionBlocked; //song play limit, this is for the playLimit variable up above(off by default)
@@ -50,86 +48,7 @@ const videoFunctions = ( bot ) => {
         if ( regionRestriction !== undefined ) {
             return regionRestriction;
         } else {
-            console.log( "Didn't find any regions:" + JSON.stringify( videoData ) );
             return null;
-        }
-    }
-
-    async function askUserForCredentials ( oauth2Client ) {
-        let authUrl = oauth2Client.generateAuthUrl( {
-            access_type: "offline",
-            scope: SCOPES,
-        } );
-        console.log( "Authorize this app by visiting this url: ", authUrl );
-        let rl = readline.createInterface( {
-            input: process.stdin,
-            output: process.stdout,
-        } );
-        const promise = new Promise( ( resolve, reject ) => {
-            rl.question( "Enter the code from that page here: ", function ( code ) {
-                rl.close();
-                oauth2Client.getToken( code, function ( err, token ) {
-                    if ( err ) {
-                        console.log( "Error while trying to retrieve access token", err );
-                        reject( err );
-                    } else {
-                        resolve( token );
-                    }
-                } );
-            } );
-        } );
-        return promise;
-    }
-
-    function buildClient ( credentials ) {
-        const clientSecret = credentials.installed.client_secret;
-        const clientId = credentials.installed.client_id;
-        const redirectUrl = credentials.installed.redirect_uris[ 0 ];
-
-        return new OAuth2( clientId, clientSecret, redirectUrl );
-    }
-
-    async function getAuthorizedClient ( credentials ) {
-        let oauth2Client = buildClient( credentials );
-        const storedCredentials = await loadJSONFromFile( TOKEN_DIR, TOKEN_PATH );
-        if ( storedCredentials ) {
-            oauth2Client.credentials = storedCredentials;
-        } else {
-            const newCredentials = await askUserForCredentials();
-            await storeJSONToFile( TOKEN_DIR, TOKEN_PATH, newCredentials );
-            oauth2Client.credentials = newCredentials;
-        }
-        return oauth2Client;
-    }
-
-    async function loadJSONFromFile ( dir, path ) {
-        try {
-            const contents = await fs.readFile( dir + path );
-            return JSON.parse( contents );
-        } catch ( err ) {
-            console.error( `Error loading JSON from file ${ path } : ${ err }` );
-            return null;
-        }
-    }
-
-    async function ensureDirectoryExists ( dir ) {
-        try {
-            await fs.mkdir( dir );
-        } catch ( err ) {
-            if ( err.code != "EEXIST" ) {
-                console.error( `Error making directory ${ dir } : ${ err }` );
-                throw err;
-            }
-        }
-    }
-
-    async function storeJSONToFile ( dir, path, content ) {
-        await ensureDirectoryExists( dir );
-        try {
-            return fs.writeFile( dir + path, JSON.stringify( content ) );
-        } catch ( err ) {
-            console.error( `Error saving JSON to file ${ path } : ${ err }` );
-            throw err;
         }
     }
 
@@ -141,15 +60,11 @@ const videoFunctions = ( bot ) => {
 
     //allow emptyList blocked undefined - allowed nowhere
 
-    async function authorize () {
-        const clientAuth = await loadJSONFromFile( "", "client_secret.json" );
-        return await getAuthorizedClient( clientAuth );
-    }
 
     function areAnyAlertRegionsBlocked ( alertRegions, blockedRegions ) {
         let blockedRegionsWeCareAbout = '';
-        for ( checkRegionLoop = 0; checkRegionLoop < alertRegions.length; checkRegionLoop++ ) {
-            for ( blockedRegionLoop = 0; blockedRegionLoop < allowedRegions.length; blockedRegionLoop++ ) {
+        for ( let checkRegionLoop = 0; checkRegionLoop < alertRegions.length; checkRegionLoop++ ) {
+            for ( let blockedRegionLoop = 0; blockedRegionLoop < blockedRegions.length; blockedRegionLoop++ ) {
                 if ( alertRegions[ checkRegionLoop ] === blockedRegions[ blockedRegionLoop ] ) {
                     blockedRegionsWeCareAbout.push( alertRegions[ checkRegionLoop ] );
                 }
@@ -223,10 +138,10 @@ const videoFunctions = ( bot ) => {
         },
 
         readRegions: function ( data, args, userFunctions, chatFunctions ) {
-            const theDJID = userFunctions.getCurrentDJID()
+            // const theDJID = userFunctions.getCurrentDJID()
             const videoID = args[ 0 ];
 
-            authorize()
+            authorize( "client_secret.json", TOKEN_PATH, SCOPES )
                 .then( ( oauthClient ) => checkVideo( oauthClient, videoID ) )
                 .then( ( restrictions ) => {
                     if ( restrictions.allowed !== undefined ) {
@@ -244,26 +159,6 @@ const videoFunctions = ( bot ) => {
                         }
                     }
                 } );
-            //  .then((blocked, hasRestrictions, restrictionDescription) => {
-            //    if (blocked) {
-            //      chatFunctions.botSpeak(
-            //        data,
-            //        "@" +
-            //          userFunctions.getUsername(theDJID) +
-            //          " that video is blocked everywhere"
-            //      );
-            //    } else if (hasRestrictions) {
-            //      chatFunctions.botSpeak(
-            //        data,
-            //        "@" +
-            //          userFunctions.getUsername(theDJID) +
-            //          " that video is blocked in the following important places" +
-            //          ""
-            //      );
-            //    } else {
-            //      console.log("Mum's the word...video has no restrictions");
-            //    }
-            //  });
         },
     };
 };
