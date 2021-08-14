@@ -65,6 +65,9 @@ const commandFunctions = ( bot ) => {
     generalCommands.regionAlerts = ( { data, botFunctions, videoFunctions, chatFunctions } ) => { videoFunctions.listAlertRegions( data, chatFunctions ); }
     generalCommands.regionAlerts.help = "Show the list of regions that DJs are alerted about ";
 
+    generalCommands.botStatus = ( { data, botFunctions, chatFunctions } ) => { botFunctions.reportBotStatus( data, chatFunctions ); }
+    generalCommands.botStatus.help = "Show the list of regions that DJs are alerted about ";
+
     // #############################################
     // General user Queue commands
     // #############################################
@@ -200,7 +203,7 @@ const commandFunctions = ( bot ) => {
     // Bot control commands
     // #############################################
 
-    botCommands.uptime = ( { data, botFunctions, chatFunctions } ) => { botFunctions.uptime( data, chatFunctions ); }
+    botCommands.uptime = ( { data, botFunctions, chatFunctions } ) => { botFunctions.reportUptime( data, chatFunctions ); }
     botCommands.uptime.help = "Tells you how long the bot has been running for";
 
     botCommands.playlist = ( { data, chatFunctions } ) => { chatFunctions.readPlaylistStats( data ); }

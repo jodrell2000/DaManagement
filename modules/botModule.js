@@ -86,7 +86,7 @@ const botFunctions = ( bot ) => {
             shutMeDown();
         },
 
-        uptime: function ( data, chatFunctions ) {
+        reportUptime: function ( data, chatFunctions ) {
             let msecPerMinute = 1000 * 60;
             let msecPerHour = msecPerMinute * 60;
             let msecPerDay = msecPerHour * 24;
@@ -101,7 +101,7 @@ const botFunctions = ( bot ) => {
 
             let minutes = Math.floor( currentTime / msecPerMinute );
 
-            chatFunctions.botSpeak( data, 'bot uptime: ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes' );
+            chatFunctions.botSpeak( data, 'I\'ve been up for: ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes' );
         },
 
         songStatsCommand: function ( data, chatFunctions ) {
@@ -128,16 +128,26 @@ const botFunctions = ( bot ) => {
             }
         },
 
+        reportBotStatus: function ( data, chatFunctions ) {
+            const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
+            const doInOrder = async () => {
+                this.reportUptime( data, chatFunctions ); await sleep( 100 );
+                this.reportAutoDJStatus( data, chatFunctions ); await sleep( 100 );
+                this.reportSongStats( data, chatFunctions ); await sleep( 100 );
+            }
+            doInOrder();
+        },
+
         // ========================================================
 
         autoDJEnabled: () => autoDJEnabled,
         enableautoDJ: function ( data, chatFunctions ) {
             autoDJEnabled = true;
-            chatFunctions.botSpeak( data, 'Auto DJing is now enabled. The Bot will DJ when the DJ Count gets to ' + this.whenToGetOnStage() + ' and will stop when there are ' + this.whenToGetOffStage() + ' DJs playing' );
-        },
+            this.reportAutoDJStatus( data, chatFunctions );
+            },
         disableautoDJ: function ( data, chatFunctions ) {
             autoDJEnabled = false;
-            chatFunctions.botSpeak( data, 'Auto DJing is now disabled' )
+            this.reportAutoDJStatus( data, chatFunctions );
         },
 
         whenToGetOnStage: () => whenToGetOnStage,
@@ -147,7 +157,7 @@ const botFunctions = ( bot ) => {
                 chatFunctions.botSpeak( data, 'Don\'t be silly. I can\'t set the auto-DJing start value to ' + numberOfDJs );
             } else {
                 whenToGetOnStage = numberOfDJs;
-                chatFunctions.botSpeak( data, 'Auto-DJing will now start at ' + numberOfDJs + ' and stop at ' + this.whenToGetOffStage() );
+                this.reportAutoDJStatus( data, chatFunctions )
             }
         },
 
@@ -158,18 +168,33 @@ const botFunctions = ( bot ) => {
                 chatFunctions.botSpeak( data, 'Don\'t be silly. I can\'t set the auto-DJing stop value to ' + numberOfDJs );
             } else {
                 whenToGetOffStage = numberOfDJs;
-                chatFunctions.botSpeak( data, 'Auto-DJing will now start at ' + this.whenToGetOnStage() + ' and stop at ' + numberOfDJs );
+                this.reportAutoDJStatus( data, chatFunctions )
+            }
+        },
+
+        reportAutoDJStatus: function ( data, chatFunctions ) {
+            if ( this.autoDJEnabled() ) {
+                chatFunctions.botSpeak( data, 'Auto-DJing is enabled and will start at ' + this.whenToGetOnStage() + ' and stop at ' + this.whenToGetOffStage() );
+            } else {
+                chatFunctions.botSpeak( data, 'Auto DJing is disabled' )
             }
         },
 
         readSongStats: () => readSongStats,
         enableReadSongStats: function ( data, chatFunctions ) {
             readSongStats = true;
-            chatFunctions.botSpeak( data, 'Song stats are now enabled')
+            this.reportSongStats( data, chatFunctions );
         },
         disableReadSongStats: function ( data, chatFunctions ) {
             readSongStats = false;
-            chatFunctions.botSpeak( data, 'Song stats are now disabled')
+            this.reportSongStats( data, chatFunctions );
+        },
+        reportSongStats: function ( data, chatFunctions ) {
+            if ( this.readSongStats() ) {
+                chatFunctions.botSpeak( data, 'Song stat reporting is enabled' );
+            } else {
+                chatFunctions.botSpeak( data, 'Song stats reporting is enabled' );
+            }
         },
 
         checkIfConnected: function () {
