@@ -149,7 +149,7 @@ const videoFunctions = ( bot ) => {
                         logMe( 'info', 'readRegions, err: ' + err );
                         logMe( 'info', 'readRegions, regions: ' + regions );
                         if ( err ) {
-                            chatFunctions.botSpeak( data, 'This video can\'t be played in ' + JSON.stringify( regions ) + '. Please consider skipping' );
+                            chatFunctions.botSpeak( data, 'This video can\'t be played in ' + regions + '. Please consider skipping' );
                         }
                     }
                     if ( restrictions.blocked !== undefined ) {
