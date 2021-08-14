@@ -164,19 +164,17 @@ const videoFunctions = ( bot ) => {
     }
 
     function areAllAlertRegionsAllowed ( alertRegions, allowedRegions ) {
-        let allowedRegionsWeCareAbout = [];
+        let missingRegions = [];
         for ( checkRegionLoop = 0; checkRegionLoop < alertRegions.length; checkRegionLoop++ ) {
-            for ( allowedRegionLoop = 0; allowedRegionLoop < allowedRegions.length; allowedRegionLoop++ ) {
-                if ( alertRegions[ checkRegionLoop ] === allowedRegions[ allowedRegionLoop ] ) {
-                    allowedRegionsWeCareAbout.push( alertRegions[ checkRegionLoop ] );
-                }
+            if ( allowedRegions.indexOf( alertRegions[ checkRegionLoop ] ) === -1 ) {
+                missingRegions.push( alertRegions[ checkRegionLoop ] );
             }
         }
 
-        if ( allowedRegionsWeCareAbout.length === alertRegions.length ) {
-            return true;
+        if ( missingRegions.length !== 0 ) {
+            return [ true, missingRegions ];
         } else {
-            return false;
+            return [ false, nil ];
         }
     }
 
@@ -232,10 +230,11 @@ const videoFunctions = ( bot ) => {
                 .then( ( oauthClient ) => checkVideo( oauthClient, videoID ) )
                 .then( ( restrictions ) => {
                     if ( restrictions.allowed !== undefined ) {
-                        logMe( 'info', 'readRegions, restrictions: allowed found' + JSON.stringify( restrictions.allowed ) );
-                        logMe( 'info', 'readRegions, restrictions: ' + restrictions.allowed.length + ' found' );
-                        if ( !areAllAlertRegionsAllowed( this.alertIfRegionBlocked(), restrictions.allowed ) ) {
-                            chatFunctions.botSpeak( data, 'This video can\'t be played in one of the regions we care about. Please consider skipping' );
+                        let [ err, regions ] = areAllAlertRegionsAllowed( this.alertIfRegionBlocked(), restrictions.allowed );
+                        logMe( 'info', 'readRegions, err: ' + err );
+                        logMe( 'info', 'readRegions, regions: ' + regions );
+                        if ( err ) {
+                            chatFunctions.botSpeak( data, 'This video can\'t be played in ' + JSON.stringify( regions ) + '. Please consider skipping' );
                         }
                     }
                     if ( restrictions.blocked !== undefined ) {
