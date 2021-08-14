@@ -9,5 +9,10 @@
 	"devDependencies": {
 		"eslint": "^7.32.0",
 		"prettier": "^2.3.0"
-	}
+ 	},
+  "scripts": {
+    "lint": "eslint . --ext .js --ignore-pattern node_modules/",
+    "tidy": "prettier . --check",
+    "tidy:fix": "prettier . --fix"
+  }
 }
