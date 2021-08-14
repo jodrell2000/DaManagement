@@ -86,7 +86,7 @@ const botFunctions = ( bot ) => {
             shutMeDown();
         },
 
-        reportUptime: function ( data, chatFunctions ) {
+        reportUptime: function ( data, userFunctions, chatFunctions ) {
             let msecPerMinute = 1000 * 60;
             let msecPerHour = msecPerMinute * 60;
             let msecPerDay = msecPerHour * 24;
@@ -101,7 +101,7 @@ const botFunctions = ( bot ) => {
 
             let minutes = Math.floor( currentTime / msecPerMinute );
 
-            chatFunctions.botSpeak( data, 'I\'ve been up for: ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes' );
+            chatFunctions.botSpeak( data, userFunctions.getUsername( authModule.USERID ) + ' has been up for: ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes' );
         },
 
         songStatsCommand: function ( data, chatFunctions ) {
@@ -128,12 +128,16 @@ const botFunctions = ( bot ) => {
             }
         },
 
-        reportBotStatus: function ( data, chatFunctions ) {
+        reportRoomStatus: function ( data, chatFunctions, userFunctions ) {
             const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
             const doInOrder = async () => {
-                this.reportUptime( data, chatFunctions ); await sleep( 100 );
+                this.reportUptime( data, userFunctions, chatFunctions ); await sleep( 100 );
                 this.reportAutoDJStatus( data, chatFunctions ); await sleep( 100 );
                 this.reportSongStats( data, chatFunctions ); await sleep( 100 );
+                userFunctions.readQueue( data, chatFunctions ); await sleep( 100 );
+                userFunctions.whatsPlayLimit( data, chatFunctions ); await sleep( 100 );
+                userFunctions.reportDJIdleStatus( data, chatFunctions ); await sleep( 100 );
+                userFunctions.reportRefreshStatus( data, chatFunctions ); await sleep( 100 );
             }
             doInOrder();
         },

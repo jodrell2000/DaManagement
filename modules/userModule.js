@@ -496,6 +496,14 @@ const userFunctions = ( bot ) => {
             }
         },
 
+        reportRefreshStatus: function ( data, chatFunctions ) {
+            if ( roomDefaults.refreshingEnabled ) {
+                chatFunctions.botSpeak( data, 'The refresh function is enabled' )
+            } else {
+                chatFunctions.botSpeak( data, 'The refresh function is disabled' )
+            }
+        },
+
         removeRefreshFromUser: function ( userID ) {
             if ( this.userExists( userID ) ) {
                 let listPosition = this.getPositionOnUsersList( userID );
@@ -554,11 +562,18 @@ const userFunctions = ( bot ) => {
         removeIdleDJs: () => removeIdleDJs,
         enableDJIdle: function ( data, chatFunctions ) {
             removeIdleDJs = true;
-            chatFunctions.botSpeak( data, 'DJs who have been idle for longer than ' + this.djIdleLimit() + ' will be removed from the decks' )
+            this.reportDJIdleStatus( data, chatFunctions );
         },
         disableDJIdle: function ( data, chatFunctions ) {
             removeIdleDJs = false;
-            chatFunctions.botSpeak( data, 'Automatic removle of idle DJs has been disabled' )
+            this.reportDJIdleStatus( data, chatFunctions );
+        },
+        reportDJIdleStatus: function ( data, chatFunctions ) {
+            if ( this.removeIdleDJs() ) {
+                chatFunctions.botSpeak( data, 'DJs who have been idle for longer than ' + this.djIdleLimit() + ' will be removed from the decks' )
+            } else {
+                chatFunctions.botSpeak( data, 'Automatic removal of idle DJs is disabled' )
+            }
         },
 
         idleFirstWarningTime: () => idleFirstWarningTime,
@@ -1024,9 +1039,9 @@ const userFunctions = ( bot ) => {
 
         whatsPlayLimit: function ( data, chatFunctions ) {
             if ( this.DJPlaysLimited() ) {
-                chatFunctions.botSpeak( data, 'The play limit is currently set to ' + this.DJsPlayLimit() );
+                chatFunctions.botSpeak( data, 'The DJ play limit is currently set to ' + this.DJsPlayLimit() );
             } else {
-                chatFunctions.botSpeak( data, 'The play limit is not currently active' );
+                chatFunctions.botSpeak( data, 'The DJ play limit is not currently active' );
             }
         },
 
@@ -1313,7 +1328,7 @@ const userFunctions = ( bot ) => {
             if ( roomDefaults.queueActive === true ) {
                 chatFunctions.botSpeak( data, this.buildQueueMessage() );
             } else {
-                chatFunctions.botSpeak( data, "The queue is not active" );
+                chatFunctions.botSpeak( data, "The DJ queue is not active" );
             }
         },
 
@@ -1332,9 +1347,9 @@ const userFunctions = ( bot ) => {
             }.bind( this ) );
 
             if ( listOfUsers !== '' ) {
-                message = "The queue is currently: " + listOfUsers;
+                message = "The DJ queue is currently: " + listOfUsers;
             } else {
-                message = "The queue is empty...";
+                message = "The DJ queue is empty...";
             }
 
             return message;

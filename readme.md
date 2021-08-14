@@ -21,7 +21,7 @@ There are 2 bots in this repo. The actuall turntable.fm bot called <strong>DaMan
 * uses the file *authChat.js* for its authentication details
 
 ### DaManagement
-* prerequisit installs
+* prerequisite installs
   ```
   npm install -g npm-check-updates
   ncu -u

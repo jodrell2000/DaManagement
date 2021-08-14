@@ -65,8 +65,8 @@ const commandFunctions = ( bot ) => {
     generalCommands.regionAlerts = ( { data, botFunctions, videoFunctions, chatFunctions } ) => { videoFunctions.listAlertRegions( data, chatFunctions ); }
     generalCommands.regionAlerts.help = "Show the list of regions that DJs are alerted about ";
 
-    generalCommands.botStatus = ( { data, botFunctions, chatFunctions } ) => { botFunctions.reportBotStatus( data, chatFunctions ); }
-    generalCommands.botStatus.help = "Show the list of regions that DJs are alerted about ";
+    generalCommands.roomStatus = ( { data, botFunctions, chatFunctions, userFunctions } ) => { botFunctions.reportRoomStatus( data, chatFunctions, userFunctions ); }
+    generalCommands.roomStatus.help = "Show the list of regions that DJs are alerted about ";
 
     // #############################################
     // General user Queue commands
@@ -203,7 +203,7 @@ const commandFunctions = ( bot ) => {
     // Bot control commands
     // #############################################
 
-    botCommands.uptime = ( { data, botFunctions, chatFunctions } ) => { botFunctions.reportUptime( data, chatFunctions ); }
+    botCommands.uptime = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.reportUptime( data, userFunctions, chatFunctions ); }
     botCommands.uptime.help = "Tells you how long the bot has been running for";
 
     botCommands.playlist = ( { data, chatFunctions } ) => { chatFunctions.readPlaylistStats( data ); }
@@ -451,21 +451,6 @@ const commandFunctions = ( bot ) => {
                 } else {
                     whatsOn += 'autoBop: Off, ';
                 }
-                if ( roomDefaults.queueActive === true ) {
-                    whatsOn += 'queue: On, ';
-                } else {
-                    whatsOn += 'queue: Off, ';
-                }
-                if ( userFunctions.AFK() === true ) {
-                    whatsOn += 'dj afk limit: On, ';
-                } else {
-                    whatsOn += 'dj afk limit: Off, ';
-                }
-                if ( botFunctions.autoDJEnabled() === true ) {
-                    whatsOn += 'autodjing: On, ';
-                } else {
-                    whatsOn += 'autodjing: Off, ';
-                }
                 if ( roomDefaults.EVENTMESSAGE === true ) {
                     whatsOn += 'event message: On, ';
                 } else {
@@ -491,30 +476,10 @@ const commandFunctions = ( bot ) => {
                 } else {
                     whatsOn += 'audience afk limit: Off, ';
                 }
-                if ( roomDefaults.SONGSTATS === true ) {
-                    whatsOn += 'song stats: On, ';
-                } else {
-                    whatsOn += 'song stats: Off, ';
-                }
                 if ( roomDefaults.kickTTSTAT === true ) {
                     whatsOn += 'auto ttstat kick: On, ';
                 } else {
                     whatsOn += 'auto ttstat kick: Off, ';
-                }
-                if ( musicDefaults.removeIdleDJs === true ) {
-                    whatsOn += 'song length limit: On, ';
-                } else {
-                    whatsOn += 'song length limit: Off, ';
-                }
-                if ( musicDefaults.DJPlaysLimit === true ) {
-                    whatsOn += 'song play limit: On, ';
-                } else {
-                    whatsOn += 'song play limit: Off, ';
-                }
-                if ( roomDefaults.refreshingEnabled === true ) {
-                    whatsOn += 'refreshing: On, ';
-                } else {
-                    whatsOn += 'refreshing: Off, ';
                 }
                 if ( botFunctions.skipOn() === true ) {
                     whatsOn += 'autoskipping: On, ';
@@ -1419,97 +1384,6 @@ const commandFunctions = ( bot ) => {
                     bot.remDj( userFunctions.theUsersList()[ checkUser ] );
                     userFunctions.setAsModerator();
                 }
-            } else if ( text.match( /^\/botstatus/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                let whatsOn = '';
-
-                if ( roomDefaults.queueActive === true ) {
-                    whatsOn += 'queue: On, ';
-                } else {
-                    whatsOn += 'queue: Off, ';
-                }
-                if ( userFunctions.AFK() === true ) {
-                    whatsOn += 'dj afk limit: On, ';
-                } else {
-                    whatsOn += 'dj afk limit: Off, ';
-                }
-                if ( botFunctions.autoDJEnabled() === true ) {
-                    whatsOn += 'autodjing: On, ';
-                } else {
-                    whatsOn += 'autodjing: Off, ';
-                }
-                if ( roomDefaults.EVENTMESSAGE === true ) {
-                    whatsOn += 'event message: On, ';
-                } else {
-                    whatsOn += 'event message: Off, ';
-                }
-                if ( roomDefaults.MESSAGE === true ) {
-                    whatsOn += 'room message: On, ';
-                } else {
-                    whatsOn += 'room message: Off, ';
-                }
-                if ( roomFunctions.GREET() === true ) {
-                    whatsOn += 'greeting message: On, ';
-                } else {
-                    whatsOn += 'greeting message: Off, ';
-                }
-                if ( musicDefaults.voteSkip === true ) {
-                    whatsOn += 'voteskipping: On, ';
-                } else {
-                    whatsOn += 'voteskipping: Off, ';
-                }
-                if ( userFunctions.roomIdle() === true ) {
-                    whatsOn += 'audience afk limit: On, ';
-                } else {
-                    whatsOn += 'audience afk limit: Off, ';
-                }
-                if ( roomDefaults.SONGSTATS === true ) {
-                    whatsOn += 'song stats: On, ';
-                } else {
-                    whatsOn += 'song stats: Off, ';
-                }
-                if ( roomDefaults.kickTTSTAT === true ) {
-                    whatsOn += 'auto ttstat kick: On, ';
-                } else {
-                    whatsOn += 'auto ttstat kick: Off, ';
-                }
-                if ( musicDefaults.removeIdleDJs === true ) {
-                    whatsOn += 'song length limit: On, ';
-                } else {
-                    whatsOn += 'song length limit: Off, ';
-                }
-                if ( musicDefaults.DJPlaysLimit === true ) {
-                    whatsOn += 'song play limit: On, ';
-                } else {
-                    whatsOn += 'song play limit: Off, ';
-                }
-                if ( roomDefaults.refreshingEnabled === true ) {
-                    whatsOn += 'refreshing: On, ';
-                } else {
-                    whatsOn += 'refreshing: Off, ';
-                }
-                if ( botFunctions.skipOn() === true ) {
-                    whatsOn += 'autoskipping: On, ';
-                } else {
-                    whatsOn += 'autoskipping: Off, ';
-                }
-                if ( songFunctions.snagSong() === true ) {
-                    whatsOn += 'every song adding: On, ';
-                } else {
-                    whatsOn += 'every song adding: Off, ';
-                }
-                if ( botDefaults.autoSnag === true ) {
-                    whatsOn += 'vote based song adding: On, ';
-                } else {
-                    whatsOn += 'vote based song adding: Off, ';
-                }
-                if ( botFunctions.randomOnce() === 0 ) {
-                    whatsOn += 'playlist reordering in progress?: No';
-                } else {
-                    whatsOn += 'playlist reordering in progress?: Yes';
-                }
-
-                bot.pm( whatsOn, speaker );
-
             } else if ( text.match( '/banstage' ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
                 let ban12 = data.text.slice( 11 );
                 let checkBan = roomFunctions.tempBanList().indexOf( ban12 );
