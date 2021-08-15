@@ -1,9 +1,5 @@
 node_modules
 DaManagement.sublime-project
 DaManagement.sublime-workspace
-auth_80s.js
-auth_awesomesauce.js
-auth.js
-authChat.js
-authAudience.js
+.env
 .idea
