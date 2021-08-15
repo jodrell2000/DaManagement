@@ -3,26 +3,15 @@ Bugs
 * sending !sarahConner in PM reports that the Bot sent the command, not the user
 * check commands for correct number of arguments
   * return help description with example command rather than the Bot crashing
-* ~~queue disabled, kicking people because holding a spot for the refresh list~~
-  * ~~inconsistent and unrepeatable, needs more info~~
-* ~~after adding a user to the queue and joining, the bot eventually sends a message "Sorry @undefined you have run out of time."~~
 
 Worklist (in order)
-* add djIdle on/off commands
-* add getOnStage command
-* add botStatus command
 * add /m (rename to say??) command
 
 Feature Requests
-* create rommSummary command
-  * useful for mods just entering the room to know what's what
 * make comamnds case insensitive
 * if a DJ leaves the room, and hasn't used the refresh command they should be removed from the queue
 * restart command to not disrupt the room when changes are made
   * have the bot save the user/queue states as JSON(?) and reload them
-* parse "region": [] from current_song data to tell people if their songs are unavailable in certain countries?
-  * configurable list of countries
-  * by users?
 * Switching playlists on should not reset playcounters
   * unless you want it to?
 * remove someone from the queue if they leave the room and don’t use /refresh
@@ -40,3 +29,20 @@ Feature Requests
 https://media.giphy.com/media/l2QE4oXcsxunFIUo0/giphy.gif
 * personalised /props gifs and welcome messages tied to userIDs
 * automatic messages on passing certain scores??
+
+
+Features added
+* ~~create rommSummary command~~
+  * ~~useful for mods just entering the room to know what's what~~
+* ~~parse "region": [] from current_song data to tell people if their songs are unavailable in certain countries?~~
+  * ~~configurable list of countries~~
+  * ~~by users?~~
+* ~~add djIdle on/off commandsv
+* ~~add getOnStage command~~
+* ~~add botStatus command~~
+
+
+Bugs fixed
+* ~~queue disabled, kicking people because holding a spot for the refresh list~~
+  * ~~inconsistent and unrepeatable, needs more info~~
+* ~~after adding a user to the queue and joining, the bot eventually sends a message "Sorry @undefined you have run out of time."~~
