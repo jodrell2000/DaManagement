@@ -44,6 +44,8 @@ There are 2 bots in this repo. The actuall turntable.fm bot called <strong>DaMan
   npm ci 
   ```
   
+* next copy the file .env.example to .env and set your Bot's USERID, AUTH, ROOMID and the character you'd like to use to identify commands sent to it
+  
 * start it directly using:
   ```
   node DaManagement.js
@@ -55,7 +57,6 @@ There are 2 bots in this repo. The actuall turntable.fm bot called <strong>DaMan
   ./startManagement.sh
   ```
 * uses the modules in the folder *modules*
-* uses the file *auth.js* for its authentication details
 * static configuration settings are contained in files within the *defaultSettings* folder
 * modules containing functions and variables that are mofifyiable using commands are contained in the *modules* folder
 
