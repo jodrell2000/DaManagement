@@ -196,6 +196,8 @@ bot.on( 'newsong', function ( data ) {
     // set user as current DJ
     userFunctions.setCurrentDJ( data.room.metadata.current_dj );
 
+    videoFunctions.checkVideoRegionAlert( data, songFunctions.ytid(), userFunctions, chatFunctions, botFunctions );
+
     //adds a song to the end of your bots queue
     if ( songFunctions.snagSong() === true ) {
         botFunctions.checkAndAddToPlaylist( songFunctions );

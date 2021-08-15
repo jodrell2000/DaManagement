@@ -8,7 +8,7 @@ let genre = null; // info for the currently playing song, so default to null
 let artist = null; // info for the currently playing song, so default to null
 let getSong = null; // info for the currently playing song, so default to null
 let dj = null; // info for the currently playing song, so default to null
-let regions = []; // region info for the cuurrently playing song
+let ytid = null; // youTube ID of the video, used to check the regions
 
 let snagSong = false; //if true causes the bot to add every song that plays to its queue
 
@@ -50,7 +50,7 @@ const songFunctions = (bot) => {
         artist: () => artist,
         getSong: () => getSong,
         dj: () => dj,
-        regions: () => regions,
+        ytid: () => ytid,
 
         snagSong: () => snagSong,
         upVotes: () => upVotes,
@@ -123,16 +123,13 @@ const songFunctions = (bot) => {
         // ========================================================
 
         getSongTags: function ( current_song ) {
-            logMe('info', "getSongTags:" + JSON.stringify( current_song ) );
             song = current_song.metadata.song;
             album = current_song.metadata.album;
             genre = current_song.metadata.genre;
             artist = current_song.metadata.artist;
             getSong = current_song._id;
             dj = current_song.djname;
-            regions = current_song.metadata.region;
-            logMe('info', "getSongTags, regions:" + JSON.stringify( regions ) );
-
+            ytid = current_song.metadata.ytid;
         },
 
         recordUpVotes: function (data) {
