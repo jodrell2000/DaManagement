@@ -62,11 +62,11 @@ const videoFunctions = () => {
     function turnCodesIntoCountries( regionCodes ) {
         let countriesString = '';
 
-        for ( let regionLoop = 0; regionLoop < regionCodes; regionLoop++ ) {
+        for ( let regionLoop = 0; regionLoop < regionCodes.length; regionLoop++ ) {
             countriesString += countryLookup.byIso( regionCodes[ regionLoop ] ).country + ', ';
         }
 
-        countriesString = countriesString.substring( 0, regionCodes - 2 );
+        countriesString = countriesString.substring( 0, countriesString.length - 2 );
         const lastComma = countriesString.lastIndexOf( ',' );
         if ( lastComma !== -1 ) {
             countriesString = countriesString.substring( 0, lastComma ) + ' and' + countriesString.substring( lastComma + 1 )
@@ -96,6 +96,7 @@ const videoFunctions = () => {
     return {
         listAlertRegions: function ( data, chatFunctions ) {
             const regionsAsArray = Array.from( regionsWeCareAbout );
+            logMe( 'info', 'listAlertRegions, regionsAsArray:' + regionsAsArray );
             let regionReport = `The list of regions that will triger a blocked alert is currently ` + turnCodesIntoCountries( regionsAsArray );
 
             chatFunctions.botSpeak( data, regionReport );
