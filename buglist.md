@@ -1,4 +1,5 @@
 Bugs
+* bot crashes if an invalid videoID is sent to queryVideoDetails
 * sending !addme in PM incorrectly adds the Bot to the queue rather than the user
 * sending !sarahConner in PM reports that the Bot sent the command, not the user
 * check commands for correct number of arguments

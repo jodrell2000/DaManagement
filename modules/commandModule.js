@@ -268,7 +268,7 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.idleWarning2 = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.setIdleSecondWarningTime( data, args, chatFunctions ) }
     moderatorCommands.idleWarning2.help = "Time in minutes for the first Idle warning to be sent";
 
-    moderatorCommands.parseVideo = ( { data, args, videoFunctions, userFunctions, chatFunctions } ) => { videoFunctions.checkVideoRegionAlert( data, args, userFunctions, chatFunctions ) }
+    moderatorCommands.parseVideo = ( { data, args, videoFunctions, userFunctions, chatFunctions, botFunctions } ) => { videoFunctions.checkVideoRegionAlert( data, args, userFunctions, chatFunctions, botFunctions ) }
     moderatorCommands.parseVideo.help = "Test the video region checker";
 
     moderatorCommands.addAlertRegion = ( { data, args, videoFunctions, chatFunctions, botFunctions } ) => { botFunctions.addAlertRegionCommand( data, args, videoFunctions, chatFunctions ) }
