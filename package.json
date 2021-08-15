@@ -4,6 +4,7 @@
 	"dependencies": {
 		"country-code-lookup": "^0.0.19",
 		"dotenv": "^10.0.0",
+		"fs": "^0.0.1-security",
 		"google-auth-library": "^7.5.0",
 		"googleapis": "^84.0.0",
 		"ttapi": "^4.0.3"
