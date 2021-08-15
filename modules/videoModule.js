@@ -60,7 +60,6 @@ const videoFunctions = () => {
     }
 
     async function queryVideoDetails( auth, videoID ) {
-        logMe( 'info', 'queryVideoDetails, ytLink: https://www.youtube.com/watch?v=' + videoID );
         let service = google.youtube( "v3" );
         return service.videos
             .list( {
@@ -69,7 +68,6 @@ const videoFunctions = () => {
                 id: videoID,
             } )
             .then( ( { data } ) => {
-                logMe( 'info', 'queryVideoDetails, data:' + JSON.stringify( data ) );
                 return data.items[ 0 ].contentDetails;
             } );
     }
@@ -98,7 +96,6 @@ const videoFunctions = () => {
 
         addAlertRegion: function ( data, [ region ], chatFunctions ) {
             let message;
-            logMe('info', 'addAlertRegion, countryLookup.byIso( region ):' + countryLookup.byIso( region ) );
             if ( countryLookup.byIso( region ) !== null ) {
                 if ( regionsWeCareAbout.has( region ) ) {
                     message = countryLookup.byIso( region ).country + ' is already in the region alerts list';
