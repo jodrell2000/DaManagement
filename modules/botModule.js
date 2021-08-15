@@ -20,6 +20,7 @@ let readSongStats = roomDefaults.SONGSTATS;
 let autoDJEnabled = botDefaults.autoDJEnabled; //autodjing(on by default)
 let whenToGetOnStage = botDefaults.whenToGetOnStage; //when this many or less people djing the bot will get on stage(only if autodjing is enabled)
 let whenToGetOffStage = botDefaults.whenToGetOffStage;
+let checkVideoRegions = musicDefaults.alertIfRegionBlocked;
 
 const botFunctions = ( bot ) => {
     function logMe ( logLevel, message ) {
@@ -113,9 +114,9 @@ const botFunctions = ( bot ) => {
 
         autoDJCommand: function ( data, chatFunctions ) {
             if ( this.autoDJEnabled() ) {
-                this.disableautoDJ( data, chatFunctions );
+                this.disableAutoDJ( data, chatFunctions );
             } else  {
-                this.enableautoDJ( data, chatFunctions );
+                this.enableAutoDJ( data, chatFunctions );
             }
         },
 
@@ -141,14 +142,66 @@ const botFunctions = ( bot ) => {
             doInOrder();
         },
 
+        checkVideoRegionsCommand: function ( data, videoFunctions, chatFunctions ) {
+            logMe('info', 'checkVideoRegionsCommand, this.checkVideoRegions():' + this.checkVideoRegions() );
+            if ( this.checkVideoRegions() ) {
+                this.disablecheckVideoRegions( data, videoFunctions, chatFunctions );
+            } else {
+                this.enablecheckVideoRegions( data, videoFunctions, chatFunctions );
+            }
+        },
+
+        addAlertRegionCommand: function ( data, args, videoFunctions, chatFunctions ) {
+            const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
+            const doInOrder = async () => {
+                videoFunctions.addAlertRegion( data, args, chatFunctions );
+                await sleep( 1000 )
+
+                this.reportRegionCheckStatus( data, videoFunctions, chatFunctions );
+                await sleep( 1000 )
+            }
+            doInOrder();
+        },
+
+        removeAlertRegionCommand: function (  data, args, videoFunctions, chatFunctions ) {
+            const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
+            const doInOrder = async () => {
+                videoFunctions.removeAlertRegion( data, args, chatFunctions )
+                await sleep( 1000 )
+
+                this.reportRegionCheckStatus( data, videoFunctions, chatFunctions );
+                await sleep( 1000 )
+            }
+            doInOrder();
+        },
+
         // ========================================================
 
+        checkVideoRegions: () => checkVideoRegions,
+        enablecheckVideoRegions: function ( data, videoFunctions, chatFunctions ) {
+            checkVideoRegions = true;
+            this.reportRegionCheckStatus( data, videoFunctions, chatFunctions );
+        },
+        disablecheckVideoRegions: function ( data, videoFunctions, chatFunctions ) {
+            checkVideoRegions = false;
+            this.reportRegionCheckStatus( data, videoFunctions, chatFunctions );
+        },
+
+        reportRegionCheckStatus: function ( data, videoFunctions, chatFunctions ) {
+            if ( this.checkVideoRegions() ) {
+                videoFunctions.listAlertRegions( data, chatFunctions );
+            } else {
+                chatFunctions.botSpeak( data, 'Video Region checking is disabled' );
+            }
+        },
+
+
         autoDJEnabled: () => autoDJEnabled,
-        enableautoDJ: function ( data, chatFunctions ) {
+        enableAutoDJ: function ( data, chatFunctions ) {
             autoDJEnabled = true;
             this.reportAutoDJStatus( data, chatFunctions );
             },
-        disableautoDJ: function ( data, chatFunctions ) {
+        disableAutoDJ: function ( data, chatFunctions ) {
             autoDJEnabled = false;
             this.reportAutoDJStatus( data, chatFunctions );
         },

@@ -62,7 +62,7 @@ const commandFunctions = ( bot ) => {
     generalCommands.refresh = ( { data, botFunctions, userFunctions, chatFunctions } ) => { userFunctions.refreshCommand( data, chatFunctions ); }
     generalCommands.refresh.help = "Hold your spot on stage for one minute if you need to refresh your browser";
 
-    generalCommands.regionAlerts = ( { data, botFunctions, videoFunctions, chatFunctions } ) => { videoFunctions.listAlertRegions( data, chatFunctions ); }
+    generalCommands.regionAlerts = ( { data, botFunctions, videoFunctions, chatFunctions } ) => { botFunctions.reportRegionCheckStatus( data, videoFunctions, chatFunctions ); }
     generalCommands.regionAlerts.help = "Show the list of regions that DJs are alerted about ";
 
     generalCommands.roomStatus = ( { data, botFunctions, chatFunctions, userFunctions } ) => { botFunctions.reportRoomStatus( data, chatFunctions, userFunctions ); }
@@ -271,15 +271,18 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.parseVideo = ( { data, args, videoFunctions, userFunctions, chatFunctions } ) => { videoFunctions.checkVideoRegionAlert( data, args, userFunctions, chatFunctions ) }
     moderatorCommands.parseVideo.help = "Test the video region checker";
 
-    moderatorCommands.addAlertRegion = ( { data, args, videoFunctions, chatFunctions } ) => { videoFunctions.addAlertRegion( data, args, chatFunctions ) }
+    moderatorCommands.addAlertRegion = ( { data, args, videoFunctions, chatFunctions, botFunctions } ) => { botFunctions.addAlertRegionCommand( data, args, videoFunctions, chatFunctions ) }
     moderatorCommands.addAlertRegion.argumentCount = 1;
     moderatorCommands.addAlertRegion.help = "Add a new region to the list of places that DJs will be alerted about if their video is blocked from";
     moderatorCommands.addAlertRegion.sampleArguments = [ "CA" ];
 
-    moderatorCommands.removeAlertRegion = ( { data, args, videoFunctions, chatFunctions } ) => { videoFunctions.removeAlertRegion( data, args, chatFunctions ) }
+    moderatorCommands.removeAlertRegion = ( { data, args, videoFunctions, chatFunctions, botFunctions } ) => { botFunctions.removeAlertRegionCommand( data, args, videoFunctions, chatFunctions ) }
     moderatorCommands.removeAlertRegion.argumentCount = 1;
     moderatorCommands.removeAlertRegion.help = "Remove a region from the list of places that DJs will be alerted about if their video is blocked from";
     moderatorCommands.removeAlertRegion.sampleArguments = [ "CA" ];
+
+    generalCommands.checkVideoRegions = ( { data, botFunctions, chatFunctions, videoFunctions } ) => { botFunctions.checkVideoRegionsCommand( data, videoFunctions, chatFunctions ); }
+    generalCommands.checkVideoRegions.help = "Switch the region alerts on/off";
 
     // #############################################
     // Moderator Only Queue commands
