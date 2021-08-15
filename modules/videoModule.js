@@ -42,7 +42,7 @@ const videoFunctions = () => {
         );
         if ( missingRegions.length ) {
             notifier(
-                `This video can't be played in ${ missingRegions }. Please consider skipping.`
+                'This video can\'t be played in ' + turnCodesIntoCountries( missingRegions ) + '. Please consider skipping.'
             );
         }
     }
@@ -54,9 +54,25 @@ const videoFunctions = () => {
         );
         if ( blockedRegions.length ) {
             notifier(
-                `This video can't be played in ${ blockedRegions }. Please consider skipping.`
+                'This video can\'t be played in ' + turnCodesIntoCountries( blockedRegions ) + '. Please consider skipping.'
             );
         }
+    }
+
+    function turnCodesIntoCountries( regionCodes ) {
+        let countriesString = '';
+
+        for ( let regionLoop = 0; regionLoop < regionCodes; regionLoop++ ) {
+            countriesString += countryLookup.byIso( regionCodes[ regionLoop ] ).country + ', ';
+        }
+
+        countriesString = countriesString.substring( 0, regionCodes - 2 );
+        const lastComma = countriesString.lastIndexOf( ',' );
+        if ( lastComma !== -1 ) {
+            countriesString = countriesString.substring( 0, lastComma ) + ' and' + countriesString.substring( lastComma + 1 )
+        }
+
+        return countriesString;
     }
 
     async function queryVideoDetails( auth, videoID ) {
@@ -80,16 +96,7 @@ const videoFunctions = () => {
     return {
         listAlertRegions: function ( data, chatFunctions ) {
             const regionsAsArray = Array.from( regionsWeCareAbout );
-            let regionReport = `The list of regions that will triger a blocked alert is currently `;
-            for ( let regionLoop = 0; regionLoop < regionsAsArray.length; regionLoop++ ) {
-                regionReport += countryLookup.byIso( regionsAsArray[ regionLoop ] ).country + ', ';
-            }
-
-            regionReport = regionReport.substring( 0, regionReport.length - 2 );
-            const lastComma = regionReport.lastIndexOf( ',' );
-            if ( lastComma !== -1 ) {
-                regionReport = regionReport.substring( 0, lastComma ) + ' and' + regionReport.substring( lastComma + 1 )
-            }
+            let regionReport = `The list of regions that will triger a blocked alert is currently ` + turnCodesIntoCountries( regionsAsArray );
 
             chatFunctions.botSpeak( data, regionReport );
         },
