@@ -97,7 +97,7 @@ const videoFunctions = () => {
         listAlertRegions: function ( data, chatFunctions ) {
             const regionsAsArray = Array.from( regionsWeCareAbout );
             logMe( 'info', 'listAlertRegions, regionsAsArray:' + regionsAsArray );
-            let regionReport = `The list of regions that will triger a blocked alert is currently ` + turnCodesIntoCountries( regionsAsArray );
+            let regionReport = `The list of regions that will trigger a blocked alert is currently ` + turnCodesIntoCountries( regionsAsArray );
 
             chatFunctions.botSpeak( data, regionReport );
         },
