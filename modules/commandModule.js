@@ -65,7 +65,7 @@ const commandFunctions = ( bot ) => {
     generalCommands.regionAlerts = ( { data, botFunctions, videoFunctions, chatFunctions } ) => { botFunctions.reportRegionCheckStatus( data, videoFunctions, chatFunctions ); }
     generalCommands.regionAlerts.help = "Show the list of regions that DJs are alerted about ";
 
-    generalCommands.roomStatus = ( { data, botFunctions, chatFunctions, userFunctions } ) => { botFunctions.reportRoomStatus( data, chatFunctions, userFunctions ); }
+    generalCommands.roomStatus = ( { data, botFunctions, chatFunctions, userFunctions, videoFunctions } ) => { botFunctions.reportRoomStatus( data, chatFunctions, userFunctions, videoFunctions ); }
     generalCommands.roomStatus.help = "Show the list of regions that DJs are alerted about ";
 
     // #############################################

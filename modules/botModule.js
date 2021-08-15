@@ -128,7 +128,7 @@ const botFunctions = ( bot ) => {
             }
         },
 
-        reportRoomStatus: function ( data, chatFunctions, userFunctions ) {
+        reportRoomStatus: function ( data, chatFunctions, userFunctions, videoFunctions ) {
             const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
             const doInOrder = async () => {
                 this.reportUptime( data, userFunctions, chatFunctions ); await sleep( 100 );
@@ -138,6 +138,7 @@ const botFunctions = ( bot ) => {
                 userFunctions.whatsPlayLimit( data, chatFunctions ); await sleep( 100 );
                 userFunctions.reportDJIdleStatus( data, chatFunctions ); await sleep( 100 );
                 userFunctions.reportRefreshStatus( data, chatFunctions ); await sleep( 100 );
+                this.reportRegionCheckStatus( data, videoFunctions, chatFunctions ); await sleep( 100 );
             }
             doInOrder();
         },
