@@ -6,6 +6,7 @@ Bugs
   * return help description with example command rather than the Bot crashing
 
 Worklist (in order)
+* document where to get the client_secrets.json file from and what to do with it!
 * add /m (rename to say??) command
 
 Feature Requests
