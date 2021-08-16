@@ -63,7 +63,6 @@ const userFunctions = ( bot ) => {
 
     }
 
-
     function formatSeconds ( seconds ) {
         return ( Math.floor( seconds / 60 ) ).toString() + ' minutes';
     }
@@ -220,13 +219,24 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        // ========================================================
+        whoSentTheCommand: function ( data ) {
+        // if the command was PMd userID will contain the ID of the Bot user #facepalm
+        // check if it was PMd and user senderid instead
+        if ( data.command === 'pmmed' ) {
+            return data.senderid;
+        } else {
+            return data.userid;
+        }
+    },
+
+
+    // ========================================================
         // User Helper Functions
         // ========================================================
 
         readUserStatus: function ( data, args, chatFunctions ) {
             let theUsername = '';
-            for ( userLoop = 0; userLoop < args.length; userLoop++ ) {
+            for ( let userLoop = 0; userLoop < args.length; userLoop++ ) {
                 theUsername += args[ userLoop ] + ' ';
             }
             theUsername = theUsername.substring( 0, theUsername.length - 1 );
@@ -452,13 +462,13 @@ const userFunctions = ( bot ) => {
             chatFunctions.botSpeak( data, theMessage );
         },
 
-        refreshDJCount: function ( ) {
+        refreshDJCount: function () {
             let theUserID;
             let theCount = 0;
             for ( let userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
                 theUserID = theUsersList[ userLoop ].id;
                 if ( theUsersList[ userLoop ][ 'RefreshStart' ] !== undefined ) {
-                    theCount ++;
+                    theCount++;
                 }
             }
             return theCount;
@@ -578,7 +588,7 @@ const userFunctions = ( bot ) => {
 
         idleFirstWarningTime: () => idleFirstWarningTime,
         setIdleFirstWarningTime: function ( data, args, chatFunctions ) {
-            const newWarningTime = args[0];
+            const newWarningTime = args[ 0 ];
             if ( isNaN( newWarningTime ) ) {
                 chatFunctions.botSpeak( data, 'I can\'t set the First Idle Warning time to ' + newWarningTime + ' minutes' );
             } else {
@@ -589,7 +599,7 @@ const userFunctions = ( bot ) => {
 
         idleSecondWarningTime: () => idleSecondWarningTime,
         setIdleSecondWarningTime: function ( data, args, chatFunctions ) {
-            const newWarningTime = args[0];
+            const newWarningTime = args[ 0 ];
             if ( isNaN( newWarningTime ) ) {
                 chatFunctions.botSpeak( data, 'I can\'t set the Second Idle Warning time to ' + newWarningTime + ' minutes' );
             } else {
@@ -1262,7 +1272,7 @@ const userFunctions = ( bot ) => {
         },
 
         whatsMyQueuePosition: function ( data, chatFunctions ) {
-            const userID = data.userid;
+            const userID = this.whoSentTheCommand( data );
 
             if ( !roomDefaults.queueActive ) {
                 chatFunctions.botSpeak( data, '@' + this.getUsername( userID ) + ', the queue is currently disabled' );
@@ -1277,7 +1287,8 @@ const userFunctions = ( bot ) => {
         },
 
         addme: function ( data, chatFunctions ) {
-            const userID = data.userid;
+            logMe( 'info', 'addme, data:' + JSON.stringify( data ) );
+            const userID = this.whoSentTheCommand( data );
 
             const [ added, theMessage ] = this.addUserToQueue( userID );
 
@@ -1296,7 +1307,7 @@ const userFunctions = ( bot ) => {
         },
 
         removeme: function ( data, chatFunctions ) {
-            const userID = data.userid;
+            const userID = this.whoSentTheCommand( data );
             if ( this.isUserIDInQueue( userID ) ) {
                 this.removeUserFromQueue( userID )
                 chatFunctions.botSpeak( data, "@" + this.getUsername( userID ) + ', I\'ve removed you from the queue' );
