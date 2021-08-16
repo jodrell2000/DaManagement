@@ -1,13 +1,10 @@
-Bugs
-* bot crashes if an invalid videoID is sent to queryVideoDetails
-* sending !addme in PM incorrectly adds the Bot to the queue rather than the user
-* sending !sarahConner in PM reports that the Bot sent the command, not the user
-* check commands for correct number of arguments
-  * return help description with example command rather than the Bot crashing
-
 Worklist (in order)
-* document where to get the client_secrets.json file from and what to do with it!
 * add /m (rename to say??) command
+* move, or discard, the rest of the old style commands
+* document where to get the client_secrets.json file from and what to do with it!
+* v0.9
+* stable
+* v1
 
 Feature Requests
 * make comamnds case insensitive
@@ -31,20 +28,3 @@ Feature Requests
 https://media.giphy.com/media/l2QE4oXcsxunFIUo0/giphy.gif
 * personalised /props gifs and welcome messages tied to userIDs
 * automatic messages on passing certain scores??
-
-
-Features added
-* ~~create rommSummary command~~
-  * ~~useful for mods just entering the room to know what's what~~
-* ~~parse "region": [] from current_song data to tell people if their songs are unavailable in certain countries?~~
-  * ~~configurable list of countries~~
-  * ~~by users?~~
-* ~~add djIdle on/off commandsv
-* ~~add getOnStage command~~
-* ~~add botStatus command~~
-
-
-Bugs fixed
-* ~~queue disabled, kicking people because holding a spot for the refresh list~~
-  * ~~inconsistent and unrepeatable, needs more info~~
-* ~~after adding a user to the queue and joining, the bot eventually sends a message "Sorry @undefined you have run out of time."~~
