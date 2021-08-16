@@ -75,9 +75,9 @@ const botFunctions = ( bot ) => {
             const shutMeDown = async () => {
                 // chatFunctions.botSpeak( data, "Going away now...", true );
                 await sleep( 100 )
-                logMe( 'error', 'The !sarahConner command was issued by @' + userFunctions.getUsername( data.userid ) + ' at ' + Date() );
+                logMe( 'error', 'The !sarahConner command was issued by @' + userFunctions.whoSentTheCommand( data ) + ' at ' + Date() );
                 await sleep( 100 )
-                logMe( 'error', 'Users:' + userFunctions.debugPrintTheUsersList() );
+                userFunctions.debugPrintTheUsersList();
                 await sleep( 100 )
                 logMe( 'error', 'Users:' + JSON.stringify( data ) );
                 await sleep( 100 )
