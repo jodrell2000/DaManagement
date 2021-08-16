@@ -68,6 +68,9 @@ const commandFunctions = ( bot ) => {
     generalCommands.roomStatus = ( { data, botFunctions, chatFunctions, userFunctions, videoFunctions } ) => { botFunctions.reportRoomStatus( data, chatFunctions, userFunctions, videoFunctions ); }
     generalCommands.roomStatus.help = "Show the list of regions that DJs are alerted about ";
 
+    generalCommands.dive = ( { data, botFunctions, chatFunctions, userFunctions } ) => { botFunctions.stageDiveCommand( data, chatFunctions, userFunctions, chatCommandItems.stageDiveMessages ); }
+    generalCommands.dive.help = "Leave the DJ booth with style...stagedive tho' init!";
+
     // #############################################
     // General user Queue commands
     // #############################################
@@ -707,13 +710,6 @@ const commandFunctions = ( bot ) => {
                 bot.becomeFan( userFunctions.myID );
             } else if ( data.text === '/getTags' ) {
                 bot.speak( 'artist name: ' + songFunctions.artist() + ', song name: ' + songFunctions.song() + ', album: ' + songFunctions.album() + ', genre: ' + songFunctions.genre() );
-            } else if ( text.match( /^\/dive/ ) ) {
-                let checkDj = userFunctions.djList().indexOf( data.userid );
-                if ( checkDj !== -1 ) {
-                    bot.remDj( data.userid );
-                } else {
-                    bot.pm( 'you must be on stage to use that command.', data.userid );
-                }
             } else if ( data.text === '/unfanme' ) {
                 bot.speak( '@' + userFunctions.name() + ' i am no longer your fan.' );
                 userFunctions.myID = data.userid;
@@ -1252,13 +1248,6 @@ const commandFunctions = ( bot ) => {
                 } else if ( botDefaults.autoSnag === true ) {
                     botDefaults.autoSnag = false;
                     bot.pm( 'vote snagging has been turned off', speaker );
-                }
-            } else if ( text.match( /^\/dive/ ) && isInRoom === true ) {
-                let checkDj = userFunctions.djList().indexOf( speaker );
-                if ( checkDj !== -1 ) {
-                    bot.remDj( speaker );
-                } else {
-                    bot.pm( 'you must be on stage to use that command.', speaker );
                 }
             } else if ( data.text === '/getTags' && isInRoom === true ) {
                 bot.pm( 'artist name: ' + songFunctions.artist() + ', song name: ' + songFunctions.song() + ', album: ' + songFunctions.album() + ', genre: ' + songFunctions.genre(), speaker );

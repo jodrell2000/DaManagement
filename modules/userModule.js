@@ -43,7 +43,7 @@ let idleSecondWarningTime = roomDefaults.djIdleLimitThresholds[ 2 ];
 
 
 const userFunctions = ( bot ) => {
-    function logMe ( logLevel, message ) {
+    function logMe( logLevel, message ) {
         switch ( logLevel ) {
             case "error":
                 console.log( "!!!!!!!!!!! userFunctions:" + logLevel + "->" + message + "\n" );
@@ -63,24 +63,24 @@ const userFunctions = ( bot ) => {
 
     }
 
-    function formatSeconds ( seconds ) {
+    function formatSeconds( seconds ) {
         return ( Math.floor( seconds / 60 ) ).toString() + ' minutes';
     }
 
-    function formatHours ( seconds ) {
+    function formatHours( seconds ) {
         const theHours = Math.floor( seconds / ( 60 * 60 ) );
         const theMinutes = Math.floor( ( ( seconds / ( 60 * 60 ) ) - theHours ) * 60 );
         return ( theHours ).toString() + ' hours ' + ( theMinutes ).toString() + ' minutes';
     }
 
-    function formatDays ( seconds ) {
+    function formatDays( seconds ) {
         const theDays = Math.floor( seconds / ( 60 * 60 * 24 ) );
         const theHours = Math.floor( seconds / ( 60 * 60 ) );
         const theMinutes = Math.floor( ( ( seconds / ( 60 * 60 ) ) - theHours ) * 60 );
         return ( theDays ).toString() + ' days, ' + ( theHours ).toString() + ' hours ' + ( theMinutes ).toString() + ' and minutes';
     }
 
-    function formatRelativeTime ( seconds ) {
+    function formatRelativeTime( seconds ) {
         if ( isNaN( seconds ) ) {
             return false
         } else {
@@ -220,17 +220,16 @@ const userFunctions = ( bot ) => {
         },
 
         whoSentTheCommand: function ( data ) {
-        // if the command was PMd userID will contain the ID of the Bot user #facepalm
-        // check if it was PMd and user senderid instead
-        if ( data.command === 'pmmed' ) {
-            return data.senderid;
-        } else {
-            return data.userid;
-        }
-    },
+            // if the command was PMd userID will contain the ID of the Bot user #facepalm
+            // check if it was PMd and user senderid instead
+            if ( data.command === 'pmmed' ) {
+                return data.senderid;
+            } else {
+                return data.userid;
+            }
+        },
 
-
-    // ========================================================
+        // ========================================================
         // User Helper Functions
         // ========================================================
 
@@ -674,9 +673,15 @@ const userFunctions = ( bot ) => {
 
             if ( minutesRemaining !== 0 ) {
                 theMessage = 'You have less than ' + minutesRemaining + ' minutes left of idle left.';
-                if ( roomDefaults.voteMeansActive === true ) { theActions += ' Awesome,'; }
-                if ( roomDefaults.speechMeansActive === true ) { theActions += ' Chat,'; }
-                if ( roomDefaults.snagMeansActive === true ) { theActions += ' Grab a song,'; }
+                if ( roomDefaults.voteMeansActive === true ) {
+                    theActions += ' Awesome,';
+                }
+                if ( roomDefaults.speechMeansActive === true ) {
+                    theActions += ' Chat,';
+                }
+                if ( roomDefaults.snagMeansActive === true ) {
+                    theActions += ' Grab a song,';
+                }
                 theActions = theActions.substring( 0, theActions.length - 1 );
                 const lastComma = theActions.lastIndexOf( ',' );
                 if ( lastComma !== -1 ) {
@@ -1027,15 +1032,23 @@ const userFunctions = ( bot ) => {
         },
 
         DJPlaysLimited: () => DJPlaysLimited,
-        enablePlayLimit: function () { DJPlaysLimited = true; },
-        disablePlayLimit: function () { DJPlaysLimited = false; },
+        enablePlayLimit: function () {
+            DJPlaysLimited = true;
+        },
+        disablePlayLimit: function () {
+            DJPlaysLimited = false;
+        },
 
         DJsPlayLimit: () => DJsPlayLimit,
-        setDJsPlayLimit: function ( value ) { DJsPlayLimit = value; },
+        setDJsPlayLimit: function ( value ) {
+            DJsPlayLimit = value;
+        },
 
         playLimitOnCommand: function ( data, args, chatFunctions ) {
             let theNewPlayLimit = args[ 0 ];
-            if ( isNaN( theNewPlayLimit ) ) { theNewPlayLimit = musicDefaults.DJsPlayLimit }
+            if ( isNaN( theNewPlayLimit ) ) {
+                theNewPlayLimit = musicDefaults.DJsPlayLimit
+            }
             this.enablePlayLimit();
             this.setDJsPlayLimit( theNewPlayLimit );
             chatFunctions.botSpeak( data, 'The play limit is now set to ' + this.DJsPlayLimit() );
@@ -1670,13 +1683,13 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        addWarnMeToUser ( userID ) {
+        addWarnMeToUser( userID ) {
             if ( this.isUserInUsersList( userID ) ) {
                 theUsersList[ this.getPositionOnUsersList( userID ) ][ 'WarnMe' ] = true;
             }
         },
 
-        removeWarnMeFromUser ( userID ) {
+        removeWarnMeFromUser( userID ) {
             if ( this.isUserInUsersList( userID ) ) {
                 delete theUsersList[ this.getPositionOnUsersList( userID ) ][ 'WarnMe' ];
             }
