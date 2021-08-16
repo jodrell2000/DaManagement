@@ -63,7 +63,6 @@ const userFunctions = ( bot ) => {
 
     }
 
-
     function formatSeconds ( seconds ) {
         return ( Math.floor( seconds / 60 ) ).toString() + ' minutes';
     }
@@ -93,6 +92,16 @@ const userFunctions = ( bot ) => {
             return formatHours( seconds );
         } else {
             return formatDays( seconds );
+        }
+    }
+
+    function whoSentTheCommand ( data ) {
+        // if the command was PMd userID will contain the ID of the Bot user #facepalm
+        // check if it was PMd and user senderid instead
+        if ( data.command === 'pmmed' ) {
+            return data.senderid;
+        } else {
+            return data.userid;
         }
     }
 
@@ -452,13 +461,13 @@ const userFunctions = ( bot ) => {
             chatFunctions.botSpeak( data, theMessage );
         },
 
-        refreshDJCount: function ( ) {
+        refreshDJCount: function () {
             let theUserID;
             let theCount = 0;
             for ( let userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
                 theUserID = theUsersList[ userLoop ].id;
                 if ( theUsersList[ userLoop ][ 'RefreshStart' ] !== undefined ) {
-                    theCount ++;
+                    theCount++;
                 }
             }
             return theCount;
@@ -578,7 +587,7 @@ const userFunctions = ( bot ) => {
 
         idleFirstWarningTime: () => idleFirstWarningTime,
         setIdleFirstWarningTime: function ( data, args, chatFunctions ) {
-            const newWarningTime = args[0];
+            const newWarningTime = args[ 0 ];
             if ( isNaN( newWarningTime ) ) {
                 chatFunctions.botSpeak( data, 'I can\'t set the First Idle Warning time to ' + newWarningTime + ' minutes' );
             } else {
@@ -589,7 +598,7 @@ const userFunctions = ( bot ) => {
 
         idleSecondWarningTime: () => idleSecondWarningTime,
         setIdleSecondWarningTime: function ( data, args, chatFunctions ) {
-            const newWarningTime = args[0];
+            const newWarningTime = args[ 0 ];
             if ( isNaN( newWarningTime ) ) {
                 chatFunctions.botSpeak( data, 'I can\'t set the Second Idle Warning time to ' + newWarningTime + ' minutes' );
             } else {
@@ -1277,7 +1286,8 @@ const userFunctions = ( bot ) => {
         },
 
         addme: function ( data, chatFunctions ) {
-            const userID = data.userid;
+            logMe( 'info', 'addme, data:' + JSON.stringify( data ) );
+            const userID = whoSentTheCommand( data );
 
             const [ added, theMessage ] = this.addUserToQueue( userID );
 
