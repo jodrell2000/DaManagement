@@ -878,10 +878,10 @@ const userFunctions = ( bot ) => {
         },
 
         removeDJFromList: function ( userID ) {
-            const findDJ = ( dj ) => dj === userID;
-            const listPosition = djList.findIndex( findDJ )
-
-            djList.splice( listPosition, 1 );
+            const listPosition = djList.indexOf( userID )
+            if ( listPosition !== -1 ) {
+                djList.splice( listPosition, 1 );
+            }
         },
 
         howManyDJs: function () {
@@ -946,7 +946,6 @@ const userFunctions = ( bot ) => {
                 for ( let djLoop = 0; djLoop < data.room.metadata.djs.length; djLoop++ ) {
                     djID = data.room.metadata.djs[ djLoop ];
                     if ( typeof djID !== 'undefined' ) {
-                        this.initialiseAllDJPlayCounts( djID );
                         this.addDJToList( djID );
                     }
                 }
@@ -1209,12 +1208,13 @@ const userFunctions = ( bot ) => {
             return [ true, '' ];
         },
 
-        removeUserFromQueue: function ( userID ) {
+        removeUserFromQueue: function ( userID, botFunctions ) {
             if ( !this.isUserIDInQueue( userID ) ) {
                 return [ true, "not in queue" ];
             } else {
-                const queuePosition = queueList.findIndex( ( { id } ) => id === userID );
+                const queuePosition = queueList.indexOf( userID );
                 queueList.splice( queuePosition, 1 );
+                botFunctions.setSayOnce( true );
                 return [ false, '' ];
             }
         },
@@ -1287,7 +1287,6 @@ const userFunctions = ( bot ) => {
         },
 
         addme: function ( data, chatFunctions ) {
-            logMe( 'info', 'addme, data:' + JSON.stringify( data ) );
             const userID = this.whoSentTheCommand( data );
 
             const [ added, theMessage ] = this.addUserToQueue( userID );

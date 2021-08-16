@@ -80,7 +80,7 @@ setInterval( function () {
         if ( botFunctions.sayOnce() === true ) {
             botFunctions.setSayOnce( false );
 
-            roomFunctions.queuePromptToDJ( userFunctions );
+            roomFunctions.queuePromptToDJ( chatFunctions, userFunctions );
 
             // start a timer to remove the DJ from the queue if they don't DJ
             roomFunctions.queueTimer = setTimeout( function () {
@@ -377,7 +377,7 @@ bot.on( 'add_dj', function ( data ) {
     userFunctions.addDJToList( theUserID );
 
     if ( userFunctions.isUserIDInQueue( theUserID ) ) {
-        userFunctions.removeUserFromQueue( theUserID );
+        userFunctions.removeUserFromQueue( theUserID, botFunctions );
         userFunctions.clearDJToNotify();
     }
 
