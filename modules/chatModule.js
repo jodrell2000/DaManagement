@@ -86,6 +86,12 @@ const chatFunctions = ( bot, roomDefaults ) => {
             }
         },
 
+        // ========================================================
+
+        // ========================================================
+        // Chat command functions
+        // ========================================================
+
         martikaCommand: function ( data, pictureVariable ) {
             const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
             const readInOrder = async () => {
@@ -152,6 +158,16 @@ const chatFunctions = ( bot, roomDefaults ) => {
 
             theMessage = theMessage + " for a total of " + theCount;
             this.botSpeak( data, theMessage );
+        },
+
+        ventriloquistCommand: function ( data, args ) {
+            let theMessage = '';
+            for ( let wordLoop = 0; wordLoop < args.length; wordLoop++ ) {
+                theMessage += args[ wordLoop ] + ' ';
+            }
+            theMessage = theMessage.substring( 0, theMessage.length - 1 );
+
+            this.botSpeak( data, theMessage, true );
         },
 
         // ========================================================

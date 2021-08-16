@@ -281,8 +281,11 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.removeAlertRegion.help = "Remove a region from the list of places that DJs will be alerted about if their video is blocked from";
     moderatorCommands.removeAlertRegion.sampleArguments = [ "CA" ];
 
-    generalCommands.checkVideoRegions = ( { data, botFunctions, chatFunctions, videoFunctions } ) => { botFunctions.checkVideoRegionsCommand( data, videoFunctions, chatFunctions ); }
-    generalCommands.checkVideoRegions.help = "Switch the region alerts on/off";
+    moderatorCommands.checkVideoRegions = ( { data, botFunctions, chatFunctions, videoFunctions } ) => { botFunctions.checkVideoRegionsCommand( data, videoFunctions, chatFunctions ); }
+    moderatorCommands.checkVideoRegions.help = "Switch the region alerts on/off";
+
+    moderatorCommands.m = ( { data, args, chatFunctions } ) => { chatFunctions.ventriloquistCommand( data, args ); }
+    moderatorCommands.m.help = "Make your Bot say whatever you want it to!";
 
     // #############################################
     // Moderator Only Queue commands
