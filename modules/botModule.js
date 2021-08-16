@@ -250,7 +250,7 @@ const botFunctions = ( bot ) => {
             if ( this.readSongStats() ) {
                 chatFunctions.botSpeak( data, 'Song stat reporting is enabled' );
             } else {
-                chatFunctions.botSpeak( data, 'Song stats reporting is enabled' );
+                chatFunctions.botSpeak( data, 'Song stats reporting is disabled' );
             }
         },
 
