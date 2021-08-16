@@ -29,9 +29,11 @@ const chatFunctions = ( bot, roomDefaults ) => {
         botSpeak: function ( data, message, public ) {
             let pmResponse;
             let senderID;
-            if ( data.command === "pmmed" ) {
-                pmResponse = true;
-                senderID = data.senderid
+            if ( data !== null ) {
+                if ( data.command === "pmmed" ) {
+                    pmResponse = true;
+                    senderID = data.senderid
+                }
             }
 
             if ( pmResponse === true && public === undefined ) {
