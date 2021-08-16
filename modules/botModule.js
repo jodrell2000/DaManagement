@@ -176,6 +176,20 @@ const botFunctions = ( bot ) => {
             doInOrder();
         },
 
+        stageDiveCommand: function ( data, chatFunctions, userFunctions, messageVariable ) {
+            const userID = userFunctions.whoSentTheCommand( data );
+            const receiverID = userFunctions.getCurrentDJID();
+
+            if ( userFunctions.isUserIDOnStage( userID ) ) {
+                const randomMessage = messageVariable[ Math.floor( Math.random() * messageVariable.length ) ];
+                const thisMessage = chatFunctions.buildUserToUserRandomMessage( userFunctions, userID, randomMessage, receiverID );
+                chatFunctions.botSpeak( data, thisMessage );
+                bot.remDj( userID );
+            } else {
+                chatFunctions.botSpeak( data, 'You can\'t leave the stage if you\'re not on stage...' )
+            }
+        },
+
         // ========================================================
 
         checkVideoRegions: () => checkVideoRegions,

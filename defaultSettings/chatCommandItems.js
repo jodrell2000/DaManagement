@@ -335,4 +335,11 @@ module.exports = {
         "https://media.giphy.com/media/9zZlVISU1yDIqCvsKF/giphy.gif"
     ],
 
+    stageDiveMessages: [
+        "He flies throught the air with the greatest of ease",
+        "CANNONBALL!!!",
+        "People on the floor beware, @senderUsername is coming down fast!",
+        "Screw you guys, @senderUsername is going home!"
+    ]
+
 }
