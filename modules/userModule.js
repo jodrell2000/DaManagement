@@ -176,7 +176,7 @@ const userFunctions = ( bot ) => {
         },
 
         getUserIDFromUsername: function ( theUsername ) {
-            for ( userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
+            for ( let userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
                 if ( theUsersList[ userLoop ].username === theUsername ) {
                     return theUsersList[ userLoop ].id;
                 }
@@ -454,9 +454,9 @@ const userFunctions = ( bot ) => {
         // Refresh Functions
         // ========================================================
 
-        refreshCommand: function ( data, chatFunctions ) {
+        refreshCommand: function ( data, chatFunctions, botFunctions ) {
             let theUserID = data.userid;
-            let [ _, theMessage ] = this.addRefreshToUser( theUserID );
+            let [ _, theMessage ] = this.addRefreshToUser( theUserID, botFunctions );
 
             chatFunctions.botSpeak( data, theMessage );
         },
@@ -473,8 +473,8 @@ const userFunctions = ( bot ) => {
             return theCount;
         },
 
-        addRefreshToUser: function ( userID ) {
-            if ( roomDefaults.refreshingEnabled ) {
+        addRefreshToUser: function ( userID, botFunctions ) {
+            if ( botFunctions.refreshingEnabled() ) {
                 if ( this.isUserInUsersList( userID ) ) {
                     if ( this.isUserIDOnStage( userID ) ) {
                         if ( !this.isUserInRefreshList( userID ) ) {
@@ -486,8 +486,6 @@ const userFunctions = ( bot ) => {
                             theUsersList[ listPosition ][ 'RefreshTimer' ] = setTimeout( function ( userID ) {
                                 this.removeRefreshFromUser( userID );
                             }.bind( this ), roomDefaults.amountOfTimeToRefresh * 1000 );
-
-                            ++refreshDJCount;
 
                             let message = '@' + this.getUsername( userID ) + ' i\'ll hold your spot on stage for the next ' + roomDefaults.amountOfTimeToRefresh / 60 + ' minutes';
                             return [ true, message ]
@@ -502,14 +500,6 @@ const userFunctions = ( bot ) => {
                 }
             } else {
                 return [ false, "Use of the /refresh command is currently disabled" ]
-            }
-        },
-
-        reportRefreshStatus: function ( data, chatFunctions ) {
-            if ( roomDefaults.refreshingEnabled ) {
-                chatFunctions.botSpeak( data, 'The refresh function is enabled' )
-            } else {
-                chatFunctions.botSpeak( data, 'The refresh function is disabled' )
             }
         },
 
@@ -528,6 +518,28 @@ const userFunctions = ( bot ) => {
             if ( this.userExists( userID ) ) {
                 return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'RefreshStart' ] !== undefined;
             }
+        },
+
+        whosRefreshingCommand: function ( data, chatFunctions ) {
+            let userList = '';
+            for ( let userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
+                if ( theUsersList[ userLoop ][ 'RefreshStart' ] !== undefined ) {
+                    userList += theUsersList[ userLoop ].username + ', ';
+                }
+            }
+
+            userList = userList.substring( 0, userList.length - 2 );
+            const lastComma = userList.lastIndexOf( ',' );
+            if ( lastComma !== -1 ) {
+                userList = userList.substring( 0, lastComma ) + ' and' + userList.substring( lastComma + 1 )
+            }
+
+            if ( userList === '' ) {
+                chatFunctions.botSpeak( data, 'No users are currently refreshing.' );
+            } else {
+                chatFunctions.botSpeak( data, 'The following users are currently refreshing. ' + userList );
+            }
+
         },
 
         getUsersRefreshCurrentPlayCount: function ( userID ) {

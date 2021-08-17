@@ -56,10 +56,10 @@ const commandFunctions = ( bot ) => {
     generalCommands.sarahConner = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.sarahConner( data, userFunctions, chatFunctions ); }
     generalCommands.sarahConner.help = "Shut down the Bot if it's causing problems";
 
-    generalCommands.whatsPlayLimit = ( { data, botFunctions, userFunctions, chatFunctions } ) => { userFunctions.whatsPlayLimit( data, chatFunctions ); }
+    generalCommands.whatsPlayLimit = ( { data, userFunctions, chatFunctions } ) => { userFunctions.whatsPlayLimit( data, chatFunctions ); }
     generalCommands.whatsPlayLimit.help = "Is the DJ Play Limit enabled, and if so what it's set to";
 
-    generalCommands.refresh = ( { data, botFunctions, userFunctions, chatFunctions } ) => { userFunctions.refreshCommand( data, chatFunctions ); }
+    generalCommands.refresh = ( { data, botFunctions, userFunctions, chatFunctions } ) => { userFunctions.refreshCommand( data, chatFunctions, botFunctions ); }
     generalCommands.refresh.help = "Hold your spot on stage for one minute if you need to refresh your browser";
 
     generalCommands.regionAlerts = ( { data, botFunctions, videoFunctions, chatFunctions } ) => { botFunctions.reportRegionCheckStatus( data, videoFunctions, chatFunctions ); }
@@ -289,6 +289,15 @@ const commandFunctions = ( bot ) => {
 
     moderatorCommands.m = ( { data, args, chatFunctions } ) => { chatFunctions.ventriloquistCommand( data, args ); }
     moderatorCommands.m.help = "Make your Bot say whatever you want it to!";
+
+    moderatorCommands.refreshOn = ( { data, botFunctions, chatFunctions } ) => { botFunctions.refreshOnCommand( data, chatFunctions ); }
+    moderatorCommands.refreshOn.help = "Enable the " + chatDefaults.commandIdentifier + "refresh command";
+
+    moderatorCommands.refreshOff = ( { data, botFunctions, chatFunctions } ) => { botFunctions.refreshOffCommand( data, chatFunctions ); }
+    moderatorCommands.refreshOff.help = "Disable the " + chatDefaults.commandIdentifier + "refresh command";
+
+    moderatorCommands.whosRefreshing = ( { data, userFunctions, chatFunctions } ) => { userFunctions.whosRefreshingCommand( data, chatFunctions ); }
+    moderatorCommands.whosRefreshing.help = "List of users currently using the refresh command";
 
     // #############################################
     // Moderator Only Queue commands
@@ -629,15 +638,6 @@ const commandFunctions = ( bot ) => {
                 } else {
                     bot.speak( 'no one is currently refreshing' );
                 }
-            } else if ( text.match( /^\/refreshoff/ ) && userFunctions.isUserModerator( speaker ) === true ) {
-                bot.speak( 'refreshing has been disabled' );
-                roomDefaults.refreshingEnabled = false;
-            } else if ( text.match( /^\/refreshon/ ) && userFunctions.isUserModerator( speaker ) === true ) {
-                bot.speak( 'refreshing has been enabled' );
-                roomDefaults.refreshingEnabled = true;
-            } else if ( text.match( /^\/refresh/ ) ) {
-                [ refreshSuccessful, theMessage ] = userFunctions.addRefreshToUser( data.userid );
-                if ( !refreshSuccessful ) { chatFunctions.botSpeak( null, theMessage ) }
             } else if ( text.match( /^\/greeton/ ) && userFunctions.isUserModerator( speaker ) === true ) {
                 bot.speak( 'room greeting: On' );
                 roomFunctions.enableGreet();
@@ -1072,12 +1072,6 @@ const commandFunctions = ( bot ) => {
                 } else {
                     bot.pm( 'no one is currently refreshing', speaker );
                 }
-            } else if ( text.match( /^\/refreshoff/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                bot.pm( 'refreshing has been disabled', speaker );
-                roomDefaults.refreshingEnabled = false;
-            } else if ( text.match( /^\/refreshon/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                bot.pm( 'refreshing has been enabled', speaker );
-                roomDefaults.refreshingEnabled = true;
             } else if ( text.match( /^\/whosinmodpm/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
                 if ( userFunctions.modPM.length !== 0 ) {
                     let temper = "Users in modpm: "; //holds names
