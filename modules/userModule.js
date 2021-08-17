@@ -176,7 +176,7 @@ const userFunctions = ( bot ) => {
         },
 
         getUserIDFromUsername: function ( theUsername ) {
-            for ( userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
+            for ( let userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
                 if ( theUsersList[ userLoop ].username === theUsername ) {
                     return theUsersList[ userLoop ].id;
                 }
@@ -518,6 +518,28 @@ const userFunctions = ( bot ) => {
             if ( this.userExists( userID ) ) {
                 return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'RefreshStart' ] !== undefined;
             }
+        },
+
+        whosRefreshingCommand: function ( data, chatFunctions ) {
+            let userList = '';
+            for ( let userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
+                if ( theUsersList[ userLoop ][ 'RefreshStart' ] !== undefined ) {
+                    userList += theUsersList[ userLoop ].username + ', ';
+                }
+            }
+
+            userList = userList.substring( 0, userList.length - 2 );
+            const lastComma = userList.lastIndexOf( ',' );
+            if ( lastComma !== -1 ) {
+                userList = userList.substring( 0, lastComma ) + ' and' + userList.substring( lastComma + 1 )
+            }
+
+            if ( userList === '' ) {
+                chatFunctions.botSpeak( data, 'No users are currently refreshing.' );
+            } else {
+                chatFunctions.botSpeak( data, 'The following users are currently refreshing. ' + userList );
+            }
+
         },
 
         getUsersRefreshCurrentPlayCount: function ( userID ) {

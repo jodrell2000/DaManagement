@@ -296,6 +296,9 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.refreshOff = ( { data, botFunctions, chatFunctions } ) => { botFunctions.refreshOffCommand( data, chatFunctions ); }
     moderatorCommands.refreshOff.help = "Disable the " + chatDefaults.commandIdentifier + "refresh command";
 
+    moderatorCommands.whosRefreshing = ( { data, userFunctions, chatFunctions } ) => { userFunctions.whosRefreshingCommand( data, chatFunctions ); }
+    moderatorCommands.whosRefreshing.help = "List of users currently using the refresh command";
+
     // #############################################
     // Moderator Only Queue commands
     // #############################################
@@ -635,15 +638,6 @@ const commandFunctions = ( bot ) => {
                 } else {
                     bot.speak( 'no one is currently refreshing' );
                 }
-            } else if ( text.match( /^\/refreshoff/ ) && userFunctions.isUserModerator( speaker ) === true ) {
-                bot.speak( 'refreshing has been disabled' );
-                roomDefaults.refreshingEnabled = false;
-            } else if ( text.match( /^\/refreshon/ ) && userFunctions.isUserModerator( speaker ) === true ) {
-                bot.speak( 'refreshing has been enabled' );
-                roomDefaults.refreshingEnabled = true;
-            } else if ( text.match( /^\/refresh/ ) ) {
-                [ refreshSuccessful, theMessage ] = userFunctions.addRefreshToUser( data.userid );
-                if ( !refreshSuccessful ) { chatFunctions.botSpeak( null, theMessage ) }
             } else if ( text.match( /^\/greeton/ ) && userFunctions.isUserModerator( speaker ) === true ) {
                 bot.speak( 'room greeting: On' );
                 roomFunctions.enableGreet();
@@ -1078,12 +1072,6 @@ const commandFunctions = ( bot ) => {
                 } else {
                     bot.pm( 'no one is currently refreshing', speaker );
                 }
-            } else if ( text.match( /^\/refreshoff/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                bot.pm( 'refreshing has been disabled', speaker );
-                roomDefaults.refreshingEnabled = false;
-            } else if ( text.match( /^\/refreshon/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                bot.pm( 'refreshing has been enabled', speaker );
-                roomDefaults.refreshingEnabled = true;
             } else if ( text.match( /^\/whosinmodpm/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
                 if ( userFunctions.modPM.length !== 0 ) {
                     let temper = "Users in modpm: "; //holds names
