@@ -1237,11 +1237,11 @@ const userFunctions = ( bot ) => {
             return inQueue !== -1;
         },
 
-        changeUsersQueuePosition: function ( data, args, chatFunctions ) {
+        changeUsersQueuePosition: function ( data, args, chatFunctions, botFunctions ) {
             const username = args[ 0 ];
             const userID = this.getUserIDFromUsername( username );
             const newPosition = args[ 1 ] - 1;
-            const [ err, _ ] = this.removeUserFromQueue( userID );
+            const [ err, _ ] = this.removeUserFromQueue( userID, botFunctions );
 
             logMe( 'info', '================ changeUsersQueuePosition, username:' + username );
             logMe( 'info', '================ changeUsersQueuePosition, userID:' + userID );
@@ -1258,10 +1258,10 @@ const userFunctions = ( bot ) => {
             this.readQueue( data, chatFunctions );
         },
 
-        moveUserToHeadOfQueue: function ( data, args, chatFunctions ) {
+        moveUserToHeadOfQueue: function ( data, args, chatFunctions, botFunctions ) {
             logMe( 'info', '================ moveUserToHeadOfQueue, args:' + JSON.stringify( args ) );
             args[ 1 ] = 1;
-            this.changeUsersQueuePosition( data, args, chatFunctions );
+            this.changeUsersQueuePosition( data, args, chatFunctions, botFunctions );
         },
 
         // ========================================================
@@ -1313,7 +1313,7 @@ const userFunctions = ( bot ) => {
 
         removeNotifyDJFromQueue: function ( botFunctions, userFunctions ) {
             bot.speak( 'Sorry @' + userFunctions.getUsername( this.notifyThisDJ().toString() ) + ' you have run out of time.' );
-            this.removeUserFromQueue( this.notifyThisDJ() );
+            this.removeUserFromQueue( this.notifyThisDJ(), botFunctions );
             this.clearDJToNotify();
             botFunctions.setSayOnce( true );
         },
