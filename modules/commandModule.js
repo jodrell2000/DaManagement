@@ -81,7 +81,7 @@ const commandFunctions = ( bot ) => {
     userQueueCommands.addme = ( { data, userFunctions, chatFunctions } ) => { userFunctions.addme( data, chatFunctions ); }
     userQueueCommands.addme.help = "Join the queue for the decks";
 
-    userQueueCommands.removeme = ( { data, userFunctions, chatFunctions } ) => { userFunctions.removeme( data, chatFunctions ); }
+    userQueueCommands.removeme = ( { data, userFunctions, chatFunctions, botFunctions } ) => { userFunctions.removeme( data, chatFunctions, botFunctions ); }
     userQueueCommands.removeme.help = "Remove yourself from the queue";
 
     userQueueCommands.position = ( { data, userFunctions, chatFunctions } ) => { userFunctions.whatsMyQueuePosition( data, chatFunctions ); }
@@ -299,7 +299,7 @@ const commandFunctions = ( bot ) => {
     moderatorQueueCommands.move.help = "Change a users position in the queue";
     moderatorQueueCommands.move.sampleArguments = [ 'jodrell', 1 ];
 
-    moderatorQueueCommands.bumptop = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.moveUserToHeadOfQueue( data, args, chatFunctions ) };
+    moderatorQueueCommands.bumptop = ( { data, args, userFunctions, chatFunctions, botFunctions } ) => { userFunctions.moveUserToHeadOfQueue( data, args, chatFunctions, botFunctions ) };
     moderatorQueueCommands.bumptop.argumentCount = 1;
     moderatorQueueCommands.bumptop.help = "Move a user to the head of the queue";
     moderatorQueueCommands.bumptop.sampleArguments = [ 'jodrell' ];
