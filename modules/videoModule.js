@@ -132,6 +132,7 @@ const videoFunctions = () => {
                     .then( ( oauthClient ) => getRegionRestrictions( oauthClient, videoID ) )
                     .then( ( restrictions ) => {
                         if ( restrictions !== undefined ) {
+                            logMe('info', 'checkVideoRegionAlert, data:' + data );
                             if ( restrictions.allowed !== undefined ) {
                                 alertIfRegionsNotAllowed( restrictions, ( msg ) =>
                                     chatFunctions.botSpeak( data, msg )
