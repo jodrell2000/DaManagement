@@ -81,7 +81,7 @@ const commandFunctions = ( bot ) => {
     userQueueCommands.addme = ( { data, userFunctions, chatFunctions } ) => { userFunctions.addme( data, chatFunctions ); }
     userQueueCommands.addme.help = "Join the queue for the decks";
 
-    userQueueCommands.removeme = ( { data, userFunctions, chatFunctions } ) => { userFunctions.removeme( data, chatFunctions ); }
+    userQueueCommands.removeme = ( { data, userFunctions, chatFunctions, botFunctions } ) => { userFunctions.removeme( data, chatFunctions, botFunctions ); }
     userQueueCommands.removeme.help = "Remove yourself from the queue";
 
     userQueueCommands.position = ( { data, userFunctions, chatFunctions } ) => { userFunctions.whatsMyQueuePosition( data, chatFunctions ); }

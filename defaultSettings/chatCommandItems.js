@@ -336,10 +336,11 @@ module.exports = {
     ],
 
     stageDiveMessages: [
-        "He flies throught the air with the greatest of ease",
-        "CANNONBALL!!!",
+        "@senderUsername flies throught the air with the greatest of ease",
+        "CANNONBALL!!! @senderUsername incomming",
         "People on the floor beware, @senderUsername is coming down fast!",
-        "Screw you guys, @senderUsername is going home!"
+        "Screw you guys, @senderUsername is going home!",
+        "@senderUsername dives off the stage feet first but nobody is there to catch them"
     ]
 
 }
