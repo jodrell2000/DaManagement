@@ -58,7 +58,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
 
         textMessageTheDJ: function ( data, messageVariable, userFunctions ) {
             const receiverID = userFunctions.getCurrentDJID();
-            const senderID = data.userid;
+            const senderID = userFunctions.whoSentTheCommand( data );
 
             if ( receiverID !== null ) {
                 const randomMessage = messageVariable[ Math.floor( Math.random() * messageVariable.length ) ];
@@ -72,7 +72,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
 
         pictureMessageTheDJ: function ( data, messageVariable, pictureVariable, userFunctions ) {
             const receiverID = userFunctions.getCurrentDJID();
-            const senderID = data.userid;
+            const senderID = userFunctions.whoSentTheCommand( data );
 
 
             if ( receiverID !== null ) {
