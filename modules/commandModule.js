@@ -71,6 +71,9 @@ const commandFunctions = ( bot ) => {
     generalCommands.dive = ( { data, botFunctions, chatFunctions, userFunctions } ) => { botFunctions.stageDiveCommand( data, chatFunctions, userFunctions, chatCommandItems.stageDiveMessages ); }
     generalCommands.dive.help = "Leave the DJ booth with style...stagedive tho' init!";
 
+    generalCommands.myStats = ( { data, userFunctions, chatFunctions } ) => { userFunctions.readSingleUserStatus( data, chatFunctions ) }
+    generalCommands.myStats.help = "What info does the Bot currently hold about you...handy for knowing how much time you've been wasting on here today!";
+
     // #############################################
     // General user Queue commands
     // #############################################
