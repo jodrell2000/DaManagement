@@ -2,6 +2,26 @@
 // they will be replaced inside the chat functions
 
 module.exports = {
+    // selection of lines to pick for functions
+    stageDiveMessages: [
+        "@senderUsername flies throught the air with the greatest of ease",
+        "CANNONBALL!!! @senderUsername incomming",
+        "People on the floor beware, @senderUsername is coming down fast!",
+        "Screw you guys, @senderUsername is going home!",
+        "@senderUsername dives off the stage feet first but nobody is there to catch them"
+    ],
+
+    queueInviteMessages: [
+        "@username you have :time: to get on stage...",
+        "OK @username, you're up! You have less than :time: to hit the DJ booth",
+        "@username...COME ON DOWN, erm, up. :time: left or someone else gets your spot",
+        "in :time: it'll be time for @username to DJ...hope they're ready!",
+        "@username, see that free DJ slot? It's got youur name on it for the next :time:",
+        "fine...I suppose it's time we let @username play a couple of tunes. You have :time: left!",
+        "drum roll please...it's time for @username to DJ. :time: left to get up there!"
+    ],
+
+    // selections of lines and images to pick for the various chat commands
     propsMessages: [
         "@senderUsername gives the props to @receiverUsername",
         "nice one @receiverUsername, @senderUsername thinks that's an absolute banger",
@@ -334,13 +354,5 @@ module.exports = {
         "https://media.tenor.com/images/db411cbfbf07da7f2b10f2d58b807d89/tenor.gif",
         "https://media.giphy.com/media/9zZlVISU1yDIqCvsKF/giphy.gif"
     ],
-
-    stageDiveMessages: [
-        "@senderUsername flies throught the air with the greatest of ease",
-        "CANNONBALL!!! @senderUsername incomming",
-        "People on the floor beware, @senderUsername is coming down fast!",
-        "Screw you guys, @senderUsername is going home!",
-        "@senderUsername dives off the stage feet first but nobody is there to catch them"
-    ]
 
 }
