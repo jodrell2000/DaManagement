@@ -1,6 +1,7 @@
 let roomDefaults = require( '../defaultSettings/roomDefaults.js' );
 let musicDefaults = require( '../defaultSettings/musicDefaults.js' );
 let botDefaults = require( '../defaultSettings/botDefaults.js' );
+let chatCommandItems = require( '../defaultSettings/chatCommandItems.js' );
 
 let djCount = null; //the number of dj's on stage, gets reset every song
 let bannedArtistsMatcher = ''; //holds the regular expression for banned artist / song matching
@@ -49,18 +50,24 @@ const roomFunctions = ( bot ) => {
         },
 
         queuePromptToDJ: function ( chatFunctions, userFunctions ) {
-            let thisMessage;
+            const djName = '@' + userFunctions.getUsername( userFunctions.notifyThisDJ().toString() );
+            let theMessage = chatCommandItems.queueInviteMessages[ Math.floor( Math.random() * chatCommandItems.queueInviteMessages.length ) ];
+
+            let theTime;
             if ( ( roomDefaults.queueWaitTime / 60 ) < 1 ) { //is it seconds
-                thisMessage = ' you have ' + roomDefaults.queueWaitTime + ' seconds to get on stage.';
+                theTime = roomDefaults.queueWaitTime + ' seconds';
             } else if ( ( roomDefaults.queueWaitTime / 60 ) === 1 ) { //is it one minute
                 let minute = Math.floor( ( roomDefaults.queueWaitTime / 60 ) );
-                thisMessage = ' you have ' + minute + ' minute to get on stage.';
+                theTime = minute + ' minute';
             } else if ( ( roomDefaults.queueWaitTime / 60 ) > 1 ) { //is it more than one minute
                 let minutes = Math.floor( ( roomDefaults.queueWaitTime / 60 ) );
-                thisMessage = ' you have ' + minutes + ' minutes to get on stage.';
+                theTime = minutes + ' minutes';
             }
 
-            chatFunctions.botSpeak( null, '@' + userFunctions.getUsername( userFunctions.notifyThisDJ().toString() ) + thisMessage, true );
+            theMessage = theMessage.replace( "@username", djName );
+            theMessage = theMessage.replace( ":time:", theTime );
+
+            chatFunctions.botSpeak( null, theMessage, true );
         },
 
         clearDecksForVIPs: function ( userFunctions, authModule ) {
