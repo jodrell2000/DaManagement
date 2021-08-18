@@ -1,5 +1,4 @@
 Worklist (in order)
-* add /m (rename to say??) command
 * move, or discard, the rest of the old style commands
 * document where to get the client_secrets.json file from and what to do with it!
 * v0.9
