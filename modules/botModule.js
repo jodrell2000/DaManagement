@@ -139,7 +139,7 @@ const botFunctions = ( bot ) => {
                 userFunctions.readQueue( data, chatFunctions ); await sleep( 100 );
                 userFunctions.whatsPlayLimit( data, chatFunctions ); await sleep( 100 );
                 userFunctions.reportDJIdleStatus( data, chatFunctions ); await sleep( 100 );
-                userFunctions.reportRefreshStatus( data, chatFunctions ); await sleep( 100 );
+                this.reportRefreshStatus( data, chatFunctions ); await sleep( 100 );
                 this.reportRegionCheckStatus( data, videoFunctions, chatFunctions ); await sleep( 100 );
             }
             doInOrder();
