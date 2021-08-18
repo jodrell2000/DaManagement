@@ -184,7 +184,7 @@ const userFunctions = ( bot ) => {
         },
 
         enableEscortMe: function ( data, chatFunctions ) {
-            let theUserID = data.userid;
+            const theUserID = this.whoSentTheCommand( data );
             let theError = '';
             if ( this.escortMeIsEnabled( theUserID ) ) {
                 theError += ", you've already enabled Escort Me...";
@@ -202,7 +202,7 @@ const userFunctions = ( bot ) => {
         },
 
         disableEscortMe: function ( data, chatFunctions ) {
-            let theUserID = data.userid;
+            const theUserID = this.whoSentTheCommand( data );
             let theError = '';
             if ( !this.escortMeIsEnabled( theUserID ) ) {
                 theError += ", you haven't enabled Escort Me..."
@@ -455,7 +455,7 @@ const userFunctions = ( bot ) => {
         // ========================================================
 
         refreshCommand: function ( data, chatFunctions, botFunctions ) {
-            let theUserID = data.userid;
+            const theUserID = this.whoSentTheCommand( data );
             let [ _, theMessage ] = this.addRefreshToUser( theUserID, botFunctions );
 
             chatFunctions.botSpeak( data, theMessage );
