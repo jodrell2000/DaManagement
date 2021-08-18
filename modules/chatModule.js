@@ -11,27 +11,15 @@ const chatFunctions = ( bot, roomDefaults ) => {
         }
     }
 
-    function buildUserToUserRandomMessage ( userFunctions, senderID, theMessage, receiverID ) {
-        const senderUsername = userFunctions.getUsername( senderID );
-        if ( senderUsername ) {
-            theMessage = theMessage.replace( "@senderUsername", "@" + senderUsername );
-        }
-
-        const receiverUsername = userFunctions.getUsername( receiverID );
-        if ( receiverUsername ) {
-            theMessage = theMessage.replace( "@receiverUsername", "@" + receiverUsername );
-        }
-
-        return theMessage
-    }
-
     return {
         botSpeak: function ( data, message, public ) {
             let pmResponse;
             let senderID;
-            if ( data.command === "pmmed" ) {
-                pmResponse = true;
-                senderID = data.senderid
+            if ( data !== null ) {
+                if ( data.command === "pmmed" ) {
+                    pmResponse = true;
+                    senderID = data.senderid
+                }
             }
 
             if ( pmResponse === true && public === undefined ) {
@@ -49,6 +37,21 @@ const chatFunctions = ( bot, roomDefaults ) => {
             bot.pm( message, user );
         },
 
+        buildUserToUserRandomMessage: function ( userFunctions, senderID, theMessage, receiverID ) {
+            const senderUsername = userFunctions.getUsername( senderID );
+            if ( senderUsername ) {
+                theMessage = theMessage.replace( "@senderUsername", "@" + senderUsername );
+            }
+
+            const receiverUsername = userFunctions.getUsername( receiverID );
+            if ( receiverUsername ) {
+                theMessage = theMessage.replace( "@receiverUsername", "@" + receiverUsername );
+            }
+
+            return theMessage
+        },
+
+
         // ========================================================
         // Misc chat functions
         // ========================================================
@@ -59,7 +62,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
 
             if ( receiverID !== null ) {
                 const randomMessage = messageVariable[ Math.floor( Math.random() * messageVariable.length ) ];
-                const thisMessage = buildUserToUserRandomMessage( userFunctions, senderID, randomMessage, receiverID );
+                const thisMessage = this.buildUserToUserRandomMessage( userFunctions, senderID, randomMessage, receiverID );
 
                 this.botSpeak( data, thisMessage, true );
             } else {
@@ -75,7 +78,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
             if ( receiverID !== null ) {
                 const randomMessage = messageVariable[ Math.floor( Math.random() * messageVariable.length ) ];
                 const randomPic = pictureVariable[ Math.floor( Math.random() * pictureVariable.length ) ];
-                const thisMessage = buildUserToUserRandomMessage( userFunctions, senderID, randomMessage, receiverID );
+                const thisMessage = this.buildUserToUserRandomMessage( userFunctions, senderID, randomMessage, receiverID );
 
                 this.botSpeak( data, thisMessage, true );
                 this.botSpeak( data, randomPic, true );
@@ -83,6 +86,12 @@ const chatFunctions = ( bot, roomDefaults ) => {
                 this.botSpeak( data, "@" + userFunctions.getUsername( senderID ) + " you can't send that message if there's no DJ?!?", true );
             }
         },
+
+        // ========================================================
+
+        // ========================================================
+        // Chat command functions
+        // ========================================================
 
         martikaCommand: function ( data, pictureVariable ) {
             const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
@@ -150,6 +159,16 @@ const chatFunctions = ( bot, roomDefaults ) => {
 
             theMessage = theMessage + " for a total of " + theCount;
             this.botSpeak( data, theMessage );
+        },
+
+        ventriloquistCommand: function ( data, args ) {
+            let theMessage = '';
+            for ( let wordLoop = 0; wordLoop < args.length; wordLoop++ ) {
+                theMessage += args[ wordLoop ] + ' ';
+            }
+            theMessage = theMessage.substring( 0, theMessage.length - 1 );
+
+            this.botSpeak( data, theMessage, true );
         },
 
         // ========================================================

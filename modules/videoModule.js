@@ -15,7 +15,7 @@ let musicDefaults = require( "../defaultSettings/musicDefaults.js" );
 let regionsWeCareAbout = new Set( musicDefaults.alertRegions ); //song play limit, this is for the playLimit variable up above(off by default)
 
 const videoFunctions = () => {
-    function logMe( logLevel, message ) {
+    function logMe ( logLevel, message ) {
         const theFile = 'videoFunctions';
         switch ( logLevel ) {
             case "error":
@@ -35,31 +35,31 @@ const videoFunctions = () => {
         }
     }
 
-    function alertIfRegionsNotAllowed( restrictions, notifier ) {
+    function alertIfRegionsNotAllowed ( restrictions, notifier ) {
         let missingRegions = setDifference(
             regionsWeCareAbout,
             restrictions.allowed
         );
         if ( missingRegions.length ) {
             notifier(
-                'This video can\'t be played in ' + turnCodesIntoCountries( missingRegions ) + '. Please consider skipping.'
+                'Sorry @' + userFunctions.getUsername( userFunctions.getCurrentDJID() ) + ', this video can\'t be played in ' + turnCodesIntoCountries( missingRegions ) + '. Please consider skipping.'
             );
         }
     }
 
-    function alertIfRegionsBlocked( restrictions, notifier ) {
+    function alertIfRegionsBlocked ( restrictions, notifier ) {
         let blockedRegions = setIntersection(
             regionsWeCareAbout,
             restrictions.blocked
         );
         if ( blockedRegions.length ) {
             notifier(
-                'This video can\'t be played in ' + turnCodesIntoCountries( blockedRegions ) + '. Please consider skipping.'
+                'Sorry @' + userFunctions.getUsername( userFunctions.getCurrentDJID() ) + ', this video can\'t be played in ' + turnCodesIntoCountries( blockedRegions ) + '. Please consider skipping.'
             );
         }
     }
 
-    function turnCodesIntoCountries( regionCodes ) {
+    function turnCodesIntoCountries ( regionCodes ) {
         let countriesString = '';
 
         for ( let regionLoop = 0; regionLoop < regionCodes.length; regionLoop++ ) {
@@ -75,7 +75,7 @@ const videoFunctions = () => {
         return countriesString;
     }
 
-    async function queryVideoDetails( auth, videoID ) {
+    async function queryVideoDetails ( auth, videoID ) {
         let service = google.youtube( "v3" );
         return service.videos
             .list( {
@@ -88,7 +88,7 @@ const videoFunctions = () => {
             } );
     }
 
-    async function getRegionRestrictions( auth, videoID ) {
+    async function getRegionRestrictions ( auth, videoID ) {
         const { regionRestriction } = await queryVideoDetails( auth, videoID );
         return regionRestriction;
     }
@@ -96,7 +96,6 @@ const videoFunctions = () => {
     return {
         listAlertRegions: function ( data, chatFunctions ) {
             const regionsAsArray = Array.from( regionsWeCareAbout );
-            logMe( 'info', 'listAlertRegions, regionsAsArray:' + regionsAsArray );
             let regionReport = `The list of regions that will trigger a blocked alert is currently ` + turnCodesIntoCountries( regionsAsArray );
 
             chatFunctions.botSpeak( data, regionReport );

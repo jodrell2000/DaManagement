@@ -80,7 +80,7 @@ setInterval( function () {
         if ( botFunctions.sayOnce() === true ) {
             botFunctions.setSayOnce( false );
 
-            roomFunctions.queuePromptToDJ( userFunctions );
+            roomFunctions.queuePromptToDJ( chatFunctions, userFunctions );
 
             // start a timer to remove the DJ from the queue if they don't DJ
             roomFunctions.queueTimer = setTimeout( function () {
@@ -196,7 +196,9 @@ bot.on( 'newsong', function ( data ) {
     // set user as current DJ
     userFunctions.setCurrentDJ( data.room.metadata.current_dj );
 
-    videoFunctions.checkVideoRegionAlert( data, songFunctions.ytid(), userFunctions, chatFunctions, botFunctions );
+    if ( songFunctions.ytid() !== undefined ) {
+        videoFunctions.checkVideoRegionAlert( data, songFunctions.ytid(), userFunctions, chatFunctions, botFunctions );
+    }
 
     //adds a song to the end of your bots queue
     if ( songFunctions.snagSong() === true ) {
@@ -377,7 +379,7 @@ bot.on( 'add_dj', function ( data ) {
     userFunctions.addDJToList( theUserID );
 
     if ( userFunctions.isUserIDInQueue( theUserID ) ) {
-        userFunctions.removeUserFromQueue( theUserID );
+        userFunctions.removeUserFromQueue( theUserID, botFunctions );
         userFunctions.clearDJToNotify();
     }
 

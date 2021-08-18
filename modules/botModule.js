@@ -1,6 +1,7 @@
 let roomDefaults = require( '../defaultSettings/roomDefaults.js' );
 let botDefaults = require( '../defaultSettings/botDefaults.js' );
 let musicDefaults = require( '../defaultSettings/musicDefaults.js' );
+let chatDefaults = require( '../defaultSettings/chatDefaults.js' );
 
 let authModule = require( '../auth.js' );
 const userFunctions = require( './userModule.js' );
@@ -21,6 +22,7 @@ let autoDJEnabled = botDefaults.autoDJEnabled; //autodjing(on by default)
 let whenToGetOnStage = botDefaults.whenToGetOnStage; //when this many or less people djing the bot will get on stage(only if autodjing is enabled)
 let whenToGetOffStage = botDefaults.whenToGetOffStage;
 let checkVideoRegions = musicDefaults.alertIfRegionBlocked;
+let refreshingEnabled = roomDefaults.refreshingEnabled;
 
 const botFunctions = ( bot ) => {
     function logMe ( logLevel, message ) {
@@ -75,9 +77,9 @@ const botFunctions = ( bot ) => {
             const shutMeDown = async () => {
                 // chatFunctions.botSpeak( data, "Going away now...", true );
                 await sleep( 100 )
-                logMe( 'error', 'The !sarahConner command was issued by @' + userFunctions.getUsername( data.userid ) + ' at ' + Date() );
+                logMe( 'error', 'The !sarahConner command was issued by @' + userFunctions.getUsername( userFunctions.whoSentTheCommand( data ) ) + ' at ' + Date() );
                 await sleep( 100 )
-                logMe( 'error', 'Users:' + userFunctions.debugPrintTheUsersList() );
+                userFunctions.debugPrintTheUsersList();
                 await sleep( 100 )
                 logMe( 'error', 'Users:' + JSON.stringify( data ) );
                 await sleep( 100 )
@@ -137,7 +139,7 @@ const botFunctions = ( bot ) => {
                 userFunctions.readQueue( data, chatFunctions ); await sleep( 100 );
                 userFunctions.whatsPlayLimit( data, chatFunctions ); await sleep( 100 );
                 userFunctions.reportDJIdleStatus( data, chatFunctions ); await sleep( 100 );
-                userFunctions.reportRefreshStatus( data, chatFunctions ); await sleep( 100 );
+                this.reportRefreshStatus( data, chatFunctions ); await sleep( 100 );
                 this.reportRegionCheckStatus( data, videoFunctions, chatFunctions ); await sleep( 100 );
             }
             doInOrder();
@@ -176,6 +178,36 @@ const botFunctions = ( bot ) => {
             doInOrder();
         },
 
+        stageDiveCommand: function ( data, chatFunctions, userFunctions, messageVariable ) {
+            const userID = userFunctions.whoSentTheCommand( data );
+            const receiverID = userFunctions.getCurrentDJID();
+
+            if ( userFunctions.isUserIDOnStage( userID ) ) {
+                const randomMessage = messageVariable[ Math.floor( Math.random() * messageVariable.length ) ];
+                const thisMessage = chatFunctions.buildUserToUserRandomMessage( userFunctions, userID, randomMessage, receiverID );
+                chatFunctions.botSpeak( data, thisMessage );
+                bot.remDj( userID );
+            } else {
+                chatFunctions.botSpeak( data, 'You can\'t leave the stage if you\'re not on stage...' )
+            }
+        },
+
+        refreshOnCommand: function ( data, chatFunctions ) {
+            if ( this.refreshingEnabled() ) {
+                chatFunctions.botSpeak( data, 'The ' + chatDefaults.commandIdentifier + 'refresh command is already enabled' );
+            } else {
+                this.enableRefreshing( data, chatFunctions );
+            }
+        },
+
+        refreshOffCommand: function ( data, chatFunctions ) {
+            if ( !this.refreshingEnabled() ) {
+                chatFunctions.botSpeak( data, 'The ' + chatDefaults.commandIdentifier + 'refresh command is already disabled' );
+            } else {
+                this.disableRefreshing( data, chatFunctions );
+            }
+        },
+
         // ========================================================
 
         checkVideoRegions: () => checkVideoRegions,
@@ -197,11 +229,29 @@ const botFunctions = ( bot ) => {
         },
 
 
+        refreshingEnabled: () => refreshingEnabled,
+        enableRefreshing: function ( data, chatFunctions ) {
+            refreshingEnabled = true;
+            this.reportRefreshStatus( data, chatFunctions );
+        },
+        disableRefreshing: function ( data, chatFunctions ) {
+            refreshingEnabled = false;
+            this.reportRefreshStatus( data, chatFunctions );
+        },
+
+        reportRefreshStatus: function ( data, chatFunctions ) {
+            if ( this.refreshingEnabled() ) {
+                chatFunctions.botSpeak( data, 'The ' + chatDefaults.commandIdentifier + 'refresh command is enabled' );
+            } else {
+                chatFunctions.botSpeak( data, 'The ' + chatDefaults.commandIdentifier + 'refresh command is disabled' );
+            }
+        },
+
         autoDJEnabled: () => autoDJEnabled,
         enableAutoDJ: function ( data, chatFunctions ) {
             autoDJEnabled = true;
             this.reportAutoDJStatus( data, chatFunctions );
-            },
+        },
         disableAutoDJ: function ( data, chatFunctions ) {
             autoDJEnabled = false;
             this.reportAutoDJStatus( data, chatFunctions );
@@ -250,7 +300,7 @@ const botFunctions = ( bot ) => {
             if ( this.readSongStats() ) {
                 chatFunctions.botSpeak( data, 'Song stat reporting is enabled' );
             } else {
-                chatFunctions.botSpeak( data, 'Song stats reporting is enabled' );
+                chatFunctions.botSpeak( data, 'Song stats reporting is disabled' );
             }
         },
 

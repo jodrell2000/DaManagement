@@ -63,7 +63,6 @@ const userFunctions = ( bot ) => {
 
     }
 
-
     function formatSeconds ( seconds ) {
         return ( Math.floor( seconds / 60 ) ).toString() + ' minutes';
     }
@@ -177,7 +176,7 @@ const userFunctions = ( bot ) => {
         },
 
         getUserIDFromUsername: function ( theUsername ) {
-            for ( userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
+            for ( let userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
                 if ( theUsersList[ userLoop ].username === theUsername ) {
                     return theUsersList[ userLoop ].id;
                 }
@@ -220,13 +219,23 @@ const userFunctions = ( bot ) => {
             }
         },
 
+        whoSentTheCommand: function ( data ) {
+            // if the command was PMd userID will contain the ID of the Bot user #facepalm
+            // check if it was PMd and user senderid instead
+            if ( data.command === 'pmmed' ) {
+                return data.senderid;
+            } else {
+                return data.userid;
+            }
+        },
+
         // ========================================================
         // User Helper Functions
         // ========================================================
 
         readUserStatus: function ( data, args, chatFunctions ) {
             let theUsername = '';
-            for ( userLoop = 0; userLoop < args.length; userLoop++ ) {
+            for ( let userLoop = 0; userLoop < args.length; userLoop++ ) {
                 theUsername += args[ userLoop ] + ' ';
             }
             theUsername = theUsername.substring( 0, theUsername.length - 1 );
@@ -445,27 +454,27 @@ const userFunctions = ( bot ) => {
         // Refresh Functions
         // ========================================================
 
-        refreshCommand: function ( data, chatFunctions ) {
+        refreshCommand: function ( data, chatFunctions, botFunctions ) {
             let theUserID = data.userid;
-            let [ _, theMessage ] = this.addRefreshToUser( theUserID );
+            let [ _, theMessage ] = this.addRefreshToUser( theUserID, botFunctions );
 
             chatFunctions.botSpeak( data, theMessage );
         },
 
-        refreshDJCount: function ( ) {
+        refreshDJCount: function () {
             let theUserID;
             let theCount = 0;
             for ( let userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
                 theUserID = theUsersList[ userLoop ].id;
                 if ( theUsersList[ userLoop ][ 'RefreshStart' ] !== undefined ) {
-                    theCount ++;
+                    theCount++;
                 }
             }
             return theCount;
         },
 
-        addRefreshToUser: function ( userID ) {
-            if ( roomDefaults.refreshingEnabled ) {
+        addRefreshToUser: function ( userID, botFunctions ) {
+            if ( botFunctions.refreshingEnabled() ) {
                 if ( this.isUserInUsersList( userID ) ) {
                     if ( this.isUserIDOnStage( userID ) ) {
                         if ( !this.isUserInRefreshList( userID ) ) {
@@ -477,8 +486,6 @@ const userFunctions = ( bot ) => {
                             theUsersList[ listPosition ][ 'RefreshTimer' ] = setTimeout( function ( userID ) {
                                 this.removeRefreshFromUser( userID );
                             }.bind( this ), roomDefaults.amountOfTimeToRefresh * 1000 );
-
-                            ++refreshDJCount;
 
                             let message = '@' + this.getUsername( userID ) + ' i\'ll hold your spot on stage for the next ' + roomDefaults.amountOfTimeToRefresh / 60 + ' minutes';
                             return [ true, message ]
@@ -493,14 +500,6 @@ const userFunctions = ( bot ) => {
                 }
             } else {
                 return [ false, "Use of the /refresh command is currently disabled" ]
-            }
-        },
-
-        reportRefreshStatus: function ( data, chatFunctions ) {
-            if ( roomDefaults.refreshingEnabled ) {
-                chatFunctions.botSpeak( data, 'The refresh function is enabled' )
-            } else {
-                chatFunctions.botSpeak( data, 'The refresh function is disabled' )
             }
         },
 
@@ -519,6 +518,28 @@ const userFunctions = ( bot ) => {
             if ( this.userExists( userID ) ) {
                 return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'RefreshStart' ] !== undefined;
             }
+        },
+
+        whosRefreshingCommand: function ( data, chatFunctions ) {
+            let userList = '';
+            for ( let userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
+                if ( theUsersList[ userLoop ][ 'RefreshStart' ] !== undefined ) {
+                    userList += theUsersList[ userLoop ].username + ', ';
+                }
+            }
+
+            userList = userList.substring( 0, userList.length - 2 );
+            const lastComma = userList.lastIndexOf( ',' );
+            if ( lastComma !== -1 ) {
+                userList = userList.substring( 0, lastComma ) + ' and' + userList.substring( lastComma + 1 )
+            }
+
+            if ( userList === '' ) {
+                chatFunctions.botSpeak( data, 'No users are currently refreshing.' );
+            } else {
+                chatFunctions.botSpeak( data, 'The following users are currently refreshing. ' + userList );
+            }
+
         },
 
         getUsersRefreshCurrentPlayCount: function ( userID ) {
@@ -578,7 +599,7 @@ const userFunctions = ( bot ) => {
 
         idleFirstWarningTime: () => idleFirstWarningTime,
         setIdleFirstWarningTime: function ( data, args, chatFunctions ) {
-            const newWarningTime = args[0];
+            const newWarningTime = args[ 0 ];
             if ( isNaN( newWarningTime ) ) {
                 chatFunctions.botSpeak( data, 'I can\'t set the First Idle Warning time to ' + newWarningTime + ' minutes' );
             } else {
@@ -589,7 +610,7 @@ const userFunctions = ( bot ) => {
 
         idleSecondWarningTime: () => idleSecondWarningTime,
         setIdleSecondWarningTime: function ( data, args, chatFunctions ) {
-            const newWarningTime = args[0];
+            const newWarningTime = args[ 0 ];
             if ( isNaN( newWarningTime ) ) {
                 chatFunctions.botSpeak( data, 'I can\'t set the Second Idle Warning time to ' + newWarningTime + ' minutes' );
             } else {
@@ -664,9 +685,15 @@ const userFunctions = ( bot ) => {
 
             if ( minutesRemaining !== 0 ) {
                 theMessage = 'You have less than ' + minutesRemaining + ' minutes left of idle left.';
-                if ( roomDefaults.voteMeansActive === true ) { theActions += ' Awesome,'; }
-                if ( roomDefaults.speechMeansActive === true ) { theActions += ' Chat,'; }
-                if ( roomDefaults.snagMeansActive === true ) { theActions += ' Grab a song,'; }
+                if ( roomDefaults.voteMeansActive === true ) {
+                    theActions += ' Awesome,';
+                }
+                if ( roomDefaults.speechMeansActive === true ) {
+                    theActions += ' Chat,';
+                }
+                if ( roomDefaults.snagMeansActive === true ) {
+                    theActions += ' Grab a song,';
+                }
                 theActions = theActions.substring( 0, theActions.length - 1 );
                 const lastComma = theActions.lastIndexOf( ',' );
                 if ( lastComma !== -1 ) {
@@ -868,10 +895,10 @@ const userFunctions = ( bot ) => {
         },
 
         removeDJFromList: function ( userID ) {
-            const findDJ = ( dj ) => dj === userID;
-            const listPosition = djList.findIndex( findDJ )
-
-            djList.splice( listPosition, 1 );
+            const listPosition = djList.indexOf( userID )
+            if ( listPosition !== -1 ) {
+                djList.splice( listPosition, 1 );
+            }
         },
 
         howManyDJs: function () {
@@ -936,7 +963,6 @@ const userFunctions = ( bot ) => {
                 for ( let djLoop = 0; djLoop < data.room.metadata.djs.length; djLoop++ ) {
                     djID = data.room.metadata.djs[ djLoop ];
                     if ( typeof djID !== 'undefined' ) {
-                        this.initialiseAllDJPlayCounts( djID );
                         this.addDJToList( djID );
                     }
                 }
@@ -1018,15 +1044,23 @@ const userFunctions = ( bot ) => {
         },
 
         DJPlaysLimited: () => DJPlaysLimited,
-        enablePlayLimit: function () { DJPlaysLimited = true; },
-        disablePlayLimit: function () { DJPlaysLimited = false; },
+        enablePlayLimit: function () {
+            DJPlaysLimited = true;
+        },
+        disablePlayLimit: function () {
+            DJPlaysLimited = false;
+        },
 
         DJsPlayLimit: () => DJsPlayLimit,
-        setDJsPlayLimit: function ( value ) { DJsPlayLimit = value; },
+        setDJsPlayLimit: function ( value ) {
+            DJsPlayLimit = value;
+        },
 
         playLimitOnCommand: function ( data, args, chatFunctions ) {
             let theNewPlayLimit = args[ 0 ];
-            if ( isNaN( theNewPlayLimit ) ) { theNewPlayLimit = musicDefaults.DJsPlayLimit }
+            if ( isNaN( theNewPlayLimit ) ) {
+                theNewPlayLimit = musicDefaults.DJsPlayLimit
+            }
             this.enablePlayLimit();
             this.setDJsPlayLimit( theNewPlayLimit );
             chatFunctions.botSpeak( data, 'The play limit is now set to ' + this.DJsPlayLimit() );
@@ -1199,11 +1233,12 @@ const userFunctions = ( bot ) => {
             return [ true, '' ];
         },
 
-        removeUserFromQueue: function ( userID ) {
+        removeUserFromQueue: function ( userID, botFunctions ) {
+            botFunctions.setSayOnce( true );
             if ( !this.isUserIDInQueue( userID ) ) {
                 return [ true, "not in queue" ];
             } else {
-                const queuePosition = queueList.findIndex( ( { id } ) => id === userID );
+                const queuePosition = queueList.indexOf( userID );
                 queueList.splice( queuePosition, 1 );
                 return [ false, '' ];
             }
@@ -1214,11 +1249,11 @@ const userFunctions = ( bot ) => {
             return inQueue !== -1;
         },
 
-        changeUsersQueuePosition: function ( data, args, chatFunctions ) {
+        changeUsersQueuePosition: function ( data, args, chatFunctions, botFunctions ) {
             const username = args[ 0 ];
             const userID = this.getUserIDFromUsername( username );
             const newPosition = args[ 1 ] - 1;
-            const [ err, _ ] = this.removeUserFromQueue( userID );
+            const [ err, _ ] = this.removeUserFromQueue( userID, botFunctions );
 
             logMe( 'info', '================ changeUsersQueuePosition, username:' + username );
             logMe( 'info', '================ changeUsersQueuePosition, userID:' + userID );
@@ -1235,10 +1270,10 @@ const userFunctions = ( bot ) => {
             this.readQueue( data, chatFunctions );
         },
 
-        moveUserToHeadOfQueue: function ( data, args, chatFunctions ) {
+        moveUserToHeadOfQueue: function ( data, args, chatFunctions, botFunctions ) {
             logMe( 'info', '================ moveUserToHeadOfQueue, args:' + JSON.stringify( args ) );
             args[ 1 ] = 1;
-            this.changeUsersQueuePosition( data, args, chatFunctions );
+            this.changeUsersQueuePosition( data, args, chatFunctions, botFunctions );
         },
 
         // ========================================================
@@ -1262,7 +1297,7 @@ const userFunctions = ( bot ) => {
         },
 
         whatsMyQueuePosition: function ( data, chatFunctions ) {
-            const userID = data.userid;
+            const userID = this.whoSentTheCommand( data );
 
             if ( !roomDefaults.queueActive ) {
                 chatFunctions.botSpeak( data, '@' + this.getUsername( userID ) + ', the queue is currently disabled' );
@@ -1277,7 +1312,7 @@ const userFunctions = ( bot ) => {
         },
 
         addme: function ( data, chatFunctions ) {
-            const userID = data.userid;
+            const userID = this.whoSentTheCommand( data );
 
             const [ added, theMessage ] = this.addUserToQueue( userID );
 
@@ -1290,15 +1325,15 @@ const userFunctions = ( bot ) => {
 
         removeNotifyDJFromQueue: function ( botFunctions, userFunctions ) {
             bot.speak( 'Sorry @' + userFunctions.getUsername( this.notifyThisDJ().toString() ) + ' you have run out of time.' );
-            this.removeUserFromQueue( this.notifyThisDJ() );
+            this.removeUserFromQueue( this.notifyThisDJ(), botFunctions );
             this.clearDJToNotify();
             botFunctions.setSayOnce( true );
         },
 
-        removeme: function ( data, chatFunctions ) {
-            const userID = data.userid;
+        removeme: function ( data, chatFunctions, botFunctions ) {
+            const userID = this.whoSentTheCommand( data );
             if ( this.isUserIDInQueue( userID ) ) {
-                this.removeUserFromQueue( userID )
+                this.removeUserFromQueue( userID, botFunctions )
                 chatFunctions.botSpeak( data, "@" + this.getUsername( userID ) + ', I\'ve removed you from the queue' );
             } else {
                 chatFunctions.botSpeak( data, "@" + this.getUsername( userID ) + ', you\'re not currently in the queue. Use the ' + chatDefaults.commandIdentifier + 'addme command to join' );

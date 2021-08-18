@@ -48,7 +48,7 @@ const roomFunctions = ( bot ) => {
             skipVoteUsers = []
         },
 
-        queuePromptToDJ: function ( userFunctions ) {
+        queuePromptToDJ: function ( chatFunctions, userFunctions ) {
             let thisMessage;
             if ( ( roomDefaults.queueWaitTime / 60 ) < 1 ) { //is it seconds
                 thisMessage = ' you have ' + roomDefaults.queueWaitTime + ' seconds to get on stage.';
@@ -60,11 +60,7 @@ const roomFunctions = ( bot ) => {
                 thisMessage = ' you have ' + minutes + ' minutes to get on stage.';
             }
 
-            bot.speak( '@' + userFunctions.getUsername( userFunctions.notifyThisDJ().toString() ) + thisMessage );
-        },
-
-        readQueueMembers: function ( userFunctions ) {
-            bot.speak( userFunctions.buildQueueMessage() );
+            chatFunctions.botSpeak( null, '@' + userFunctions.getUsername( userFunctions.notifyThisDJ().toString() ) + thisMessage, true );
         },
 
         clearDecksForVIPs: function ( userFunctions, authModule ) {
