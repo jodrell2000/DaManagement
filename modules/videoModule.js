@@ -35,7 +35,7 @@ const videoFunctions = () => {
         }
     }
 
-    function alertIfRegionsNotAllowed ( restrictions, notifier ) {
+    function alertIfRegionsNotAllowed ( restrictions, userFunctions, notifier ) {
         let missingRegions = setDifference(
             regionsWeCareAbout,
             restrictions.allowed
@@ -47,7 +47,7 @@ const videoFunctions = () => {
         }
     }
 
-    function alertIfRegionsBlocked ( restrictions, notifier ) {
+    function alertIfRegionsBlocked ( restrictions, userFunctions, notifier ) {
         let blockedRegions = setIntersection(
             regionsWeCareAbout,
             restrictions.blocked
@@ -133,11 +133,11 @@ const videoFunctions = () => {
                     .then( ( restrictions ) => {
                         if ( restrictions !== undefined ) {
                             if ( restrictions.allowed !== undefined ) {
-                                alertIfRegionsNotAllowed( restrictions, ( msg ) =>
+                                alertIfRegionsNotAllowed( restrictions, userFunctions, ( msg ) =>
                                     chatFunctions.botSpeak( data, msg )
                                 );
                             } else if ( restrictions.blocked !== undefined ) {
-                                alertIfRegionsBlocked( restrictions, ( msg ) =>
+                                alertIfRegionsBlocked( restrictions, userFunctions, ( msg ) =>
                                     chatFunctions.botSpeak( data, msg )
                                 );
                             }
