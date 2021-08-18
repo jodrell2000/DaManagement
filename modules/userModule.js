@@ -233,6 +233,13 @@ const userFunctions = ( bot ) => {
         // User Helper Functions
         // ========================================================
 
+        readSingleUserStatus: function ( data, chatFunctions ) {
+            let username = [];
+            username.push( this.getUsername( this.whoSentTheCommand( data ) ) );
+
+            this.readUserStatus( data, username, chatFunctions );
+        },
+
         readUserStatus: function ( data, args, chatFunctions ) {
             let theUsername = '';
             for ( let userLoop = 0; userLoop < args.length; userLoop++ ) {
