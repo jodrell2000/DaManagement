@@ -11,8 +11,8 @@ let lastdj = null; //holds the userid of the currently playing dj
 let songLimitTimer = null; //holds the timer used to remove a dj off stage if they don't skip their song in time, and their song has exceeded the max allowed song time
 let queueTimer = null; //holds the timer the auto removes dj's from the queue if they do not get on stage within the allowed time period
 
-let greet = true //room greeting when someone joins the room(on by default)
-let greetThroughPm = false; //choose whether greeting message is through the pm or the chatbox(false = chatbox, true = pm), (only works when greeting message is turned on) (off by default)
+let greet = roomDefaults.greetUsers; //room greeting when someone joins the room(on by default)
+let greetThroughPm = roomDefaults.greetThroughPM; //choose whether greeting message is through the pm or the chatbox(false = chatbox, true = pm), (only works when greeting message is turned on) (off by default)
 let greetingTimer = []; //holds the timeout for people that join the room, if someone rejoins before their timeout completes their timer is reset
 let roomJoinMessage = ''; //the message users will see when they join the room, leave it empty for the default message (only works when greet is turned on)
 
@@ -37,17 +37,26 @@ const roomFunctions = ( bot ) => {
         songLimitTimer: () => songLimitTimer,
         queueTimer: () => queueTimer,
 
+        roomJoinMessage: () => roomJoinMessage,
+
+        resetSkipVoteUsers: function () {
+            skipVoteUsers = []
+        },
+
+        // ========================================================
+        // DJ Queue Helper Functions
+        // ========================================================
+
         greet: () => greet,
         enableGreet: function () { greet = true; },
         disableGreet: function () { greet = false; },
 
         greetThroughPm: () => greetThroughPm,
         greetingTimer: () => greetingTimer,
+
         roomJoinMessage: () => roomJoinMessage,
 
-        resetSkipVoteUsers: function () {
-            skipVoteUsers = []
-        },
+        // ========================================================
 
         queuePromptToDJ: function ( chatFunctions, userFunctions ) {
             const djName = '@' + userFunctions.getUsername( userFunctions.notifyThisDJ().toString() );

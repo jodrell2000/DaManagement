@@ -8,12 +8,12 @@ const botFunctions = require( './botModule.js' );
 
 
 const generalCommands = {};
-const moderatorCommands = {};
-const botCommands = {};
-const chatCommands = {};
 const userCommands = {};
+const chatCommands = {};
+const botCommands = {};
 const userQueueCommands = {};
 const moderatorQueueCommands = {};
+const moderatorCommands = {};
 
 const commandFunctions = ( bot ) => {
     function logMe ( logLevel, message ) {
