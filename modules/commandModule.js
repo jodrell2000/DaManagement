@@ -190,6 +190,9 @@ const commandFunctions = ( bot ) => {
     chatCommands.rush = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.rushMessages, chatCommandItems.rushPics, userFunctions ); }
     chatCommands.rush.help = "Celebrate the Rush ;-)";
 
+    chatCommands.bow = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.bowMessages, chatCommandItems.bowPics, userFunctions ); }
+    chatCommands.bow.help = "Celebrate the Rush ;-)";
+
     // ######################################################
     // Advanced chat commands...more than just basic messages
     // ######################################################

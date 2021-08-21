@@ -355,4 +355,19 @@ module.exports = {
         "https://media.giphy.com/media/9zZlVISU1yDIqCvsKF/giphy.gif"
     ],
 
+    bowMessages: [
+        "Thank you, thank you...thank you",
+        "No no, you're too kind",
+        "Oh please, it was nothing. Thank you"
+    ],
+
+    bowPics: [
+        "https://media.giphy.com/media/l2R0eYcNq9rJUsVAA/giphy.gif",
+        "https://media.giphy.com/media/xUA7aN1MTCZx97V1Ic/giphy.gif",
+        "https://thumbs.gfycat.com/GlitteringAcceptableGalapagosdove-max-1mb.gif",
+        "https://thumbs.gfycat.com/BraveAcceptableHarpseal-max-1mb.gif",
+        "https://thumbs.gfycat.com/HelpfulGleefulBarasinga-max-1mb.gif"
+
+    ],
+
 }
