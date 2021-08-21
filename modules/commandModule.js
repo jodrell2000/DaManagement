@@ -53,9 +53,6 @@ const commandFunctions = ( bot ) => {
     generalCommands.stopescortme = ( { data, userFunctions, chatFunctions } ) => { userFunctions.disableEscortMe( data, chatFunctions ); }
     generalCommands.stopescortme.help = "Stop yourself from being removed from the decks after your track finishes playing";
 
-    generalCommands.sarahConner = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.sarahConner( data, userFunctions, chatFunctions ); }
-    generalCommands.sarahConner.help = "Shut down the Bot if it's causing problems";
-
     generalCommands.whatsPlayLimit = ( { data, userFunctions, chatFunctions } ) => { userFunctions.whatsPlayLimit( data, chatFunctions ); }
     generalCommands.whatsPlayLimit.help = "Is the DJ Play Limit enabled, and if so what it's set to";
 
@@ -193,6 +190,9 @@ const commandFunctions = ( bot ) => {
     chatCommands.rush = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.rushMessages, chatCommandItems.rushPics, userFunctions ); }
     chatCommands.rush.help = "Celebrate the Rush ;-)";
 
+    chatCommands.bow = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.bowMessages, chatCommandItems.bowPics, userFunctions ); }
+    chatCommands.bow.help = "Celebrate the Rush ;-)";
+
     // ######################################################
     // Advanced chat commands...more than just basic messages
     // ######################################################
@@ -301,6 +301,9 @@ const commandFunctions = ( bot ) => {
 
     moderatorCommands.whosRefreshing = ( { data, userFunctions, chatFunctions } ) => { userFunctions.whosRefreshingCommand( data, chatFunctions ); }
     moderatorCommands.whosRefreshing.help = "List of users currently using the refresh command";
+
+    moderatorCommands.sarahConner = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.sarahConner( data, userFunctions, chatFunctions ); }
+    moderatorCommands.sarahConner.help = "Shut down the Bot if it's causing problems";
 
     // #############################################
     // Moderator Only Queue commands

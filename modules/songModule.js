@@ -14,7 +14,7 @@ let snagSong = false; //if true causes the bot to add every song that plays to i
 
 let upVotes = 0;
 let downVotes = 0;
-let whoSnagged = 0;
+let snagCount = 0;
 let checkVotes = [];
 let voteCountSkip = 0;
 let ALLREADYCALLED = false; //resets votesnagging so that it can be called again
@@ -24,19 +24,20 @@ let votesLeft = roomDefaults.HowManyVotesToSkip;
 
 const songFunctions = (bot) => {
     function logMe ( logLevel, message ) {
+        let theFile = "songFunctions";
         switch ( logLevel ) {
             case "error":
-                console.log( "!!!!!!!!!!! songFunctions:" + logLevel + "->" + message + "\n" );
+                console.log( "!!!!!!!!!!! " + theFile +  ":" + logLevel + "->" + message + "\n" );
                 break;
             case "warn":
-                console.log( "+++++++++++ songFunctions:" + logLevel + "->" + message + "\n" );
+                console.log( "+++++++++++ " + theFile +  ":" + logLevel + "->" + message + "\n" );
                 break;
             case "info":
-                console.log( "----------- songFunctions:" + logLevel + "->" + message + "\n" );
+                console.log( "----------- " + theFile +  ":" + logLevel + "->" + message + "\n" );
                 break;
             default:
                 if ( bot.debug ) {
-                    console.log( "songFunctions:" + logLevel + "->" + message + "\n" );
+                    console.log( "" + theFile +  ":" + logLevel + "->" + message + "\n" );
                 }
                 break;
         }
@@ -55,7 +56,6 @@ const songFunctions = (bot) => {
         snagSong: () => snagSong,
         upVotes: () => upVotes,
         downVotes: () => downVotes,
-        whoSnagged: () => whoSnagged,
         voteCountSkip: () => voteCountSkip,
         ALLREADYCALLED: () => ALLREADYCALLED,
 
@@ -122,6 +122,24 @@ const songFunctions = (bot) => {
 
         // ========================================================
 
+
+        // ========================================================
+        // Snagging Functions
+        // ========================================================
+
+
+        snagCount: () => snagCount,
+
+        incrementSnagCount: function () {
+            snagCount += 1;
+        },
+
+        resetSnagCount: function () {
+            snagCount = 0;
+        },
+
+        // ========================================================
+
         getSongTags: function ( current_song ) {
             song = current_song.metadata.song;
             album = current_song.metadata.album;
@@ -148,14 +166,6 @@ const songFunctions = (bot) => {
             downVotes = 0;
         },
 
-        voteSnagged: function () {
-            whoSnagged += 1;
-        },
-
-        resetWhoSnagged: function () {
-            whoSnagged = 0;
-        },
-
         resetCheckVotes: function () {
             checkVotes = [];
         },
@@ -176,7 +186,7 @@ const songFunctions = (bot) => {
             ALLREADYCALLED = false; //resets votesnagging so that it can be called again
         },
 
-        voteSnagged: function () {
+        songSnagged: function () {
             ALLREADYCALLED = true; //this makes it so that it can only be called once per song
         },
 

@@ -35,19 +35,20 @@ const commandFunctions = commandModule( bot );
 const videoFunctions = videoModule( bot );
 
 function logMe ( logLevel, message ) {
+    let theFile = "Main file";
     switch ( logLevel ) {
         case "error":
-            console.log( "!!!!!!!!!!! Main File:" + logLevel + "->" + message + "\n" );
+            console.log( "!!!!!!!!!!! " + theFile +  ":" + logLevel + "->" + message + "\n" );
             break;
         case "warn":
-            console.log( "+++++++++++ Main File:" + logLevel + "->" + message + "\n" );
+            console.log( "+++++++++++ " + theFile +  ":" + logLevel + "->" + message + "\n" );
             break;
         case "info":
-            console.log( "----------- Main File:" + logLevel + "->" + message + "\n" );
+            console.log( "----------- " + theFile +  ":" + logLevel + "->" + message + "\n" );
             break;
         default:
             if ( bot.debug ) {
-                console.log( "Main File:" + logLevel + "->" + message + "\n" );
+                console.log( "" + theFile +  ":" + logLevel + "->" + message + "\n" );
             }
             break;
     }
@@ -169,7 +170,7 @@ bot.on( 'roomChanged', function ( data ) {
 
     }
     catch ( err ) {
-        logMe( 'info', 'unable to join the room the room due to err: ' + err.toString() );
+        logMe( 'error', 'unable to join the room the room due to err: ' + err.toString() );
     }
 } );
 
@@ -181,7 +182,7 @@ bot.on( 'newsong', function ( data ) {
     songFunctions.resetCheckVotes();
     songFunctions.resetVoteCountSkip();
     songFunctions.resetVotesLeft( roomDefaults.HowManyVotesToSkip );
-    songFunctions.resetWhoSnagged();
+    songFunctions.resetSnagCount();
     songFunctions.resetUpVotes();
     songFunctions.resetDownVotes();
     songFunctions.resetVoteSnagging();
@@ -341,14 +342,14 @@ bot.on( 'update_votes', function ( data ) {
 
     //this is for /autosnag, automatically adds songs that get over the awesome threshold
     if ( botDefaults.autoSnag === true && songFunctions.snagSong() === false && songFunctions.upVotes() >= botDefaults.howManyVotes && songFunctions.ALLREADYCALLED() === false ) {
-        songFunctions.voteSnagged();
+        songFunctions.songSnagged();
         botFunctions.checkAndAddToPlaylist( songFunctions );
     }
 } )
 
 //checks who added a song and updates their position on the afk list.
 bot.on( 'snagged', function ( data ) {
-    songFunctions.voteSnagged();
+    songFunctions.incrementSnagCount();
     userFunctions.updateUserLastSnagged( data.userid ); //update the afk position of people who add a song to their queue
 } )
 
