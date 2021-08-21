@@ -853,7 +853,7 @@ const userFunctions = ( bot ) => {
 
         switchUserAFK: function ( data, chatFunctions ) {
             const theUserID = this.whoSentTheCommand( data );
-            if ( this.isUserAFK( userID ) === true ) {
+            if ( this.isUserAFK( theUserID ) === true ) {
                 this.removeUserFromAFKList( data, chatFunctions );
             } else {
                 this.addToAFKList( data, chatFunctions );
@@ -863,17 +863,17 @@ const userFunctions = ( bot ) => {
         addToAFKList: function ( data, chatFunctions ) {
             const theUserID = this.whoSentTheCommand( data );
 
-            afkPeople.push( userID );
-            chatFunctions.botSpeak( data, '@' + this.getUsername( userID ) + ' you are marked as afk' )
+            afkPeople.push( theUserID );
+            chatFunctions.botSpeak( data, '@' + this.getUsername( theUserID ) + ' you are marked as afk' )
         },
 
         removeUserFromAFKList: function ( data, chatFunctions ) {
             const theUserID = this.whoSentTheCommand( data );
-            const listPosition = afkPeople.indexOf( userID );
+            const listPosition = afkPeople.indexOf( theUserID );
 
             afkPeople.splice( listPosition, 1 );
 
-            chatFunctions.botSpeak( data, '@' + this.getUsername( userID ) + ' you are no longer afk' )
+            chatFunctions.botSpeak( data, '@' + this.getUsername( theUserID ) + ' you are no longer afk' )
         },
 
         howManyAFKUsers: function () {
