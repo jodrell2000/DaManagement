@@ -852,7 +852,7 @@ const userFunctions = ( bot ) => {
         },
 
         switchUserAFK: function ( data, chatFunctions ) {
-            const userID = this.getUserIDFromData( data );
+            const theUserID = this.whoSentTheCommand( data );
             if ( this.isUserAFK( userID ) === true ) {
                 this.removeUserFromAFKList( data, chatFunctions );
             } else {
@@ -861,14 +861,14 @@ const userFunctions = ( bot ) => {
         },
 
         addToAFKList: function ( data, chatFunctions ) {
-            const userID = this.getUserIDFromData( data );
+            const theUserID = this.whoSentTheCommand( data );
 
             afkPeople.push( userID );
             chatFunctions.botSpeak( data, '@' + this.getUsername( userID ) + ' you are marked as afk' )
         },
 
         removeUserFromAFKList: function ( data, chatFunctions ) {
-            const userID = this.getUserIDFromData( data );
+            const theUserID = this.whoSentTheCommand( data );
             const listPosition = afkPeople.indexOf( userID );
 
             afkPeople.splice( listPosition, 1 );
