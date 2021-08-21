@@ -44,23 +44,23 @@ let idleSecondWarningTime = roomDefaults.djIdleLimitThresholds[ 2 ];
 
 const userFunctions = ( bot ) => {
     function logMe ( logLevel, message ) {
+        let theFile = "userFunctions";
         switch ( logLevel ) {
             case "error":
-                console.log( "!!!!!!!!!!! userFunctions:" + logLevel + "->" + message + "\n" );
+                console.log( "!!!!!!!!!!! " + theFile +  ":" + logLevel + "->" + message + "\n" );
                 break;
             case "warn":
-                console.log( "+++++++++++ userFunctions:" + logLevel + "->" + message + "\n" );
+                console.log( "+++++++++++ " + theFile +  ":" + logLevel + "->" + message + "\n" );
                 break;
             case "info":
-                console.log( "----------- userFunctions:" + logLevel + "->" + message + "\n" );
+                console.log( "----------- " + theFile +  ":" + logLevel + "->" + message + "\n" );
                 break;
             default:
                 if ( bot.debug ) {
-                    console.log( "userFunctions:" + logLevel + "->" + message + "\n" );
+                    console.log( "" + theFile +  ":" + logLevel + "->" + message + "\n" );
                 }
                 break;
         }
-
     }
 
     function formatSeconds ( seconds ) {
@@ -957,8 +957,6 @@ const userFunctions = ( bot ) => {
         },
 
         isCurrentDJ: function ( data, userID ) {
-            logMe( 'info', 'isCurrentDJ, data:' + data );
-            logMe( 'info', 'isCurrentDJ, data.room.metadata.current_dj:' + data.room.metadata.current_dj );
             const currentDJ = data.room.metadata.current_dj
             return userID === currentDJ;
         },
@@ -1262,15 +1260,8 @@ const userFunctions = ( bot ) => {
             const newPosition = args[ 1 ] - 1;
             const [ err, _ ] = this.removeUserFromQueue( userID, botFunctions );
 
-            logMe( 'info', '================ changeUsersQueuePosition, username:' + username );
-            logMe( 'info', '================ changeUsersQueuePosition, userID:' + userID );
-            logMe( 'info', '================ changeUsersQueuePosition, newPosition:' + newPosition );
-            logMe( 'info', '================ changeUsersQueuePosition, err:' + err );
-            logMe( 'info', '================ changeUsersQueuePosition, queueList:' + JSON.stringify( queueList ) );
-
             if ( err !== true ) {
                 queueList.splice( newPosition, 0, userID );
-                logMe( 'info', '================ changeUsersQueuePosition, queueList:' + JSON.stringify( queueList ) );
             } else {
                 chatFunctions.botSpeak( data, "The user " + this.getUsername( userID ) + " is not currently in the queue" );
             }
@@ -1278,7 +1269,6 @@ const userFunctions = ( bot ) => {
         },
 
         moveUserToHeadOfQueue: function ( data, args, chatFunctions, botFunctions ) {
-            logMe( 'info', '================ moveUserToHeadOfQueue, args:' + JSON.stringify( args ) );
             args[ 1 ] = 1;
             this.changeUsersQueuePosition( data, args, chatFunctions, botFunctions );
         },
