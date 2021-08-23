@@ -176,15 +176,13 @@ bot.on( 'roomChanged', function ( data ) {
 
 //checks at the beggining of the song
 bot.on( 'newsong', function ( data ) {
-    // bot.speak("entered newsong");
-
     //resets counters and array for vote skipping
     songFunctions.resetCheckVotes();
     songFunctions.resetVoteCountSkip();
     songFunctions.resetVotesLeft( roomDefaults.HowManyVotesToSkip );
-    songFunctions.resetSnagCount();
     songFunctions.resetUpVotes();
     songFunctions.resetDownVotes();
+    songFunctions.resetSnagCount();
     songFunctions.resetVoteSnagging();
 
     //procedure for getting song tags
@@ -349,6 +347,7 @@ bot.on( 'update_votes', function ( data ) {
 
 //checks who added a song and updates their position on the afk list.
 bot.on( 'snagged', function ( data ) {
+    logMe('info', '++++++++++++++++++++++++++++++++++++++++ snagged...');
     songFunctions.incrementSnagCount();
     userFunctions.updateUserLastSnagged( data.userid ); //update the afk position of people who add a song to their queue
 } )
