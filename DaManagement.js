@@ -450,15 +450,16 @@ bot.on( 'deregistered', function ( data ) {
 
 //activates at the end of a song.
 bot.on( 'endsong', function ( data ) {
+    songFunctions.grabSongStats();
     const djID = data.room.metadata.current_dj;
+
+    //bot says song stats for each song
+    chatFunctions.readSongStats( data, songFunctions, botFunctions )
 
     userFunctions.incrementDJPlayCount( djID );
 
     // check the playlimit and remove the current DJ if they've reached it
     userFunctions.removeDJsOverPlaylimit( data, chatFunctions, djID );
-
-    //bot says song stats for each song
-    chatFunctions.readSongStats( data, songFunctions, botFunctions )
 
     roomFunctions.escortDJsDown( data, djID, botFunctions, userFunctions, chatFunctions );
 } );

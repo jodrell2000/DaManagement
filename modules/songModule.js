@@ -17,6 +17,7 @@ let downVotes = 0;
 let snagCount = 0;
 let checkVotes = [];
 let voteCountSkip = 0;
+let previousSongStats = []; // grab the ending song votes before they're reset
 let ALLREADYCALLED = false; //resets votesnagging so that it can be called again
 let curSongWatchdog = null; //used to hold the timer for stuck songs
 let takedownTimer = null; //used to hold the timer that fires after curSongWatchDog which represents the time a person with a stuck song has left to skip their song
@@ -140,6 +141,22 @@ const songFunctions = (bot) => {
 
         // ========================================================
 
+        // ========================================================
+        // Song Stats Functions
+        // ========================================================
+
+        previousUpVotes: () => previousSongStats['upvotes'],
+        previousDownVotes: () => previousSongStats['downvotes'],
+        previousSnags: () => previousSongStats['snags'],
+
+        grabSongStats: function ( ) {
+            previousSongStats['upvotes'] = upVotes;
+            previousSongStats['downvotes'] = downVotes;
+            previousSongStats['snags'] = this.snagCount();
+        },
+
+        // ========================================================
+
         getSongTags: function ( current_song ) {
             song = current_song.metadata.song;
             album = current_song.metadata.album;
@@ -202,7 +219,7 @@ const songFunctions = (bot) => {
 
         clearTakedownTimer(userFunctions, roomFunctions) {
             // If takedown Timer has been set, clear since we've made it to the next song
-            if (takedownTimer !== null) {
+            if ( takedownTimer !== null && roomFunctions.lastdj() !== undefined ) {
                 clearTimeout(takedownTimer);
                 takedownTimer = null;
 
@@ -216,20 +233,24 @@ const songFunctions = (bot) => {
 
         startSongWatchdog(data, userFunctions, roomFunctions) {
             const length = data.room.metadata.current_song.metadata.length;
+            const lastDJ = roomFunctions.lastdj();
+
             // Set a new watchdog timer for the current song.
             curSongWatchdog = setTimeout(function () {
                 curSongWatchdog = null;
 
-                if (typeof userFunctions.theUsersList()[userFunctions.theUsersList().indexOf(roomFunctions.lastdj()) + 1] !== 'undefined') {
-                    bot.speak("@" + userFunctions.theUsersList()[userFunctions.theUsersList().indexOf(roomFunctions.lastdj()) + 1] + ", you have 20 seconds to skip your stuck song before you are removed");
-                } else {
-                    bot.speak("current dj, you have 20 seconds to skip your stuck song before you are removed");
+                if ( lastDJ !== undefined ) {
+                    if ( typeof userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( lastDJ ) + 1 ] !== 'undefined' ) {
+                        bot.speak( "@" + userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( lastDJ ) + 1 ] + ", you have 20 seconds to skip your stuck song before you are removed" );
+                    } else {
+                        bot.speak( "current dj, you have 20 seconds to skip your stuck song before you are removed" );
+                    }
                 }
 
                 //START THE 20 SEC TIMER
                 takedownTimer = setTimeout(function () {
                     takedownTimer = null;
-                    bot.remDj(roomFunctions.lastdj()); // Remove Saved DJ from last newsong call
+                    bot.remDj( lastDJ ); // Remove Saved DJ from last newsong call
                 }, 20 * 1000); // Current DJ has 20 seconds to skip before they are removed
             }, (length + 10) * 1000); //Timer expires 10 seconds after the end of the song, if not cleared by a newsong
         }
