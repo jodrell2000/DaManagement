@@ -33,7 +33,6 @@ const roomFunctions = ( bot ) => {
         bannedArtistsMatcher: () => bannedArtistsMatcher,
         tempBanList: () => tempBanList,
         skipVoteUsers: () => skipVoteUsers,
-        lastdj: () => lastdj,
         songLimitTimer: () => songLimitTimer,
         queueTimer: () => queueTimer,
 
@@ -47,6 +46,11 @@ const roomFunctions = ( bot ) => {
 
         resetSkipVoteUsers: function () {
             skipVoteUsers = []
+        },
+
+        lastdj: () => lastdj,
+        setLastDJ: function ( djID ) {
+            lastdj = djID;
         },
 
         queuePromptToDJ: function ( chatFunctions, userFunctions ) {
