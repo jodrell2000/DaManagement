@@ -305,6 +305,18 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.sarahConner = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.sarahConner( data, userFunctions, chatFunctions ); }
     moderatorCommands.sarahConner.help = "Shut down the Bot if it's causing problems";
 
+    moderatorCommands.removedj = ( { data, args, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.removeDJCommand( data, reassembleArgs( args ), userFunctions, chatFunctions ); }
+    moderatorCommands.removedj.help = "Remove the current DJ from the decks. Add a message after the command to have it sent direct to the DJ (in public)";
+
+    moderatorCommands.informdj = ( { data, args, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.informDJCommand( data, reassembleArgs( args ), userFunctions, chatFunctions ); }
+    moderatorCommands.informdj.help = "Have the Bot send the current DJ a message";
+
+    moderatorCommands.awesome = ( { botFunctions } ) => { botFunctions.awesomeCommand( ); }
+    moderatorCommands.awesome.help = "Have the Bot uptote";
+
+    moderatorCommands.lame = ( { botFunctions } ) => { botFunctions.lameCommand( ); }
+    moderatorCommands.lame.help = "Have the Bot uptote";
+
     // #############################################
     // Moderator Only Queue commands
     // #############################################
@@ -412,6 +424,16 @@ const commandFunctions = ( bot ) => {
             theMessage = theMessage + "': " + allCommands[ command ].help;
             chatFunctions.botSpeak( data, theMessage );
         }
+    }
+
+    function reassembleArgs ( args ) {
+        let theString = '';
+        for ( let argLoop = 0; argLoop < args.length; argLoop++ ) {
+            theString += args[ argLoop ] + ' ';
+        }
+        theString = theString.substring( 0, theString.length - 1 );
+
+        return theString;
     }
 
     return {
@@ -636,28 +658,6 @@ const commandFunctions = ( bot ) => {
             } else if ( text.match( /^\/messageOff/ ) && userFunctions.isUserModerator( speaker ) === true ) {
                 bot.speak( 'message: Off' );
                 roomDefaults.MESSAGE = false;
-            } else if ( text.match( '/awesome' ) ) {
-                bot.vote( 'up' );
-            } else if ( text.match( '/lame' ) && userFunctions.isUserModerator( speaker ) === true ) {
-                bot.vote( 'down' );
-            } else if ( text.match( /^\/removedj$/ ) && userFunctions.isUserModerator( speaker ) === true ) {
-                bot.remDj();
-            } else if ( text.match( /^\/inform$/ ) && userFunctions.isUserModerator( speaker ) === true ) {
-                if ( roomFunctions.checkWhoIsDj() !== null ) {
-                    if ( userFunctions.informTimer === null ) {
-                        let checkDjsName = userFunctions.theUsersList().indexOf( roomFunctions.lastdj() ) + 1;
-                        bot.speak( '@' + userFunctions.theUsersList()[ checkDjsName ] + ' your song is not the appropriate genre for this room, please skip or you will be removed in 20 seconds' );
-                        userFunctions.informTimer = setTimeout( function () {
-                            bot.pm( 'you took too long to skip your song', roomFunctions.lastdj() );
-                            bot.remDj( roomFunctions.lastdj() );
-                            userFunctions.informTimer = null;
-                        }, 20 * 1000 );
-                    } else {
-                        bot.pm( 'the /inform timer has already been activated, it may be used only once per song', data.userid );
-                    }
-                } else {
-                    bot.pm( 'you must wait one song since the bot has started to use that command', data.userid );
-                }
             } else if ( text.match( /^\/fanratio/ ) ) //this one courtesy of JenTheInstigator of turntable.fm
             {
                 let tmpuser = data.text.substring( 11 );
@@ -1002,10 +1002,6 @@ const commandFunctions = ( bot ) => {
                     botDefaults.autoSnag = false;
                     bot.pm( 'vote snagging has been turned off', speaker );
                 }
-            } else if ( text.match( '/awesome' ) && isInRoom === true ) {
-                bot.vote( 'up' );
-            } else if ( text.match( '/lame' ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                bot.vote( 'down' );
             } else if ( text.match( /^\/eventmessageOn/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
                 bot.pm( 'event message: On', speaker );
                 roomDefaults.EVENTMESSAGE = true;
@@ -1163,22 +1159,6 @@ const commandFunctions = ( bot ) => {
                     }
                 } else {
                     bot.pm( 'error, you can\'t snag the song that\'s playing when the bot enters the room', speaker );
-                }
-            } else if ( text.match( /^\/inform$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                if ( roomFunctions.checkWhoIsDj() !== null ) {
-                    if ( userFunctions.informTimer === null ) {
-                        let checkDjsName = userFunctions.theUsersList().indexOf( roomFunctions.lastdj() ) + 1;
-                        bot.speak( '@' + userFunctions.theUsersList()[ checkDjsName ] + ' your song is not the appropriate genre for this room, please skip or you will be removed in 20 seconds' );
-                        userFunctions.informTimer = setTimeout( function () {
-                            bot.pm( 'you took too long to skip your song', roomFunctions.lastdj() );
-                            bot.remDj( roomFunctions.lastdj() );
-                            userFunctions.informTimer = null;
-                        }, 20 * 1000 );
-                    } else {
-                        bot.pm( 'the /inform timer has already been activated, it may be used only once per song', speaker );
-                    }
-                } else {
-                    bot.pm( 'you must wait one song since the bot has started to use that command', speaker );
                 }
             } else if ( text.match( /^\/removesong$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
                 if ( roomFunctions.checkWhoIsDj() === authModule.USERID ) {

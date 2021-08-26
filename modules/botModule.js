@@ -208,6 +208,35 @@ const botFunctions = ( bot ) => {
             }
         },
 
+        removeDJCommand: function ( data, theMessage, userFunctions, chatFunctions ) {
+            const djID = userFunctions.getCurrentDJID();
+
+            if ( theMessage !== '' ) {
+                const djName = userFunctions.getUsername( djID );
+
+                chatFunctions.botSpeak( data, '@' + djName + ', ' + theMessage, true );
+            }
+            bot.remDj( djID );
+        },
+
+        informDJCommand: function ( data, theMessage, userFunctions, chatFunctions ) {
+            const djID = userFunctions.getCurrentDJID();
+
+            if ( theMessage !== '' ) {
+                chatFunctions.botSpeak( data, '@' + userFunctions.getUsername( djID ) + ', ' + theMessage, true );
+            } else {
+                chatFunctions.botSpeak( data, 'You didn\'t ask me to send the DJ any message?!?' );
+            }
+        },
+
+        awesomeCommand: function ( ) {
+            bot.vote( 'up' );
+        },
+
+        lameCommand: function ( ) {
+            bot.vote( 'down' );
+        },
+
         // ========================================================
 
         checkVideoRegions: () => checkVideoRegions,
