@@ -229,6 +229,14 @@ const botFunctions = ( bot ) => {
             }
         },
 
+        awesomeCommand: function ( ) {
+            bot.vote( 'up' );
+        },
+
+        lameCommand: function ( ) {
+            bot.vote( 'down' );
+        },
+
         // ========================================================
 
         checkVideoRegions: () => checkVideoRegions,

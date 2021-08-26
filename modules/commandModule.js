@@ -311,6 +311,12 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.informdj = ( { data, args, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.informDJCommand( data, reassembleArgs( args ), userFunctions, chatFunctions ); }
     moderatorCommands.informdj.help = "Have the Bot send the current DJ a message";
 
+    moderatorCommands.awesome = ( { botFunctions } ) => { botFunctions.awesomeCommand( ); }
+    moderatorCommands.awesome.help = "Have the Bot uptote";
+
+    moderatorCommands.lame = ( { botFunctions } ) => { botFunctions.lameCommand( ); }
+    moderatorCommands.lame.help = "Have the Bot uptote";
+
     // #############################################
     // Moderator Only Queue commands
     // #############################################
@@ -652,10 +658,6 @@ const commandFunctions = ( bot ) => {
             } else if ( text.match( /^\/messageOff/ ) && userFunctions.isUserModerator( speaker ) === true ) {
                 bot.speak( 'message: Off' );
                 roomDefaults.MESSAGE = false;
-            } else if ( text.match( '/awesome' ) ) {
-                bot.vote( 'up' );
-            } else if ( text.match( '/lame' ) && userFunctions.isUserModerator( speaker ) === true ) {
-                bot.vote( 'down' );
             } else if ( text.match( /^\/fanratio/ ) ) //this one courtesy of JenTheInstigator of turntable.fm
             {
                 let tmpuser = data.text.substring( 11 );
@@ -1000,10 +1002,6 @@ const commandFunctions = ( bot ) => {
                     botDefaults.autoSnag = false;
                     bot.pm( 'vote snagging has been turned off', speaker );
                 }
-            } else if ( text.match( '/awesome' ) && isInRoom === true ) {
-                bot.vote( 'up' );
-            } else if ( text.match( '/lame' ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                bot.vote( 'down' );
             } else if ( text.match( /^\/eventmessageOn/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
                 bot.pm( 'event message: On', speaker );
                 roomDefaults.EVENTMESSAGE = true;
