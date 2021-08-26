@@ -206,8 +206,13 @@ const chatFunctions = ( bot, roomDefaults ) => {
 
         readSongStats: function ( data, songFunctions, botFunctions ) {
             if ( botFunctions.readSongStats() ) {
-                this.botSpeak( data, 'Stats for ' + songFunctions.song() + ' by ' + songFunctions.artist() + ':' );
-                this.botSpeak( data, ':thumbsup:' + songFunctions.previousUpVotes() + ':thumbsdown:' + songFunctions.previousDownVotes() + ':heart:' + songFunctions.previousSnags() );
+                const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
+                const readInOrder = async () => {
+                    this.botSpeak( data, 'Stats for ' + songFunctions.song() + ' by ' + songFunctions.artist() + ':' );
+                    await sleep( 10 )
+                    this.botSpeak( data, ':thumbsup:' + songFunctions.previousUpVotes() + ':thumbsdown:' + songFunctions.previousDownVotes() + ':heart:' + songFunctions.previousSnags() );
+                }
+                readInOrder();
             }
         },
 
