@@ -219,6 +219,16 @@ const botFunctions = ( bot ) => {
             bot.remDj( djID );
         },
 
+        informDJCommand: function ( data, theMessage, userFunctions, chatFunctions ) {
+            const djID = userFunctions.getCurrentDJID();
+
+            if ( theMessage !== '' ) {
+                chatFunctions.botSpeak( data, '@' + userFunctions.getUsername( djID ) + ', ' + theMessage, true );
+            } else {
+                chatFunctions.botSpeak( data, 'You didn\'t ask me to send the DJ any message?!?' );
+            }
+        },
+
         // ========================================================
 
         checkVideoRegions: () => checkVideoRegions,
