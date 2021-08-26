@@ -208,6 +208,17 @@ const botFunctions = ( bot ) => {
             }
         },
 
+        removeDJCommand: function ( data, theMessage, userFunctions, chatFunctions ) {
+            const djID = userFunctions.getCurrentDJID();
+
+            if ( theMessage !== '' ) {
+                const djName = userFunctions.getUsername( djID );
+
+                chatFunctions.botSpeak( data, '@' + djName + ', ' + theMessage, true );
+            }
+            bot.remDj( djID );
+        },
+
         // ========================================================
 
         checkVideoRegions: () => checkVideoRegions,

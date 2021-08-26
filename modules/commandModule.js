@@ -305,6 +305,9 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.sarahConner = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.sarahConner( data, userFunctions, chatFunctions ); }
     moderatorCommands.sarahConner.help = "Shut down the Bot if it's causing problems";
 
+    moderatorCommands.removedj = ( { data, args, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.removeDJCommand( data, reassembleArgs( args ), userFunctions, chatFunctions ); }
+    moderatorCommands.removedj.help = "Remove the current DJ from the decks. Add a message after the command to have it sent direct to the DJ (in public)";
+
     // #############################################
     // Moderator Only Queue commands
     // #############################################
@@ -412,6 +415,16 @@ const commandFunctions = ( bot ) => {
             theMessage = theMessage + "': " + allCommands[ command ].help;
             chatFunctions.botSpeak( data, theMessage );
         }
+    }
+
+    function reassembleArgs ( args ) {
+        let theString = '';
+        for ( let argLoop = 0; argLoop < args.length; argLoop++ ) {
+            theString += args[ argLoop ] + ' ';
+        }
+        theString = theString.substring( 0, theString.length - 1 );
+
+        return theString;
     }
 
     return {
