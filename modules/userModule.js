@@ -565,8 +565,6 @@ const userFunctions = ( bot ) => {
                 let listPosition = this.getPositionOnUsersList( userID );
                 if ( theUsersList[ listPosition ][ 'RefreshTotalPlayCount' ] !== undefined ) {
                     return theUsersList[ listPosition ][ 'RefreshTotalPlayCount' ];
-                } else {
-                    return 0;
                 }
             }
         },
