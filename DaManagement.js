@@ -357,6 +357,7 @@ bot.on( 'add_dj', function ( data ) {
     let OKToDJ;
     let theMessage;
     const theUserID = data.user[ 0 ].userid;
+    const totalPlayCount = userFunctions.getDJTotalPlayCount( theUserID );
 
     [ OKToDJ, theMessage ] = userFunctions.checkOKToDJ( theUserID, roomFunctions );
 
@@ -370,8 +371,13 @@ bot.on( 'add_dj', function ( data ) {
     //unless they used the refresh command, in which case its set to
     //what it was before they left the room
     userFunctions.setDJCurrentPlayCount( theUserID, userFunctions.getUsersRefreshCurrentPlayCount[ theUserID ] );
-    userFunctions.setDJTotalPlayCount( theUserID, userFunctions.getUsersRefreshTotalPlayCount[ theUserID ] );
 
+    //keep the total playcount as it is, unless they've refreshed
+    if ( totalPlayCount !== undefined ) {
+        userFunctions.setDJTotalPlayCount( theUserID, totalPlayCount );
+    } else {
+        userFunctions.setDJTotalPlayCount( theUserID, userFunctions.getUsersRefreshTotalPlayCount[ theUserID ] );
+    }
     //updates the afk position of the person who joins the stage.
     userFunctions.updateUserJoinedStage( theUserID );
 
