@@ -1127,6 +1127,17 @@ const userFunctions = ( bot ) => {
             }
         },
 
+        setDJCurrentPlaycountCommand: function ( data, theCount, theUsername, chatFunctions ) {
+            if ( theCount === undefined || isNaN( theCount ) ) {
+                chatFunctions.botSpeak( data, "The new playcount doesn't seem to be a number. Check the command help for an example" )
+            } else if ( theUsername === '' || theUsername === undefined ) {
+                chatFunctions.botSpeak( data, "I can't see a username there. Check the command help for an example" )
+            } else {
+                chatFunctions.botSpeak( data, "Setting the Current playcount for @" + theUsername + " to " + theCount )
+                this .setDJCurrentPlayCount( this.getUserIDFromUsername( theUsername ), theCount );
+            }
+        },
+
         setDJCurrentPlayCount: function ( userID, theCount ) {
             if ( theCount === undefined ) {
                 theCount = 0

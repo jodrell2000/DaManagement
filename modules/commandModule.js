@@ -337,6 +337,11 @@ const commandFunctions = ( bot ) => {
     moderatorQueueCommands.queueOff = ( { data, userFunctions, chatFunctions } ) => { userFunctions.disableQueue( data, chatFunctions ) }
     moderatorQueueCommands.queueOff.help = "Disables the queue";
 
+    moderatorQueueCommands.setDJPlaycount = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.setDJCurrentPlaycountCommand( data, args[0], reassembleArgs( args, 1 ), chatFunctions ) }
+    moderatorQueueCommands.setDJPlaycount.argumentCount = 2;
+    moderatorQueueCommands.setDJPlaycount.help = "Sets a DJs current playcount. This will let you give a DJ extra plays, or fewer, if the playLimit is set";
+    moderatorQueueCommands.setDJPlaycount.sampleArguments = [ 2, 'jodrell' ];
+
     // #############################
     // end of fully checked commands
     // #############################
@@ -426,9 +431,10 @@ const commandFunctions = ( bot ) => {
         }
     }
 
-    function reassembleArgs ( args ) {
+    function reassembleArgs ( args, startFrom ) {
         let theString = '';
-        for ( let argLoop = 0; argLoop < args.length; argLoop++ ) {
+        if ( startFrom === undefined ) { startFrom = 0; }
+        for ( let argLoop = startFrom; argLoop < args.length; argLoop++ ) {
             theString += args[ argLoop ] + ' ';
         }
         theString = theString.substring( 0, theString.length - 1 );
@@ -726,41 +732,6 @@ const commandFunctions = ( bot ) => {
                     bot.playlistRemove( -1 );
                     bot.speak( 'the last snagged song has been removed.' );
                 }
-            } else if ( text.match( /^\/playminus/ ) && userFunctions.isUserModerator( speaker ) === true ) {
-                if ( musicDefaults.DJPlaysLimit === true ) //is the play limit on?
-                {
-                    let playMinus = data.text.slice( 12 );
-                    let areTheyInRoom = userFunctions.theUsersList().indexOf( playMinus );
-                    let areTheyDj = userFunctions.djList().indexOf( userFunctions.theUsersList()[ areTheyInRoom - 1 ] );
-
-                    if ( areTheyInRoom !== -1 ) //are they in the room?
-                    {
-                        if ( areTheyDj !== -1 ) //are they a dj?
-                        {
-                            if ( typeof ( userFunctions.djSongCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ] ) ) != 'undefined' ) {
-                                if ( !userFunctions.djSongCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ] ).nbSong <= 0 ) //is their play count already 0 or lower?
-                                {
-                                    userFunctions.decrementDJPlayCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ] );
-                                    bot.speak( userFunctions.theUsersList()[ areTheyInRoom ] + '\'s play count has been reduced by one' );
-                                } else {
-                                    bot.pm( 'error, that user\'s play count is already at zero', data.userid );
-                                }
-                            } else {
-                                bot.pm( 'something weird happened!, attemping to recover now', data.userid );
-                                if ( typeof userFunctions.theUsersList()[ areTheyInRoom - 1 ] != 'undefined' ) {
-                                    //recover here
-                                    userFunctions.setDJPlayCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ], 0 );
-                                }
-                            }
-                        } else {
-                            bot.pm( 'error, that user is not currently djing', data.userid );
-                        }
-                    } else {
-                        bot.pm( 'error, that user is not currently in the room', data.userid );
-                    }
-                } else {
-                    bot.pm( 'error, the play limit must be turned on in order for me to decrement play counts', data.userid );
-                }
             } else if ( text.match( /^\/whobanned$/ ) && userFunctions.isUserModerator( speaker ) === true ) {
                 if ( roomDefaults.blackList.length !== 0 ) {
                     bot.speak( 'ban list: ' + roomDefaults.blackList );
@@ -946,43 +917,6 @@ const commandFunctions = ( bot ) => {
                     }
                 } else {
                     bot.pm( 'error, you must be on stage to use that command', speaker );
-                }
-            } else if ( text.match( /^\/playminus/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                if ( musicDefaults.DJPlaysLimit === true ) //is the play limit on?
-                {
-                    let playMinus = data.text.slice( 12 );
-                    let areTheyInRoom = userFunctions.theUsersList().indexOf( playMinus );
-                    let areTheyDj = userFunctions.djList().indexOf( userFunctions.theUsersList()[ areTheyInRoom - 1 ] );
-                    if ( areTheyInRoom !== -1 ) //are they in the room?
-                    {
-                        if ( areTheyDj !== -1 ) //are they a dj?
-                        {
-                            if ( typeof ( userFunctions.djSongCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ] ) ) != 'undefined' ) {
-
-                                if ( !userFunctions.djSongCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ] ).nbSong <= 0 ) //is their play count already 0 or lower?
-                                {
-                                    userFunctions.decrementDJPlayCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ] );
-                                    bot.pm( userFunctions.theUsersList()[ areTheyInRoom ] + '\'s play count has been reduced by one', speaker );
-                                } else {
-                                    bot.pm( 'error, that user\'s play count is already at zero', speaker );
-                                }
-                            } else {
-                                bot.pm( 'something weird happened!, attemping to recover now', speaker );
-
-                                if ( userFunctions.theUsersList()[ areTheyInRoom - 1 ] !== 'undefined' ) //only recover if userid given is not undefined
-                                {
-                                    //recover here
-                                    userFunctions.initialiseDJPlayCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ] );
-                                }
-                            }
-                        } else {
-                            bot.pm( 'error, that user is not currently djing', speaker );
-                        }
-                    } else {
-                        bot.pm( 'error, that user is not currently in the room', speaker );
-                    }
-                } else {
-                    bot.pm( 'error, the play limit must be turned on in order for me to decrement play counts', speaker );
                 }
             } else if ( text.match( /^\/snagevery$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
                 if ( songFunctions.snagSong() === true ) {
