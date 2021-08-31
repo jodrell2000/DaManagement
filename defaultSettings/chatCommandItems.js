@@ -370,4 +370,22 @@ module.exports = {
 
     ],
 
+    cheeseMessages: [
+        "Mmmmmmmmmm...cheeeeeeeese",
+        "The cheesier the better!",
+        "Bring on the cheese @username. We love it ;-)",
+        "There's no such thing as bad cheese",
+        "Cracking cheese @username"
+    ],
+
+    cheesePics: [
+        "https://media.giphy.com/media/BqF5AuSSc3m9i/giphy.gif",
+        "https://media.giphy.com/media/WMPQ6NTg9X8Zy/giphy.gif",
+        "https://media.giphy.com/media/kcog6ebOvhWBW/giphy.gif",
+        "https://media.giphy.com/media/oHvyjUCA699A1rOlqt/giphy.gif",
+        "https://media.giphy.com/media/l1L2UkgpuiE4U/giphy.gif",
+        "https://media.giphy.com/media/z7WDgVoPhLo7S/giphy.gif",
+        "https://media.giphy.com/media/itSWSzmigkzGE/giphy.gif"
+    ],
+
 }
