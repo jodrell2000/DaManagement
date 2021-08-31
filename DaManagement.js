@@ -38,17 +38,17 @@ function logMe ( logLevel, message ) {
     let theFile = "Main file";
     switch ( logLevel ) {
         case "error":
-            console.log( "!!!!!!!!!!! " + theFile +  ":" + logLevel + "->" + message + "\n" );
+            console.log( "!!!!!!!!!!! " + theFile + ":" + logLevel + "->" + message + "\n" );
             break;
         case "warn":
-            console.log( "+++++++++++ " + theFile +  ":" + logLevel + "->" + message + "\n" );
+            console.log( "+++++++++++ " + theFile + ":" + logLevel + "->" + message + "\n" );
             break;
         case "info":
-            console.log( "----------- " + theFile +  ":" + logLevel + "->" + message + "\n" );
+            console.log( "----------- " + theFile + ":" + logLevel + "->" + message + "\n" );
             break;
         default:
             if ( bot.debug ) {
-                console.log( "" + theFile +  ":" + logLevel + "->" + message + "\n" );
+                console.log( "" + theFile + ":" + logLevel + "->" + message + "\n" );
             }
             break;
     }
@@ -347,7 +347,6 @@ bot.on( 'update_votes', function ( data ) {
 
 //checks who added a song and updates their position on the afk list.
 bot.on( 'snagged', function ( data ) {
-    logMe('info', '++++++++++++++++++++++++++++++++++++++++ snagged...');
     songFunctions.incrementSnagCount();
     userFunctions.updateUserLastSnagged( data.userid ); //update the afk position of people who add a song to their queue
 } )
