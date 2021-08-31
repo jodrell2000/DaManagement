@@ -193,6 +193,9 @@ const commandFunctions = ( bot ) => {
     chatCommands.bow = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.bowMessages, chatCommandItems.bowPics, userFunctions ); }
     chatCommands.bow.help = "Celebrate the Rush ;-)";
 
+    chatCommands.cheese = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.cheeseMessages, chatCommandItems.cheesePics, userFunctions ); }
+    chatCommands.cheese.help = "You want cheese, you got cheese!";
+
     // ######################################################
     // Advanced chat commands...more than just basic messages
     // ######################################################
@@ -311,10 +314,10 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.informdj = ( { data, args, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.informDJCommand( data, reassembleArgs( args ), userFunctions, chatFunctions ); }
     moderatorCommands.informdj.help = "Have the Bot send the current DJ a message";
 
-    moderatorCommands.awesome = ( { botFunctions } ) => { botFunctions.awesomeCommand( ); }
+    moderatorCommands.awesome = ( { botFunctions } ) => { botFunctions.awesomeCommand(); }
     moderatorCommands.awesome.help = "Have the Bot uptote";
 
-    moderatorCommands.lame = ( { botFunctions } ) => { botFunctions.lameCommand( ); }
+    moderatorCommands.lame = ( { botFunctions } ) => { botFunctions.lameCommand(); }
     moderatorCommands.lame.help = "Have the Bot uptote";
 
     // #############################################
@@ -337,7 +340,7 @@ const commandFunctions = ( bot ) => {
     moderatorQueueCommands.queueOff = ( { data, userFunctions, chatFunctions } ) => { userFunctions.disableQueue( data, chatFunctions ) }
     moderatorQueueCommands.queueOff.help = "Disables the queue";
 
-    moderatorQueueCommands.setDJPlaycount = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.setDJCurrentPlaycountCommand( data, args[0], reassembleArgs( args, 1 ), chatFunctions ) }
+    moderatorQueueCommands.setDJPlaycount = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.setDJCurrentPlaycountCommand( data, args[ 0 ], reassembleArgs( args, 1 ), chatFunctions ) }
     moderatorQueueCommands.setDJPlaycount.argumentCount = 2;
     moderatorQueueCommands.setDJPlaycount.help = "Sets a DJs current playcount. This will let you give a DJ extra plays, or fewer, if the playLimit is set";
     moderatorQueueCommands.setDJPlaycount.sampleArguments = [ 2, 'jodrell' ];
