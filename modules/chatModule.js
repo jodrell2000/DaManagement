@@ -1,4 +1,5 @@
 let botDefaults = require( '../defaultSettings/botDefaults.js' );
+let userMessages = require( '../defaultSettings/customGreetings.js');
 
 const chatFunctions = ( bot, roomDefaults ) => {
     function logMe ( logLevel, message ) {
@@ -174,25 +175,30 @@ const chatFunctions = ( bot, roomDefaults ) => {
         // ========================================================
 
         userGreeting: function ( userID, username, roomFunctions ) {
-            this.message = '';
+            const customGreeting = userMessages.userGreetings.find( ({ id }) => id === userID );
 
-            if ( roomFunctions.roomJoinMessage() !== '' ) //if your not using the default greeting
-            {
-                if ( roomDefaults.theme === false ) //if theres no theme this is the message.
-                {
-                    this.message = roomFunctions.roomJoinMessage();
-                } else {
-                    this.message = roomFunctions.roomJoinMessage() + '; The theme is currently set to: ' + roomDefaults.whatIsTheme;
-                }
+            if ( customGreeting !== undefined ) {
+                this.greetMessage( userID, customGreeting.message, roomFunctions );
             } else {
-                if ( roomDefaults.theme === false ) //if theres no theme this is the message.
+                this.message = '';
+                if ( roomFunctions.roomJoinMessage() !== '' ) //if your not using the default greeting
                 {
-                    this.message = 'Welcome to ' + roomDefaults.roomName + ' @' + username + ', enjoy your stay!';
+                    if ( roomDefaults.theme === false ) //if theres no theme this is the message.
+                    {
+                        this.message = roomFunctions.roomJoinMessage();
+                    } else {
+                        this.message = roomFunctions.roomJoinMessage() + '; The theme is currently set to: ' + roomDefaults.whatIsTheme;
+                    }
                 } else {
-                    this.message = 'Welcome to ' + roomDefaults.roomName + ' @' + username + ', the theme is currently set to: ' + roomDefaults.whatIsTheme;
+                    if ( roomDefaults.theme === false ) //if theres no theme this is the message.
+                    {
+                        this.message = 'Welcome to ' + roomDefaults.roomName + ' @' + username + ', enjoy your stay!';
+                    } else {
+                        this.message = 'Welcome to ' + roomDefaults.roomName + ' @' + username + ', the theme is currently set to: ' + roomDefaults.whatIsTheme;
+                    }
                 }
+                this.greetMessage( userID, this.message, roomFunctions )
             }
-            this.greetMessage( userID, this.message, roomFunctions )
         },
 
         greetMessage: function ( userID, message, roomFunctions ) {
