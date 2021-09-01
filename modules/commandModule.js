@@ -4,8 +4,6 @@ let roomDefaults = require( '../defaultSettings/roomDefaults.js' );
 let musicDefaults = require( '../defaultSettings/musicDefaults.js' );
 let chatDefaults = require( '../defaultSettings/chatDefaults.js' );
 let chatCommandItems = require( '../defaultSettings/chatCommandItems.js' );
-const botFunctions = require( './botModule.js' );
-
 
 const generalCommands = {};
 const moderatorCommands = {};
