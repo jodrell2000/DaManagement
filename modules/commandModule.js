@@ -13,6 +13,8 @@ const userCommands = {};
 const userQueueCommands = {};
 const moderatorQueueCommands = {};
 
+const ignoreCommands = [ '/me' ];
+
 const commandFunctions = ( bot ) => {
     function logMe ( logLevel, message ) {
         if ( logLevel === 'error' || logLevel === 'info' ) {
@@ -447,6 +449,13 @@ const commandFunctions = ( bot ) => {
 
         wasThisACommand: function ( data ) {
             let text = data.text;
+
+            // was this on the ignore list
+            for ( let ignoreLoop = 0; ignoreLoop < ignoreCommands.length; ignoreLoop++ ) {
+                if ( text.match( ignoreCommands[ ignoreLoop ] ) ) {
+                    return false;
+                }
+            }
 
             // check if this was a command
             const commandString = "^" + chatDefaults.commandIdentifier;
