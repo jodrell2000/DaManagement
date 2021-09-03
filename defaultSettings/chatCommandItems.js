@@ -405,7 +405,8 @@ module.exports = {
     gothMessages: [
         "It's too bright!!",
         "The sun, it burns!",
-        "Anyone playing MCR today?!?"
+        "Anyone playing MCR today?!?",
+        "60 watts?! What do you think this is, a tanning salon?"
     ],
 
     gothPics: [
