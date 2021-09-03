@@ -189,6 +189,9 @@ const commandFunctions = ( bot ) => {
     chatCommands.twofer = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.twoferMessages, chatCommandItems.twoferPics, userFunctions ); }
     chatCommands.twofer.help = "You want cheese, you got cheese!";
 
+    chatCommands.goth = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.gothMessages, chatCommandItems.gothPics, userFunctions ); }
+    chatCommands.goth.help = "You want cheese, you got cheese!";
+
     // ######################################################
     // Advanced chat commands...more than just basic messages
     // ######################################################

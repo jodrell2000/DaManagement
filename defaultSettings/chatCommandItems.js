@@ -402,4 +402,17 @@ module.exports = {
         "https://media.giphy.com/media/l36kU80xPf0ojG0Erg/giphy.gif?cid=ecf05e47cuie1cpjbt75k9xshp0u1rsx92pfcnhnv9rxohzl&rid=giphy.gif&ct=g"
     ],
 
+    gothMessages: [
+        "It's too bright!!",
+        "The sun, it burns!",
+        "Anyone playing MCR today?!?"
+    ],
+
+    gothPics: [
+        "https://media.giphy.com/media/PRELuG1jX892g/giphy.gif?cid=790b7611567789f6bfc6c3db649d8c20a5424f7265d3da0c&rid=giphy.gif&ct=g",
+        "https://media.giphy.com/media/nuXIEASt1wqI/giphy.gif?cid=ecf05e47jmf6kpklzahgu1cww2cw2fv4tspcdvhe1pfgeyw0&rid=giphy.gif&ct=g",
+        "https://media.giphy.com/media/Im59R8Ij9OKzK/giphy.gif?cid=ecf05e47jmf6kpklzahgu1cww2cw2fv4tspcdvhe1pfgeyw0&rid=giphy.gif&ct=g",
+        "https://media.giphy.com/media/3o7TKNPAmBQGXgEZpu/giphy.gif?cid=ecf05e47jmf6kpklzahgu1cww2cw2fv4tspcdvhe1pfgeyw0&rid=giphy.gif&ct=g"
+    ],
+
 }
