@@ -176,7 +176,7 @@ bot.on( 'roomChanged', function ( data ) {
 
 //checks at the beggining of the song
 bot.on( 'newsong', function ( data ) {
-    console.group('newsong');
+    console.group( 'newsong' );
     //resets counters and array for vote skipping
     songFunctions.resetCheckVotes();
     songFunctions.resetVoteCountSkip();
@@ -284,7 +284,7 @@ bot.on( 'newsong', function ( data ) {
     //of some event not firing, remake currentDj's array
     // data.room.metadata.djs.length is index 0 so add 1 to compare
     if ( data.room.metadata.djs.length !== userFunctions.howManyDJs() ) {
-        logMe( 'error', Date.now() + ' The DJ counts don\'t match...resetting them. Count from data is ' + data.room.metadata.djs.length + ', count from Bot is ' + userFunctions.howManyDJs() );
+        console.warn( date.format( "{Date:2}/{Month:2}/{FullYear}" ) + ' The DJ counts don\'t match...resetting them. Count from data is ' + data.room.metadata.djs.length + ', count from Bot is ' + userFunctions.howManyDJs() );
         userFunctions.resetDJs( data ); //reset current djs array
     }
     console.groupEnd();
