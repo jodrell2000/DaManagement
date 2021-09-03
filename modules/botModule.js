@@ -79,7 +79,7 @@ const botFunctions = ( bot ) => {
                 await sleep( 100 )
                 userFunctions.debugPrintTheUsersList();
                 await sleep( 100 )
-                this.logCommandUsage( 'sarahConner', data, theMessage )
+                this.logCommandUsage( userFunctions, 'sarahConner', data, theMessage )
                 process.exit( 1 );
             }
             shutMeDown();
@@ -205,7 +205,7 @@ const botFunctions = ( bot ) => {
             }
         },
 
-        logCommandUsage: function ( command, data, theMessage ) {
+        logCommandUsage: function ( userFunctions, command, data, theMessage ) {
             console.group( command );
             console.info( 'The ' + command + ' command was issued by @' + userFunctions.getUsername( userFunctions.whoSentTheCommand( data ) ) + ' at ' + Date() );
             console.info( theMessage );
@@ -220,7 +220,7 @@ const botFunctions = ( bot ) => {
                 theMessage = '@' + djName + ', ' + theMessage;
 
                 chatFunctions.botSpeak( data, theMessage, true );
-                this.logCommandUsage( 'removeDJ', data, theMessage )
+                this.logCommandUsage( userFunctions, 'removeDJ', data, theMessage )
             }
             bot.remDj( djID );
         },
@@ -231,7 +231,7 @@ const botFunctions = ( bot ) => {
             if ( theMessage !== '' ) {
                 theMessage = '@' + userFunctions.getUsername( djID ) + ', ' + theMessage
                 chatFunctions.botSpeak( data, theMessage, true );
-                this.logCommandUsage( 'informDJ', data, theMessage )
+                this.logCommandUsage( userFunctions, 'informDJ', data, theMessage )
             } else {
                 chatFunctions.botSpeak( data, 'You didn\'t ask me to send the DJ any message?!?' );
             }
@@ -246,6 +246,12 @@ const botFunctions = ( bot ) => {
         },
 
         // ========================================================
+
+        getFormattedDate: function () {
+            var dateobj = new Date();
+            var date = dateobj.getDate(), month = dateobj.getMonth() + 1, year = dateobj.getFullYear();
+            return `${ date }/${ month }/${ year }`;
+        },
 
         checkVideoRegions: () => checkVideoRegions,
         enablecheckVideoRegions: function ( data, videoFunctions, chatFunctions ) {
