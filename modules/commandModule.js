@@ -16,16 +16,6 @@ const moderatorQueueCommands = {};
 const ignoreCommands = [ '/me' ];
 
 const commandFunctions = ( bot ) => {
-    function logMe ( logLevel, message ) {
-        if ( logLevel === 'error' || logLevel === 'info' ) {
-            console.log( "commandFunctions:" + logLevel + "->" + message + "\n" );
-        } else {
-            if ( bot.debug ) {
-                console.log( "commandFunctions:" + logLevel + "->" + message + "\n" );
-            }
-        }
-    }
-
     // #############################################
     // These comamnds are confirmed as fully working
     // #############################################

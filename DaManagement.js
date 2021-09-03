@@ -176,6 +176,7 @@ bot.on( 'roomChanged', function ( data ) {
 
 //checks at the beggining of the song
 bot.on( 'newsong', function ( data ) {
+    console.group('newsong');
     //resets counters and array for vote skipping
     songFunctions.resetCheckVotes();
     songFunctions.resetVoteCountSkip();
@@ -186,6 +187,7 @@ bot.on( 'newsong', function ( data ) {
     songFunctions.resetVoteSnagging();
 
     //procedure for getting song tags
+    console.info( "data.room.metadata.current_song:" + JSON.stringify( data.room.metadata.current_song ) );
     songFunctions.getSongTags( data.room.metadata.current_song )
 
     //set information
@@ -285,6 +287,7 @@ bot.on( 'newsong', function ( data ) {
         logMe( 'error', Date.now() + ' The DJ counts don\'t match...resetting them. Count from data is ' + data.room.metadata.djs.length + ', count from Bot is ' + userFunctions.howManyDJs() );
         userFunctions.resetDJs( data ); //reset current djs array
     }
+    console.groupEnd();
 } );
 
 //bot gets on stage and starts djing if no song is playing.

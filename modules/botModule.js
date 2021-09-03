@@ -72,6 +72,8 @@ const botFunctions = ( bot ) => {
         // ========================================================
 
         sarahConner: function ( data, userFunctions, chatFunctions ) {
+            console.group('sarahConner');
+
             const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve( "done" ), delay ) )
 
             const shutMeDown = async () => {
@@ -79,13 +81,15 @@ const botFunctions = ( bot ) => {
                 await sleep( 100 )
                 userFunctions.debugPrintTheUsersList();
                 await sleep( 100 )
-                logMe( 'error', 'Data:' + JSON.stringify( data ) );
+                console.info('Data:' + data );
                 await sleep( 100 )
-                logMe( 'error', 'The !sarahConner command was issued by @' + userFunctions.getUsername( userFunctions.whoSentTheCommand( data ) ) + ' at ' + Date() );
+                console.info('The !sarahConner command was issued by @' + userFunctions.getUsername( userFunctions.whoSentTheCommand( data ) ) + ' at ' + Date() );
                 await sleep( 100 )
                 process.exit( 1 );
             }
             shutMeDown();
+
+            console.groupEnd();
         },
 
         reportUptime: function ( data, userFunctions, chatFunctions ) {
@@ -208,22 +212,35 @@ const botFunctions = ( bot ) => {
             }
         },
 
+        logCommandUsage: function ( command, data, theMessage ) {
+            console.info('The ' + command + ' command was issued by @' + userFunctions.getUsername( userFunctions.whoSentTheCommand( data ) ) + ' at ' + Date() );
+            console.info( theMessage );
+        },
+
         removeDJCommand: function ( data, theMessage, userFunctions, chatFunctions ) {
+            console.group('removeDJCommand');
+
             const djID = userFunctions.getCurrentDJID();
 
             if ( theMessage !== '' ) {
                 const djName = userFunctions.getUsername( djID );
+                theMessage = '@' + djName + ', ' + theMessage;
 
-                chatFunctions.botSpeak( data, '@' + djName + ', ' + theMessage, true );
+                chatFunctions.botSpeak( data, theMessage, true );
+                this.logCommandUsage( 'removeDJ', data, theMessage )
             }
             bot.remDj( djID );
+
+            console.groupEnd();
         },
 
         informDJCommand: function ( data, theMessage, userFunctions, chatFunctions ) {
             const djID = userFunctions.getCurrentDJID();
 
             if ( theMessage !== '' ) {
-                chatFunctions.botSpeak( data, '@' + userFunctions.getUsername( djID ) + ', ' + theMessage, true );
+                theMessage = '@' + userFunctions.getUsername( djID ) + ', ' + theMessage
+                chatFunctions.botSpeak( data, theMessage, true );
+                this.logCommandUsage( 'informDJ', data, theMessage )
             } else {
                 chatFunctions.botSpeak( data, 'You didn\'t ask me to send the DJ any message?!?' );
             }
