@@ -295,8 +295,10 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.whosRefreshing = ( { data, userFunctions, chatFunctions } ) => { userFunctions.whosRefreshingCommand( data, chatFunctions ); }
     moderatorCommands.whosRefreshing.help = "List of users currently using the refresh command";
 
-    moderatorCommands.sarahConner = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.sarahConner( data, userFunctions, chatFunctions ); }
+    moderatorCommands.sarahConner = ( { data, args, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.sarahConner( data, reassembleArgs( args ), userFunctions, chatFunctions ); }
+    moderatorCommands.sarahConner.argumentCount = 1;
     moderatorCommands.sarahConner.help = "Shut down the Bot if it's causing problems";
+    moderatorCommands.sarahConner.sampleArguments = [ "He started booting everyone!" ];
 
     moderatorCommands.removedj = ( { data, args, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.removeDJCommand( data, reassembleArgs( args ), userFunctions, chatFunctions ); }
     moderatorCommands.removedj.help = "Remove the current DJ from the decks. Add a message after the command to have it sent direct to the DJ (in public)";
