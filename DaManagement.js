@@ -187,7 +187,7 @@ bot.on( 'newsong', function ( data ) {
     songFunctions.resetVoteSnagging();
 
     //procedure for getting song tags
-    console.info( "data.room.metadata.current_song:" + JSON.stringify( data.room.metadata.current_song ) );
+    //console.info( "data.room.metadata.current_song:" + JSON.stringify( data.room.metadata.current_song ) );
     songFunctions.getSongTags( data.room.metadata.current_song )
 
     //set information
@@ -284,7 +284,7 @@ bot.on( 'newsong', function ( data ) {
     //of some event not firing, remake currentDj's array
     // data.room.metadata.djs.length is index 0 so add 1 to compare
     if ( data.room.metadata.djs.length !== userFunctions.howManyDJs() ) {
-        console.warn( date.format( "{Date:2}/{Month:2}/{FullYear}" ) + ' The DJ counts don\'t match...resetting them. Count from data is ' + data.room.metadata.djs.length + ', count from Bot is ' + userFunctions.howManyDJs() );
+        console.warn( botFunctions.getFormattedDate() + ' The DJ counts don\'t match...resetting them. Count from data is ' + data.room.metadata.djs.length + ', count from Bot is ' + userFunctions.howManyDJs() );
         userFunctions.resetDJs( data ); //reset current djs array
     }
     console.groupEnd();
