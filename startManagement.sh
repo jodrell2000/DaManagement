@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export CMD="node DaManagement.js" 
+export CMD="node --trace-warnings DaManagement.js" 
 
 while true 
 do
