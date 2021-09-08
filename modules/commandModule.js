@@ -13,7 +13,7 @@ const userCommands = {};
 const userQueueCommands = {};
 const moderatorQueueCommands = {};
 
-const ignoreCommands = [ '/me' ];
+const ignoreCommands = [ '/me ' ];
 
 const commandFunctions = ( bot ) => {
     // #############################################
