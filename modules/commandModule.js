@@ -13,19 +13,9 @@ const userCommands = {};
 const userQueueCommands = {};
 const moderatorQueueCommands = {};
 
-const ignoreCommands = [ '/me' ];
+const ignoreCommands = [ '/me ' ];
 
 const commandFunctions = ( bot ) => {
-    function logMe ( logLevel, message ) {
-        if ( logLevel === 'error' || logLevel === 'info' ) {
-            console.log( "commandFunctions:" + logLevel + "->" + message + "\n" );
-        } else {
-            if ( bot.debug ) {
-                console.log( "commandFunctions:" + logLevel + "->" + message + "\n" );
-            }
-        }
-    }
-
     // #############################################
     // These comamnds are confirmed as fully working
     // #############################################
@@ -196,6 +186,12 @@ const commandFunctions = ( bot ) => {
     chatCommands.cheese = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.cheeseMessages, chatCommandItems.cheesePics, userFunctions ); }
     chatCommands.cheese.help = "You want cheese, you got cheese!";
 
+    chatCommands.twofer = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.twoferMessages, chatCommandItems.twoferPics, userFunctions ); }
+    chatCommands.twofer.help = "You want cheese, you got cheese!";
+
+    chatCommands.goth = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.gothMessages, chatCommandItems.gothPics, userFunctions ); }
+    chatCommands.goth.help = "You want cheese, you got cheese!";
+
     // ######################################################
     // Advanced chat commands...more than just basic messages
     // ######################################################
@@ -305,8 +301,10 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.whosRefreshing = ( { data, userFunctions, chatFunctions } ) => { userFunctions.whosRefreshingCommand( data, chatFunctions ); }
     moderatorCommands.whosRefreshing.help = "List of users currently using the refresh command";
 
-    moderatorCommands.sarahConner = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.sarahConner( data, userFunctions, chatFunctions ); }
+    moderatorCommands.sarahConner = ( { data, args, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.sarahConner( data, reassembleArgs( args ), userFunctions, chatFunctions ); }
+    moderatorCommands.sarahConner.argumentCount = 1;
     moderatorCommands.sarahConner.help = "Shut down the Bot if it's causing problems";
+    moderatorCommands.sarahConner.sampleArguments = [ "He started booting everyone!" ];
 
     moderatorCommands.removedj = ( { data, args, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.removeDJCommand( data, reassembleArgs( args ), userFunctions, chatFunctions ); }
     moderatorCommands.removedj.help = "Remove the current DJ from the decks. Add a message after the command to have it sent direct to the DJ (in public)";

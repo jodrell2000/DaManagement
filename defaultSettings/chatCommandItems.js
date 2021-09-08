@@ -62,7 +62,10 @@ module.exports = {
         "https://media.giphy.com/media/Zw3oBUuOlDJ3W/giphy.gif",
         "https://media.giphy.com/media/4qfccBawqdr9K/giphy.gif",
         "https://media.giphy.com/media/xUA7bceFLbFZb02UZa/giphy.gif",
-        "https://media.giphy.com/media/8mkykXIicXOVms2xYE/giphy.gif"
+        "https://media.giphy.com/media/8mkykXIicXOVms2xYE/giphy.gif",
+        "https://media.giphy.com/media/3o6ZsUJ44ffpnAW7Dy/giphy.gif?cid=ecf05e47h91j38srsovm9rt5uabcyqedsqrjsillk8tg6ohp&rid=giphy.gif&ct=g",
+        "https://media.giphy.com/media/3osxYqq9oQSka9YeGI/giphy.gif?cid=ecf05e47p15hg91nda4rdazsp8r1pozh5tmk4jdegb6twn8f&rid=giphy.gif&ct=g",
+        "https://media.giphy.com/media/t2sKa4JKNW9DawxAYi/giphy.gif?cid=ecf05e47h91j38srsovm9rt5uabcyqedsqrjsillk8tg6ohp&rid=giphy.gif&ct=g"
     ],
 
     danceMessages: [
@@ -386,6 +389,31 @@ module.exports = {
         "https://media.giphy.com/media/l1L2UkgpuiE4U/giphy.gif",
         "https://media.giphy.com/media/z7WDgVoPhLo7S/giphy.gif",
         "https://media.giphy.com/media/itSWSzmigkzGE/giphy.gif"
+    ],
+
+    twoferMessages: [
+        "When one is just not enough",
+        "We liked it so much we played them again!"
+    ],
+
+    twoferPics: [
+        "https://media.giphy.com/media/XaM3GgMW65BNMBhIqH/giphy.gif?cid=ecf05e47li9eelfxh6eb8seqi9ccidfutqidwzrdo0qeraxg&rid=giphy.gif&ct=g",
+        "https://media.giphy.com/media/zujkOi1kkLRzG/giphy.gif?cid=ecf05e47hiq0x3epzfolo6ko6xvae0a98dbpjxwsyolaahiy&rid=giphy.gif&ct=g",
+        "https://media.giphy.com/media/l36kU80xPf0ojG0Erg/giphy.gif?cid=ecf05e47cuie1cpjbt75k9xshp0u1rsx92pfcnhnv9rxohzl&rid=giphy.gif&ct=g"
+    ],
+
+    gothMessages: [
+        "It's too bright!!",
+        "The sun, it burns!",
+        "Anyone playing MCR today?!?",
+        "60 watts?! What do you think this is, a tanning salon?"
+    ],
+
+    gothPics: [
+        "https://media.giphy.com/media/PRELuG1jX892g/giphy.gif?cid=790b7611567789f6bfc6c3db649d8c20a5424f7265d3da0c&rid=giphy.gif&ct=g",
+        "https://media.giphy.com/media/nuXIEASt1wqI/giphy.gif?cid=ecf05e47jmf6kpklzahgu1cww2cw2fv4tspcdvhe1pfgeyw0&rid=giphy.gif&ct=g",
+        "https://media.giphy.com/media/Im59R8Ij9OKzK/giphy.gif?cid=ecf05e47jmf6kpklzahgu1cww2cw2fv4tspcdvhe1pfgeyw0&rid=giphy.gif&ct=g",
+        "https://media.giphy.com/media/3o7TKNPAmBQGXgEZpu/giphy.gif?cid=ecf05e47jmf6kpklzahgu1cww2cw2fv4tspcdvhe1pfgeyw0&rid=giphy.gif&ct=g"
     ],
 
 }
