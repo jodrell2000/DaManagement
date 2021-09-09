@@ -318,6 +318,12 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.lame = ( { botFunctions } ) => { botFunctions.lameCommand(); }
     moderatorCommands.lame.help = "Have the Bot uptote";
 
+    moderatorCommands.greetOn = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.greetOnCommand( data, chatFunctions ); }
+    moderatorCommands.greetOn.help = "Enable user greetings";
+
+    moderatorCommands.greetOff = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.greetOffCommand( data, chatFunctions ); }
+    moderatorCommands.greetOff.help = "Disable user greetings";
+
     // #############################################
     // Moderator Only Queue commands
     // #############################################
@@ -654,12 +660,6 @@ const commandFunctions = ( bot ) => {
                 bot.getProfile( data.userid, function ( data6 ) {
                     bot.speak( '@' + data6.name + ' you have been in the room for: ' + days1 + ' days, ' + hours1 + ' hours, ' + minutes1 + ' minutes' );
                 } );
-            } else if ( text.match( /^\/greeton/ ) && userFunctions.isUserModerator( speaker ) === true ) {
-                bot.speak( 'room greeting: On' );
-                roomFunctions.enableGreet();
-            } else if ( text.match( /^\/greetoff/ ) && userFunctions.isUserModerator( speaker ) === true ) {
-                bot.speak( 'room greeting: Off' );
-                roomFunctions.disableGreet();
             } else if ( text.match( /^\/eventmessageOn/ ) && userFunctions.isUserModerator( speaker ) === true ) {
                 bot.speak( 'event message: On' );
                 roomDefaults.EVENTMESSAGE = true;
@@ -956,12 +956,6 @@ const commandFunctions = ( bot ) => {
             } else if ( text.match( /^\/messageOn/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
                 bot.pm( 'message: On', speaker );
                 roomDefaults.MESSAGE = true;
-            } else if ( text.match( /^\/greetoff/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                bot.pm( 'room greeting: Off', speaker );
-                roomFunctions.disableGreet();
-            } else if ( text.match( /^\/greeton/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                bot.pm( 'room greeting: On', speaker );
-                roomFunctions.enableGreet();
             } else if ( text.match( /^\/setTheme/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
                 whatIsTheme = data.text.slice( 10 );
                 roomDefaults.THEME = true;

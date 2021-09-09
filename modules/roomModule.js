@@ -14,18 +14,11 @@ let queueTimer = null; //holds the timer the auto removes dj's from the queue if
 let greet = roomDefaults.greetUsers; //room greeting when someone joins the room(on by default)
 let greetThroughPm = roomDefaults.greetThroughPM; //choose whether greeting message is through the pm or the chatbox(false = chatbox, true = pm), (only works when greeting message is turned on) (off by default)
 let greetingTimer = []; //holds the timeout for people that join the room, if someone rejoins before their timeout completes their timer is reset
-let roomJoinMessage = ''; //the message users will see when they join the room, leave it empty for the default message (only works when greet is turned on)
+
+let roomName = '';
+let roomJoinMessage = 'Welcome to @roomName @username'; //the message users will see when they join the room, leave it empty for the default message (only works when greet is turned on)
 
 const roomFunctions = ( bot ) => {
-    function logMe ( logLevel, message ) {
-        if ( logLevel === 'error' || logLevel === 'info' ) {
-            console.log( "roomFunctions:" + logLevel + "->" + message + "\n" );
-        } else {
-            if ( bot.debug ) {
-                console.log( "roomFunctions:" + logLevel + "->" + message + "\n" );
-            }
-        }
-    }
 
     return {
         djCount: () => djCount, setDJCount: function ( theCount ) { djCount = theCount; },
@@ -43,7 +36,7 @@ const roomFunctions = ( bot ) => {
         },
 
         // ========================================================
-        // DJ Queue Helper Functions
+        // Greeting Functions
         // ========================================================
 
         greet: () => greet,
@@ -53,7 +46,33 @@ const roomFunctions = ( bot ) => {
         greetThroughPm: () => greetThroughPm,
         greetingTimer: () => greetingTimer,
 
-        roomJoinMessage: () => roomJoinMessage,
+        greetOnCommand: function ( data, chatFunctions ) {
+            if ( this.greet() === true ) {
+                chatFunctions.botSpeak( data, 'The Greet command is already enabled' );
+            } else {
+                this.enableGreet();
+                this.readGreetingStatus( data, chatFunctions );
+            }
+        },
+
+        greetOffCommand: function ( data, chatFunctions ) {
+            if ( this.greet() === false ) {
+                chatFunctions.botSpeak( data, 'The Greet command is already disabled' );
+            } else {
+                this.disableGreet();
+                this.readGreetingStatus( data, chatFunctions );
+            }
+        },
+
+        readGreetingStatus: function ( data, chatFunctions ) {
+            let theMessage = 'The Greet command is ';
+            if ( this.greet() === true ) {
+                theMessage += 'enabled';
+            } else {
+                theMessage += 'disabled';
+            }
+            chatFunctions.botSpeak( data, theMessage );
+        },
 
         // ========================================================
 
@@ -130,9 +149,12 @@ const roomFunctions = ( bot ) => {
             }
         },
 
+        roomName: () => roomName,
+        setRoomName: function ( value ) { roomName = value; },
+
         setRoomDefaults: function ( data ) {
             roomDefaults.detail = data.room.description; //used to get room description
-            roomDefaults.roomName = data.room.name; //gets your rooms name
+            this.setRoomName ( data.room.name ); //gets your rooms name
             roomDefaults.ttRoomName = data.room.shortcut; //gets room shortcut
 
             bot.playlistAll( function ( callback ) {
