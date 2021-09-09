@@ -3,3 +3,4 @@ DaManagement.sublime-project
 DaManagement.sublime-workspace
 .env
 .idea
+client_secret.json

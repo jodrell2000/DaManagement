@@ -71,18 +71,15 @@ const botFunctions = ( bot ) => {
         // Bot Command Functions
         // ========================================================
 
-        sarahConner: function ( data, userFunctions, chatFunctions ) {
+        sarahConner: function ( data, theMessage, userFunctions, chatFunctions ) {
             const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve( "done" ), delay ) )
 
             const shutMeDown = async () => {
-                // chatFunctions.botSpeak( data, "Going away now...", true );
-                await sleep( 100 )
-                logMe( 'error', 'The !sarahConner command was issued by @' + userFunctions.getUsername( userFunctions.whoSentTheCommand( data ) ) + ' at ' + Date() );
+                chatFunctions.botSpeak( data, "Going away now...", true );
                 await sleep( 100 )
                 userFunctions.debugPrintTheUsersList();
                 await sleep( 100 )
-                logMe( 'error', 'Users:' + JSON.stringify( data ) );
-                await sleep( 100 )
+                this.logCommandUsage( userFunctions, 'sarahConner', data, theMessage )
                 process.exit( 1 );
             }
             shutMeDown();
@@ -109,7 +106,7 @@ const botFunctions = ( bot ) => {
         songStatsCommand: function ( data, chatFunctions ) {
             if ( this.readSongStats() ) {
                 this.disableReadSongStats( data, chatFunctions );
-            } else  {
+            } else {
                 this.enableReadSongStats( data, chatFunctions );
             }
         },
@@ -117,7 +114,7 @@ const botFunctions = ( bot ) => {
         autoDJCommand: function ( data, chatFunctions ) {
             if ( this.autoDJEnabled() ) {
                 this.disableAutoDJ( data, chatFunctions );
-            } else  {
+            } else {
                 this.enableAutoDJ( data, chatFunctions );
             }
         },
@@ -125,7 +122,7 @@ const botFunctions = ( bot ) => {
         removeIdleDJsCommand: function ( data, userFunctions, chatFunctions ) {
             if ( userFunctions.removeIdleDJs() ) {
                 userFunctions.disableDJIdle( data, chatFunctions );
-            } else  {
+            } else {
                 userFunctions.enableDJIdle( data, chatFunctions );
             }
         },
@@ -146,7 +143,7 @@ const botFunctions = ( bot ) => {
         },
 
         checkVideoRegionsCommand: function ( data, videoFunctions, chatFunctions ) {
-            logMe('info', 'checkVideoRegionsCommand, this.checkVideoRegions():' + this.checkVideoRegions() );
+            logMe( 'info', 'checkVideoRegionsCommand, this.checkVideoRegions():' + this.checkVideoRegions() );
             if ( this.checkVideoRegions() ) {
                 this.disablecheckVideoRegions( data, videoFunctions, chatFunctions );
             } else {
@@ -166,7 +163,7 @@ const botFunctions = ( bot ) => {
             doInOrder();
         },
 
-        removeAlertRegionCommand: function (  data, args, videoFunctions, chatFunctions ) {
+        removeAlertRegionCommand: function ( data, args, videoFunctions, chatFunctions ) {
             const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
             const doInOrder = async () => {
                 videoFunctions.removeAlertRegion( data, args, chatFunctions )
@@ -208,7 +205,53 @@ const botFunctions = ( bot ) => {
             }
         },
 
+        logCommandUsage: function ( userFunctions, command, data, theMessage ) {
+            console.group( command );
+            console.info( 'The ' + command + ' command was issued by @' + userFunctions.getUsername( userFunctions.whoSentTheCommand( data ) ) + ' at ' + Date() );
+            console.info( theMessage );
+            console.groupEnd();
+        },
+
+        removeDJCommand: function ( data, theMessage, userFunctions, chatFunctions ) {
+            const djID = userFunctions.getCurrentDJID();
+
+            if ( theMessage !== '' ) {
+                const djName = userFunctions.getUsername( djID );
+                theMessage = '@' + djName + ', ' + theMessage;
+
+                chatFunctions.botSpeak( data, theMessage, true );
+                this.logCommandUsage( userFunctions, 'removeDJ', data, theMessage )
+            }
+            bot.remDj( djID );
+        },
+
+        informDJCommand: function ( data, theMessage, userFunctions, chatFunctions ) {
+            const djID = userFunctions.getCurrentDJID();
+
+            if ( theMessage !== '' ) {
+                theMessage = '@' + userFunctions.getUsername( djID ) + ', ' + theMessage
+                chatFunctions.botSpeak( data, theMessage, true );
+                this.logCommandUsage( userFunctions, 'informDJ', data, theMessage )
+            } else {
+                chatFunctions.botSpeak( data, 'You didn\'t ask me to send the DJ any message?!?' );
+            }
+        },
+
+        awesomeCommand: function () {
+            bot.vote( 'up' );
+        },
+
+        lameCommand: function () {
+            bot.vote( 'down' );
+        },
+
         // ========================================================
+
+        getFormattedDate: function () {
+            var dateobj = new Date();
+            var date = dateobj.getDate(), month = dateobj.getMonth() + 1, year = dateobj.getFullYear();
+            return `${ date }/${ month }/${ year }`;
+        },
 
         checkVideoRegions: () => checkVideoRegions,
         enablecheckVideoRegions: function ( data, videoFunctions, chatFunctions ) {
@@ -259,8 +302,8 @@ const botFunctions = ( bot ) => {
 
         whenToGetOnStage: () => whenToGetOnStage,
         setWhenToGetOnStage: function ( data, args, chatFunctions ) {
-            const numberOfDJs = args[0];
-            if ( isNaN(numberOfDJs) ) {
+            const numberOfDJs = args[ 0 ];
+            if ( isNaN( numberOfDJs ) ) {
                 chatFunctions.botSpeak( data, 'Don\'t be silly. I can\'t set the auto-DJing start value to ' + numberOfDJs );
             } else {
                 whenToGetOnStage = numberOfDJs;
@@ -268,10 +311,10 @@ const botFunctions = ( bot ) => {
             }
         },
 
-        whenToGetOffStage: () =>  whenToGetOffStage,
+        whenToGetOffStage: () => whenToGetOffStage,
         setWhenToGetOffStage: function ( data, args, chatFunctions ) {
-            const numberOfDJs = args[0];
-            if ( isNaN(numberOfDJs) ) {
+            const numberOfDJs = args[ 0 ];
+            if ( isNaN( numberOfDJs ) ) {
                 chatFunctions.botSpeak( data, 'Don\'t be silly. I can\'t set the auto-DJing stop value to ' + numberOfDJs );
             } else {
                 whenToGetOffStage = numberOfDJs;
@@ -458,8 +501,8 @@ const botFunctions = ( bot ) => {
             this.clearAllTimers( userFunctions, roomFunctions, songFunctions );
 
             // Set this after processing things from last timer calls
-            roomFunctions.lastdj = data.room.metadata.current_dj;
-            masterIndex = userFunctions.masterIds().indexOf( roomFunctions.lastdj ); //master id's check
+            roomFunctions.setLastDJ( data.room.metadata.current_dj );
+            masterIndex = userFunctions.masterIds().indexOf( roomFunctions.lastdj() ); //master id's check
 
             songFunctions.startSongWatchdog( data, userFunctions, roomFunctions );
 
@@ -468,8 +511,8 @@ const botFunctions = ( bot ) => {
                 if ( roomFunctions.lastdj() === authModule.USERID || masterIndex === -1 ) //if dj is the bot or not a master
                 {
                     if ( musicDefaults.songLengthLimitOn === true ) {
-                        if ( typeof userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( roomFunctions.lastdj ) + 1 ] !== 'undefined' ) {
-                            bot.speak( "@" + userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( roomFunctions.lastdj ) + 1 ] + ", your song is over " + roomDefaults.songLengthLimit + " mins long, you have 20 seconds to skip before being removed." );
+                        if ( typeof userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( roomFunctions.lastdj() ) + 1 ] !== 'undefined' ) {
+                            bot.speak( "@" + userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( roomFunctions.lastdj() ) + 1 ] + ", your song is over " + roomDefaults.songLengthLimit + " mins long, you have 20 seconds to skip before being removed." );
                         }
                         else {
                             bot.speak( 'current dj, your song is over ' + musicDefaults.songLengthLimit + ' mins long, you have 20 seconds to skip before being removed.' );

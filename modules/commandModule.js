@@ -4,8 +4,6 @@ let roomDefaults = require( '../defaultSettings/roomDefaults.js' );
 let musicDefaults = require( '../defaultSettings/musicDefaults.js' );
 let chatDefaults = require( '../defaultSettings/chatDefaults.js' );
 let chatCommandItems = require( '../defaultSettings/chatCommandItems.js' );
-const botFunctions = require( './botModule.js' );
-
 
 const generalCommands = {};
 const userCommands = {};
@@ -15,17 +13,9 @@ const userQueueCommands = {};
 const moderatorQueueCommands = {};
 const moderatorCommands = {};
 
-const commandFunctions = ( bot ) => {
-    function logMe ( logLevel, message ) {
-        if ( logLevel === 'error' || logLevel === 'info' ) {
-            console.log( "commandFunctions:" + logLevel + "->" + message + "\n" );
-        } else {
-            if ( bot.debug ) {
-                console.log( "commandFunctions:" + logLevel + "->" + message + "\n" );
-            }
-        }
-    }
+const ignoreCommands = [ '/me ' ];
 
+const commandFunctions = ( bot ) => {
     // #############################################
     // These comamnds are confirmed as fully working
     // #############################################
@@ -52,9 +42,6 @@ const commandFunctions = ( bot ) => {
 
     generalCommands.stopescortme = ( { data, userFunctions, chatFunctions } ) => { userFunctions.disableEscortMe( data, chatFunctions ); }
     generalCommands.stopescortme.help = "Stop yourself from being removed from the decks after your track finishes playing";
-
-    generalCommands.sarahConner = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.sarahConner( data, userFunctions, chatFunctions ); }
-    generalCommands.sarahConner.help = "Shut down the Bot if it's causing problems";
 
     generalCommands.whatsPlayLimit = ( { data, userFunctions, chatFunctions } ) => { userFunctions.whatsPlayLimit( data, chatFunctions ); }
     generalCommands.whatsPlayLimit.help = "Is the DJ Play Limit enabled, and if so what it's set to";
@@ -193,6 +180,18 @@ const commandFunctions = ( bot ) => {
     chatCommands.rush = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.rushMessages, chatCommandItems.rushPics, userFunctions ); }
     chatCommands.rush.help = "Celebrate the Rush ;-)";
 
+    chatCommands.bow = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.bowMessages, chatCommandItems.bowPics, userFunctions ); }
+    chatCommands.bow.help = "Celebrate the Rush ;-)";
+
+    chatCommands.cheese = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.cheeseMessages, chatCommandItems.cheesePics, userFunctions ); }
+    chatCommands.cheese.help = "You want cheese, you got cheese!";
+
+    chatCommands.twofer = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.twoferMessages, chatCommandItems.twoferPics, userFunctions ); }
+    chatCommands.twofer.help = "You want cheese, you got cheese!";
+
+    chatCommands.goth = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.gothMessages, chatCommandItems.gothPics, userFunctions ); }
+    chatCommands.goth.help = "You want cheese, you got cheese!";
+
     // ######################################################
     // Advanced chat commands...more than just basic messages
     // ######################################################
@@ -302,6 +301,23 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.whosRefreshing = ( { data, userFunctions, chatFunctions } ) => { userFunctions.whosRefreshingCommand( data, chatFunctions ); }
     moderatorCommands.whosRefreshing.help = "List of users currently using the refresh command";
 
+    moderatorCommands.sarahConner = ( { data, args, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.sarahConner( data, reassembleArgs( args ), userFunctions, chatFunctions ); }
+    moderatorCommands.sarahConner.argumentCount = 1;
+    moderatorCommands.sarahConner.help = "Shut down the Bot if it's causing problems";
+    moderatorCommands.sarahConner.sampleArguments = [ "He started booting everyone!" ];
+
+    moderatorCommands.removedj = ( { data, args, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.removeDJCommand( data, reassembleArgs( args ), userFunctions, chatFunctions ); }
+    moderatorCommands.removedj.help = "Remove the current DJ from the decks. Add a message after the command to have it sent direct to the DJ (in public)";
+
+    moderatorCommands.informdj = ( { data, args, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.informDJCommand( data, reassembleArgs( args ), userFunctions, chatFunctions ); }
+    moderatorCommands.informdj.help = "Have the Bot send the current DJ a message";
+
+    moderatorCommands.awesome = ( { botFunctions } ) => { botFunctions.awesomeCommand(); }
+    moderatorCommands.awesome.help = "Have the Bot uptote";
+
+    moderatorCommands.lame = ( { botFunctions } ) => { botFunctions.lameCommand(); }
+    moderatorCommands.lame.help = "Have the Bot uptote";
+
     // #############################################
     // Moderator Only Queue commands
     // #############################################
@@ -321,6 +337,11 @@ const commandFunctions = ( bot ) => {
 
     moderatorQueueCommands.queueOff = ( { data, userFunctions, chatFunctions } ) => { userFunctions.disableQueue( data, chatFunctions ) }
     moderatorQueueCommands.queueOff.help = "Disables the queue";
+
+    moderatorQueueCommands.setDJPlaycount = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.setDJCurrentPlaycountCommand( data, args[ 0 ], reassembleArgs( args, 1 ), chatFunctions ) }
+    moderatorQueueCommands.setDJPlaycount.argumentCount = 2;
+    moderatorQueueCommands.setDJPlaycount.help = "Sets a DJs current playcount. This will let you give a DJ extra plays, or fewer, if the playLimit is set";
+    moderatorQueueCommands.setDJPlaycount.sampleArguments = [ 2, 'jodrell' ];
 
     // #############################
     // end of fully checked commands
@@ -411,10 +432,28 @@ const commandFunctions = ( bot ) => {
         }
     }
 
+    function reassembleArgs ( args, startFrom ) {
+        let theString = '';
+        if ( startFrom === undefined ) { startFrom = 0; }
+        for ( let argLoop = startFrom; argLoop < args.length; argLoop++ ) {
+            theString += args[ argLoop ] + ' ';
+        }
+        theString = theString.substring( 0, theString.length - 1 );
+
+        return theString;
+    }
+
     return {
 
         wasThisACommand: function ( data ) {
             let text = data.text;
+
+            // was this on the ignore list
+            for ( let ignoreLoop = 0; ignoreLoop < ignoreCommands.length; ignoreLoop++ ) {
+                if ( text.match( ignoreCommands[ ignoreLoop ] ) ) {
+                    return false;
+                }
+            }
 
             // check if this was a command
             const commandString = "^" + chatDefaults.commandIdentifier;
@@ -633,28 +672,6 @@ const commandFunctions = ( bot ) => {
             } else if ( text.match( /^\/messageOff/ ) && userFunctions.isUserModerator( speaker ) === true ) {
                 bot.speak( 'message: Off' );
                 roomDefaults.MESSAGE = false;
-            } else if ( text.match( '/awesome' ) ) {
-                bot.vote( 'up' );
-            } else if ( text.match( '/lame' ) && userFunctions.isUserModerator( speaker ) === true ) {
-                bot.vote( 'down' );
-            } else if ( text.match( /^\/removedj$/ ) && userFunctions.isUserModerator( speaker ) === true ) {
-                bot.remDj();
-            } else if ( text.match( /^\/inform$/ ) && userFunctions.isUserModerator( speaker ) === true ) {
-                if ( roomFunctions.checkWhoIsDj() !== null ) {
-                    if ( userFunctions.informTimer === null ) {
-                        let checkDjsName = userFunctions.theUsersList().indexOf( roomFunctions.lastdj() ) + 1;
-                        bot.speak( '@' + userFunctions.theUsersList()[ checkDjsName ] + ' your song is not the appropriate genre for this room, please skip or you will be removed in 20 seconds' );
-                        userFunctions.informTimer = setTimeout( function () {
-                            bot.pm( 'you took too long to skip your song', roomFunctions.lastdj() );
-                            bot.remDj( roomFunctions.lastdj() );
-                            userFunctions.informTimer = null;
-                        }, 20 * 1000 );
-                    } else {
-                        bot.pm( 'the /inform timer has already been activated, it may be used only once per song', data.userid );
-                    }
-                } else {
-                    bot.pm( 'you must wait one song since the bot has started to use that command', data.userid );
-                }
             } else if ( text.match( /^\/fanratio/ ) ) //this one courtesy of JenTheInstigator of turntable.fm
             {
                 let tmpuser = data.text.substring( 11 );
@@ -722,41 +739,6 @@ const commandFunctions = ( bot ) => {
                     botDefaults.botPlaylist.splice( botDefaults.botPlaylist.length - 1, 1 );
                     bot.playlistRemove( -1 );
                     bot.speak( 'the last snagged song has been removed.' );
-                }
-            } else if ( text.match( /^\/playminus/ ) && userFunctions.isUserModerator( speaker ) === true ) {
-                if ( musicDefaults.DJPlaysLimit === true ) //is the play limit on?
-                {
-                    let playMinus = data.text.slice( 12 );
-                    let areTheyInRoom = userFunctions.theUsersList().indexOf( playMinus );
-                    let areTheyDj = userFunctions.djList().indexOf( userFunctions.theUsersList()[ areTheyInRoom - 1 ] );
-
-                    if ( areTheyInRoom !== -1 ) //are they in the room?
-                    {
-                        if ( areTheyDj !== -1 ) //are they a dj?
-                        {
-                            if ( typeof ( userFunctions.djSongCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ] ) ) != 'undefined' ) {
-                                if ( !userFunctions.djSongCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ] ).nbSong <= 0 ) //is their play count already 0 or lower?
-                                {
-                                    userFunctions.decrementDJPlayCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ] );
-                                    bot.speak( userFunctions.theUsersList()[ areTheyInRoom ] + '\'s play count has been reduced by one' );
-                                } else {
-                                    bot.pm( 'error, that user\'s play count is already at zero', data.userid );
-                                }
-                            } else {
-                                bot.pm( 'something weird happened!, attemping to recover now', data.userid );
-                                if ( typeof userFunctions.theUsersList()[ areTheyInRoom - 1 ] != 'undefined' ) {
-                                    //recover here
-                                    userFunctions.setDJPlayCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ], 0 );
-                                }
-                            }
-                        } else {
-                            bot.pm( 'error, that user is not currently djing', data.userid );
-                        }
-                    } else {
-                        bot.pm( 'error, that user is not currently in the room', data.userid );
-                    }
-                } else {
-                    bot.pm( 'error, the play limit must be turned on in order for me to decrement play counts', data.userid );
                 }
             } else if ( text.match( /^\/whobanned$/ ) && userFunctions.isUserModerator( speaker ) === true ) {
                 if ( roomDefaults.blackList.length !== 0 ) {
@@ -944,43 +926,6 @@ const commandFunctions = ( bot ) => {
                 } else {
                     bot.pm( 'error, you must be on stage to use that command', speaker );
                 }
-            } else if ( text.match( /^\/playminus/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                if ( musicDefaults.DJPlaysLimit === true ) //is the play limit on?
-                {
-                    let playMinus = data.text.slice( 12 );
-                    let areTheyInRoom = userFunctions.theUsersList().indexOf( playMinus );
-                    let areTheyDj = userFunctions.djList().indexOf( userFunctions.theUsersList()[ areTheyInRoom - 1 ] );
-                    if ( areTheyInRoom !== -1 ) //are they in the room?
-                    {
-                        if ( areTheyDj !== -1 ) //are they a dj?
-                        {
-                            if ( typeof ( userFunctions.djSongCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ] ) ) != 'undefined' ) {
-
-                                if ( !userFunctions.djSongCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ] ).nbSong <= 0 ) //is their play count already 0 or lower?
-                                {
-                                    userFunctions.decrementDJPlayCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ] );
-                                    bot.pm( userFunctions.theUsersList()[ areTheyInRoom ] + '\'s play count has been reduced by one', speaker );
-                                } else {
-                                    bot.pm( 'error, that user\'s play count is already at zero', speaker );
-                                }
-                            } else {
-                                bot.pm( 'something weird happened!, attemping to recover now', speaker );
-
-                                if ( userFunctions.theUsersList()[ areTheyInRoom - 1 ] !== 'undefined' ) //only recover if userid given is not undefined
-                                {
-                                    //recover here
-                                    userFunctions.initialiseDJPlayCount( userFunctions.theUsersList()[ areTheyInRoom - 1 ] );
-                                }
-                            }
-                        } else {
-                            bot.pm( 'error, that user is not currently djing', speaker );
-                        }
-                    } else {
-                        bot.pm( 'error, that user is not currently in the room', speaker );
-                    }
-                } else {
-                    bot.pm( 'error, the play limit must be turned on in order for me to decrement play counts', speaker );
-                }
             } else if ( text.match( /^\/snagevery$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
                 if ( songFunctions.snagSong() === true ) {
                     songFunctions.snagSong = false;
@@ -999,10 +944,6 @@ const commandFunctions = ( bot ) => {
                     botDefaults.autoSnag = false;
                     bot.pm( 'vote snagging has been turned off', speaker );
                 }
-            } else if ( text.match( '/awesome' ) && isInRoom === true ) {
-                bot.vote( 'up' );
-            } else if ( text.match( '/lame' ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                bot.vote( 'down' );
             } else if ( text.match( /^\/eventmessageOn/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
                 bot.pm( 'event message: On', speaker );
                 roomDefaults.EVENTMESSAGE = true;
@@ -1160,22 +1101,6 @@ const commandFunctions = ( bot ) => {
                     }
                 } else {
                     bot.pm( 'error, you can\'t snag the song that\'s playing when the bot enters the room', speaker );
-                }
-            } else if ( text.match( /^\/inform$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                if ( roomFunctions.checkWhoIsDj() !== null ) {
-                    if ( userFunctions.informTimer === null ) {
-                        let checkDjsName = userFunctions.theUsersList().indexOf( roomFunctions.lastdj() ) + 1;
-                        bot.speak( '@' + userFunctions.theUsersList()[ checkDjsName ] + ' your song is not the appropriate genre for this room, please skip or you will be removed in 20 seconds' );
-                        userFunctions.informTimer = setTimeout( function () {
-                            bot.pm( 'you took too long to skip your song', roomFunctions.lastdj() );
-                            bot.remDj( roomFunctions.lastdj() );
-                            userFunctions.informTimer = null;
-                        }, 20 * 1000 );
-                    } else {
-                        bot.pm( 'the /inform timer has already been activated, it may be used only once per song', speaker );
-                    }
-                } else {
-                    bot.pm( 'you must wait one song since the bot has started to use that command', speaker );
                 }
             } else if ( text.match( /^\/removesong$/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
                 if ( roomFunctions.checkWhoIsDj() === authModule.USERID ) {

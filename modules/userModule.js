@@ -44,23 +44,23 @@ let idleSecondWarningTime = roomDefaults.djIdleLimitThresholds[ 2 ];
 
 const userFunctions = ( bot ) => {
     function logMe ( logLevel, message ) {
+        let theFile = "userFunctions";
         switch ( logLevel ) {
             case "error":
-                console.log( "!!!!!!!!!!! userFunctions:" + logLevel + "->" + message + "\n" );
+                console.log( "!!!!!!!!!!! " + theFile +  ":" + logLevel + "->" + message + "\n" );
                 break;
             case "warn":
-                console.log( "+++++++++++ userFunctions:" + logLevel + "->" + message + "\n" );
+                console.log( "+++++++++++ " + theFile +  ":" + logLevel + "->" + message + "\n" );
                 break;
             case "info":
-                console.log( "----------- userFunctions:" + logLevel + "->" + message + "\n" );
+                console.log( "----------- " + theFile +  ":" + logLevel + "->" + message + "\n" );
                 break;
             default:
                 if ( bot.debug ) {
-                    console.log( "userFunctions:" + logLevel + "->" + message + "\n" );
+                    console.log( "" + theFile +  ":" + logLevel + "->" + message + "\n" );
                 }
                 break;
         }
-
     }
 
     function formatSeconds ( seconds ) {
@@ -565,8 +565,6 @@ const userFunctions = ( bot ) => {
                 let listPosition = this.getPositionOnUsersList( userID );
                 if ( theUsersList[ listPosition ][ 'RefreshTotalPlayCount' ] !== undefined ) {
                     return theUsersList[ listPosition ][ 'RefreshTotalPlayCount' ];
-                } else {
-                    return 0;
                 }
             }
         },
@@ -852,8 +850,8 @@ const userFunctions = ( bot ) => {
         },
 
         switchUserAFK: function ( data, chatFunctions ) {
-            const userID = this.getUserIDFromData( data );
-            if ( this.isUserAFK( userID ) === true ) {
+            const theUserID = this.whoSentTheCommand( data );
+            if ( this.isUserAFK( theUserID ) === true ) {
                 this.removeUserFromAFKList( data, chatFunctions );
             } else {
                 this.addToAFKList( data, chatFunctions );
@@ -861,19 +859,19 @@ const userFunctions = ( bot ) => {
         },
 
         addToAFKList: function ( data, chatFunctions ) {
-            const userID = this.getUserIDFromData( data );
+            const theUserID = this.whoSentTheCommand( data );
 
-            afkPeople.push( userID );
-            chatFunctions.botSpeak( data, '@' + this.getUsername( userID ) + ' you are marked as afk' )
+            afkPeople.push( theUserID );
+            chatFunctions.botSpeak( data, '@' + this.getUsername( theUserID ) + ' you are marked as afk' )
         },
 
         removeUserFromAFKList: function ( data, chatFunctions ) {
-            const userID = this.getUserIDFromData( data );
-            const listPosition = afkPeople.indexOf( userID );
+            const theUserID = this.whoSentTheCommand( data );
+            const listPosition = afkPeople.indexOf( theUserID );
 
             afkPeople.splice( listPosition, 1 );
 
-            chatFunctions.botSpeak( data, '@' + this.getUsername( userID ) + ' you are no longer afk' )
+            chatFunctions.botSpeak( data, '@' + this.getUsername( theUserID ) + ' you are no longer afk' )
         },
 
         howManyAFKUsers: function () {
@@ -957,8 +955,6 @@ const userFunctions = ( bot ) => {
         },
 
         isCurrentDJ: function ( data, userID ) {
-            logMe( 'info', 'isCurrentDJ, data:' + data );
-            logMe( 'info', 'isCurrentDJ, data.room.metadata.current_dj:' + data.room.metadata.current_dj );
             const currentDJ = data.room.metadata.current_dj
             return userID === currentDJ;
         },
@@ -1131,6 +1127,17 @@ const userFunctions = ( bot ) => {
             }
         },
 
+        setDJCurrentPlaycountCommand: function ( data, theCount, theUsername, chatFunctions ) {
+            if ( theCount === undefined || isNaN( theCount ) ) {
+                chatFunctions.botSpeak( data, "The new playcount doesn't seem to be a number. Check the command help for an example" )
+            } else if ( theUsername === '' || theUsername === undefined ) {
+                chatFunctions.botSpeak( data, "I can't see a username there. Check the command help for an example" )
+            } else {
+                chatFunctions.botSpeak( data, "Setting the Current playcount for @" + theUsername + " to " + theCount )
+                this .setDJCurrentPlayCount( this.getUserIDFromUsername( theUsername ), theCount );
+            }
+        },
+
         setDJCurrentPlayCount: function ( userID, theCount ) {
             if ( theCount === undefined ) {
                 theCount = 0
@@ -1262,15 +1269,8 @@ const userFunctions = ( bot ) => {
             const newPosition = args[ 1 ] - 1;
             const [ err, _ ] = this.removeUserFromQueue( userID, botFunctions );
 
-            logMe( 'info', '================ changeUsersQueuePosition, username:' + username );
-            logMe( 'info', '================ changeUsersQueuePosition, userID:' + userID );
-            logMe( 'info', '================ changeUsersQueuePosition, newPosition:' + newPosition );
-            logMe( 'info', '================ changeUsersQueuePosition, err:' + err );
-            logMe( 'info', '================ changeUsersQueuePosition, queueList:' + JSON.stringify( queueList ) );
-
             if ( err !== true ) {
                 queueList.splice( newPosition, 0, userID );
-                logMe( 'info', '================ changeUsersQueuePosition, queueList:' + JSON.stringify( queueList ) );
             } else {
                 chatFunctions.botSpeak( data, "The user " + this.getUsername( userID ) + " is not currently in the queue" );
             }
@@ -1278,7 +1278,6 @@ const userFunctions = ( bot ) => {
         },
 
         moveUserToHeadOfQueue: function ( data, args, chatFunctions, botFunctions ) {
-            logMe( 'info', '================ moveUserToHeadOfQueue, args:' + JSON.stringify( args ) );
             args[ 1 ] = 1;
             this.changeUsersQueuePosition( data, args, chatFunctions, botFunctions );
         },

@@ -14,9 +14,10 @@ let snagSong = false; //if true causes the bot to add every song that plays to i
 
 let upVotes = 0;
 let downVotes = 0;
-let whoSnagged = 0;
+let snagCount = 0;
 let checkVotes = [];
 let voteCountSkip = 0;
+let previousSongStats = []; // grab the ending song votes before they're reset
 let ALLREADYCALLED = false; //resets votesnagging so that it can be called again
 let curSongWatchdog = null; //used to hold the timer for stuck songs
 let takedownTimer = null; //used to hold the timer that fires after curSongWatchDog which represents the time a person with a stuck song has left to skip their song
@@ -24,19 +25,20 @@ let votesLeft = roomDefaults.HowManyVotesToSkip;
 
 const songFunctions = (bot) => {
     function logMe ( logLevel, message ) {
+        let theFile = "songFunctions";
         switch ( logLevel ) {
             case "error":
-                console.log( "!!!!!!!!!!! songFunctions:" + logLevel + "->" + message + "\n" );
+                console.log( "!!!!!!!!!!! " + theFile +  ":" + logLevel + "->" + message + "\n" );
                 break;
             case "warn":
-                console.log( "+++++++++++ songFunctions:" + logLevel + "->" + message + "\n" );
+                console.log( "+++++++++++ " + theFile +  ":" + logLevel + "->" + message + "\n" );
                 break;
             case "info":
-                console.log( "----------- songFunctions:" + logLevel + "->" + message + "\n" );
+                console.log( "----------- " + theFile +  ":" + logLevel + "->" + message + "\n" );
                 break;
             default:
                 if ( bot.debug ) {
-                    console.log( "songFunctions:" + logLevel + "->" + message + "\n" );
+                    console.log( "" + theFile +  ":" + logLevel + "->" + message + "\n" );
                 }
                 break;
         }
@@ -55,7 +57,6 @@ const songFunctions = (bot) => {
         snagSong: () => snagSong,
         upVotes: () => upVotes,
         downVotes: () => downVotes,
-        whoSnagged: () => whoSnagged,
         voteCountSkip: () => voteCountSkip,
         ALLREADYCALLED: () => ALLREADYCALLED,
 
@@ -122,6 +123,40 @@ const songFunctions = (bot) => {
 
         // ========================================================
 
+
+        // ========================================================
+        // Snagging Functions
+        // ========================================================
+
+
+        snagCount: () => snagCount,
+
+        incrementSnagCount: function () {
+            snagCount += 1;
+        },
+
+        resetSnagCount: function () {
+            snagCount = 0;
+        },
+
+        // ========================================================
+
+        // ========================================================
+        // Song Stats Functions
+        // ========================================================
+
+        previousUpVotes: () => previousSongStats['upvotes'],
+        previousDownVotes: () => previousSongStats['downvotes'],
+        previousSnags: () => previousSongStats['snags'],
+
+        grabSongStats: function ( ) {
+            previousSongStats['upvotes'] = upVotes;
+            previousSongStats['downvotes'] = downVotes;
+            previousSongStats['snags'] = this.snagCount();
+        },
+
+        // ========================================================
+
         getSongTags: function ( current_song ) {
             song = current_song.metadata.song;
             album = current_song.metadata.album;
@@ -148,14 +183,6 @@ const songFunctions = (bot) => {
             downVotes = 0;
         },
 
-        voteSnagged: function () {
-            whoSnagged += 1;
-        },
-
-        resetWhoSnagged: function () {
-            whoSnagged = 0;
-        },
-
         resetCheckVotes: function () {
             checkVotes = [];
         },
@@ -176,7 +203,7 @@ const songFunctions = (bot) => {
             ALLREADYCALLED = false; //resets votesnagging so that it can be called again
         },
 
-        voteSnagged: function () {
+        songSnagged: function () {
             ALLREADYCALLED = true; //this makes it so that it can only be called once per song
         },
 
@@ -192,7 +219,7 @@ const songFunctions = (bot) => {
 
         clearTakedownTimer(userFunctions, roomFunctions) {
             // If takedown Timer has been set, clear since we've made it to the next song
-            if (takedownTimer !== null) {
+            if ( takedownTimer !== null && roomFunctions.lastdj() !== undefined ) {
                 clearTimeout(takedownTimer);
                 takedownTimer = null;
 
@@ -206,20 +233,24 @@ const songFunctions = (bot) => {
 
         startSongWatchdog(data, userFunctions, roomFunctions) {
             const length = data.room.metadata.current_song.metadata.length;
+            const lastDJ = roomFunctions.lastdj();
+
             // Set a new watchdog timer for the current song.
             curSongWatchdog = setTimeout(function () {
                 curSongWatchdog = null;
 
-                if (typeof userFunctions.theUsersList()[userFunctions.theUsersList().indexOf(roomFunctions.lastdj()) + 1] !== 'undefined') {
-                    bot.speak("@" + userFunctions.theUsersList()[userFunctions.theUsersList().indexOf(roomFunctions.lastdj()) + 1] + ", you have 20 seconds to skip your stuck song before you are removed");
-                } else {
-                    bot.speak("current dj, you have 20 seconds to skip your stuck song before you are removed");
+                if ( lastDJ !== undefined ) {
+                    if ( typeof userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( lastDJ ) + 1 ] !== 'undefined' ) {
+                        bot.speak( "@" + userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( lastDJ ) + 1 ] + ", you have 20 seconds to skip your stuck song before you are removed" );
+                    } else {
+                        bot.speak( "current dj, you have 20 seconds to skip your stuck song before you are removed" );
+                    }
                 }
 
                 //START THE 20 SEC TIMER
                 takedownTimer = setTimeout(function () {
                     takedownTimer = null;
-                    bot.remDj(roomFunctions.lastdj()); // Remove Saved DJ from last newsong call
+                    bot.remDj( lastDJ ); // Remove Saved DJ from last newsong call
                 }, 20 * 1000); // Current DJ has 20 seconds to skip before they are removed
             }, (length + 10) * 1000); //Timer expires 10 seconds after the end of the song, if not cleared by a newsong
         }
