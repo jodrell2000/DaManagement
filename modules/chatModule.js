@@ -13,7 +13,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
     }
 
     return {
-        botSpeak: function ( data, message, public ) {
+        botSpeak: function ( data, message, inChat ) {
             let pmResponse;
             let senderID;
             if ( data !== null ) {
@@ -23,7 +23,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
                 }
             }
 
-            if ( pmResponse === true && public === undefined ) {
+            if ( pmResponse === true && inChat === undefined ) {
                 this.botPM( senderID, message );
             } else {
                 this.botChat( message );
@@ -174,35 +174,28 @@ const chatFunctions = ( bot, roomDefaults ) => {
 
         // ========================================================
 
-        userGreeting: function ( userID, username, roomFunctions ) {
-            const customGreeting = userMessages.userGreetings.find( ({ id }) => id === userID );
+        userGreeting: function( userID, theUsername, roomFunctions ) {
+            const customGreeting = userMessages.userGreetings.find( ( { id } ) => id === userID );
+            let theMessage;
 
             if ( customGreeting !== undefined ) {
-                this.greetMessage( userID, customGreeting.message, roomFunctions );
+                theMessage = customGreeting.message;
             } else {
-                this.message = '';
-                if ( roomFunctions.roomJoinMessage() !== '' ) //if your not using the default greeting
-                {
-                    if ( roomDefaults.theme === false ) //if theres no theme this is the message.
-                    {
-                        this.message = roomFunctions.roomJoinMessage();
-                    } else {
-                        this.message = roomFunctions.roomJoinMessage() + '; The theme is currently set to: ' + roomDefaults.whatIsTheme;
-                    }
-                } else {
-                    if ( roomDefaults.theme === false ) //if theres no theme this is the message.
-                    {
-                        this.message = 'Welcome to ' + roomDefaults.roomName + ' @' + username + ', enjoy your stay!';
-                    } else {
-                        this.message = 'Welcome to ' + roomDefaults.roomName + ' @' + username + ', the theme is currently set to: ' + roomDefaults.whatIsTheme;
-                    }
-                }
-                this.greetMessage( userID, this.message, roomFunctions )
+                theMessage = roomFunctions.roomJoinMessage();
             }
+
+            if ( roomFunctions.theme() !== false ) {
+                    theMessage += '; The theme is currently set to ' + roomFunctions.theme();
+            }
+
+            theMessage = theMessage.replace( "@username", "@" + theUsername );
+            theMessage = theMessage.replace( "@roomName", roomFunctions.roomName() );
+
+            this.greetMessage( userID, theMessage, roomFunctions );
         },
 
-        greetMessage: function ( userID, message, roomFunctions ) {
-            if ( roomFunctions.greetThroughPm() === false ) //if your not sending the message through the pm
+        greetMessage: function( userID, message, roomFunctions ) {
+            if ( roomFunctions.greetThroughPm () === false ) //if your not sending the message through the pm
             {
                 bot.speak( message );
             } else {

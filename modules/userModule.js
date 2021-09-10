@@ -43,25 +43,6 @@ let idleSecondWarningTime = roomDefaults.djIdleLimitThresholds[ 2 ];
 
 
 const userFunctions = ( bot ) => {
-    function logMe ( logLevel, message ) {
-        let theFile = "userFunctions";
-        switch ( logLevel ) {
-            case "error":
-                console.log( "!!!!!!!!!!! " + theFile +  ":" + logLevel + "->" + message + "\n" );
-                break;
-            case "warn":
-                console.log( "+++++++++++ " + theFile +  ":" + logLevel + "->" + message + "\n" );
-                break;
-            case "info":
-                console.log( "----------- " + theFile +  ":" + logLevel + "->" + message + "\n" );
-                break;
-            default:
-                if ( bot.debug ) {
-                    console.log( "" + theFile +  ":" + logLevel + "->" + message + "\n" );
-                }
-                break;
-        }
-    }
 
     function formatSeconds ( seconds ) {
         return ( Math.floor( seconds / 60 ) ).toString() + ' minutes';

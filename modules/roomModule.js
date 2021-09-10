@@ -11,21 +11,16 @@ let lastdj = null; //holds the userid of the currently playing dj
 let songLimitTimer = null; //holds the timer used to remove a dj off stage if they don't skip their song in time, and their song has exceeded the max allowed song time
 let queueTimer = null; //holds the timer the auto removes dj's from the queue if they do not get on stage within the allowed time period
 
-let greet = true //room greeting when someone joins the room(on by default)
-let greetThroughPm = false; //choose whether greeting message is through the pm or the chatbox(false = chatbox, true = pm), (only works when greeting message is turned on) (off by default)
+let greet = roomDefaults.greetUsers; //room greeting when someone joins the room(on by default)
+let greetThroughPm = roomDefaults.greetThroughPM; //choose whether greeting message is through the pm or the chatbox(false = chatbox, true = pm), (only works when greeting message is turned on) (off by default)
 let greetingTimer = []; //holds the timeout for people that join the room, if someone rejoins before their timeout completes their timer is reset
-let roomJoinMessage = ''; //the message users will see when they join the room, leave it empty for the default message (only works when greet is turned on)
+
+let roomName = '';
+let roomJoinMessage = 'Welcome to @roomName @username'; //the message users will see when they join the room, leave it empty for the default message (only works when greet is turned on)
+
+let theme = false; //has a current theme been set? true or false. handled by commands
 
 const roomFunctions = ( bot ) => {
-    function logMe ( logLevel, message ) {
-        if ( logLevel === 'error' || logLevel === 'info' ) {
-            console.log( "roomFunctions:" + logLevel + "->" + message + "\n" );
-        } else {
-            if ( bot.debug ) {
-                console.log( "roomFunctions:" + logLevel + "->" + message + "\n" );
-            }
-        }
-    }
 
     return {
         djCount: () => djCount, setDJCount: function ( theCount ) { djCount = theCount; },
@@ -36,17 +31,84 @@ const roomFunctions = ( bot ) => {
         songLimitTimer: () => songLimitTimer,
         queueTimer: () => queueTimer,
 
+        roomJoinMessage: () => roomJoinMessage,
+
+        resetSkipVoteUsers: function () {
+            skipVoteUsers = []
+        },
+
+        // ========================================================
+        // Greeting Functions
+        // ========================================================
+
         greet: () => greet,
         enableGreet: function () { greet = true; },
         disableGreet: function () { greet = false; },
 
         greetThroughPm: () => greetThroughPm,
         greetingTimer: () => greetingTimer,
-        roomJoinMessage: () => roomJoinMessage,
 
-        resetSkipVoteUsers: function () {
-            skipVoteUsers = []
+        greetOnCommand: function ( data, chatFunctions ) {
+            if ( this.greet() === true ) {
+                chatFunctions.botSpeak( data, 'The Greet command is already enabled' );
+            } else {
+                this.enableGreet();
+                this.readGreetingStatus( data, chatFunctions );
+            }
         },
+
+        greetOffCommand: function ( data, chatFunctions ) {
+            if ( this.greet() === false ) {
+                chatFunctions.botSpeak( data, 'The Greet command is already disabled' );
+            } else {
+                this.disableGreet();
+                this.readGreetingStatus( data, chatFunctions );
+            }
+        },
+
+        readGreetingStatus: function ( data, chatFunctions ) {
+            let theMessage = 'The Greet command is ';
+            if ( this.greet() === true ) {
+                theMessage += 'enabled';
+            } else {
+                theMessage += 'disabled';
+            }
+            chatFunctions.botSpeak( data, theMessage );
+        },
+
+        // ========================================================
+
+        // ========================================================
+        // Greeting Functions
+        // ========================================================
+
+        theme: () => theme,
+        setTheme: function( value ) {
+            theme = value;
+        },
+        clearTheme: function() {
+            theme = false;
+        },
+
+        setThemeCommand: function( data, newTheme, chatFunctions ) {
+            this.setTheme( newTheme );
+            this.readTheme( data, chatFunctions );
+        },
+
+        removeThemeCommand: function( data, chatFunctions ) {
+            this.clearTheme();
+            this.readTheme( data, chatFunctions );
+        },
+
+        readTheme: function( data, chatFunctions ) {
+            if ( this.theme() === false ) {
+                chatFunctions.botSpeak( data, 'There is currently no theme' );
+            } else {
+                chatFunctions.botSpeak( data, 'The Theme is currently set to ' + this.theme() );
+            }
+        },
+
+        // ========================================================
 
         lastdj: () => lastdj,
         setLastDJ: function ( djID ) {
@@ -121,9 +183,12 @@ const roomFunctions = ( bot ) => {
             }
         },
 
+        roomName: () => roomName,
+        setRoomName: function ( value ) { roomName = value; },
+
         setRoomDefaults: function ( data ) {
             roomDefaults.detail = data.room.description; //used to get room description
-            roomDefaults.roomName = data.room.name; //gets your rooms name
+            this.setRoomName ( data.room.name ); //gets your rooms name
             roomDefaults.ttRoomName = data.room.shortcut; //gets room shortcut
 
             bot.playlistAll( function ( callback ) {

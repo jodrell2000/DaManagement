@@ -14,6 +14,9 @@ module.exports = {
                                           (false = through the chatbox, true = through the pm) (MESSAGE must equal true for this to work) (this feature is off by default)
                                         */
 
+    greetUsers: true, //room greeting when someone joins the room(on by default)
+    greetThroughPM: false, //choose whether greeting message is through the pm or the chatbox(false = chatbox, true = pm), (only works when greeting message is turned on) (off by default)
+
     //this is for the event messages
     //This cycles through all the different messages that you enter into this array. one message per time cycle, once it gets to the end of your messages it starts over again
     eventMessageRepeatTime: 15, //how long in minutes between event messages(must have EVENTMESSAGE = true to see any messages)
@@ -43,9 +46,6 @@ module.exports = {
     blackList: [], //holds the userid of everyone who is in the command based banned from the room list
 
     kickTTSTAT: false, //kicks the ttstats bot when it tries to join the room(off by default)
-
-    theme: false, //has a current theme been set? true or false. handled by commands
-    whatIsTheme: null, //this holds a string which is set by the /setTheme command
 
     errorMessage: null, //the error message you get when trying to connect to the room
 

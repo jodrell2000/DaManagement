@@ -21,6 +21,10 @@ module.exports = {
         "drum roll please...it's time for @username to DJ. :time: left to get up there!"
     ],
 
+    roomJoinMessages: [
+        ""
+    ],
+
     // selections of lines and images to pick for the various chat commands
     propsMessages: [
         "@senderUsername gives the props to @receiverUsername",
