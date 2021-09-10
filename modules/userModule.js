@@ -89,15 +89,10 @@ const userFunctions = ( bot ) => {
             modPM = []
         },
 
-        resetPeople: function () {
-            people = []
-        },
-
         botStartReset: function ( botFunctions, songFunctions ) {
             this.resetAllEscortMe( bot );
             this.resetUsersList();
             this.resetQueueList();
-            this.resetPeople();
             this.resetAFKPeople();
             this.deleteAllDJPlayCounts();
             this.resetModPM();
@@ -122,19 +117,11 @@ const userFunctions = ( bot ) => {
         // ========================================================
 
         isThisTheBot: function ( userID ) {
-            if ( userID === auth.USERID ) {
-                return true;
-            } else {
-                return false;
-            }
+            return userID === auth.USERID;
         },
 
         userExists: function ( userID ) {
-            if ( theUsersList[ this.getPositionOnUsersList( userID ) ] !== undefined ) {
-                return true;
-            } else {
-                return false;
-            }
+            return theUsersList[ this.getPositionOnUsersList( userID ) ] !== undefined;
         },
 
         getUsername: function ( userID ) {
@@ -365,11 +352,7 @@ const userFunctions = ( bot ) => {
         isUserModerator: function ( theUserID ) {
             if ( this.userExists( theUserID ) ) {
                 let userPosition = this.getPositionOnUsersList( theUserID );
-                if ( theUsersList[ userPosition ][ 'moderator' ] === true ) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return theUsersList[ userPosition ][ 'moderator' ] === true;
             }
         },
 
@@ -770,6 +753,30 @@ const userFunctions = ( bot ) => {
                     }
                 }
             }
+        },
+
+        // ========================================================
+
+        // ========================================================
+        // User Timer functions
+        // ========================================================
+
+        isUsersWelcomeTimerActive: function ( userID ) {
+            return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'welcomeTimer' ] === true;
+        },
+
+        activateUsersWelcomeTimer: function ( userID ) {
+            console.info('Adding user timer: ' + userID );
+            theUsersList[ this.getPositionOnUsersList( userID ) ][ 'welcomeTimer' ] = true;
+
+            setTimeout( function ( ) {
+                this.clearUsersWelcomeTimer( userID );
+            }.bind( this ), 5 * 60 * 1000 );
+        },
+
+        clearUsersWelcomeTimer: function ( userID ) {
+            console.info('Clearing user timer: ' + userID );
+            theUsersList[ this.getPositionOnUsersList( userID ) ][ 'welcomeTimer' ] = false;
         },
 
         // ========================================================
@@ -1448,7 +1455,7 @@ const userFunctions = ( bot ) => {
                 }
             }
 
-            this.removeUserFromTheUsersList( userID );
+            // this.removeUserFromTheUsersList( userID );
         },
 
 
@@ -1515,8 +1522,7 @@ const userFunctions = ( bot ) => {
         },
 
         getPositionOnUsersList: function ( userID ) {
-            let listPosition = theUsersList.findIndex( ( { id } ) => id === userID )
-            return listPosition;
+            return theUsersList.findIndex( ( { id } ) => id === userID )
         },
 
         userJoinsRoom: function ( userID, username ) {
@@ -1699,11 +1705,7 @@ const userFunctions = ( bot ) => {
 
         escortMeIsEnabled: function ( userID ) {
             if ( this.isUserInUsersList( userID ) ) {
-                if ( theUsersList[ this.getPositionOnUsersList( userID ) ][ 'EscortMe' ] === true ) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'EscortMe' ] === true;
             }
         },
 

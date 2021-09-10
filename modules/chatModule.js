@@ -181,7 +181,6 @@ const chatFunctions = ( bot, roomDefaults ) => {
         // ========================================================
 
         userGreeting: function( data, userID, theUsername, roomFunctions, userFunctions ) {
-            console.group('userGreeting')
             const customGreeting = userMessages.userGreetings.find( ( { id } ) => id === userID );
             let theMessage;
 
@@ -198,22 +197,20 @@ const chatFunctions = ( bot, roomDefaults ) => {
             theMessage = theMessage.replace( "@username", "@" + theUsername );
             theMessage = theMessage.replace( "@roomName", roomFunctions.roomName() );
 
-            console.info( 'theMessage:' + theMessage );
-            console.info( 'roomFunctions.greetInPublic():' + roomFunctions.greetInPublic() );
-            console.info( 'userID:' + userID );
+            if ( !userFunctions.isUsersWelcomeTimerActive( userID ) ) {
+                userFunctions.activateUsersWelcomeTimer( userID );
 
-            const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
-            const readInOrder = async () => {
-                await sleep( 1000 )
-                this.botSpeak( theMessage, null, roomFunctions.greetInPublic(), userID );
-                await sleep( 10 )
-                if ( roomDefaults.queueActive === true && userFunctions.howManyDJs() === 5 ) {
-                    this.botSpeak( 'The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.', data, roomFunctions.greetInPublic() );
+                const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
+                const readInOrder = async () => {
+                    await sleep( 1000 )
+                    this.botSpeak( theMessage, null, roomFunctions.greetInPublic(), userID );
+                    await sleep( 10 )
+                    if ( roomDefaults.queueActive === true && userFunctions.howManyDJs() === 5 ) {
+                        this.botSpeak( 'The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.', data, roomFunctions.greetInPublic() );
+                    }
                 }
+                readInOrder();
             }
-            readInOrder();
-
-            console.groupEnd();
         },
 
         readSongStats: function ( data, songFunctions, botFunctions ) {
