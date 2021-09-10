@@ -176,22 +176,22 @@ const chatFunctions = ( bot, roomDefaults ) => {
 
         userGreeting: function( userID, theUsername, roomFunctions ) {
             const customGreeting = userMessages.userGreetings.find( ( { id } ) => id === userID );
+            let theMessage;
 
             if ( customGreeting !== undefined ) {
-                this.greetMessage( userID, customGreeting.message, roomFunctions );
+                theMessage = customGreeting.message;
             } else {
-                this.message = '';
-                if ( roomDefaults.theme === false ) {
-                    this.message = roomFunctions.roomJoinMessage();
-                } else {
-                    this.message = roomFunctions.roomJoinMessage() + '; The theme is currently set to: ' + roomDefaults.whatIsTheme;
-                }
-
-                this.message = this.message.replace( "@username", "@" + theUsername );
-                this.message = this.message.replace( "@roomName", roomFunctions.roomName() );
-
-                this.greetMessage( userID, this.message, roomFunctions );
+                theMessage = roomFunctions.roomJoinMessage();
             }
+
+            if ( roomFunctions.theme() !== false ) {
+                    theMessage += '; The theme is currently set to ' + roomFunctions.theme();
+            }
+
+            theMessage = theMessage.replace( "@username", "@" + theUsername );
+            theMessage = theMessage.replace( "@roomName", roomFunctions.roomName() );
+
+            this.greetMessage( userID, theMessage, roomFunctions );
         },
 
         greetMessage: function( userID, message, roomFunctions ) {
