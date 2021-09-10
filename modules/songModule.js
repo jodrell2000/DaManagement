@@ -15,7 +15,6 @@ let snagSong = false; //if true causes the bot to add every song that plays to i
 let upVotes = 0;
 let downVotes = 0;
 let snagCount = 0;
-let checkVotes = [];
 let voteCountSkip = 0;
 let previousSongStats = []; // grab the ending song votes before they're reset
 let ALLREADYCALLED = false; //resets votesnagging so that it can be called again
@@ -24,27 +23,6 @@ let takedownTimer = null; //used to hold the timer that fires after curSongWatch
 let votesLeft = roomDefaults.HowManyVotesToSkip;
 
 const songFunctions = (bot) => {
-    function logMe ( logLevel, message ) {
-        let theFile = "songFunctions";
-        switch ( logLevel ) {
-            case "error":
-                console.log( "!!!!!!!!!!! " + theFile +  ":" + logLevel + "->" + message + "\n" );
-                break;
-            case "warn":
-                console.log( "+++++++++++ " + theFile +  ":" + logLevel + "->" + message + "\n" );
-                break;
-            case "info":
-                console.log( "----------- " + theFile +  ":" + logLevel + "->" + message + "\n" );
-                break;
-            default:
-                if ( bot.debug ) {
-                    console.log( "" + theFile +  ":" + logLevel + "->" + message + "\n" );
-                }
-                break;
-        }
-    }
-
-
     return {
         song: () => song,
         album: () => album,
@@ -62,7 +40,7 @@ const songFunctions = (bot) => {
 
         votesLeft: () => votesLeft,
         setVotesLeft: function (value) { votesLeft = value; },
-        decrementVotesLeft: function (value) { --votesLeft; },
+        decrementVotesLeft: function ( ) { --votesLeft; },
 
         // ========================================================
         // Playlist Functions
@@ -118,7 +96,7 @@ const songFunctions = (bot) => {
                 theMessage += " innactive";
             }
 
-            chatFunctions.botSpeak( data, theMessage, true)
+            chatFunctions.botSpeak( theMessage, data, true)
         },
 
         // ========================================================

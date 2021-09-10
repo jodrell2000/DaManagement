@@ -414,7 +414,7 @@ const commandFunctions = ( bot ) => {
         }
 
         theMessage = theMessage.replace( ',', ', ' );
-        chatFunctions.botSpeak( data, theMessage );
+        chatFunctions.botSpeak( theMessage, data );
     }
 
     function buildListFromObject ( commandObject ) {
@@ -433,7 +433,7 @@ const commandFunctions = ( bot ) => {
         }
 
         if ( allCommands[ command ] === undefined ) {
-            chatFunctions.botSpeak( data, 'That command doesn\'t exist. Try ' + chatDefaults.commandIdentifier + 'list to find the available commands' );
+            chatFunctions.botSpeak( 'That command doesn\'t exist. Try ' + chatDefaults.commandIdentifier + 'list to find the available commands', data );
         } else {
             theMessage = theMessage + "'" + chatDefaults.commandIdentifier + command;
 
@@ -443,7 +443,7 @@ const commandFunctions = ( bot ) => {
                 }
             }
             theMessage = theMessage + "': " + allCommands[ command ].help;
-            chatFunctions.botSpeak( data, theMessage );
+            chatFunctions.botSpeak( theMessage, data );
         }
     }
 
@@ -493,11 +493,11 @@ const commandFunctions = ( bot ) => {
             const senderID = data.userid;
             const [ command, args, moderatorOnly ] = this.getCommandAndArguments( data.text, allCommands );
             if ( moderatorOnly && !userFunctions.isUserModerator( senderID ) ) {
-                chatFunctions.botSpeak( data, "Sorry, that function is only available to moderators" );
+                chatFunctions.botSpeak( "Sorry, that function is only available to moderators", data );
             } else if ( command ) {
                 command.call( null, { data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions } );
             } else {
-                chatFunctions.botSpeak( data, "Sorry, that's not a command I recognise. Try " + chatDefaults.commandIdentifier + "list to find out more." );
+                chatFunctions.botSpeak( "Sorry, that's not a command I recognise. Try " + chatDefaults.commandIdentifier + "list to find out more.", data );
             }
         },
 

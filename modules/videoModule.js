@@ -15,26 +15,6 @@ let musicDefaults = require( "../defaultSettings/musicDefaults.js" );
 let regionsWeCareAbout = new Set( musicDefaults.alertRegions ); //song play limit, this is for the playLimit variable up above(off by default)
 
 const videoFunctions = () => {
-    function logMe ( logLevel, message ) {
-        const theFile = 'videoFunctions';
-        switch ( logLevel ) {
-            case "error":
-                console.log( "!!!!!!!!!!! " + theFile + ":" + logLevel + "->" + message + "\n" );
-                break;
-            case "warn":
-                console.log( "+++++++++++ " + theFile + ":" + logLevel + "->" + message + "\n" );
-                break;
-            case "info":
-                console.log( "----------- " + theFile + ":" + logLevel + "->" + message + "\n" );
-                break;
-            default:
-                if ( bot.debug ) {
-                    console.log( "" + theFile + ":" + logLevel + "->" + message + "\n" );
-                }
-                break;
-        }
-    }
-
     function alertIfRegionsNotAllowed ( restrictions, userFunctions, notifier ) {
         let missingRegions = setDifference(
             regionsWeCareAbout,
@@ -98,7 +78,7 @@ const videoFunctions = () => {
             const regionsAsArray = Array.from( regionsWeCareAbout );
             let regionReport = `The list of regions that will trigger a blocked alert is currently ` + turnCodesIntoCountries( regionsAsArray );
 
-            chatFunctions.botSpeak( data, regionReport );
+            chatFunctions.botSpeak( regionReport, data );
         },
 
         addAlertRegion: function ( data, [ region ], chatFunctions ) {
@@ -110,9 +90,9 @@ const videoFunctions = () => {
                     regionsWeCareAbout.add( region );
                     message = countryLookup.byIso( region ).country + ' has been added to the region alerts list';
                 }
-                chatFunctions.botSpeak( data, message );
+                chatFunctions.botSpeak( message, data );
             } else {
-                chatFunctions.botSpeak( data, 'That region is not recognised. Please use one of the 2 character ISO country codes, https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2' );
+                chatFunctions.botSpeak( 'That region is not recognised. Please use one of the 2 character ISO country codes, https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2', data );
             }
         },
 
@@ -123,7 +103,7 @@ const videoFunctions = () => {
             } else {
                 message = countryLookup.byIso( region ).country + ' is not in the region alerts list';
             }
-            chatFunctions.botSpeak( data, message );
+            chatFunctions.botSpeak( message, data );
         },
 
         checkVideoRegionAlert: function ( data, videoID, userFunctions, chatFunctions, botFunctions ) {
@@ -134,11 +114,11 @@ const videoFunctions = () => {
                         if ( restrictions !== undefined ) {
                             if ( restrictions.allowed !== undefined ) {
                                 alertIfRegionsNotAllowed( restrictions, userFunctions, ( msg ) =>
-                                    chatFunctions.botSpeak( data, msg )
+                                    chatFunctions.botSpeak( msg, data )
                                 );
                             } else if ( restrictions.blocked !== undefined ) {
                                 alertIfRegionsBlocked( restrictions, userFunctions, ( msg ) =>
-                                    chatFunctions.botSpeak( data, msg )
+                                    chatFunctions.botSpeak( msg, data )
                                 );
                             }
                         }

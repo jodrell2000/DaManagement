@@ -13,28 +13,34 @@ const chatFunctions = ( bot, roomDefaults ) => {
     }
 
     return {
-        botSpeak: function ( data, message, inChat ) {
-            let pmResponse;
-            let senderID;
-            if ( data !== null ) {
+        botSpeak: function ( message, data, publicChat, recipient ) {
+            console.group('botSpeak' );
+            console.info( 'message:' + message );
+            console.info( 'data:' + data );
+            console.info( 'publicChat:' + publicChat );
+            console.info( 'recipient:' + recipient );
+            let pmCommand;
+
+            if ( recipient === undefined && data !== null ) {
                 if ( data.command === "pmmed" ) {
-                    pmResponse = true;
-                    senderID = data.senderid
+                    pmCommand = true;
+                    recipient = data.senderid;
                 }
             }
 
-            if ( pmResponse === true && inChat === undefined ) {
-                this.botPM( senderID, message );
+            if ( pmCommand === true && publicChat === undefined ) {
+                this.botPM( message, recipient );
             } else {
                 this.botChat( message );
             }
+            console.groupEnd();
         },
 
         botChat: function ( message ) {
             bot.speak( message );
         },
 
-        botPM: function ( user, message ) {
+        botPM: function ( message, user ) {
             bot.pm( message, user );
         },
 
@@ -65,9 +71,9 @@ const chatFunctions = ( bot, roomDefaults ) => {
                 const randomMessage = messageVariable[ Math.floor( Math.random() * messageVariable.length ) ];
                 const thisMessage = this.buildUserToUserRandomMessage( userFunctions, senderID, randomMessage, receiverID );
 
-                this.botSpeak( data, thisMessage, true );
+                this.botSpeak( thisMessage, data, true );
             } else {
-                this.botSpeak( data, "@" + userFunctions.getUsername( senderID ) + " you can't send that message if there's no DJ?!?", true );
+                this.botSpeak( "@" + userFunctions.getUsername( senderID ) + " you can't send that message if there's no DJ?!?", data, true );
             }
         },
 
@@ -81,10 +87,10 @@ const chatFunctions = ( bot, roomDefaults ) => {
                 const randomPic = pictureVariable[ Math.floor( Math.random() * pictureVariable.length ) ];
                 const thisMessage = this.buildUserToUserRandomMessage( userFunctions, senderID, randomMessage, receiverID );
 
-                this.botSpeak( data, thisMessage, true );
-                this.botSpeak( data, randomPic, true );
+                this.botSpeak( thisMessage, data, true );
+                this.botSpeak( randomPic, data, true );
             } else {
-                this.botSpeak( data, "@" + userFunctions.getUsername( senderID ) + " you can't send that message if there's no DJ?!?", true );
+                this.botSpeak( "@" + userFunctions.getUsername( senderID ) + " you can't send that message if there's no DJ?!?", data, true );
             }
         },
 
@@ -97,29 +103,29 @@ const chatFunctions = ( bot, roomDefaults ) => {
         martikaCommand: function ( data, pictureVariable ) {
             const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
             const readInOrder = async () => {
-                this.botSpeak( data, 'M' );
+                this.botSpeak( 'M', data );
                 await sleep( 1000 )
 
-                this.botSpeak( data, 'A' );
+                this.botSpeak( 'A', data );
                 await sleep( 1000 )
 
-                this.botSpeak( data, 'R' );
+                this.botSpeak( 'R', data );
                 await sleep( 1000 )
 
-                this.botSpeak( data, 'T' );
+                this.botSpeak( 'T', data );
                 await sleep( 1000 )
 
-                this.botSpeak( data, 'I' );
+                this.botSpeak( 'I', data );
                 await sleep( 1000 )
 
-                this.botSpeak( data, 'K' );
+                this.botSpeak( 'K', data );
                 await sleep( 1000 )
 
-                this.botSpeak( data, 'A' );
+                this.botSpeak( 'A', data );
                 await sleep( 1000 )
 
                 const randomPic = pictureVariable[ Math.floor( Math.random() * pictureVariable.length ) ];
-                this.botSpeak( data, randomPic, true );
+                this.botSpeak( randomPic, data );
             }
             readInOrder();
         },
@@ -128,15 +134,15 @@ const chatFunctions = ( bot, roomDefaults ) => {
             const theUsername = userFunctions.getUsername( data.userid )
             let randomNumber = Math.random();
             if ( randomNumber === 0.5 ) {
-                this.botSpeak( data, '@' + theUsername + ' I am flipping a coin. You got...an edge?!?', true );
+                this.botSpeak( '@' + theUsername + ' I am flipping a coin. You got...an edge?!?', data, true );
             } else {
                 let y = Math.ceil( randomNumber * 2 );
                 switch ( y ) {
                     case 1:
-                        this.botSpeak( data, '@' + theUsername + ' I am flipping a coin. You got...heads', true );
+                        this.botSpeak( '@' + theUsername + ' I am flipping a coin. You got...heads', data, true );
                         break;
                     case 2:
-                        this.botSpeak( data, '@' + theUsername + ' I am flipping a coin. You got...tails', true );
+                        this.botSpeak( '@' + theUsername + ' I am flipping a coin. You got...tails', data, true );
                         break;
                 }
             }
@@ -159,7 +165,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
             }
 
             theMessage = theMessage + " for a total of " + theCount;
-            this.botSpeak( data, theMessage );
+            this.botSpeak( theMessage, data );
         },
 
         ventriloquistCommand: function ( data, args ) {
@@ -169,12 +175,13 @@ const chatFunctions = ( bot, roomDefaults ) => {
             }
             theMessage = theMessage.substring( 0, theMessage.length - 1 );
 
-            this.botSpeak( data, theMessage, true );
+            this.botSpeak( theMessage, data, true );
         },
 
         // ========================================================
 
-        userGreeting: function( userID, theUsername, roomFunctions ) {
+        userGreeting: function( data, userID, theUsername, roomFunctions, userFunctions ) {
+            console.group('userGreeting')
             const customGreeting = userMessages.userGreetings.find( ( { id } ) => id === userID );
             let theMessage;
 
@@ -191,25 +198,31 @@ const chatFunctions = ( bot, roomDefaults ) => {
             theMessage = theMessage.replace( "@username", "@" + theUsername );
             theMessage = theMessage.replace( "@roomName", roomFunctions.roomName() );
 
-            this.greetMessage( userID, theMessage, roomFunctions );
-        },
+            console.info( 'theMessage:' + theMessage );
+            console.info( 'roomFunctions.greetInPublic():' + roomFunctions.greetInPublic() );
+            console.info( 'userID:' + userID );
 
-        greetMessage: function( userID, message, roomFunctions ) {
-            if ( roomFunctions.greetThroughPm () === false ) //if your not sending the message through the pm
-            {
-                bot.speak( message );
-            } else {
-                bot.pm( message, userID );
+            const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
+            const readInOrder = async () => {
+                await sleep( 1000 )
+                this.botSpeak( theMessage, null, roomFunctions.greetInPublic(), userID );
+                await sleep( 10 )
+                if ( roomDefaults.queueActive === true && userFunctions.howManyDJs() === 5 ) {
+                    this.botSpeak( 'The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.', data, roomFunctions.greetInPublic() );
+                }
             }
+            readInOrder();
+
+            console.groupEnd();
         },
 
         readSongStats: function ( data, songFunctions, botFunctions ) {
             if ( botFunctions.readSongStats() ) {
                 const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
                 const readInOrder = async () => {
-                    this.botSpeak( data, 'Stats for ' + songFunctions.song() + ' by ' + songFunctions.artist() + ':' );
+                    this.botSpeak( 'Stats for ' + songFunctions.song() + ' by ' + songFunctions.artist() + ':', data );
                     await sleep( 10 )
-                    this.botSpeak( data, ':thumbsup:' + songFunctions.previousUpVotes() + ':thumbsdown:' + songFunctions.previousDownVotes() + ':heart:' + songFunctions.previousSnags() );
+                    this.botSpeak( ':thumbsup:' + songFunctions.previousUpVotes() + ':thumbsdown:' + songFunctions.previousDownVotes() + ':heart:' + songFunctions.previousSnags(), data );
                 }
                 readInOrder();
             }
@@ -217,12 +230,12 @@ const chatFunctions = ( bot, roomDefaults ) => {
 
         readPlaylistStats: function ( data ) {
             if ( botDefaults.botPlaylist !== null ) {
-                this.botSpeak( data, 'There are currently ' + botDefaults.botPlaylist.length + ' songs in my playlist.' );
+                this.botSpeak( 'There are currently ' + botDefaults.botPlaylist.length + ' songs in my playlist.', data );
             }
         },
 
         overPlayLimit: function ( data, username, playLimit ) {
-            this.botSpeak( data, '@' + username + ' the  playlimit is currently ' + playLimit + '. Time for another DJ.' );
+            this.botSpeak( '@' + username + ' the  playlimit is currently ' + playLimit + '. Time for another DJ.', data );
         },
 
         eventMessageIterator: function ( botFunctions, userFunctions ) {

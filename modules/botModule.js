@@ -4,7 +4,6 @@ let musicDefaults = require( '../defaultSettings/musicDefaults.js' );
 let chatDefaults = require( '../defaultSettings/chatDefaults.js' );
 
 let authModule = require( '../auth.js' );
-const userFunctions = require( './userModule.js' );
 
 let checkActivity = Date.now();
 let skipOn = null; //if true causes the bot to skip every song it plays, toggled on and off by commands
@@ -75,7 +74,7 @@ const botFunctions = ( bot ) => {
             const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve( "done" ), delay ) )
 
             const shutMeDown = async () => {
-                chatFunctions.botSpeak( data, "Going away now...", true );
+                chatFunctions.botSpeak( "Going away now...", data, true );
                 await sleep( 100 )
                 userFunctions.debugPrintTheUsersList();
                 await sleep( 100 )
@@ -100,7 +99,7 @@ const botFunctions = ( bot ) => {
 
             let minutes = Math.floor( currentTime / msecPerMinute );
 
-            chatFunctions.botSpeak( data, userFunctions.getUsername( authModule.USERID ) + ' has been up for: ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes' );
+            chatFunctions.botSpeak( userFunctions.getUsername( authModule.USERID ) + ' has been up for: ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes', data );
         },
 
         songStatsCommand: function ( data, chatFunctions ) {
@@ -182,16 +181,16 @@ const botFunctions = ( bot ) => {
             if ( userFunctions.isUserIDOnStage( userID ) ) {
                 const randomMessage = messageVariable[ Math.floor( Math.random() * messageVariable.length ) ];
                 const thisMessage = chatFunctions.buildUserToUserRandomMessage( userFunctions, userID, randomMessage, receiverID );
-                chatFunctions.botSpeak( data, thisMessage );
+                chatFunctions.botSpeak( thisMessage, data );
                 bot.remDj( userID );
             } else {
-                chatFunctions.botSpeak( data, 'You can\'t leave the stage if you\'re not on stage...' )
+                chatFunctions.botSpeak( 'You can\'t leave the stage if you\'re not on stage...', data )
             }
         },
 
         refreshOnCommand: function ( data, chatFunctions ) {
             if ( this.refreshingEnabled() ) {
-                chatFunctions.botSpeak( data, 'The ' + chatDefaults.commandIdentifier + 'refresh command is already enabled' );
+                chatFunctions.botSpeak( 'The ' + chatDefaults.commandIdentifier + 'refresh command is already enabled', data );
             } else {
                 this.enableRefreshing( data, chatFunctions );
             }
@@ -199,7 +198,7 @@ const botFunctions = ( bot ) => {
 
         refreshOffCommand: function ( data, chatFunctions ) {
             if ( !this.refreshingEnabled() ) {
-                chatFunctions.botSpeak( data, 'The ' + chatDefaults.commandIdentifier + 'refresh command is already disabled' );
+                chatFunctions.botSpeak( 'The ' + chatDefaults.commandIdentifier + 'refresh command is already disabled', data );
             } else {
                 this.disableRefreshing( data, chatFunctions );
             }
@@ -219,7 +218,7 @@ const botFunctions = ( bot ) => {
                 const djName = userFunctions.getUsername( djID );
                 theMessage = '@' + djName + ', ' + theMessage;
 
-                chatFunctions.botSpeak( data, theMessage, true );
+                chatFunctions.botSpeak( theMessage, data, true );
                 this.logCommandUsage( userFunctions, 'removeDJ', data, theMessage )
             }
             bot.remDj( djID );
@@ -230,10 +229,10 @@ const botFunctions = ( bot ) => {
 
             if ( theMessage !== '' ) {
                 theMessage = '@' + userFunctions.getUsername( djID ) + ', ' + theMessage
-                chatFunctions.botSpeak( data, theMessage, true );
+                chatFunctions.botSpeak( theMessage, data, true );
                 this.logCommandUsage( userFunctions, 'informDJ', data, theMessage )
             } else {
-                chatFunctions.botSpeak( data, 'You didn\'t ask me to send the DJ any message?!?' );
+                chatFunctions.botSpeak( 'You didn\'t ask me to send the DJ any message?!?', data );
             }
         },
 
@@ -267,7 +266,7 @@ const botFunctions = ( bot ) => {
             if ( this.checkVideoRegions() ) {
                 videoFunctions.listAlertRegions( data, chatFunctions );
             } else {
-                chatFunctions.botSpeak( data, 'Video Region checking is disabled' );
+                chatFunctions.botSpeak( 'Video Region checking is disabled', data );
             }
         },
 
@@ -284,9 +283,9 @@ const botFunctions = ( bot ) => {
 
         reportRefreshStatus: function ( data, chatFunctions ) {
             if ( this.refreshingEnabled() ) {
-                chatFunctions.botSpeak( data, 'The ' + chatDefaults.commandIdentifier + 'refresh command is enabled' );
+                chatFunctions.botSpeak( 'The ' + chatDefaults.commandIdentifier + 'refresh command is enabled', data );
             } else {
-                chatFunctions.botSpeak( data, 'The ' + chatDefaults.commandIdentifier + 'refresh command is disabled' );
+                chatFunctions.botSpeak( 'The ' + chatDefaults.commandIdentifier + 'refresh command is disabled', data );
             }
         },
 
@@ -304,7 +303,7 @@ const botFunctions = ( bot ) => {
         setWhenToGetOnStage: function ( data, args, chatFunctions ) {
             const numberOfDJs = args[ 0 ];
             if ( isNaN( numberOfDJs ) ) {
-                chatFunctions.botSpeak( data, 'Don\'t be silly. I can\'t set the auto-DJing start value to ' + numberOfDJs );
+                chatFunctions.botSpeak( 'Don\'t be silly. I can\'t set the auto-DJing start value to ' + numberOfDJs, data );
             } else {
                 whenToGetOnStage = numberOfDJs;
                 this.reportAutoDJStatus( data, chatFunctions )
@@ -315,7 +314,7 @@ const botFunctions = ( bot ) => {
         setWhenToGetOffStage: function ( data, args, chatFunctions ) {
             const numberOfDJs = args[ 0 ];
             if ( isNaN( numberOfDJs ) ) {
-                chatFunctions.botSpeak( data, 'Don\'t be silly. I can\'t set the auto-DJing stop value to ' + numberOfDJs );
+                chatFunctions.botSpeak( 'Don\'t be silly. I can\'t set the auto-DJing stop value to ' + numberOfDJs, data );
             } else {
                 whenToGetOffStage = numberOfDJs;
                 this.reportAutoDJStatus( data, chatFunctions )
@@ -324,9 +323,9 @@ const botFunctions = ( bot ) => {
 
         reportAutoDJStatus: function ( data, chatFunctions ) {
             if ( this.autoDJEnabled() ) {
-                chatFunctions.botSpeak( data, 'Auto-DJing is enabled and will start at ' + this.whenToGetOnStage() + ' and stop at ' + this.whenToGetOffStage() );
+                chatFunctions.botSpeak( 'Auto-DJing is enabled and will start at ' + this.whenToGetOnStage() + ' and stop at ' + this.whenToGetOffStage(), data );
             } else {
-                chatFunctions.botSpeak( data, 'Auto DJing is disabled' )
+                chatFunctions.botSpeak( 'Auto DJing is disabled', data )
             }
         },
 
@@ -341,9 +340,9 @@ const botFunctions = ( bot ) => {
         },
         reportSongStats: function ( data, chatFunctions ) {
             if ( this.readSongStats() ) {
-                chatFunctions.botSpeak( data, 'Song stat reporting is enabled' );
+                chatFunctions.botSpeak( 'Song stat reporting is enabled', data );
             } else {
-                chatFunctions.botSpeak( data, 'Song stats reporting is disabled' );
+                chatFunctions.botSpeak( 'Song stats reporting is disabled', data );
             }
         },
 
@@ -376,12 +375,9 @@ const botFunctions = ( bot ) => {
 
         reconnect: function () {
             attemptToReconnect = setInterval( function () {
-                let whichMessage;
                 if ( bot._isAuthenticated ) {
-                    whichMessage = true;
                     logMe( 'error', '+++++++++++++++++++++++++ BotModule Error: it looks like your bot is not in it\'s room. attempting to reconnect now....' );
                 } else {
-                    whichMessage = false;
                     logMe( 'error', '+++++++++++++++++++++++++ BotModule Error: connection with turntable lost, waiting for connection to come back...' );
                 }
 
@@ -409,7 +405,7 @@ const botFunctions = ( bot ) => {
             return isBotAlreadyOnStage;
         },
 
-        shouldTheBotDJ: function ( userFunctions, roomFunctions ) {
+        shouldTheBotDJ: function ( userFunctions ) {
             return userFunctions.howManyDJs() >= 1 && // is there at least one DJ on stage
                 userFunctions.howManyDJs() <= this.whenToGetOnStage() && // are there fewer than the limit of DJs on stage
                 userFunctions.queueList().length === 0 && // is the queue empty
@@ -417,12 +413,12 @@ const botFunctions = ( bot ) => {
                 userFunctions.refreshDJCount() === 0; // is there someone currently using the refresh command
         },
 
-        shouldStopBotDJing: function ( userFunctions, roomFunctions ) {
+        shouldStopBotDJing: function ( userFunctions ) {
             return userFunctions.howManyDJs() >= this.whenToGetOffStage() && // are there enough DJs onstage
                 userFunctions.getCurrentDJID() !== authModule.USERID; // check the Bot isn't currently DJing
         },
 
-        checkAutoDJing: function ( userFunctions, roomFunctions ) {
+        checkAutoDJing: function ( userFunctions ) {
             if ( autoDjingTimer != null ) {
                 clearTimeout( autoDjingTimer );
                 autoDjingTimer = null;
@@ -432,11 +428,11 @@ const botFunctions = ( bot ) => {
 
                 autoDjingTimer = setTimeout( function () {
                     if ( !this.isBotOnStage( userFunctions ) ) { //if the bot is not already on stage
-                        if ( this.shouldTheBotDJ( userFunctions, roomFunctions ) ) {
+                        if ( this.shouldTheBotDJ( userFunctions ) ) {
                             this.startBotDJing();
                         }
                     } else { //else it is on stage
-                        if ( this.shouldStopBotDJing( userFunctions, roomFunctions ) ) {
+                        if ( this.shouldStopBotDJing( userFunctions ) ) {
                             this.removeBotFromStage(); // remove the Bot from stage
                         }
                     }

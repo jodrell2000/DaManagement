@@ -12,8 +12,7 @@ let songLimitTimer = null; //holds the timer used to remove a dj off stage if th
 let queueTimer = null; //holds the timer the auto removes dj's from the queue if they do not get on stage within the allowed time period
 
 let greet = roomDefaults.greetUsers; //room greeting when someone joins the room(on by default)
-let greetThroughPm = roomDefaults.greetThroughPM; //choose whether greeting message is through the pm or the chatbox(false = chatbox, true = pm), (only works when greeting message is turned on) (off by default)
-let greetingTimer = []; //holds the timeout for people that join the room, if someone rejoins before their timeout completes their timer is reset
+let greetInPublic = roomDefaults.greetInPublic; //choose whether greeting message is through the pm or the chatbox(false = chatbox, true = pm), (only works when greeting message is turned on) (off by default)
 
 let roomName = '';
 let roomJoinMessage = 'Welcome to @roomName @username'; //the message users will see when they join the room, leave it empty for the default message (only works when greet is turned on)
@@ -45,12 +44,11 @@ const roomFunctions = ( bot ) => {
         enableGreet: function () { greet = true; },
         disableGreet: function () { greet = false; },
 
-        greetThroughPm: () => greetThroughPm,
-        greetingTimer: () => greetingTimer,
+        greetInPublic: () => greetInPublic,
 
         greetOnCommand: function ( data, chatFunctions ) {
             if ( this.greet() === true ) {
-                chatFunctions.botSpeak( data, 'The Greet command is already enabled' );
+                chatFunctions.botSpeak( 'The Greet command is already enabled', data );
             } else {
                 this.enableGreet();
                 this.readGreetingStatus( data, chatFunctions );
@@ -59,7 +57,7 @@ const roomFunctions = ( bot ) => {
 
         greetOffCommand: function ( data, chatFunctions ) {
             if ( this.greet() === false ) {
-                chatFunctions.botSpeak( data, 'The Greet command is already disabled' );
+                chatFunctions.botSpeak( 'The Greet command is already disabled', data );
             } else {
                 this.disableGreet();
                 this.readGreetingStatus( data, chatFunctions );
@@ -73,7 +71,7 @@ const roomFunctions = ( bot ) => {
             } else {
                 theMessage += 'disabled';
             }
-            chatFunctions.botSpeak( data, theMessage );
+            chatFunctions.botSpeak( theMessage, data );
         },
 
         // ========================================================
@@ -102,9 +100,9 @@ const roomFunctions = ( bot ) => {
 
         readTheme: function( data, chatFunctions ) {
             if ( this.theme() === false ) {
-                chatFunctions.botSpeak( data, 'There is currently no theme' );
+                chatFunctions.botSpeak( 'There is currently no theme', data );
             } else {
-                chatFunctions.botSpeak( data, 'The Theme is currently set to ' + this.theme() );
+                chatFunctions.botSpeak( 'The Theme is currently set to ' + this.theme(), data );
             }
         },
 
@@ -133,7 +131,7 @@ const roomFunctions = ( bot ) => {
             theMessage = theMessage.replace( "@username", djName );
             theMessage = theMessage.replace( ":time:", theTime );
 
-            chatFunctions.botSpeak( null, theMessage, true );
+            chatFunctions.botSpeak( theMessage, null, true );
         },
 
         clearDecksForVIPs: function ( userFunctions, authModule ) {
@@ -179,7 +177,7 @@ const roomFunctions = ( bot ) => {
                 userFunctions.removeEscortMeFromUser( currentDJ );
 
                 const theMessage = '@' + userFunctions.getUsername( currentDJ ) + ' had enabled escortme';
-                chatFunctions.botSpeak( data, theMessage );
+                chatFunctions.botSpeak( theMessage, data );
             }
         },
 
