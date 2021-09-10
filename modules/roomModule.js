@@ -18,6 +18,8 @@ let greetingTimer = []; //holds the timeout for people that join the room, if so
 let roomName = '';
 let roomJoinMessage = 'Welcome to @roomName @username'; //the message users will see when they join the room, leave it empty for the default message (only works when greet is turned on)
 
+let theme = false; //has a current theme been set? true or false. handled by commands
+
 const roomFunctions = ( bot ) => {
 
     return {
@@ -72,6 +74,38 @@ const roomFunctions = ( bot ) => {
                 theMessage += 'disabled';
             }
             chatFunctions.botSpeak( data, theMessage );
+        },
+
+        // ========================================================
+
+        // ========================================================
+        // Greeting Functions
+        // ========================================================
+
+        theme: () => theme,
+        setTheme: function( value ) {
+            theme = value;
+        },
+        clearTheme: function() {
+            theme = false;
+        },
+
+        setThemeCommand: function( data, newTheme, chatFunctions ) {
+            this.setTheme( newTheme );
+            this.readTheme( data, chatFunctions );
+        },
+
+        removeThemeCommand: function( data, chatFunctions ) {
+            this.clearTheme();
+            this.readTheme( data, chatFunctions );
+        },
+
+        readTheme: function( data, chatFunctions ) {
+            if ( this.theme() === false ) {
+                chatFunctions.botSpeak( data, 'There is currently no theme' );
+            } else {
+                chatFunctions.botSpeak( data, 'The Theme is currently set to ' + this.theme() );
+            }
         },
 
         // ========================================================

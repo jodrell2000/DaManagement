@@ -61,6 +61,9 @@ const commandFunctions = ( bot ) => {
     generalCommands.myStats = ( { data, userFunctions, chatFunctions } ) => { userFunctions.readSingleUserStatus( data, chatFunctions ) }
     generalCommands.myStats.help = "What info does the Bot currently hold about you...handy for knowing how much time you've been wasting on here today!";
 
+    generalCommands.theme = ( { data, roomFunctions, chatFunctions } ) => { roomFunctions.readTheme( data, chatFunctions ) }
+    generalCommands.theme.help = "Tells you what the current teme is, if there is one";
+
     // #############################################
     // General user Queue commands
     // #############################################
@@ -324,6 +327,12 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.greetOff = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.greetOffCommand( data, chatFunctions ); }
     moderatorCommands.greetOff.help = "Disable user greetings";
 
+    moderatorCommands.setTheme = ( { data, args, chatFunctions, roomFunctions } ) => { roomFunctions.setThemeCommand( data, reassembleArgs( args ), chatFunctions ); }
+    moderatorCommands.setTheme.help = "Set a theme for the room";
+
+    moderatorCommands.noTheme = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.removeThemeCommand( data, chatFunctions ); }
+    moderatorCommands.noTheme.help = "Set a theme for the room";
+
     // #############################################
     // Moderator Only Queue commands
     // #############################################
@@ -581,19 +590,6 @@ const commandFunctions = ( bot ) => {
                     musicDefaults.voteSkip = true;
                     songFunctions.resetVoteCountSkip();
                     songFunctions.setVotesLeft( roomDefaults.HowManyVotesToSkip );
-                }
-            } else if ( text.match( /^\/noTheme/ ) && userFunctions.isUserModerator( speaker ) === true ) {
-                roomDefaults.THEME = false;
-                bot.speak( 'The theme is now inactive' );
-            } else if ( text.match( /^\/setTheme/ ) && userFunctions.isUserModerator( speaker ) === true ) {
-                whatIsTheme = data.text.slice( 10 );
-                roomDefaults.THEME = true;
-                bot.speak( 'The theme is now set to: ' + whatIsTheme );
-            } else if ( text.match( /^\/theme/ ) ) {
-                if ( roomDefaults.THEME === false ) {
-                    bot.speak( 'There is currently no theme, standard rules apply' );
-                } else {
-                    bot.speak( 'The theme is currently set to: ' + whatIsTheme );
                 }
             } else if ( text.match( /^\/voteskipoff$/ ) && userFunctions.isUserModerator( speaker ) === true ) {
                 bot.speak( "vote skipping is now inactive" );
@@ -956,19 +952,6 @@ const commandFunctions = ( bot ) => {
             } else if ( text.match( /^\/messageOn/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
                 bot.pm( 'message: On', speaker );
                 roomDefaults.MESSAGE = true;
-            } else if ( text.match( /^\/setTheme/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                whatIsTheme = data.text.slice( 10 );
-                roomDefaults.THEME = true;
-                bot.pm( 'The theme is now set to: ' + whatIsTheme, speaker );
-            } else if ( text.match( /^\/noTheme/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
-                roomDefaults.THEME = false;
-                bot.pm( 'The theme is now inactive', speaker );
-            } else if ( text.match( /^\/theme/ ) && isInRoom === true ) {
-                if ( roomDefaults.THEME === false ) {
-                    bot.pm( 'There is currently no theme, standard rules apply', speaker );
-                } else {
-                    bot.pm( 'The theme is currently set to: ' + whatIsTheme, speaker );
-                }
             } else if ( text.match( /^\/roomafkoff/ ) && userFunctions.isUserModerator( speaker ) === true && isInRoom === true ) {
                 userFunctions.disableRoomIdle();
                 bot.pm( 'the audience afk list is now inactive.', speaker );

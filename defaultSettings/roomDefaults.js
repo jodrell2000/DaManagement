@@ -47,9 +47,6 @@ module.exports = {
 
     kickTTSTAT: false, //kicks the ttstats bot when it tries to join the room(off by default)
 
-    theme: false, //has a current theme been set? true or false. handled by commands
-    whatIsTheme: null, //this holds a string which is set by the /setTheme command
-
     errorMessage: null, //the error message you get when trying to connect to the room
 
     spamLimit: 3, //number of times a user can spam being kicked off the stage within 10 secs
