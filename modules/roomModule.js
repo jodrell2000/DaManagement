@@ -20,6 +20,8 @@ let additionalJoinMessage = "You can checkout the room rules here ->  and if you
 
 let theme = false; //has a current theme been set? true or false. handled by commands
 let rulesTimerRunning = false;
+let rulesMessageOn = true;
+let rulesInterval = 15; // how ofter, in minutes, the room rules will be displayed with the welcome messages
 
 const roomFunctions = ( bot ) => {
 
@@ -124,12 +126,39 @@ const roomFunctions = ( bot ) => {
 
             setTimeout( function ( ) {
                 this.clearRulesTimer(  );
-            }.bind( this ), 2 * 60 * 1000 );
+            }.bind( this ), this.rulesInterval() * 60 * 1000 );
 
         },
 
         clearRulesTimer: function (  ) {
             rulesTimerRunning = false;
+        },
+
+        rulesMessageOn: () => rulesMessageOn,
+
+        enableRulesMessageCommand: function ( data, chatFunctions ) {
+            rulesMessageOn = true;
+            this.readRulesStatus( data, chatFunctions );
+        },
+
+        disableRulesMessageCommand: function ( data, chatFunctions ) {
+            rulesMessageOn = false;
+            this.readRulesStatus( data, chatFunctions );
+        },
+
+        readRulesStatus: function ( data, chatFunctions ) {
+            if ( this.rulesMessageOn() )  {
+                chatFunctions.botSpeak( 'The rules will displayed with the welcome message after ' + this.rulesInterval() + ' minutes', data );
+            } else {
+                chatFunctions.botSpeak( 'The rules will not displayed with the welcome message. The rules interval is set to ' + this.rulesInterval() + ' minutes', data );
+            }
+        },
+
+        rulesInterval: () => rulesInterval,
+
+        setRulesIntervalCommand: function ( data, minutes, chatFunctions ) {
+            rulesInterval = minutes;
+            this.readRulesStatus( data, chatFunctions );
         },
 
         // ========================================================

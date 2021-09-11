@@ -7,13 +7,14 @@ const chatCommands = {};
 const botCommands = {};
 const userQueueCommands = {};
 const moderatorQueueCommands = {};
+const moderatorWelcomeCommands = {};
 const moderatorCommands = {};
 
 const ignoreCommands = [ '/me ' ];
 
 const commandFunctions = ( bot ) => {
     // #############################################
-    // These comamnds are confirmed as fully working
+    // These commands are confirmed as fully working
     // #############################################
 
     // #############################################
@@ -214,7 +215,7 @@ const commandFunctions = ( bot ) => {
     botCommands.playlist.help = "Tells you how many songs are in the Bot playlist";
 
     // #############################################
-    // User comamnds
+    // User commands
     // #############################################
 
     userCommands.afk = ( { data, userFunctions, chatFunctions } ) => { userFunctions.switchUserAFK( data, chatFunctions ); }
@@ -224,7 +225,7 @@ const commandFunctions = ( bot ) => {
     userCommands.whosafk.help = "Tells you which users have enabled AFK";
 
     // #############################################
-    // Moderator Only comamnds
+    // Moderator Only commands
     // #############################################
 
     moderatorCommands.randomisePlaylist = ( { songFunctions } ) => { songFunctions.randomisePlaylist() }
@@ -312,22 +313,37 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.informdj.help = "Have the Bot send the current DJ a message";
 
     moderatorCommands.awesome = ( { botFunctions } ) => { botFunctions.awesomeCommand(); }
-    moderatorCommands.awesome.help = "Have the Bot uptote";
+    moderatorCommands.awesome.help = "Have the Bot upvote";
 
     moderatorCommands.lame = ( { botFunctions } ) => { botFunctions.lameCommand(); }
-    moderatorCommands.lame.help = "Have the Bot uptote";
+    moderatorCommands.lame.help = "Have the Bot downvote";
 
-    moderatorCommands.greetOn = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.greetOnCommand( data, chatFunctions ); }
-    moderatorCommands.greetOn.help = "Enable user greetings";
+    // #############################################
+    // Moderator Greeting commands
+    // #############################################
 
-    moderatorCommands.greetOff = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.greetOffCommand( data, chatFunctions ); }
-    moderatorCommands.greetOff.help = "Disable user greetings";
+    moderatorWelcomeCommands.greetOn = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.greetOnCommand( data, chatFunctions ); }
+    moderatorWelcomeCommands.greetOn.help = "Enable user greetings";
 
-    moderatorCommands.setTheme = ( { data, args, chatFunctions, roomFunctions } ) => { roomFunctions.setThemeCommand( data, reassembleArgs( args ), chatFunctions ); }
-    moderatorCommands.setTheme.help = "Set a theme for the room";
+    moderatorWelcomeCommands.greetOff = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.greetOffCommand( data, chatFunctions ); }
+    moderatorWelcomeCommands.greetOff.help = "Disable user greetings";
 
-    moderatorCommands.noTheme = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.removeThemeCommand( data, chatFunctions ); }
-    moderatorCommands.noTheme.help = "Set a theme for the room";
+    moderatorWelcomeCommands.setTheme = ( { data, args, chatFunctions, roomFunctions } ) => { roomFunctions.setThemeCommand( data, reassembleArgs( args ), chatFunctions ); }
+    moderatorWelcomeCommands.setTheme.help = "Set a theme for the room";
+
+    moderatorWelcomeCommands.noTheme = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.removeThemeCommand( data, chatFunctions ); }
+    moderatorWelcomeCommands.noTheme.help = "Set a theme for the room";
+
+    moderatorWelcomeCommands.enableRules = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.enableRulesMessageCommand( data, chatFunctions ); }
+    moderatorWelcomeCommands.enableRules.help = "Have the room rules etc read out with the room greeting";
+
+    moderatorWelcomeCommands.disableRules = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.disableRulesMessageCommand( data, chatFunctions ); }
+    moderatorWelcomeCommands.disableRules.help = "Stop the room rules being read out with the room greeting";
+
+    moderatorWelcomeCommands.rulesInterval = ( { data, args, chatFunctions, roomFunctions } ) => { roomFunctions.setRulesIntervalCommand( data, args, chatFunctions ); }
+    moderatorWelcomeCommands.rulesInterval.argumentCount = 1;
+    moderatorWelcomeCommands.rulesInterval.help = "Set the interval, in minutes, for how often the room rules will be read out with the room greeting";
+    moderatorWelcomeCommands.rulesInterval.sampleArguments = [ 15 ];
 
     // #############################################
     // Moderator Only Queue commands
@@ -360,6 +376,7 @@ const commandFunctions = ( bot ) => {
 
     const allModeratorCommands = {
         ...moderatorCommands,
+        ...moderatorWelcomeCommands,
         ...moderatorQueueCommands
     }
 
@@ -389,8 +406,14 @@ const commandFunctions = ( bot ) => {
             case "generalCommands":
                 theMessage = "The General Commands are " + buildListFromObject( Object.keys( allGeneralCommands ) );
                 break;
-            case "moderatorCommands":
-                theMessage = "The Moderator Commands are " + buildListFromObject( Object.keys( allModeratorCommands ) );
+            case "modCommands":
+                theMessage = "The Moderator Commands are " + buildListFromObject( Object.keys( moderatorCommands ) );
+                break;
+            case "modWelcomeCommands":
+                theMessage = "The Moderator Welcome Commands are " + buildListFromObject( Object.keys( moderatorWelcomeCommands ) );
+                break;
+            case "modQueueCommands":
+                theMessage = "The Moderator Queue Commands are " + buildListFromObject( Object.keys( moderatorQueueCommands ) );
                 break;
             case "botCommands":
                 theMessage = "The Bot Commands are " + buildListFromObject( Object.keys( botCommands ) );
@@ -405,7 +428,7 @@ const commandFunctions = ( bot ) => {
                 theMessage = "The User Commands are " + buildListFromObject( Object.keys( allQueueCommands ) );
                 break;
             default:
-                theMessage = 'Top level command groups are: generalCommands, moderatorCommands, botCommands, chatCommands, userCommands, queueCommands. Please use ' + chatDefaults.commandIdentifier + 'list [commandGroup] for the individual commands';
+                theMessage = 'Top level command groups are: generalCommands, chatCommands, queueCommands, botCommands, userCommands, modCommands, modWelcomeCommands, modQueueCommands. Please use ' + chatDefaults.commandIdentifier + 'list [commandGroup] for the individual commands';
                 break;
         }
 

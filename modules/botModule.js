@@ -24,24 +24,6 @@ let checkVideoRegions = musicDefaults.alertIfRegionBlocked;
 let refreshingEnabled = roomDefaults.refreshingEnabled;
 
 const botFunctions = ( bot ) => {
-    function logMe ( logLevel, message ) {
-        switch ( logLevel ) {
-            case "error":
-                console.log( "!!!!!!!!!!! botFunctions:" + logLevel + "->" + message + "\n" );
-                break;
-            case "warn":
-                console.log( "+++++++++++ botFunctions:" + logLevel + "->" + message + "\n" );
-                break;
-            case "info":
-                console.log( "----------- botFunctions:" + logLevel + "->" + message + "\n" );
-                break;
-            default:
-                if ( bot.debug ) {
-                    console.log( "botFunctions:" + logLevel + "->" + message + "\n" );
-                }
-                break;
-        }
-    }
 
     return {
         checkActivity: () => checkActivity,
@@ -142,7 +124,6 @@ const botFunctions = ( bot ) => {
         },
 
         checkVideoRegionsCommand: function ( data, videoFunctions, chatFunctions ) {
-            logMe( 'info', 'checkVideoRegionsCommand, this.checkVideoRegions():' + this.checkVideoRegions() );
             if ( this.checkVideoRegions() ) {
                 this.disablecheckVideoRegions( data, videoFunctions, chatFunctions );
             } else {
@@ -374,11 +355,12 @@ const botFunctions = ( bot ) => {
         },
 
         reconnect: function () {
+            console.group( 'botModule: reconnect' );
             attemptToReconnect = setInterval( function () {
                 if ( bot._isAuthenticated ) {
-                    logMe( 'error', '+++++++++++++++++++++++++ BotModule Error: it looks like your bot is not in it\'s room. attempting to reconnect now....' );
+                    console.error( '+++++++++++++++++++++++++ BotModule Error: it looks like your bot is not in it\'s room. attempting to reconnect now....' );
                 } else {
-                    logMe( 'error', '+++++++++++++++++++++++++ BotModule Error: connection with turntable lost, waiting for connection to come back...' );
+                    console.error( '+++++++++++++++++++++++++ BotModule Error: connection with turntable lost, waiting for connection to come back...' );
                 }
 
                 bot.roomRegister( authModule.ROOMID, function ( data ) {
@@ -394,6 +376,7 @@ const botFunctions = ( bot ) => {
                     }
                 } );
             }, 1000 * 10 );
+            console.groupEnd()
         },
 
         recordActivity: function () {
@@ -401,8 +384,7 @@ const botFunctions = ( bot ) => {
         },
 
         isBotOnStage: function ( userFunctions ) {
-            let isBotAlreadyOnStage = userFunctions.isUserIDOnStage( authModule.USERID );
-            return isBotAlreadyOnStage;
+            return userFunctions.isUserIDOnStage( authModule.USERID );
         },
 
         shouldTheBotDJ: function ( userFunctions ) {

@@ -2,23 +2,9 @@ let botDefaults = require( '../defaultSettings/botDefaults.js' );
 let userMessages = require( '../defaultSettings/customGreetings.js');
 
 const chatFunctions = ( bot, roomDefaults ) => {
-    function logMe ( logLevel, message ) {
-        if ( logLevel === 'error' || logLevel === 'info' ) {
-            console.log( "chatFunctions:" + logLevel + "->" + message + "\n" );
-        } else {
-            if ( bot.debug ) {
-                console.log( "chatFunctions:" + logLevel + "->" + message + "\n" );
-            }
-        }
-    }
 
     return {
         botSpeak: function ( message, data, publicChat, recipient ) {
-            console.group('botSpeak' );
-            console.info( 'message:' + message );
-            console.info( 'data:' + data );
-            console.info( 'publicChat:' + publicChat );
-            console.info( 'recipient:' + recipient );
             let pmCommand;
 
             if ( recipient === undefined && data !== null ) {
@@ -33,7 +19,6 @@ const chatFunctions = ( bot, roomDefaults ) => {
             } else {
                 this.botChat( message );
             }
-            console.groupEnd();
         },
 
         botChat: function ( message ) {
@@ -149,7 +134,6 @@ const chatFunctions = ( bot, roomDefaults ) => {
         },
 
         dice: function ( data, args, userFunctions ) {
-            logMe( 'info', 'dice, command:' + JSON.stringify( args ) );
             const theUsername = userFunctions.getUsername( data.userid );
             const diceCount = args[ 0 ];
             const diceType = args[ 1 ].split( "d" )[ 1 ];
@@ -210,7 +194,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
                     }
                     
                     await sleep( 10 )
-                    if ( !roomFunctions.isRulesTimerRunning() ) {
+                    if ( !roomFunctions.isRulesTimerRunning() && roomFunctions.rulesMessageOn() ) {
                         this.botSpeak( roomFunctions.additionalJoinMessage(), data, roomFunctions.greetInPublic() );
                         roomFunctions.startRulesTimer();
                     }

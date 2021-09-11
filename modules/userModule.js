@@ -70,7 +70,7 @@ const userFunctions = ( bot ) => {
 
     return {
         debugPrintTheUsersList: function () {
-            console.log( "Full theUsersList: " + JSON.stringify( theUsersList ) );
+            console.info( "Full theUsersList: " + JSON.stringify( theUsersList ) );
         },
 
         theUsersList: () => theUsersList,
@@ -766,7 +766,6 @@ const userFunctions = ( bot ) => {
         },
 
         activateUsersWelcomeTimer: function ( userID ) {
-            console.info('Adding user timer: ' + userID );
             theUsersList[ this.getPositionOnUsersList( userID ) ][ 'welcomeTimer' ] = true;
 
             setTimeout( function ( ) {
@@ -775,7 +774,6 @@ const userFunctions = ( bot ) => {
         },
 
         clearUsersWelcomeTimer: function ( userID ) {
-            console.info('Clearing user timer: ' + userID );
             theUsersList[ this.getPositionOnUsersList( userID ) ][ 'welcomeTimer' ] = false;
         },
 
