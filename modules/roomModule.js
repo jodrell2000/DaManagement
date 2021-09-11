@@ -16,8 +16,10 @@ let greetInPublic = roomDefaults.greetInPublic; //choose whether greeting messag
 
 let roomName = '';
 let roomJoinMessage = 'Welcome to @roomName @username'; //the message users will see when they join the room, leave it empty for the default message (only works when greet is turned on)
+let additionalJoinMessage = "You can checkout the room rules here ->  and if you have any suggestions you can make them on our Facebook page here -> ";
 
 let theme = false; //has a current theme been set? true or false. handled by commands
+let rulesTimerRunning = false;
 
 const roomFunctions = ( bot ) => {
 
@@ -31,6 +33,7 @@ const roomFunctions = ( bot ) => {
         queueTimer: () => queueTimer,
 
         roomJoinMessage: () => roomJoinMessage,
+        additionalJoinMessage: () => additionalJoinMessage,
 
         resetSkipVoteUsers: function () {
             skipVoteUsers = []
@@ -104,6 +107,29 @@ const roomFunctions = ( bot ) => {
             } else {
                 chatFunctions.botSpeak( 'The Theme is currently set to ' + this.theme(), data );
             }
+        },
+
+        // ========================================================
+
+        // ========================================================
+        // Greeting Functions
+        // ========================================================
+
+        isRulesTimerRunning: function ( ) {
+            return rulesTimerRunning;
+        },
+
+        startRulesTimer: function (  ) {
+            rulesTimerRunning = true;
+
+            setTimeout( function ( ) {
+                this.clearRulesTimer(  );
+            }.bind( this ), 2 * 60 * 1000 );
+
+        },
+
+        clearRulesTimer: function (  ) {
+            rulesTimerRunning = false;
         },
 
         // ========================================================

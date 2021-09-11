@@ -208,6 +208,13 @@ const chatFunctions = ( bot, roomDefaults ) => {
                     if ( roomDefaults.queueActive === true && userFunctions.howManyDJs() === 5 ) {
                         this.botSpeak( 'The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.', data, roomFunctions.greetInPublic() );
                     }
+                    
+                    await sleep( 10 )
+                    if ( !roomFunctions.isRulesTimerRunning() ) {
+                        this.botSpeak( roomFunctions.additionalJoinMessage(), data, roomFunctions.greetInPublic() );
+                        roomFunctions.startRulesTimer();
+                    }
+                    
                 }
                 readInOrder();
             }
@@ -256,33 +263,6 @@ const chatFunctions = ( bot, roomDefaults ) => {
             }
         },
 
-        repeatWelcomeMessage: function ( userFunctions ) {
-            if ( roomDefaults.MESSAGE === true && typeof roomDefaults.detail !== 'undefined' ) {
-                if ( roomDefaults.repeatMessageThroughPm === false ) //if not doing through the pm
-                {
-                    if ( roomDefaults.defaultMessage === true ) //if using default message
-                    {
-                        bot.speak( 'Welcome to ' + roomDefaults.roomName + ', ' + roomDefaults.detail ); //set the message you wish the bot to repeat here i.e rules and such.
-                    }
-                    else {
-                        bot.speak( '' + roomDefaults.detail );
-                    }
-                }
-                else {
-                    if ( roomDefaults.defaultMessage === true ) {
-                        for ( let jkl = 0; jkl < userFunctions.userIDs.length; jkl++ ) {
-                            bot.pm( 'Welcome to ' + roomDefaults.roomName + ', ' + roomDefaults.detail, userFunctions.userIDs[ jkl ] ); //set the message you wish the bot to repeat here i.e rules and such.
-                        }
-                    }
-                    else {
-                        for ( let lkj = 0; lkj < userFunctions.userIDs.length; lkj++ ) {
-                            bot.pm( '' + roomDefaults.detail, userFunctions.userIDs[ lkj ] ); //set the message you wish the bot to repeat here i.e rules and such.
-                        }
-                    }
-                }
-            }
-
-        }
     }
 }
 
