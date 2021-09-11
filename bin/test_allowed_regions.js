@@ -10,7 +10,7 @@ let {
 } = videoFunctions(null);
 
 const dummyChat = {
-  botSpeak: (data, msg) => console.log(msg),
+  botSpeak: (msg, data) => console.log(msg),
 };
 
 console.log("-test 1");

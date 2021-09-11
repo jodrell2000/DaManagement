@@ -115,7 +115,8 @@ bot.on( 'ready', function () {
 } );
 
 //starts up when a new person joins the room
-bot.on( 'registered', function ( data ) {
+bot.on( 'registered', function( data ) {
+    console.group('registered' );
     const theUserID = data.user[ 0 ].userid;
     const username = data.user[ 0 ].name;
 
@@ -124,25 +125,13 @@ bot.on( 'registered', function ( data ) {
     const bootThisUser = userFunctions.bootNewUserCheck[ 0 ];
     const bootMessage = userFunctions.bootNewUserCheck[ 1 ];
 
+    console.info( 'bootThisUser:' + bootThisUser );
     if ( bootThisUser ) {
         userFunctions.bootThisUser( theUserID, bootMessage );
     } else {
-        //if there are 5 dj's on stage and the queue is turned on when a user enters the room
-        if ( roomDefaults.queueActive === true && userFunctions.howManyDJs() === 5 ) {
-            bot.pm( 'The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.', userFunctions.getUsername( theUserID ) );
-        }
-
-        if ( userFunctions.greetNewuser( theUserID, username, roomFunctions ) ) {
-            const greetingTimers = roomFunctions.greetingTimer();
-
-            greetingTimers[ theUserID ] = setTimeout( function () {
-                chatFunctions.userGreeting( theUserID, username, roomFunctions )
-
-                // remove timeout function from the list of timeout functions
-                delete greetingTimers[ theUserID ];
-            }, 3 * 1000 );
-        }
+        chatFunctions.userGreeting( data, theUserID, username, roomFunctions, userFunctions )
     }
+    console.groupEnd();
 } );
 
 //starts up when bot first enters the room
@@ -212,7 +201,7 @@ bot.on( 'newsong', function ( data ) {
     }
 
     //check to see if conditions are met for bot's autodjing feature
-    botFunctions.checkAutoDJing( userFunctions, roomFunctions );
+    botFunctions.checkAutoDJing( userFunctions );
 
     //if the bot is the only one on stage and they are skipping their songs
     //they will stop skipping
@@ -319,9 +308,8 @@ bot.on( 'speak', function ( data ) {
     //checks to see if someone is trying to speak to an afk person or not.
     const foundUsernames = userFunctions.checkTextForUsernames( text );
 
-    let thisAFKUser;
-    for ( userLoop = 0; userLoop < foundUsernames.length; userLoop++ ) {
-        thisAFKUserID = userFunctions.getUserIDFromUsername( foundUsernames[ userLoop ] );
+    for ( let userLoop = 0; userLoop < foundUsernames.length; userLoop++ ) {
+        let thisAFKUserID = userFunctions.getUserIDFromUsername( foundUsernames[ userLoop ] );
         if ( userFunctions.isUserAFK( thisAFKUserID ) && !userFunctions.isThisTheBot( theUserID ) === true ) {
             userFunctions.sendUserIsAFKMessage( data, thisAFKUserID, chatFunctions );
         }
@@ -366,7 +354,7 @@ bot.on( 'add_dj', function ( data ) {
     if ( !OKToDJ ) {
         bot.remDj( theUserID );
         userFunctions.incrementSpamCounter( theUserID );
-        chatFunctions.botSpeak( data, theMessage );
+        chatFunctions.botSpeak( theMessage, data );
     }
 
     //sets dj's current songcount to zero when they enter the stage.
@@ -396,7 +384,7 @@ bot.on( 'add_dj', function ( data ) {
     }
 
     //check to see if conditions are met for bot's autodjing feature
-    botFunctions.checkAutoDJing( userFunctions, roomFunctions );
+    botFunctions.checkAutoDJing( userFunctions );
 } );
 
 //checks when a dj leaves the stage
@@ -428,14 +416,14 @@ bot.on( 'rem_dj', function ( data ) {
     userFunctions.warnMeCall( roomFunctions );
 
     //check to see if conditions are met for bot's autodjing feature
-    botFunctions.checkAutoDJing( userFunctions, roomFunctions );
+    botFunctions.checkAutoDJing( userFunctions );
 
     //takes a user off the escort list if they leave the stage.
     userFunctions.removeEscortMeFromUser( theUserID );
 } );
 
 bot.on( 'update_user', function ( data ) {
-    userFunctions.updateUser( data, roomFunctions );
+    userFunctions.updateUser( data );
 } )
 
 //updates the moderator list when a moderator is added.

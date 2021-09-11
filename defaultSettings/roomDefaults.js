@@ -15,7 +15,7 @@ module.exports = {
                                         */
 
     greetUsers: true, //room greeting when someone joins the room(on by default)
-    greetThroughPM: false, //choose whether greeting message is through the pm or the chatbox(false = chatbox, true = pm), (only works when greeting message is turned on) (off by default)
+    greetInPublic: true, //choose whether greeting message is through the pm or the chatbox(false = chatbox, true = pm), (only works when greeting message is turned on) (off by default)
 
     //this is for the event messages
     //This cycles through all the different messages that you enter into this array. one message per time cycle, once it gets to the end of your messages it starts over again
@@ -59,7 +59,7 @@ module.exports = {
     removeIdleDJs: true, // are the DJ idle checks active, this is for the dj's on stage
     djIdleLimitThresholds: [ 20, 15, 19 ], /* Total idle allowed, first warnign time then second warning time for DJs idling out
                                         [ 20, 15, 19 ] would be 20 minutes idle allowed with the first warning at 15 minutes and the second at 19 minutes */
-    warnIdlePM: true, //choose whether idle warnings(for dj's on stage) will be given through the pm or the chatbox (false = chatbox, true = pm message)
+    warnIdlePublic: true, //choose whether idle warnings(for dj's on stage) will be given through the pm or the chatbox (false = chatbox, true = pm message)
     voteMeansActive: true, // does voting/bopping count as user being active (too many user autoBop)
     speechMeansActive: true, // does chatting count as user being active
     snagMeansActive: true, // does snagging a track count as user being active
