@@ -16,8 +16,7 @@ let greetInPublic = roomDefaults.greetInPublic; //choose whether greeting messag
 
 let roomName = '';
 let roomJoinMessage = 'Welcome to @roomName @username'; //the message users will see when they join the room, leave it empty for the default message (only works when greet is turned on)
-let additionalJoinMessage = "You can checkout the room rules here ->  and if you have any suggestions you can make them on our Facebook page here -> ";
-
+let additionalJoinMessage = "You can checkout the room rules here: https://bit.ly/ilt80s and if you have any suggestions you can make them here: https://bit.ly/80scd";
 let theme = false; //has a current theme been set? true or false. handled by commands
 let rulesTimerRunning = false;
 let rulesMessageOn = true;
@@ -86,24 +85,24 @@ const roomFunctions = ( bot ) => {
         // ========================================================
 
         theme: () => theme,
-        setTheme: function( value ) {
+        setTheme: function ( value ) {
             theme = value;
         },
-        clearTheme: function() {
+        clearTheme: function () {
             theme = false;
         },
 
-        setThemeCommand: function( data, newTheme, chatFunctions ) {
+        setThemeCommand: function ( data, newTheme, chatFunctions ) {
             this.setTheme( newTheme );
             this.readTheme( data, chatFunctions );
         },
 
-        removeThemeCommand: function( data, chatFunctions ) {
+        removeThemeCommand: function ( data, chatFunctions ) {
             this.clearTheme();
             this.readTheme( data, chatFunctions );
         },
 
-        readTheme: function( data, chatFunctions ) {
+        readTheme: function ( data, chatFunctions ) {
             if ( this.theme() === false ) {
                 chatFunctions.botSpeak( 'There is currently no theme', data );
             } else {
@@ -117,20 +116,20 @@ const roomFunctions = ( bot ) => {
         // Greeting Functions
         // ========================================================
 
-        isRulesTimerRunning: function ( ) {
+        isRulesTimerRunning: function () {
             return rulesTimerRunning;
         },
 
-        startRulesTimer: function (  ) {
+        startRulesTimer: function () {
             rulesTimerRunning = true;
 
-            setTimeout( function ( ) {
-                this.clearRulesTimer(  );
+            setTimeout( function () {
+                this.clearRulesTimer();
             }.bind( this ), this.rulesInterval() * 60 * 1000 );
 
         },
 
-        clearRulesTimer: function (  ) {
+        clearRulesTimer: function () {
             rulesTimerRunning = false;
         },
 
@@ -147,7 +146,7 @@ const roomFunctions = ( bot ) => {
         },
 
         readRulesStatus: function ( data, chatFunctions ) {
-            if ( this.rulesMessageOn() )  {
+            if ( this.rulesMessageOn() ) {
                 chatFunctions.botSpeak( 'The rules will displayed with the welcome message after ' + this.rulesInterval() + ' minutes', data );
             } else {
                 chatFunctions.botSpeak( 'The rules will not displayed with the welcome message. The rules interval is set to ' + this.rulesInterval() + ' minutes', data );
@@ -241,7 +240,7 @@ const roomFunctions = ( bot ) => {
 
         setRoomDefaults: function ( data ) {
             roomDefaults.detail = data.room.description; //used to get room description
-            this.setRoomName ( data.room.name ); //gets your rooms name
+            this.setRoomName( data.room.name ); //gets your rooms name
             roomDefaults.ttRoomName = data.room.shortcut; //gets room shortcut
 
             bot.playlistAll( function ( callback ) {
