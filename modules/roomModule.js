@@ -155,8 +155,9 @@ const roomFunctions = ( bot ) => {
 
         rulesInterval: () => rulesInterval,
 
-        setRulesIntervalCommand: function ( data, minutes, chatFunctions ) {
-            if ( isNaN( minutes ) || minutes === undefined ) {
+        setRulesIntervalCommand: function ( data, args, chatFunctions ) {
+            const minutes = args[ 0 ];
+            if ( isNaN( minutes ) || minutes === undefined || minutes === '' ) {
                 chatFunctions.botSpeak( minutes + ' is not a valid interval in minutes.', data );
             } else {
                 rulesInterval = minutes;
