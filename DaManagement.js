@@ -115,8 +115,7 @@ bot.on( 'ready', function () {
 } );
 
 //starts up when a new person joins the room
-bot.on( 'registered', function( data ) {
-    console.group('registered' );
+bot.on( 'registered', function ( data ) {
     const theUserID = data.user[ 0 ].userid;
     const username = data.user[ 0 ].name;
 
@@ -125,13 +124,11 @@ bot.on( 'registered', function( data ) {
     const bootThisUser = userFunctions.bootNewUserCheck[ 0 ];
     const bootMessage = userFunctions.bootNewUserCheck[ 1 ];
 
-    console.info( 'bootThisUser:' + bootThisUser );
     if ( bootThisUser ) {
         userFunctions.bootThisUser( theUserID, bootMessage );
     } else {
         chatFunctions.userGreeting( data, theUserID, username, roomFunctions, userFunctions )
     }
-    console.groupEnd();
 } );
 
 //starts up when bot first enters the room
