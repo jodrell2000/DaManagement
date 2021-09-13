@@ -665,7 +665,7 @@ const userFunctions = ( bot ) => {
             }
 
             chatFunctions.botSpeak( '@' + this.getUsername( userID ) + ' ' + theMessage, null, roomDefaults.warnIdlePublic, userID );
-            },
+        },
 
         checkHasUserIdledOut: function ( userID, threshold ) {
             let totalIdleAllowed = this.djIdleLimit();
@@ -768,7 +768,7 @@ const userFunctions = ( bot ) => {
         activateUsersWelcomeTimer: function ( userID ) {
             theUsersList[ this.getPositionOnUsersList( userID ) ][ 'welcomeTimer' ] = true;
 
-            setTimeout( function ( ) {
+            setTimeout( function () {
                 this.clearUsersWelcomeTimer( userID );
             }.bind( this ), 5 * 60 * 1000 );
         },
@@ -1105,7 +1105,7 @@ const userFunctions = ( bot ) => {
                 chatFunctions.botSpeak( "I can't see a username there. Check the command help for an example", data )
             } else {
                 chatFunctions.botSpeak( "Setting the Current playcount for @" + theUsername + " to " + theCount, data )
-                this .setDJCurrentPlayCount( this.getUserIDFromUsername( theUsername ), theCount );
+                this.setDJCurrentPlayCount( this.getUserIDFromUsername( theUsername ), theCount );
             }
         },
 
@@ -1150,7 +1150,7 @@ const userFunctions = ( bot ) => {
         },
 
         djPlaysCommand: function ( data, chatFunctions ) {
-            chatFunctions.botSpeak( data, this.buildDJPlaysMessage() );
+            chatFunctions.botSpeak( this.buildDJPlaysMessage(), data );
         },
 
 
@@ -1243,7 +1243,7 @@ const userFunctions = ( bot ) => {
             if ( err !== true ) {
                 queueList.splice( newPosition, 0, userID );
             } else {
-                chatFunctions.botSpeak( data, "The user " + this.getUsername( userID ) + " is not currently in the queue" );
+                chatFunctions.botSpeak( "The user " + this.getUsername( userID ) + " is not currently in the queue", data );
             }
             this.readQueue( data, chatFunctions );
         },
@@ -1277,13 +1277,13 @@ const userFunctions = ( bot ) => {
             const userID = this.whoSentTheCommand( data );
 
             if ( !roomDefaults.queueActive ) {
-                chatFunctions.botSpeak( data, '@' + this.getUsername( userID ) + ', the queue is currently disabled' );
+                chatFunctions.botSpeak( '@' + this.getUsername( userID ) + ', the queue is currently disabled', data );
             } else {
                 const queuePosition = queueList.findIndex( ( { id } ) => id === userID ) + 1;
                 if ( queuePosition !== -1 ) {
-                    chatFunctions.botSpeak( data, '@' + this.getUsername( userID ) + ', you are currently at position ' + queuePosition + ' in the queue' );
+                    chatFunctions.botSpeak( '@' + this.getUsername( userID ) + ', you are currently at position ' + queuePosition + ' in the queue', data );
                 } else {
-                    chatFunctions.botSpeak( data, '@' + this.getUsername( userID ) + ', you are not currently in the queue' );
+                    chatFunctions.botSpeak( '@' + this.getUsername( userID ) + ', you are not currently in the queue', data );
                 }
             }
         },
@@ -1296,7 +1296,7 @@ const userFunctions = ( bot ) => {
             if ( added === true ) {
                 this.readQueue( data, chatFunctions )
             } else {
-                chatFunctions.botSpeak( data, theMessage );
+                chatFunctions.botSpeak( theMessage, data );
             }
         },
 
@@ -1311,36 +1311,36 @@ const userFunctions = ( bot ) => {
             const userID = this.whoSentTheCommand( data );
             if ( this.isUserIDInQueue( userID ) ) {
                 this.removeUserFromQueue( userID, botFunctions )
-                chatFunctions.botSpeak( data, "@" + this.getUsername( userID ) + ', I\'ve removed you from the queue' );
+                chatFunctions.botSpeak( "@" + this.getUsername( userID ) + ', I\'ve removed you from the queue', data );
             } else {
-                chatFunctions.botSpeak( data, "@" + this.getUsername( userID ) + ', you\'re not currently in the queue. Use the ' + chatDefaults.commandIdentifier + 'addme command to join' );
+                chatFunctions.botSpeak( "@" + this.getUsername( userID ) + ', you\'re not currently in the queue. Use the ' + chatDefaults.commandIdentifier + 'addme command to join', data );
             }
             this.readQueue( data, chatFunctions )
         },
 
         enableQueue: function ( data, chatFunctions ) {
             if ( roomDefaults.queueActive === true ) {
-                chatFunctions.botSpeak( data, "The queue is already enabled" );
+                chatFunctions.botSpeak( "The queue is already enabled", data );
             } else {
                 roomDefaults.queueActive = true;
-                chatFunctions.botSpeak( data, "The queue is now on" );
+                chatFunctions.botSpeak( "The queue is now on", data );
             }
         },
 
         disableQueue: function ( data, chatFunctions ) {
             if ( roomDefaults.queueActive !== true ) {
-                chatFunctions.botSpeak( data, "The queue is already disabled" );
+                chatFunctions.botSpeak( "The queue is already disabled", data );
             } else {
                 roomDefaults.queueActive = false;
-                chatFunctions.botSpeak( data, "The queue is now off" );
+                chatFunctions.botSpeak( "The queue is now off", data );
             }
         },
 
         readQueue: function ( data, chatFunctions ) {
             if ( roomDefaults.queueActive === true ) {
-                chatFunctions.botSpeak( data, this.buildQueueMessage() );
+                chatFunctions.botSpeak( this.buildQueueMessage(), data );
             } else {
-                chatFunctions.botSpeak( data, "The DJ queue is not active" );
+                chatFunctions.botSpeak( "The DJ queue is not active", data );
             }
         },
 
