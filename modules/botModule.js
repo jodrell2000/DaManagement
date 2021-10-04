@@ -4,7 +4,6 @@ let musicDefaults = require( '../defaultSettings/musicDefaults.js' );
 let chatDefaults = require( '../defaultSettings/chatDefaults.js' );
 
 let authModule = require( '../auth.js' );
-const userFunctions = require( './userModule.js' );
 
 let checkActivity = Date.now();
 let skipOn = null; //if true causes the bot to skip every song it plays, toggled on and off by commands
@@ -25,24 +24,6 @@ let checkVideoRegions = musicDefaults.alertIfRegionBlocked;
 let refreshingEnabled = roomDefaults.refreshingEnabled;
 
 const botFunctions = ( bot ) => {
-    function logMe ( logLevel, message ) {
-        switch ( logLevel ) {
-            case "error":
-                console.log( "!!!!!!!!!!! botFunctions:" + logLevel + "->" + message + "\n" );
-                break;
-            case "warn":
-                console.log( "+++++++++++ botFunctions:" + logLevel + "->" + message + "\n" );
-                break;
-            case "info":
-                console.log( "----------- botFunctions:" + logLevel + "->" + message + "\n" );
-                break;
-            default:
-                if ( bot.debug ) {
-                    console.log( "botFunctions:" + logLevel + "->" + message + "\n" );
-                }
-                break;
-        }
-    }
 
     return {
         checkActivity: () => checkActivity,
@@ -71,18 +52,15 @@ const botFunctions = ( bot ) => {
         // Bot Command Functions
         // ========================================================
 
-        sarahConner: function ( data, userFunctions, chatFunctions ) {
+        sarahConner: function ( data, theMessage, userFunctions, chatFunctions ) {
             const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve( "done" ), delay ) )
 
             const shutMeDown = async () => {
-                // chatFunctions.botSpeak( data, "Going away now...", true );
-                await sleep( 100 )
-                logMe( 'error', 'The !sarahConner command was issued by @' + userFunctions.getUsername( userFunctions.whoSentTheCommand( data ) ) + ' at ' + Date() );
+                chatFunctions.botSpeak( "Going away now...", data, true );
                 await sleep( 100 )
                 userFunctions.debugPrintTheUsersList();
                 await sleep( 100 )
-                logMe( 'error', 'Users:' + JSON.stringify( data ) );
-                await sleep( 100 )
+                this.logCommandUsage( userFunctions, 'sarahConner', data, theMessage )
                 process.exit( 1 );
             }
             shutMeDown();
@@ -103,13 +81,13 @@ const botFunctions = ( bot ) => {
 
             let minutes = Math.floor( currentTime / msecPerMinute );
 
-            chatFunctions.botSpeak( data, userFunctions.getUsername( authModule.USERID ) + ' has been up for: ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes' );
+            chatFunctions.botSpeak( userFunctions.getUsername( authModule.USERID ) + ' has been up for: ' + days + ' days, ' + hours + ' hours, ' + minutes + ' minutes', data );
         },
 
         songStatsCommand: function ( data, chatFunctions ) {
             if ( this.readSongStats() ) {
                 this.disableReadSongStats( data, chatFunctions );
-            } else  {
+            } else {
                 this.enableReadSongStats( data, chatFunctions );
             }
         },
@@ -117,7 +95,7 @@ const botFunctions = ( bot ) => {
         autoDJCommand: function ( data, chatFunctions ) {
             if ( this.autoDJEnabled() ) {
                 this.disableAutoDJ( data, chatFunctions );
-            } else  {
+            } else {
                 this.enableAutoDJ( data, chatFunctions );
             }
         },
@@ -125,7 +103,7 @@ const botFunctions = ( bot ) => {
         removeIdleDJsCommand: function ( data, userFunctions, chatFunctions ) {
             if ( userFunctions.removeIdleDJs() ) {
                 userFunctions.disableDJIdle( data, chatFunctions );
-            } else  {
+            } else {
                 userFunctions.enableDJIdle( data, chatFunctions );
             }
         },
@@ -146,7 +124,6 @@ const botFunctions = ( bot ) => {
         },
 
         checkVideoRegionsCommand: function ( data, videoFunctions, chatFunctions ) {
-            logMe('info', 'checkVideoRegionsCommand, this.checkVideoRegions():' + this.checkVideoRegions() );
             if ( this.checkVideoRegions() ) {
                 this.disablecheckVideoRegions( data, videoFunctions, chatFunctions );
             } else {
@@ -166,7 +143,7 @@ const botFunctions = ( bot ) => {
             doInOrder();
         },
 
-        removeAlertRegionCommand: function (  data, args, videoFunctions, chatFunctions ) {
+        removeAlertRegionCommand: function ( data, args, videoFunctions, chatFunctions ) {
             const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
             const doInOrder = async () => {
                 videoFunctions.removeAlertRegion( data, args, chatFunctions )
@@ -185,16 +162,16 @@ const botFunctions = ( bot ) => {
             if ( userFunctions.isUserIDOnStage( userID ) ) {
                 const randomMessage = messageVariable[ Math.floor( Math.random() * messageVariable.length ) ];
                 const thisMessage = chatFunctions.buildUserToUserRandomMessage( userFunctions, userID, randomMessage, receiverID );
-                chatFunctions.botSpeak( data, thisMessage );
+                chatFunctions.botSpeak( thisMessage, data );
                 bot.remDj( userID );
             } else {
-                chatFunctions.botSpeak( data, 'You can\'t leave the stage if you\'re not on stage...' )
+                chatFunctions.botSpeak( 'You can\'t leave the stage if you\'re not on stage...', data )
             }
         },
 
         refreshOnCommand: function ( data, chatFunctions ) {
             if ( this.refreshingEnabled() ) {
-                chatFunctions.botSpeak( data, 'The ' + chatDefaults.commandIdentifier + 'refresh command is already enabled' );
+                chatFunctions.botSpeak( 'The ' + chatDefaults.commandIdentifier + 'refresh command is already enabled', data );
             } else {
                 this.enableRefreshing( data, chatFunctions );
             }
@@ -202,13 +179,59 @@ const botFunctions = ( bot ) => {
 
         refreshOffCommand: function ( data, chatFunctions ) {
             if ( !this.refreshingEnabled() ) {
-                chatFunctions.botSpeak( data, 'The ' + chatDefaults.commandIdentifier + 'refresh command is already disabled' );
+                chatFunctions.botSpeak( 'The ' + chatDefaults.commandIdentifier + 'refresh command is already disabled', data );
             } else {
                 this.disableRefreshing( data, chatFunctions );
             }
         },
 
+        logCommandUsage: function ( userFunctions, command, data, theMessage ) {
+            console.group( command );
+            console.info( 'The ' + command + ' command was issued by @' + userFunctions.getUsername( userFunctions.whoSentTheCommand( data ) ) + ' at ' + Date() );
+            console.info( theMessage );
+            console.groupEnd();
+        },
+
+        removeDJCommand: function ( data, theMessage, userFunctions, chatFunctions ) {
+            const djID = userFunctions.getCurrentDJID();
+
+            if ( theMessage !== '' ) {
+                const djName = userFunctions.getUsername( djID );
+                theMessage = '@' + djName + ', ' + theMessage;
+
+                chatFunctions.botSpeak( theMessage, data, true );
+                this.logCommandUsage( userFunctions, 'removeDJ', data, theMessage )
+            }
+            bot.remDj( djID );
+        },
+
+        informDJCommand: function ( data, theMessage, userFunctions, chatFunctions ) {
+            const djID = userFunctions.getCurrentDJID();
+
+            if ( theMessage !== '' ) {
+                theMessage = '@' + userFunctions.getUsername( djID ) + ', ' + theMessage
+                chatFunctions.botSpeak( theMessage, data, true );
+                this.logCommandUsage( userFunctions, 'informDJ', data, theMessage )
+            } else {
+                chatFunctions.botSpeak( 'You didn\'t ask me to send the DJ any message?!?', data );
+            }
+        },
+
+        awesomeCommand: function () {
+            bot.vote( 'up' );
+        },
+
+        lameCommand: function () {
+            bot.vote( 'down' );
+        },
+
         // ========================================================
+
+        getFormattedDate: function () {
+            var dateobj = new Date();
+            var date = dateobj.getDate(), month = dateobj.getMonth() + 1, year = dateobj.getFullYear();
+            return `${ date }/${ month }/${ year }`;
+        },
 
         checkVideoRegions: () => checkVideoRegions,
         enablecheckVideoRegions: function ( data, videoFunctions, chatFunctions ) {
@@ -224,7 +247,7 @@ const botFunctions = ( bot ) => {
             if ( this.checkVideoRegions() ) {
                 videoFunctions.listAlertRegions( data, chatFunctions );
             } else {
-                chatFunctions.botSpeak( data, 'Video Region checking is disabled' );
+                chatFunctions.botSpeak( 'Video Region checking is disabled', data );
             }
         },
 
@@ -241,9 +264,9 @@ const botFunctions = ( bot ) => {
 
         reportRefreshStatus: function ( data, chatFunctions ) {
             if ( this.refreshingEnabled() ) {
-                chatFunctions.botSpeak( data, 'The ' + chatDefaults.commandIdentifier + 'refresh command is enabled' );
+                chatFunctions.botSpeak( 'The ' + chatDefaults.commandIdentifier + 'refresh command is enabled', data );
             } else {
-                chatFunctions.botSpeak( data, 'The ' + chatDefaults.commandIdentifier + 'refresh command is disabled' );
+                chatFunctions.botSpeak( 'The ' + chatDefaults.commandIdentifier + 'refresh command is disabled', data );
             }
         },
 
@@ -259,20 +282,20 @@ const botFunctions = ( bot ) => {
 
         whenToGetOnStage: () => whenToGetOnStage,
         setWhenToGetOnStage: function ( data, args, chatFunctions ) {
-            const numberOfDJs = args[0];
-            if ( isNaN(numberOfDJs) ) {
-                chatFunctions.botSpeak( data, 'Don\'t be silly. I can\'t set the auto-DJing start value to ' + numberOfDJs );
+            const numberOfDJs = args[ 0 ];
+            if ( isNaN( numberOfDJs ) ) {
+                chatFunctions.botSpeak( 'Don\'t be silly. I can\'t set the auto-DJing start value to ' + numberOfDJs, data );
             } else {
                 whenToGetOnStage = numberOfDJs;
                 this.reportAutoDJStatus( data, chatFunctions )
             }
         },
 
-        whenToGetOffStage: () =>  whenToGetOffStage,
+        whenToGetOffStage: () => whenToGetOffStage,
         setWhenToGetOffStage: function ( data, args, chatFunctions ) {
-            const numberOfDJs = args[0];
-            if ( isNaN(numberOfDJs) ) {
-                chatFunctions.botSpeak( data, 'Don\'t be silly. I can\'t set the auto-DJing stop value to ' + numberOfDJs );
+            const numberOfDJs = args[ 0 ];
+            if ( isNaN( numberOfDJs ) ) {
+                chatFunctions.botSpeak( 'Don\'t be silly. I can\'t set the auto-DJing stop value to ' + numberOfDJs, data );
             } else {
                 whenToGetOffStage = numberOfDJs;
                 this.reportAutoDJStatus( data, chatFunctions )
@@ -281,9 +304,9 @@ const botFunctions = ( bot ) => {
 
         reportAutoDJStatus: function ( data, chatFunctions ) {
             if ( this.autoDJEnabled() ) {
-                chatFunctions.botSpeak( data, 'Auto-DJing is enabled and will start at ' + this.whenToGetOnStage() + ' and stop at ' + this.whenToGetOffStage() );
+                chatFunctions.botSpeak( 'Auto-DJing is enabled and will start at ' + this.whenToGetOnStage() + ' and stop at ' + this.whenToGetOffStage(), data );
             } else {
-                chatFunctions.botSpeak( data, 'Auto DJing is disabled' )
+                chatFunctions.botSpeak( 'Auto DJing is disabled', data )
             }
         },
 
@@ -298,9 +321,9 @@ const botFunctions = ( bot ) => {
         },
         reportSongStats: function ( data, chatFunctions ) {
             if ( this.readSongStats() ) {
-                chatFunctions.botSpeak( data, 'Song stat reporting is enabled' );
+                chatFunctions.botSpeak( 'Song stat reporting is enabled', data );
             } else {
-                chatFunctions.botSpeak( data, 'Song stats reporting is disabled' );
+                chatFunctions.botSpeak( 'Song stats reporting is disabled', data );
             }
         },
 
@@ -332,14 +355,12 @@ const botFunctions = ( bot ) => {
         },
 
         reconnect: function () {
+            console.group( 'botModule: reconnect' );
             attemptToReconnect = setInterval( function () {
-                let whichMessage;
                 if ( bot._isAuthenticated ) {
-                    whichMessage = true;
-                    logMe( 'error', '+++++++++++++++++++++++++ BotModule Error: it looks like your bot is not in it\'s room. attempting to reconnect now....' );
+                    console.error( '+++++++++++++++++++++++++ BotModule Error: it looks like your bot is not in it\'s room. attempting to reconnect now....' );
                 } else {
-                    whichMessage = false;
-                    logMe( 'error', '+++++++++++++++++++++++++ BotModule Error: connection with turntable lost, waiting for connection to come back...' );
+                    console.error( '+++++++++++++++++++++++++ BotModule Error: connection with turntable lost, waiting for connection to come back...' );
                 }
 
                 bot.roomRegister( authModule.ROOMID, function ( data ) {
@@ -355,6 +376,7 @@ const botFunctions = ( bot ) => {
                     }
                 } );
             }, 1000 * 10 );
+            console.groupEnd()
         },
 
         recordActivity: function () {
@@ -362,11 +384,10 @@ const botFunctions = ( bot ) => {
         },
 
         isBotOnStage: function ( userFunctions ) {
-            let isBotAlreadyOnStage = userFunctions.isUserIDOnStage( authModule.USERID );
-            return isBotAlreadyOnStage;
+            return userFunctions.isUserIDOnStage( authModule.USERID );
         },
 
-        shouldTheBotDJ: function ( userFunctions, roomFunctions ) {
+        shouldTheBotDJ: function ( userFunctions ) {
             return userFunctions.howManyDJs() >= 1 && // is there at least one DJ on stage
                 userFunctions.howManyDJs() <= this.whenToGetOnStage() && // are there fewer than the limit of DJs on stage
                 userFunctions.queueList().length === 0 && // is the queue empty
@@ -374,12 +395,12 @@ const botFunctions = ( bot ) => {
                 userFunctions.refreshDJCount() === 0; // is there someone currently using the refresh command
         },
 
-        shouldStopBotDJing: function ( userFunctions, roomFunctions ) {
+        shouldStopBotDJing: function ( userFunctions ) {
             return userFunctions.howManyDJs() >= this.whenToGetOffStage() && // are there enough DJs onstage
                 userFunctions.getCurrentDJID() !== authModule.USERID; // check the Bot isn't currently DJing
         },
 
-        checkAutoDJing: function ( userFunctions, roomFunctions ) {
+        checkAutoDJing: function ( userFunctions ) {
             if ( autoDjingTimer != null ) {
                 clearTimeout( autoDjingTimer );
                 autoDjingTimer = null;
@@ -389,11 +410,11 @@ const botFunctions = ( bot ) => {
 
                 autoDjingTimer = setTimeout( function () {
                     if ( !this.isBotOnStage( userFunctions ) ) { //if the bot is not already on stage
-                        if ( this.shouldTheBotDJ( userFunctions, roomFunctions ) ) {
+                        if ( this.shouldTheBotDJ( userFunctions ) ) {
                             this.startBotDJing();
                         }
                     } else { //else it is on stage
-                        if ( this.shouldStopBotDJing( userFunctions, roomFunctions ) ) {
+                        if ( this.shouldStopBotDJing( userFunctions ) ) {
                             this.removeBotFromStage(); // remove the Bot from stage
                         }
                     }
@@ -458,8 +479,8 @@ const botFunctions = ( bot ) => {
             this.clearAllTimers( userFunctions, roomFunctions, songFunctions );
 
             // Set this after processing things from last timer calls
-            roomFunctions.lastdj = data.room.metadata.current_dj;
-            masterIndex = userFunctions.masterIds().indexOf( roomFunctions.lastdj ); //master id's check
+            roomFunctions.setLastDJ( data.room.metadata.current_dj );
+            masterIndex = userFunctions.masterIds().indexOf( roomFunctions.lastdj() ); //master id's check
 
             songFunctions.startSongWatchdog( data, userFunctions, roomFunctions );
 
@@ -468,8 +489,8 @@ const botFunctions = ( bot ) => {
                 if ( roomFunctions.lastdj() === authModule.USERID || masterIndex === -1 ) //if dj is the bot or not a master
                 {
                     if ( musicDefaults.songLengthLimitOn === true ) {
-                        if ( typeof userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( roomFunctions.lastdj ) + 1 ] !== 'undefined' ) {
-                            bot.speak( "@" + userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( roomFunctions.lastdj ) + 1 ] + ", your song is over " + roomDefaults.songLengthLimit + " mins long, you have 20 seconds to skip before being removed." );
+                        if ( typeof userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( roomFunctions.lastdj() ) + 1 ] !== 'undefined' ) {
+                            bot.speak( "@" + userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( roomFunctions.lastdj() ) + 1 ] + ", your song is over " + roomDefaults.songLengthLimit + " mins long, you have 20 seconds to skip before being removed." );
                         }
                         else {
                             bot.speak( 'current dj, your song is over ' + musicDefaults.songLengthLimit + ' mins long, you have 20 seconds to skip before being removed.' );

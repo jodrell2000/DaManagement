@@ -35,19 +35,20 @@ const commandFunctions = commandModule( bot );
 const videoFunctions = videoModule( bot );
 
 function logMe ( logLevel, message ) {
+    let theFile = "Main file";
     switch ( logLevel ) {
         case "error":
-            console.log( "!!!!!!!!!!! Main File:" + logLevel + "->" + message + "\n" );
+            console.log( "!!!!!!!!!!! " + theFile + ":" + logLevel + "->" + message + "\n" );
             break;
         case "warn":
-            console.log( "+++++++++++ Main File:" + logLevel + "->" + message + "\n" );
+            console.log( "+++++++++++ " + theFile + ":" + logLevel + "->" + message + "\n" );
             break;
         case "info":
-            console.log( "----------- Main File:" + logLevel + "->" + message + "\n" );
+            console.log( "----------- " + theFile + ":" + logLevel + "->" + message + "\n" );
             break;
         default:
             if ( bot.debug ) {
-                console.log( "Main File:" + logLevel + "->" + message + "\n" );
+                console.log( "" + theFile + ":" + logLevel + "->" + message + "\n" );
             }
             break;
     }
@@ -126,21 +127,7 @@ bot.on( 'registered', function ( data ) {
     if ( bootThisUser ) {
         userFunctions.bootThisUser( theUserID, bootMessage );
     } else {
-        //if there are 5 dj's on stage and the queue is turned on when a user enters the room
-        if ( roomDefaults.queueActive === true && userFunctions.howManyDJs() === 5 ) {
-            bot.pm( 'The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.', userFunctions.getUsername( theUserID ) );
-        }
-
-        if ( userFunctions.greetNewuser( theUserID, username, roomFunctions ) ) {
-            const greetingTimers = roomFunctions.greetingTimer();
-
-            greetingTimers[ theUserID ] = setTimeout( function () {
-                chatFunctions.userGreeting( theUserID, username, roomFunctions )
-
-                // remove timeout function from the list of timeout functions
-                delete greetingTimers[ theUserID ];
-            }, 3 * 1000 );
-        }
+        chatFunctions.userGreeting( data, theUserID, username, roomFunctions, userFunctions )
     }
 } );
 
@@ -169,24 +156,23 @@ bot.on( 'roomChanged', function ( data ) {
 
     }
     catch ( err ) {
-        logMe( 'info', 'unable to join the room the room due to err: ' + err.toString() );
+        logMe( 'error', 'unable to join the room the room due to err: ' + err.toString() );
     }
 } );
 
 //checks at the beggining of the song
 bot.on( 'newsong', function ( data ) {
-    // bot.speak("entered newsong");
-
     //resets counters and array for vote skipping
     songFunctions.resetCheckVotes();
     songFunctions.resetVoteCountSkip();
     songFunctions.resetVotesLeft( roomDefaults.HowManyVotesToSkip );
-    songFunctions.resetWhoSnagged();
     songFunctions.resetUpVotes();
     songFunctions.resetDownVotes();
+    songFunctions.resetSnagCount();
     songFunctions.resetVoteSnagging();
 
     //procedure for getting song tags
+    //console.info( "data.room.metadata.current_song:" + JSON.stringify( data.room.metadata.current_song ) );
     songFunctions.getSongTags( data.room.metadata.current_song )
 
     //set information
@@ -211,7 +197,7 @@ bot.on( 'newsong', function ( data ) {
     }
 
     //check to see if conditions are met for bot's autodjing feature
-    botFunctions.checkAutoDJing( userFunctions, roomFunctions );
+    botFunctions.checkAutoDJing( userFunctions );
 
     //if the bot is the only one on stage and they are skipping their songs
     //they will stop skipping
@@ -283,9 +269,10 @@ bot.on( 'newsong', function ( data ) {
     //of some event not firing, remake currentDj's array
     // data.room.metadata.djs.length is index 0 so add 1 to compare
     if ( data.room.metadata.djs.length !== userFunctions.howManyDJs() ) {
-        logMe( 'error', Date.now() + ' The DJ counts don\'t match...resetting them. Count from data is ' + data.room.metadata.djs.length + ', count from Bot is ' + userFunctions.howManyDJs() );
+        console.warn( botFunctions.getFormattedDate() + ' The DJ counts don\'t match...resetting them. Count from data is ' + data.room.metadata.djs.length + ', count from Bot is ' + userFunctions.howManyDJs() );
         userFunctions.resetDJs( data ); //reset current djs array
     }
+    console.groupEnd();
 } );
 
 //bot gets on stage and starts djing if no song is playing.
@@ -317,9 +304,8 @@ bot.on( 'speak', function ( data ) {
     //checks to see if someone is trying to speak to an afk person or not.
     const foundUsernames = userFunctions.checkTextForUsernames( text );
 
-    let thisAFKUser;
-    for ( userLoop = 0; userLoop < foundUsernames.length; userLoop++ ) {
-        thisAFKUserID = userFunctions.getUserIDFromUsername( foundUsernames[ userLoop ] );
+    for ( let userLoop = 0; userLoop < foundUsernames.length; userLoop++ ) {
+        let thisAFKUserID = userFunctions.getUserIDFromUsername( foundUsernames[ userLoop ] );
         if ( userFunctions.isUserAFK( thisAFKUserID ) && !userFunctions.isThisTheBot( theUserID ) === true ) {
             userFunctions.sendUserIsAFKMessage( data, thisAFKUserID, chatFunctions );
         }
@@ -341,14 +327,14 @@ bot.on( 'update_votes', function ( data ) {
 
     //this is for /autosnag, automatically adds songs that get over the awesome threshold
     if ( botDefaults.autoSnag === true && songFunctions.snagSong() === false && songFunctions.upVotes() >= botDefaults.howManyVotes && songFunctions.ALLREADYCALLED() === false ) {
-        songFunctions.voteSnagged();
+        songFunctions.songSnagged();
         botFunctions.checkAndAddToPlaylist( songFunctions );
     }
 } )
 
 //checks who added a song and updates their position on the afk list.
 bot.on( 'snagged', function ( data ) {
-    songFunctions.voteSnagged();
+    songFunctions.incrementSnagCount();
     userFunctions.updateUserLastSnagged( data.userid ); //update the afk position of people who add a song to their queue
 } )
 
@@ -357,21 +343,27 @@ bot.on( 'add_dj', function ( data ) {
     let OKToDJ;
     let theMessage;
     const theUserID = data.user[ 0 ].userid;
+    const totalPlayCount = userFunctions.getDJTotalPlayCount( theUserID );
 
     [ OKToDJ, theMessage ] = userFunctions.checkOKToDJ( theUserID, roomFunctions );
 
     if ( !OKToDJ ) {
         bot.remDj( theUserID );
         userFunctions.incrementSpamCounter( theUserID );
-        chatFunctions.botSpeak( data, theMessage );
+        chatFunctions.botSpeak( theMessage, data );
     }
 
     //sets dj's current songcount to zero when they enter the stage.
     //unless they used the refresh command, in which case its set to
     //what it was before they left the room
     userFunctions.setDJCurrentPlayCount( theUserID, userFunctions.getUsersRefreshCurrentPlayCount[ theUserID ] );
-    userFunctions.setDJTotalPlayCount( theUserID, userFunctions.getUsersRefreshTotalPlayCount[ theUserID ] );
 
+    //keep the total playcount as it is, unless they've refreshed
+    if ( totalPlayCount !== undefined ) {
+        userFunctions.setDJTotalPlayCount( theUserID, totalPlayCount );
+    } else {
+        userFunctions.setDJTotalPlayCount( theUserID, userFunctions.getUsersRefreshTotalPlayCount[ theUserID ] );
+    }
     //updates the afk position of the person who joins the stage.
     userFunctions.updateUserJoinedStage( theUserID );
 
@@ -388,7 +380,7 @@ bot.on( 'add_dj', function ( data ) {
     }
 
     //check to see if conditions are met for bot's autodjing feature
-    botFunctions.checkAutoDJing( userFunctions, roomFunctions );
+    botFunctions.checkAutoDJing( userFunctions );
 } );
 
 //checks when a dj leaves the stage
@@ -420,14 +412,14 @@ bot.on( 'rem_dj', function ( data ) {
     userFunctions.warnMeCall( roomFunctions );
 
     //check to see if conditions are met for bot's autodjing feature
-    botFunctions.checkAutoDJing( userFunctions, roomFunctions );
+    botFunctions.checkAutoDJing( userFunctions );
 
     //takes a user off the escort list if they leave the stage.
     userFunctions.removeEscortMeFromUser( theUserID );
 } );
 
 bot.on( 'update_user', function ( data ) {
-    userFunctions.updateUser( data, roomFunctions );
+    userFunctions.updateUser( data );
 } )
 
 //updates the moderator list when a moderator is added.
@@ -450,15 +442,16 @@ bot.on( 'deregistered', function ( data ) {
 
 //activates at the end of a song.
 bot.on( 'endsong', function ( data ) {
+    songFunctions.grabSongStats();
     const djID = data.room.metadata.current_dj;
+
+    //bot says song stats for each song
+    chatFunctions.readSongStats( data, songFunctions, botFunctions )
 
     userFunctions.incrementDJPlayCount( djID );
 
     // check the playlimit and remove the current DJ if they've reached it
     userFunctions.removeDJsOverPlaylimit( data, chatFunctions, djID );
-
-    //bot says song stats for each song
-    chatFunctions.readSongStats( data, songFunctions, botFunctions )
 
     roomFunctions.escortDJsDown( data, djID, botFunctions, userFunctions, chatFunctions );
 } );

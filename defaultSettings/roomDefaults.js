@@ -14,6 +14,9 @@ module.exports = {
                                           (false = through the chatbox, true = through the pm) (MESSAGE must equal true for this to work) (this feature is off by default)
                                         */
 
+    greetUsers: true, //room greeting when someone joins the room(on by default)
+    greetInPublic: true, //choose whether greeting message is through the pm or the chatbox(false = chatbox, true = pm), (only works when greeting message is turned on) (off by default)
+
     //this is for the event messages
     //This cycles through all the different messages that you enter into this array. one message per time cycle, once it gets to the end of your messages it starts over again
     eventMessageRepeatTime: 15, //how long in minutes between event messages(must have EVENTMESSAGE = true to see any messages)
@@ -44,9 +47,6 @@ module.exports = {
 
     kickTTSTAT: false, //kicks the ttstats bot when it tries to join the room(off by default)
 
-    theme: false, //has a current theme been set? true or false. handled by commands
-    whatIsTheme: null, //this holds a string which is set by the /setTheme command
-
     errorMessage: null, //the error message you get when trying to connect to the room
 
     spamLimit: 3, //number of times a user can spam being kicked off the stage within 10 secs
@@ -59,7 +59,7 @@ module.exports = {
     removeIdleDJs: true, // are the DJ idle checks active, this is for the dj's on stage
     djIdleLimitThresholds: [ 20, 15, 19 ], /* Total idle allowed, first warnign time then second warning time for DJs idling out
                                         [ 20, 15, 19 ] would be 20 minutes idle allowed with the first warning at 15 minutes and the second at 19 minutes */
-    warnIdlePM: true, //choose whether idle warnings(for dj's on stage) will be given through the pm or the chatbox (false = chatbox, true = pm message)
+    warnIdlePublic: true, //choose whether idle warnings(for dj's on stage) will be given through the pm or the chatbox (false = chatbox, true = pm message)
     voteMeansActive: true, // does voting/bopping count as user being active (too many user autoBop)
     speechMeansActive: true, // does chatting count as user being active
     snagMeansActive: true, // does snagging a track count as user being active

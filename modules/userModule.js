@@ -9,10 +9,6 @@ let theUsersList = []; // object array of everyone in the room
 let afkPeople = []; //holds the userid of everyone who has used the /afk command
 let modPM = []; //holds the userid's of everyone in the /modpm feature
 let djList = []; //holds the userid of all the dj's who are on stage currently
-let people = []; //holds the userid's of everyone who is kicked off stage for the spam limit
-let myTime = []; //holds a date object for everyone in the room, which represents the time when they joined the room, resets every time the person rejoins
-let timer = []; //holds the timeout of everyone who has been spamming the stage, resets their spam count if their timer completes
-let myID = null; //the userid of the person using the /fanme command, speak event only
 let notifyThisDJ = null; // holds the ID of the DJ being told they're next in the queue
 
 let bannedUsers = [ { id: 636473737373 }, { id: 535253533353 } ]; //banned users list, put userids in string form here for permanent banning(put their name after their userid to tell who is banned).
@@ -28,7 +24,6 @@ let masterIds = [ '6040a0333f4bfc001be4cf39' ]; //example (clear this before usi
 
 let index = null; //the index returned when using unban commands
 let informTimer = null; //holds the timeout for the /inform command, null lets it know that it hasn't already been set
-let playLimitOfRefresher = []; //holds a copy of the number of plays for people who have used the /refresh command
 let refreshDJCount = 0; // how many people are currently using the refresh command
 let warnme = []; //holds the userid's of everyone using the /warnme feature
 
@@ -43,25 +38,6 @@ let idleSecondWarningTime = roomDefaults.djIdleLimitThresholds[ 2 ];
 
 
 const userFunctions = ( bot ) => {
-    function logMe ( logLevel, message ) {
-        switch ( logLevel ) {
-            case "error":
-                console.log( "!!!!!!!!!!! userFunctions:" + logLevel + "->" + message + "\n" );
-                break;
-            case "warn":
-                console.log( "+++++++++++ userFunctions:" + logLevel + "->" + message + "\n" );
-                break;
-            case "info":
-                console.log( "----------- userFunctions:" + logLevel + "->" + message + "\n" );
-                break;
-            default:
-                if ( bot.debug ) {
-                    console.log( "userFunctions:" + logLevel + "->" + message + "\n" );
-                }
-                break;
-        }
-
-    }
 
     function formatSeconds ( seconds ) {
         return ( Math.floor( seconds / 60 ) ).toString() + ' minutes';
@@ -83,10 +59,7 @@ const userFunctions = ( bot ) => {
     function formatRelativeTime ( seconds ) {
         if ( isNaN( seconds ) ) {
             return false
-        } else {
-        }
-
-        if ( seconds < 60 * 60 ) {
+        } else if ( seconds < 60 * 60 ) {
             return formatSeconds( seconds );
         } else if ( seconds < 60 * 60 * 24 ) {
             return formatHours( seconds );
@@ -97,7 +70,7 @@ const userFunctions = ( bot ) => {
 
     return {
         debugPrintTheUsersList: function () {
-            console.log( "Full theUsersList: " + JSON.stringify( theUsersList ) );
+            console.info( "Full theUsersList: " + JSON.stringify( theUsersList ) );
         },
 
         theUsersList: () => theUsersList,
@@ -116,15 +89,10 @@ const userFunctions = ( bot ) => {
             modPM = []
         },
 
-        resetPeople: function () {
-            people = []
-        },
-
         botStartReset: function ( botFunctions, songFunctions ) {
             this.resetAllEscortMe( bot );
             this.resetUsersList();
             this.resetQueueList();
-            this.resetPeople();
             this.resetAFKPeople();
             this.deleteAllDJPlayCounts();
             this.resetModPM();
@@ -149,19 +117,11 @@ const userFunctions = ( bot ) => {
         // ========================================================
 
         isThisTheBot: function ( userID ) {
-            if ( userID === auth.USERID ) {
-                return true;
-            } else {
-                return false;
-            }
+            return userID === auth.USERID;
         },
 
         userExists: function ( userID ) {
-            if ( theUsersList[ this.getPositionOnUsersList( userID ) ] !== undefined ) {
-                return true;
-            } else {
-                return false;
-            }
+            return theUsersList[ this.getPositionOnUsersList( userID ) ] !== undefined;
         },
 
         getUsername: function ( userID ) {
@@ -184,7 +144,7 @@ const userFunctions = ( bot ) => {
         },
 
         enableEscortMe: function ( data, chatFunctions ) {
-            let theUserID = data.userid;
+            const theUserID = this.whoSentTheCommand( data );
             let theError = '';
             if ( this.escortMeIsEnabled( theUserID ) ) {
                 theError += ", you've already enabled Escort Me...";
@@ -195,14 +155,14 @@ const userFunctions = ( bot ) => {
 
             if ( theError === '' ) {
                 this.addEscortMeToUser( theUserID );
-                chatFunctions.botSpeak( data, '@' + this.getUsername( theUserID ) + ' you will be escorted after you play your song' );
+                chatFunctions.botSpeak( '@' + this.getUsername( theUserID ) + ' you will be escorted after you play your song', data );
             } else {
-                chatFunctions.botSpeak( data, '@' + this.getUsername( theUserID ) + theError );
+                chatFunctions.botSpeak( '@' + this.getUsername( theUserID ) + theError, data );
             }
         },
 
         disableEscortMe: function ( data, chatFunctions ) {
-            let theUserID = data.userid;
+            const theUserID = this.whoSentTheCommand( data );
             let theError = '';
             if ( !this.escortMeIsEnabled( theUserID ) ) {
                 theError += ", you haven't enabled Escort Me..."
@@ -213,9 +173,9 @@ const userFunctions = ( bot ) => {
 
             if ( theError === '' ) {
                 this.removeEscortMeFromUser( theUserID );
-                chatFunctions.botSpeak( data, '@' + this.getUsername( theUserID ) + ' you will no longer be escorted after you play your song' );
+                chatFunctions.botSpeak( '@' + this.getUsername( theUserID ) + ' you will no longer be escorted after you play your song', data );
             } else {
-                chatFunctions.botSpeak( data, '@' + this.getUsername( theUserID ) + theError );
+                chatFunctions.botSpeak( '@' + this.getUsername( theUserID ) + theError, data );
             }
         },
 
@@ -232,6 +192,13 @@ const userFunctions = ( bot ) => {
         // ========================================================
         // User Helper Functions
         // ========================================================
+
+        readSingleUserStatus: function ( data, chatFunctions ) {
+            let username = [];
+            username.push( this.getUsername( this.whoSentTheCommand( data ) ) );
+
+            this.readUserStatus( data, username, chatFunctions );
+        },
 
         readUserStatus: function ( data, args, chatFunctions ) {
             let theUsername = '';
@@ -261,54 +228,54 @@ const userFunctions = ( bot ) => {
                 // the message is constructed in this way to add a brief pause before sending each part
                 // this ensures that the messages appear in the correct order
                 const readStatusInOrder = async () => {
-                    chatFunctions.botSpeak( data, 'User info for ' + theUsername );
+                    chatFunctions.botSpeak( 'User info for ' + theUsername, data );
                     await sleep( 100 )
 
-                    chatFunctions.botSpeak( data, '- userID is ' + theUserID );
+                    chatFunctions.botSpeak( '- userID is ' + theUserID, data );
                     await sleep( 100 )
 
-                    chatFunctions.botSpeak( data, '- joined the room ' + roomJoined + ' ago' );
+                    chatFunctions.botSpeak( '- joined the room ' + roomJoined + ' ago', data );
                     await sleep( 100 )
 
-                    chatFunctions.botSpeak( data, '- is ' + modText + 'a Moderator' );
+                    chatFunctions.botSpeak( '- is ' + modText + 'a Moderator', data );
                     await sleep( 100 )
 
                     if ( lastSpoke !== false ) {
-                        chatFunctions.botSpeak( data, '- spoke ' + lastSpoke + ' ago' );
+                        chatFunctions.botSpeak( '- spoke ' + lastSpoke + ' ago', data );
                         await sleep( 100 )
                     }
 
                     if ( lastVoted !== false ) {
-                        chatFunctions.botSpeak( data, '- voted ' + lastVoted + ' ago' );
+                        chatFunctions.botSpeak( '- voted ' + lastVoted + ' ago', data );
                         await sleep( 100 )
                     }
 
                     if ( lastSnagged !== false ) {
-                        chatFunctions.botSpeak( data, '- snagged ' + lastSnagged + ' ago' );
+                        chatFunctions.botSpeak( '- snagged ' + lastSnagged + ' ago', data );
                         await sleep( 100 )
                     }
 
                     if ( joinedStage !== false ) {
-                        chatFunctions.botSpeak( data, '- DJd ' + joinedStage + ' ago' );
+                        chatFunctions.botSpeak( '- DJd ' + joinedStage + ' ago', data );
                         await sleep( 100 )
                     }
 
-                    chatFunctions.botSpeak( data, '- SPAM count=' + spamCount );
+                    chatFunctions.botSpeak( '- SPAM count=' + spamCount, data );
                     await sleep( 100 )
 
                     if ( currentPlayCount !== undefined ) {
-                        chatFunctions.botSpeak( data, '- current playcount=' + currentPlayCount );
+                        chatFunctions.botSpeak( '- current playcount=' + currentPlayCount, data );
                         await sleep( 100 )
                     }
 
                     if ( !isNaN( totalPlayCount ) ) {
-                        chatFunctions.botSpeak( data, '- total playcount=' + totalPlayCount );
+                        chatFunctions.botSpeak( '- total playcount=' + totalPlayCount, data );
                         await sleep( 100 )
                     }
                 }
                 readStatusInOrder();
             } else {
-                chatFunctions.botSpeak( data, 'I couldn\'t find the details for that user. Please check the spelling, and capitalisation' );
+                chatFunctions.botSpeak( 'I couldn\'t find the details for that user. Please check the spelling, and capitalisation', data );
             }
 
         },
@@ -357,7 +324,6 @@ const userFunctions = ( bot ) => {
         // ========================================================
 
         resetModerators: function ( data ) {
-            let userPosition;
             let theUserID;
             if ( data.room !== undefined ) {
                 for ( let modLoop = 0; modLoop < data.room.metadata.moderator_id.length; modLoop++ ) {
@@ -386,11 +352,7 @@ const userFunctions = ( bot ) => {
         isUserModerator: function ( theUserID ) {
             if ( this.userExists( theUserID ) ) {
                 let userPosition = this.getPositionOnUsersList( theUserID );
-                if ( theUsersList[ userPosition ][ 'moderator' ] === true ) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return theUsersList[ userPosition ][ 'moderator' ] === true;
             }
         },
 
@@ -455,17 +417,15 @@ const userFunctions = ( bot ) => {
         // ========================================================
 
         refreshCommand: function ( data, chatFunctions, botFunctions ) {
-            let theUserID = data.userid;
-            let [ _, theMessage ] = this.addRefreshToUser( theUserID, botFunctions );
+            const theUserID = this.whoSentTheCommand( data );
+            let [ , theMessage ] = this.addRefreshToUser( theUserID, botFunctions );
 
-            chatFunctions.botSpeak( data, theMessage );
+            chatFunctions.botSpeak( theMessage, data );
         },
 
         refreshDJCount: function () {
-            let theUserID;
             let theCount = 0;
             for ( let userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
-                theUserID = theUsersList[ userLoop ].id;
                 if ( theUsersList[ userLoop ][ 'RefreshStart' ] !== undefined ) {
                     theCount++;
                 }
@@ -535,9 +495,9 @@ const userFunctions = ( bot ) => {
             }
 
             if ( userList === '' ) {
-                chatFunctions.botSpeak( data, 'No users are currently refreshing.' );
+                chatFunctions.botSpeak( 'No users are currently refreshing.', data );
             } else {
-                chatFunctions.botSpeak( data, 'The following users are currently refreshing. ' + userList );
+                chatFunctions.botSpeak( 'The following users are currently refreshing. ' + userList, data );
             }
 
         },
@@ -558,8 +518,6 @@ const userFunctions = ( bot ) => {
                 let listPosition = this.getPositionOnUsersList( userID );
                 if ( theUsersList[ listPosition ][ 'RefreshTotalPlayCount' ] !== undefined ) {
                     return theUsersList[ listPosition ][ 'RefreshTotalPlayCount' ];
-                } else {
-                    return 0;
                 }
             }
         },
@@ -591,9 +549,9 @@ const userFunctions = ( bot ) => {
         },
         reportDJIdleStatus: function ( data, chatFunctions ) {
             if ( this.removeIdleDJs() ) {
-                chatFunctions.botSpeak( data, 'DJs who have been idle for longer than ' + this.djIdleLimit() + ' will be removed from the decks' )
+                chatFunctions.botSpeak( 'DJs who have been idle for longer than ' + this.djIdleLimit() + ' will be removed from the decks', data )
             } else {
-                chatFunctions.botSpeak( data, 'Automatic removal of idle DJs is disabled' )
+                chatFunctions.botSpeak( 'Automatic removal of idle DJs is disabled', data )
             }
         },
 
@@ -601,10 +559,10 @@ const userFunctions = ( bot ) => {
         setIdleFirstWarningTime: function ( data, args, chatFunctions ) {
             const newWarningTime = args[ 0 ];
             if ( isNaN( newWarningTime ) ) {
-                chatFunctions.botSpeak( data, 'I can\'t set the First Idle Warning time to ' + newWarningTime + ' minutes' );
+                chatFunctions.botSpeak( 'I can\'t set the First Idle Warning time to ' + newWarningTime + ' minutes', data );
             } else {
                 idleFirstWarningTime = newWarningTime;
-                chatFunctions.botSpeak( data, 'DJs will now be given their first Idle warning after ' + newWarningTime + ' minutes' );
+                chatFunctions.botSpeak( 'DJs will now be given their first Idle warning after ' + newWarningTime + ' minutes', data );
             }
         },
 
@@ -612,10 +570,10 @@ const userFunctions = ( bot ) => {
         setIdleSecondWarningTime: function ( data, args, chatFunctions ) {
             const newWarningTime = args[ 0 ];
             if ( isNaN( newWarningTime ) ) {
-                chatFunctions.botSpeak( data, 'I can\'t set the Second Idle Warning time to ' + newWarningTime + ' minutes' );
+                chatFunctions.botSpeak( 'I can\'t set the Second Idle Warning time to ' + newWarningTime + ' minutes', data );
             } else {
                 idleSecondWarningTime = newWarningTime;
-                chatFunctions.botSpeak( data, 'DJs will now be given their Second Idle Warning after ' + newWarningTime + ' minutes' );
+                chatFunctions.botSpeak( 'DJs will now be given their Second Idle Warning after ' + newWarningTime + ' minutes', data );
             }
         },
 
@@ -706,11 +664,7 @@ const userFunctions = ( bot ) => {
                 theMessage = 'You are over the idle limit of ' + idleLimit + ' minutes.';
             }
 
-            if ( roomDefaults.warnIdlePM === false ) {
-                chatFunctions.botSpeak( '@' + this.getUsername( userID ) + ' ' + theMessage );
-            } else {
-                chatFunctions.botPM( userID, theMessage );
-            }
+            chatFunctions.botSpeak( '@' + this.getUsername( userID ) + ' ' + theMessage, null, roomDefaults.warnIdlePublic, userID );
         },
 
         checkHasUserIdledOut: function ( userID, threshold ) {
@@ -804,6 +758,28 @@ const userFunctions = ( bot ) => {
         // ========================================================
 
         // ========================================================
+        // User Timer functions
+        // ========================================================
+
+        isUsersWelcomeTimerActive: function ( userID ) {
+            return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'welcomeTimer' ] === true;
+        },
+
+        activateUsersWelcomeTimer: function ( userID ) {
+            theUsersList[ this.getPositionOnUsersList( userID ) ][ 'welcomeTimer' ] = true;
+
+            setTimeout( function () {
+                this.clearUsersWelcomeTimer( userID );
+            }.bind( this ), 5 * 60 * 1000 );
+        },
+
+        clearUsersWelcomeTimer: function ( userID ) {
+            theUsersList[ this.getPositionOnUsersList( userID ) ][ 'welcomeTimer' ] = false;
+        },
+
+        // ========================================================
+
+        // ========================================================
         // AFK Functions (for the afk command)
         // ========================================================
 
@@ -833,9 +809,9 @@ const userFunctions = ( bot ) => {
                     userList += ' are';
                 }
                 userList += ' marked as AFK';
-                chatFunctions.botSpeak( data, userList )
+                chatFunctions.botSpeak( userList, data )
             } else {
-                chatFunctions.botSpeak( data, "No one...everyone's here :-)" )
+                chatFunctions.botSpeak( "No one...everyone's here :-)", data )
             }
         },
 
@@ -845,8 +821,8 @@ const userFunctions = ( bot ) => {
         },
 
         switchUserAFK: function ( data, chatFunctions ) {
-            const userID = this.getUserIDFromData( data );
-            if ( this.isUserAFK( userID ) === true ) {
+            const theUserID = this.whoSentTheCommand( data );
+            if ( this.isUserAFK( theUserID ) === true ) {
                 this.removeUserFromAFKList( data, chatFunctions );
             } else {
                 this.addToAFKList( data, chatFunctions );
@@ -854,19 +830,19 @@ const userFunctions = ( bot ) => {
         },
 
         addToAFKList: function ( data, chatFunctions ) {
-            const userID = this.getUserIDFromData( data );
+            const theUserID = this.whoSentTheCommand( data );
 
-            afkPeople.push( userID );
-            chatFunctions.botSpeak( data, '@' + this.getUsername( userID ) + ' you are marked as afk' )
+            afkPeople.push( theUserID );
+            chatFunctions.botSpeak( '@' + this.getUsername( theUserID ) + ' you are marked as afk', data )
         },
 
         removeUserFromAFKList: function ( data, chatFunctions ) {
-            const userID = this.getUserIDFromData( data );
-            const listPosition = afkPeople.indexOf( userID );
+            const theUserID = this.whoSentTheCommand( data );
+            const listPosition = afkPeople.indexOf( theUserID );
 
             afkPeople.splice( listPosition, 1 );
 
-            chatFunctions.botSpeak( data, '@' + this.getUsername( userID ) + ' you are no longer afk' )
+            chatFunctions.botSpeak( '@' + this.getUsername( theUserID ) + ' you are no longer afk', data )
         },
 
         howManyAFKUsers: function () {
@@ -874,7 +850,7 @@ const userFunctions = ( bot ) => {
         },
 
         sendUserIsAFKMessage: function ( data, userID, chatFunctions ) {
-            chatFunctions.botSpeak( data, '@' + this.getUsername( userID ) + ' is currently AFK, sorry' )
+            chatFunctions.botSpeak( '@' + this.getUsername( userID ) + ' is currently AFK, sorry', data )
         },
 
 
@@ -950,8 +926,6 @@ const userFunctions = ( bot ) => {
         },
 
         isCurrentDJ: function ( data, userID ) {
-            logMe( 'info', 'isCurrentDJ, data:' + data );
-            logMe( 'info', 'isCurrentDJ, data.room.metadata.current_dj:' + data.room.metadata.current_dj );
             const currentDJ = data.room.metadata.current_dj
             return userID === currentDJ;
         },
@@ -1063,19 +1037,19 @@ const userFunctions = ( bot ) => {
             }
             this.enablePlayLimit();
             this.setDJsPlayLimit( theNewPlayLimit );
-            chatFunctions.botSpeak( data, 'The play limit is now set to ' + this.DJsPlayLimit() );
+            chatFunctions.botSpeak( 'The play limit is now set to ' + this.DJsPlayLimit(), data );
         },
 
         playLimitOffCommand: function ( data, chatFunctions ) {
             this.disablePlayLimit();
-            chatFunctions.botSpeak( data, 'The play limit is now disabled' );
+            chatFunctions.botSpeak( 'The play limit is now disabled', data );
         },
 
         whatsPlayLimit: function ( data, chatFunctions ) {
             if ( this.DJPlaysLimited() ) {
-                chatFunctions.botSpeak( data, 'The DJ play limit is currently set to ' + this.DJsPlayLimit() );
+                chatFunctions.botSpeak( 'The DJ play limit is currently set to ' + this.DJsPlayLimit(), data );
             } else {
-                chatFunctions.botSpeak( data, 'The DJ play limit is not currently active' );
+                chatFunctions.botSpeak( 'The DJ play limit is not currently active', data );
             }
         },
 
@@ -1124,6 +1098,17 @@ const userFunctions = ( bot ) => {
             }
         },
 
+        setDJCurrentPlaycountCommand: function ( data, theCount, theUsername, chatFunctions ) {
+            if ( theCount === undefined || isNaN( theCount ) ) {
+                chatFunctions.botSpeak( "The new playcount doesn't seem to be a number. Check the command help for an example", data )
+            } else if ( theUsername === '' || theUsername === undefined ) {
+                chatFunctions.botSpeak( "I can't see a username there. Check the command help for an example", data )
+            } else {
+                chatFunctions.botSpeak( "Setting the Current playcount for @" + theUsername + " to " + theCount, data )
+                this.setDJCurrentPlayCount( this.getUserIDFromUsername( theUsername ), theCount );
+            }
+        },
+
         setDJCurrentPlayCount: function ( userID, theCount ) {
             if ( theCount === undefined ) {
                 theCount = 0
@@ -1165,7 +1150,7 @@ const userFunctions = ( bot ) => {
         },
 
         djPlaysCommand: function ( data, chatFunctions ) {
-            chatFunctions.botSpeak( data, this.buildDJPlaysMessage() );
+            chatFunctions.botSpeak( this.buildDJPlaysMessage(), data );
         },
 
 
@@ -1253,25 +1238,17 @@ const userFunctions = ( bot ) => {
             const username = args[ 0 ];
             const userID = this.getUserIDFromUsername( username );
             const newPosition = args[ 1 ] - 1;
-            const [ err, _ ] = this.removeUserFromQueue( userID, botFunctions );
-
-            logMe( 'info', '================ changeUsersQueuePosition, username:' + username );
-            logMe( 'info', '================ changeUsersQueuePosition, userID:' + userID );
-            logMe( 'info', '================ changeUsersQueuePosition, newPosition:' + newPosition );
-            logMe( 'info', '================ changeUsersQueuePosition, err:' + err );
-            logMe( 'info', '================ changeUsersQueuePosition, queueList:' + JSON.stringify( queueList ) );
+            const [ err, ] = this.removeUserFromQueue( userID, botFunctions );
 
             if ( err !== true ) {
                 queueList.splice( newPosition, 0, userID );
-                logMe( 'info', '================ changeUsersQueuePosition, queueList:' + JSON.stringify( queueList ) );
             } else {
-                chatFunctions.botSpeak( data, "The user " + this.getUsername( userID ) + " is not currently in the queue" );
+                chatFunctions.botSpeak( "The user " + this.getUsername( userID ) + " is not currently in the queue", data );
             }
             this.readQueue( data, chatFunctions );
         },
 
         moveUserToHeadOfQueue: function ( data, args, chatFunctions, botFunctions ) {
-            logMe( 'info', '================ moveUserToHeadOfQueue, args:' + JSON.stringify( args ) );
             args[ 1 ] = 1;
             this.changeUsersQueuePosition( data, args, chatFunctions, botFunctions );
         },
@@ -1300,13 +1277,13 @@ const userFunctions = ( bot ) => {
             const userID = this.whoSentTheCommand( data );
 
             if ( !roomDefaults.queueActive ) {
-                chatFunctions.botSpeak( data, '@' + this.getUsername( userID ) + ', the queue is currently disabled' );
+                chatFunctions.botSpeak( '@' + this.getUsername( userID ) + ', the queue is currently disabled', data );
             } else {
                 const queuePosition = queueList.findIndex( ( { id } ) => id === userID ) + 1;
                 if ( queuePosition !== -1 ) {
-                    chatFunctions.botSpeak( data, '@' + this.getUsername( userID ) + ', you are currently at position ' + queuePosition + ' in the queue' );
+                    chatFunctions.botSpeak( '@' + this.getUsername( userID ) + ', you are currently at position ' + queuePosition + ' in the queue', data );
                 } else {
-                    chatFunctions.botSpeak( data, '@' + this.getUsername( userID ) + ', you are not currently in the queue' );
+                    chatFunctions.botSpeak( '@' + this.getUsername( userID ) + ', you are not currently in the queue', data );
                 }
             }
         },
@@ -1319,7 +1296,7 @@ const userFunctions = ( bot ) => {
             if ( added === true ) {
                 this.readQueue( data, chatFunctions )
             } else {
-                chatFunctions.botSpeak( data, theMessage );
+                chatFunctions.botSpeak( theMessage, data );
             }
         },
 
@@ -1334,36 +1311,36 @@ const userFunctions = ( bot ) => {
             const userID = this.whoSentTheCommand( data );
             if ( this.isUserIDInQueue( userID ) ) {
                 this.removeUserFromQueue( userID, botFunctions )
-                chatFunctions.botSpeak( data, "@" + this.getUsername( userID ) + ', I\'ve removed you from the queue' );
+                chatFunctions.botSpeak( "@" + this.getUsername( userID ) + ', I\'ve removed you from the queue', data );
             } else {
-                chatFunctions.botSpeak( data, "@" + this.getUsername( userID ) + ', you\'re not currently in the queue. Use the ' + chatDefaults.commandIdentifier + 'addme command to join' );
+                chatFunctions.botSpeak( "@" + this.getUsername( userID ) + ', you\'re not currently in the queue. Use the ' + chatDefaults.commandIdentifier + 'addme command to join', data );
             }
             this.readQueue( data, chatFunctions )
         },
 
         enableQueue: function ( data, chatFunctions ) {
             if ( roomDefaults.queueActive === true ) {
-                chatFunctions.botSpeak( data, "The queue is already enabled" );
+                chatFunctions.botSpeak( "The queue is already enabled", data );
             } else {
                 roomDefaults.queueActive = true;
-                chatFunctions.botSpeak( data, "The queue is now on" );
+                chatFunctions.botSpeak( "The queue is now on", data );
             }
         },
 
         disableQueue: function ( data, chatFunctions ) {
             if ( roomDefaults.queueActive !== true ) {
-                chatFunctions.botSpeak( data, "The queue is already disabled" );
+                chatFunctions.botSpeak( "The queue is already disabled", data );
             } else {
                 roomDefaults.queueActive = false;
-                chatFunctions.botSpeak( data, "The queue is now off" );
+                chatFunctions.botSpeak( "The queue is now off", data );
             }
         },
 
         readQueue: function ( data, chatFunctions ) {
             if ( roomDefaults.queueActive === true ) {
-                chatFunctions.botSpeak( data, this.buildQueueMessage() );
+                chatFunctions.botSpeak( this.buildQueueMessage(), data );
             } else {
-                chatFunctions.botSpeak( data, "The DJ queue is not active" );
+                chatFunctions.botSpeak( "The DJ queue is not active", data );
             }
         },
 
@@ -1400,7 +1377,7 @@ const userFunctions = ( bot ) => {
             theUsersList = []
         },
 
-        updateUser: function ( data, roomFunctions ) {
+        updateUser: function ( data ) {
             if ( typeof data.name === 'string' ) {
                 let oldname = ''; //holds users old name if exists
                 let queueNamePosition;
@@ -1476,7 +1453,7 @@ const userFunctions = ( bot ) => {
                 }
             }
 
-            this.removeUserFromTheUsersList( userID );
+            // this.removeUserFromTheUsersList( userID );
         },
 
 
@@ -1543,8 +1520,7 @@ const userFunctions = ( bot ) => {
         },
 
         getPositionOnUsersList: function ( userID ) {
-            let listPosition = theUsersList.findIndex( ( { id } ) => id === userID )
-            return listPosition;
+            return theUsersList.findIndex( ( { id } ) => id === userID )
         },
 
         userJoinsRoom: function ( userID, username ) {
@@ -1573,18 +1549,6 @@ const userFunctions = ( bot ) => {
             if ( !this.isUserInUsersList( userID ) ) {
                 theUsersList.push( { id: userID, username: username } );
             }
-        },
-
-        removeUserFromTheUsersList: function ( userID ) {
-            // maybe don't do this
-            // remove users if they've not been in the room for 24hrs instead?
-            // that was we keep stats for longer
-            //
-
-            // if ( this.userExists( userID ) ) {
-            //     let listLocation = theUsersList.find( ( { id } ) => id === userID );
-            //     theUsersList.splice( listLocation, 1 );
-            // }
         },
 
         rebuildUserList: function ( data ) {
@@ -1620,7 +1584,7 @@ const userFunctions = ( bot ) => {
             let mentions = [];
 
             if ( theText.indexOf( '@' ) !== -1 ) {
-                for ( afkPeopleLoop = 0; afkPeopleLoop < afkPeople.length; afkPeopleLoop++ ) {
+                for ( let afkPeopleLoop = 0; afkPeopleLoop < afkPeople.length; afkPeopleLoop++ ) {
                     loopUsername = this.getUsername( afkPeople[ afkPeopleLoop ] );
                     if ( theText.indexOf( '@' + loopUsername ) !== -1 ) {
                         mentions.push( loopUsername );
@@ -1739,11 +1703,7 @@ const userFunctions = ( bot ) => {
 
         escortMeIsEnabled: function ( userID ) {
             if ( this.isUserInUsersList( userID ) ) {
-                if ( theUsersList[ this.getPositionOnUsersList( userID ) ][ 'EscortMe' ] === true ) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'EscortMe' ] === true;
             }
         },
 
