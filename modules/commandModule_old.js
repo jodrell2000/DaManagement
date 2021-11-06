@@ -117,7 +117,7 @@ const oldCommandFunctions = ( bot ) => {
                     if ( songFunctions.votesLeft() === 0 && checkIfMaster === -1 && !isNaN( roomDefaults.HowManyVotesToSkip ) ) //if there are no votes left and the current dj is not on the master list and the
                     { //the amount of votes set was a valid number
                         bot.speak( "@" + userFunctions.theUsersList()[ findLastDj + 1 ] + " you have been voted off stage" );
-                        bot.remDj( roomFunctions.lastdj() ); //remove the current dj and display the above message
+                        userFunctions.removeDJ( roomFunctions.lastdj(), 'DJ was voted off stage' ); //remove the current dj and display the above message
                     }
                 } else //else the command user has already voted
                 {
