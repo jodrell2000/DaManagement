@@ -198,7 +198,7 @@ const roomFunctions = ( bot ) => {
                 for ( let p = 0; p < userFunctions.howManyDJs(); p++ ) {
                     let checkIfVip = userFunctions.vipList.indexOf( userFunctions.djList()[ p ] );
                     if ( checkIfVip === -1 && userFunctions.djList()[ p ] !== authModule.USERID ) {
-                        bot.remDj( userFunctions.djList()[ p ] );
+                        userFunctions.removeDJ( userFunctions.djList()[ p ], 'Removing non VIP DJs' );
                     }
                 }
             }
@@ -232,7 +232,7 @@ const roomFunctions = ( bot ) => {
             //iterates through the escort list and escorts all djs on the list off the stage.
 
             if ( userFunctions.escortMeIsEnabled( currentDJ ) === true ) {
-                bot.remDj( currentDJ );
+                userFunctions.removeDJ( currentDJ, 'DJ had enabled escortme' );
                 userFunctions.removeEscortMeFromUser( currentDJ );
 
                 const theMessage = '@' + userFunctions.getUsername( currentDJ ) + ' had enabled escortme';
