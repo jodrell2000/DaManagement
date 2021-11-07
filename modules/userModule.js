@@ -685,7 +685,7 @@ const userFunctions = ( bot ) => {
                     let idleTImeInMinutes = this.getIdleTime( userID ) / 60;
                     if ( idleTImeInMinutes > totalIdleAllowed ) {
                         this.idleWarning( userID, 0, chatFunctions );
-                        bot.remDj( userID ); //remove them
+                        this.removeDJ( userID, 'DJ has idled out' ); //remove them
                         chatFunctions.botChat( 'The user' + '@' + this.getUsername( userID ) + ' was removed for being over the ' + totalIdleAllowed + ' minute idle limit.' );
                     } else if ( ( idleTImeInMinutes > finalWarning ) && !this.hasDJHadSecondIdleWarning( userID ) ) {
                         this.setDJSecondIdleWarning( userID );
@@ -997,6 +997,20 @@ const userFunctions = ( bot ) => {
             }
         },
 
+        removeDJ: function ( djID, message ) {
+            console.group( 'removeDJ');
+            console.log( '========================================');
+
+            let currentDateTime = require('moment');
+            console.log( 'DJ removed at ' + currentDateTime().format('DD/MM/yyyy hh:mm:ss') );
+            console.log( 'The DJ ' + this.getUsername(djID) + ' with ID ' + djID + ' is being removed from the decks');
+            console.log( 'Reason: ' + message );
+            bot.remDj( djID );
+
+            console.log( '========================================');
+            console.groupEnd();
+        },
+
         // ========================================================
 
         // ========================================================
@@ -1011,7 +1025,7 @@ const userFunctions = ( bot ) => {
                     if ( this.userExists( userID ) ) {
                         chatFunctions.overPlayLimit( data, this.getUsername( userID ), this.DJsPlayLimit() );
 
-                        bot.remDj( userID );
+                        this.removeDJ( userID, 'DJ is over play limit' );
                     }
                 }
             }

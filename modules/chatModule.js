@@ -143,7 +143,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
             let thisDice;
 
             for ( let diceLoop = 0; diceLoop < diceCount; diceLoop++ ) {
-                thisDice = Math.floor( Math.random() * diceType );
+                thisDice = Math.ceil( Math.random() * diceType );
                 theMessage = theMessage + " a " + thisDice + ", ";
                 theCount = theCount + thisDice;
             }

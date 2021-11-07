@@ -34,26 +34,6 @@ const roomFunctions = roomModule( bot );
 const commandFunctions = commandModule( bot );
 const videoFunctions = videoModule( bot );
 
-function logMe ( logLevel, message ) {
-    let theFile = "Main file";
-    switch ( logLevel ) {
-        case "error":
-            console.log( "!!!!!!!!!!! " + theFile + ":" + logLevel + "->" + message + "\n" );
-            break;
-        case "warn":
-            console.log( "+++++++++++ " + theFile + ":" + logLevel + "->" + message + "\n" );
-            break;
-        case "info":
-            console.log( "----------- " + theFile + ":" + logLevel + "->" + message + "\n" );
-            break;
-        default:
-            if ( bot.debug ) {
-                console.log( "" + theFile + ":" + logLevel + "->" + message + "\n" );
-            }
-            break;
-    }
-}
-
 // do something when the bot disconnects?
 bot.on( 'disconnected', function ( data ) { } );
 
@@ -223,7 +203,7 @@ bot.on( 'newsong', function ( data ) {
             //if matching is enabled for both songs and artists
             if ( musicDefaults.matchArtists && musicDefaults.matchSongs ) {
                 if ( songFunctions.artist().match( roomFunctions.bannedArtistsMatcher() ) || songFunctions.song().match( roomFunctions.bannedArtistsMatcher() ) ) {
-                    bot.remDj( djCheck );
+                    userFunctions.removeDJ( djCheck, 'DJ has played a banned song or artist' );
 
                     if ( typeof userFunctions.theUsersList()[ nameDj ] !== 'undefined' ) {
                         bot.speak( '@' + userFunctions.theUsersList()[ nameDj ] + ' you have played a banned track or artist.' );
@@ -236,7 +216,7 @@ bot.on( 'newsong', function ( data ) {
             else if ( musicDefaults.matchArtists ) //if just artist matching is enabled
             {
                 if ( songFunctions.artist().match( roomFunctions.bannedArtistsMatcher() ) ) {
-                    bot.remDj( userFunctions.getCurrentDJID() );
+                    userFunctions.removeDJ( djCheck, 'DJ has played a banned song or artist' );
 
                     if ( typeof userFunctions.theUsersList()[ nameDj ] !== 'undefined' ) {
                         bot.speak( '@' + userFunctions.theUsersList()[ nameDj ] + ' you have played a banned artist.' );
@@ -249,7 +229,7 @@ bot.on( 'newsong', function ( data ) {
             else if ( musicDefaults.matchSongs ) //if just song matching is enabled
             {
                 if ( songFunctions.song().match( roomFunctions.bannedArtistsMatcher() ) ) {
-                    bot.remDj( djCheck );
+                    userFunctions.removeDJ( djCheck, 'DJ has played a banned song or artist' );
 
                     if ( typeof userFunctions.theUsersList()[ nameDj ] !== 'undefined' ) {
                         bot.speak( '@' + userFunctions.theUsersList()[ nameDj ] + ' you have played a banned track.' );
@@ -348,7 +328,7 @@ bot.on( 'add_dj', function ( data ) {
     [ OKToDJ, theMessage ] = userFunctions.checkOKToDJ( theUserID, roomFunctions );
 
     if ( !OKToDJ ) {
-        bot.remDj( theUserID );
+        userFunctions.removeDJ( theUserID, 'User is not allowed to DJ so was removed' );
         userFunctions.incrementSpamCounter( theUserID );
         chatFunctions.botSpeak( theMessage, data );
     }

@@ -163,7 +163,7 @@ const botFunctions = ( bot ) => {
                 const randomMessage = messageVariable[ Math.floor( Math.random() * messageVariable.length ) ];
                 const thisMessage = chatFunctions.buildUserToUserRandomMessage( userFunctions, userID, randomMessage, receiverID );
                 chatFunctions.botSpeak( thisMessage, data );
-                bot.remDj( userID );
+                userFunctions.removeDJ( userID, 'DJ used the /dive command' );
             } else {
                 chatFunctions.botSpeak( 'You can\'t leave the stage if you\'re not on stage...', data )
             }
@@ -202,7 +202,7 @@ const botFunctions = ( bot ) => {
                 chatFunctions.botSpeak( theMessage, data, true );
                 this.logCommandUsage( userFunctions, 'removeDJ', data, theMessage )
             }
-            bot.remDj( djID );
+            userFunctions.removeDJ( djID, 'The removeDJ command had been issued: ' + theMessage );
         },
 
         informDJCommand: function ( data, theMessage, userFunctions, chatFunctions ) {
@@ -499,7 +499,7 @@ const botFunctions = ( bot ) => {
                         //START THE 20 SEC TIMER
                         roomFunctions.songLimitTimer = setTimeout( function () {
                             roomFunctions.songLimitTimer = null;
-                            bot.remDj( roomFunctions.lastdj() ); // Remove Saved DJ from last newsong call
+                            userFunctions.removeDJ( roomFunctions.lastdj(), 'DJ removed because their song is over the length limit' ); // Remove Saved DJ from last newsong call
                         }, 20 * 1000 ); // Current DJ has 20 seconds to skip before they are removed
                     }
                 }

@@ -420,4 +420,17 @@ module.exports = {
         "https://media.giphy.com/media/3o7TKNPAmBQGXgEZpu/giphy.gif?cid=ecf05e47jmf6kpklzahgu1cww2cw2fv4tspcdvhe1pfgeyw0&rid=giphy.gif&ct=g"
     ],
 
+    dramaMessages: [
+        "You go honey...",
+        "Oooooo...exciting",
+        "Really? Tell me more"
+    ],
+
+    dramaPics: [
+        "https://c.tenor.com/EQOo4NM9Ny4AAAAM/michael-jackson-eating-popcorn.gif",
+        "https://media.giphy.com/media/26gYO4oCowW8bH0Ws/source.gif",
+        "https://c.tenor.com/oI8WPapaIzIAAAAM/drama-queen-drama.gif",
+        "https://media.giphy.com/media/tKGFfFcHjKT9m/source.gif"
+    ],
+
 }
