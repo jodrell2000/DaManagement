@@ -1001,7 +1001,9 @@ const userFunctions = ( bot ) => {
             console.group( 'removeDJ');
             console.log( '========================================');
 
-            console.log( 'The DJ: ' + this.getUsername(djID) + ' with ID ' + djID + ' is being removed from the decks');
+            let currentDateTime = require('moment');
+            console.log( 'DJ removed at ' + currentDateTime().format('DD/MM/yyyy hh:mm:ss') );
+            console.log( 'The DJ ' + this.getUsername(djID) + ' with ID ' + djID + ' is being removed from the decks');
             console.log( 'Reason: ' + message );
             bot.remDj( djID );
 

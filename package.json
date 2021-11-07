@@ -7,6 +7,7 @@
 		"fs": "^0.0.1-security",
 		"google-auth-library": "^7.9.1",
 		"googleapis": "^85.0.0",
+		"moment": "^2.29.1",
 		"ttapi": "^4.0.3"
 	},
 	"devDependencies": {
