@@ -998,16 +998,16 @@ const userFunctions = ( bot ) => {
         },
 
         removeDJ: function ( djID, message ) {
-            console.group( 'removeDJ');
-            console.log( '========================================');
+            console.group( '! removeDJ ===============================' );
+            console.log( '========================================' );
 
-            let currentDateTime = require('moment');
-            console.log( 'DJ removed at ' + currentDateTime().format('DD/MM/yyyy hh:mm:ss') );
-            console.log( 'The DJ ' + this.getUsername(djID) + ' with ID ' + djID + ' is being removed from the decks');
+            let currentDateTime = require( 'moment' );
+            console.log( 'DJ removed at ' + currentDateTime().format( 'DD/MM/yyyy HH:mm:ss' ) );
+            console.log( 'The DJ ' + this.getUsername( djID ) + ' with ID ' + djID + ' is being removed from the decks' );
             console.log( 'Reason: ' + message );
             bot.remDj( djID );
 
-            console.log( '========================================');
+            console.log( '========================================' );
             console.groupEnd();
         },
 
