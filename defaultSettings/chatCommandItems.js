@@ -337,6 +337,15 @@ module.exports = {
         "https://media.giphy.com/media/TiVjsGVRBBb7GBzszq/giphy.gif",
     ],
 
+    monkeyMessages: [
+        [ 'Shock', 'the', 'Monkey' ],
+        [ '', '', '' ]
+    ],
+
+    monkeyPics: [
+        "https://media.giphy.com/media/1iUZa41YxKQtaJq0/source.gif",
+    ],
+
     mindBlownMessages: [
         "Whaaa!!",
         "What, seriously?!?",
@@ -431,6 +440,19 @@ module.exports = {
         "https://media.giphy.com/media/26gYO4oCowW8bH0Ws/source.gif",
         "https://c.tenor.com/oI8WPapaIzIAAAAM/drama-queen-drama.gif",
         "https://media.giphy.com/media/tKGFfFcHjKT9m/source.gif"
+    ],
+
+    nopeMessages: [
+        "Nope nope nope!",
+        "That's the Pope of Nope to you sir!",
+        "oh HELL nope!"
+    ],
+
+    nopePics: [
+        "https://media.giphy.com/media/Wjtqf63eB4AWQ/source.gif",
+        "https://media.giphy.com/media/hicmfOv3Ue0mY/source.gif",
+        "https://media.giphy.com/media/wofftnAdDtx4s/giphy.gif",
+        "https://media.giphy.com/media/W5YVAfSttCqre/source.gif"
     ],
 
 }

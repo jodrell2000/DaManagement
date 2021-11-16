@@ -174,6 +174,9 @@ const commandFunctions = ( bot ) => {
     chatCommands.martika = ( { data, chatFunctions } ) => { chatFunctions.martikaCommand( data, chatCommandItems.martikaPics ); }
     chatCommands.martika.help = "M A R T I K A";
 
+    chatCommands.monkey = ( { data, chatFunctions } ) => { chatFunctions.monkeyCommand( data, chatCommandItems.monkeyPics ); }
+    chatCommands.monkey.help = "Schock den Affen!";
+
     chatCommands.mindBlown = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.mindBlownMessages, chatCommandItems.mindBlownPics, userFunctions ); }
     chatCommands.mindBlown.help = "Huh?!? I didn't know that!";
 
@@ -194,6 +197,9 @@ const commandFunctions = ( bot ) => {
 
     chatCommands.drama = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.dramaMessages, chatCommandItems.dramaPics, userFunctions ); }
     chatCommands.drama.help = "Just sit back and watch the fun";
+
+    chatCommands.nope = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.nopeMessages, chatCommandItems.nopePics, userFunctions ); }
+    chatCommands.nope.help = "Nope nope nope!";
 
     // ######################################################
     // Advanced chat commands...more than just basic messages
