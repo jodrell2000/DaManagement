@@ -348,6 +348,10 @@ module.exports = {
 
     monkeyPics: [
         "https://media.giphy.com/media/1iUZa41YxKQtaJq0/source.gif",
+        "https://media.giphy.com/media/26uf9OZQN3QWgiRz2/source.gif",
+        "https://media.giphy.com/media/OYJ2kbvdTPW6I/source.gif",
+        "https://media.giphy.com/media/3o6ZsZB89MSzlDo5pe/source.gif",
+        "https://media.giphy.com/media/3o6Ztpej1dvqSwvdLy/source.gif"
     ],
 
     mindBlownMessages: [
