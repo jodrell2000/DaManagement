@@ -333,13 +333,17 @@ module.exports = {
         "https://media.giphy.com/media/H8DietxBNO5YvxjLk7/giphy.gif"
     ],
 
+    martikaMessages: [
+        [ [ 'M', 1000 ], [ 'A', 1000 ], [ 'R', 1000 ], [ 'T', 1000 ], [ 'I', 1000 ], [ 'K', 1000 ], [ 'A', 1000 ], ]
+    ],
+
     martikaPics: [
         "https://media.giphy.com/media/TiVjsGVRBBb7GBzszq/giphy.gif",
     ],
 
     monkeyMessages: [
-        [ 'Shock', 'the', 'Monkey' ],
-        [ '', '', '' ]
+        [ [ 'Shock', 100 ], [ 'the', 100 ], [ 'Monkey', 100 ] ],
+        [ [ 'Schockt', 1000 ], [ 'Schockt', 1000 ], [ 'Schockt', 2000 ], [ 'Schockt', 10 ], [ 'den', 10 ], [ 'Affen', 100 ] ]
     ],
 
     monkeyPics: [

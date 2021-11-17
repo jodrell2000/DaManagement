@@ -171,10 +171,10 @@ const commandFunctions = ( bot ) => {
     chatCommands.carefulNow = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.carefulNowMessages, chatCommandItems.carefulNowPics, userFunctions ); }
     chatCommands.carefulNow.help = "Woah there...careful";
 
-    chatCommands.martika = ( { data, chatFunctions } ) => { chatFunctions.martikaCommand( data, chatCommandItems.martikaPics ); }
+    chatCommands.martika = ( { data, chatFunctions } ) => { chatFunctions.multilineChatCommand( data, chatCommandItems.martikaMessages, chatCommandItems.martikaPics ); }
     chatCommands.martika.help = "M A R T I K A";
 
-    chatCommands.monkey = ( { data, chatFunctions } ) => { chatFunctions.monkeyCommand( data, chatCommandItems.monkeyPics ); }
+    chatCommands.monkey = ( { data, chatFunctions } ) => { chatFunctions.multilineChatCommand( data, chatCommandItems.monkeyMessages, chatCommandItems.monkeyPics ); }
     chatCommands.monkey.help = "Schock den Affen!";
 
     chatCommands.mindBlown = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.mindBlownMessages, chatCommandItems.mindBlownPics, userFunctions ); }

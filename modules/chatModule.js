@@ -1,5 +1,5 @@
 let botDefaults = require( '../defaultSettings/botDefaults.js' );
-let userMessages = require( '../defaultSettings/customGreetings.js');
+let userMessages = require( '../defaultSettings/customGreetings.js' );
 
 const chatFunctions = ( bot, roomDefaults ) => {
 
@@ -85,29 +85,15 @@ const chatFunctions = ( bot, roomDefaults ) => {
         // Chat command functions
         // ========================================================
 
-        martikaCommand: function ( data, pictureVariable ) {
+        multilineChatCommand: function ( data, messageVariable, pictureVariable ) {
             const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
+            let randomMessageNumber = Math.ceil( Math.random() * messageVariable.length ) - 1;
+
             const readInOrder = async () => {
-                this.botSpeak( 'M', data );
-                await sleep( 1000 )
-
-                this.botSpeak( 'A', data );
-                await sleep( 1000 )
-
-                this.botSpeak( 'R', data );
-                await sleep( 1000 )
-
-                this.botSpeak( 'T', data );
-                await sleep( 1000 )
-
-                this.botSpeak( 'I', data );
-                await sleep( 1000 )
-
-                this.botSpeak( 'K', data );
-                await sleep( 1000 )
-
-                this.botSpeak( 'A', data );
-                await sleep( 1000 )
+                for ( let messageLoop = 0; messageLoop < messageVariable[ randomMessageNumber ].length; messageLoop++ ) {
+                    this.botSpeak( messageVariable[ randomMessageNumber ][ messageLoop ][ 0 ], data );
+                    await sleep( messageVariable[ randomMessageNumber ][ messageLoop ][ 1 ] )
+                }
 
                 const randomPic = pictureVariable[ Math.floor( Math.random() * pictureVariable.length ) ];
                 this.botSpeak( randomPic, data );
@@ -164,7 +150,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
 
         // ========================================================
 
-        userGreeting: function( data, userID, theUsername, roomFunctions, userFunctions ) {
+        userGreeting: function ( data, userID, theUsername, roomFunctions, userFunctions ) {
             const customGreeting = userMessages.userGreetings.find( ( { id } ) => id === userID );
             let theMessage;
 
@@ -175,7 +161,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
             }
 
             if ( roomFunctions.theme() !== false ) {
-                    theMessage += '; The theme is currently set to ' + roomFunctions.theme();
+                theMessage += '; The theme is currently set to ' + roomFunctions.theme();
             }
 
             theMessage = theMessage.replace( "@username", "@" + theUsername );
@@ -192,13 +178,13 @@ const chatFunctions = ( bot, roomDefaults ) => {
                     if ( roomDefaults.queueActive === true && userFunctions.howManyDJs() === 5 ) {
                         this.botSpeak( 'The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.', data, roomFunctions.greetInPublic() );
                     }
-                    
+
                     await sleep( 10 )
                     if ( !roomFunctions.isRulesTimerRunning() && roomFunctions.rulesMessageOn() ) {
                         this.botSpeak( roomFunctions.additionalJoinMessage(), data, roomFunctions.greetInPublic() );
                         roomFunctions.startRulesTimer();
                     }
-                    
+
                 }
                 readInOrder();
             }
