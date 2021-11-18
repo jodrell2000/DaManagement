@@ -686,7 +686,7 @@ const userFunctions = ( bot ) => {
                     if ( idleTImeInMinutes > totalIdleAllowed ) {
                         this.idleWarning( userID, 0, chatFunctions );
                         this.removeDJ( userID, 'DJ has idled out' ); //remove them
-                        chatFunctions.botChat( 'The user' + '@' + this.getUsername( userID ) + ' was removed for being over the ' + totalIdleAllowed + ' minute idle limit.' );
+                        chatFunctions.botChat( 'The user ' + '@' + this.getUsername( userID ) + ' was removed for being over the ' + totalIdleAllowed + ' minute idle limit.' );
                     } else if ( ( idleTImeInMinutes > finalWarning ) && !this.hasDJHadSecondIdleWarning( userID ) ) {
                         this.setDJSecondIdleWarning( userID );
                         this.idleWarning( userID, finalWarning, chatFunctions );
