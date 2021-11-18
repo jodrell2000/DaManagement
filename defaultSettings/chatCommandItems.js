@@ -342,8 +342,8 @@ module.exports = {
     ],
 
     monkeyMessages: [
-        [ [ 'Shock', 100 ], [ 'the', 100 ], [ 'Monkey', 100 ] ],
-        [ [ 'Schockt', 1000 ], [ 'Schockt', 1000 ], [ 'Schockt', 2000 ], [ 'Schockt', 10 ], [ 'den', 10 ], [ 'Affen', 100 ] ]
+        [ [ 'Shock', 250 ], [ 'the', 250 ], [ 'Monkey', 250 ] ],
+        [ [ 'Schockt', 1000 ], [ 'Schockt', 1000 ], [ 'Schockt', 2000 ], [ 'Schockt', 250 ], [ 'den', 250 ], [ 'Affen', 250 ] ]
     ],
 
     monkeyPics: [
