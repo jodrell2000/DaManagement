@@ -201,6 +201,9 @@ const commandFunctions = ( bot ) => {
     chatCommands.nope = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.nopeMessages, chatCommandItems.nopePics, userFunctions ); }
     chatCommands.nope.help = "Nope nope nope!";
 
+    chatCommands.thirtyk = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.thirtyKMessages, chatCommandItems.thirtyKPics, userFunctions ); }
+    chatCommands.thirtyk.help = "30k point celebration";
+
     // ######################################################
     // Advanced chat commands...more than just basic messages
     // ######################################################

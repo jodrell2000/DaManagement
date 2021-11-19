@@ -463,4 +463,15 @@ module.exports = {
         "https://media.giphy.com/media/W5YVAfSttCqre/source.gif"
     ],
 
+    thirtyKMessages: [
+        "30k baby!!!!!",
+        "Woah! Thirty...Thousand...Points"
+
+    ],
+
+    thirtyKPics: [
+        "https://media.giphy.com/media/4KHEnMspWRmj95AOqK/source.gif",
+        "https://media.giphy.com/media/cgzF1me40AKstwINxi/source.mov"
+    ]
+
 }
