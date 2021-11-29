@@ -23,7 +23,7 @@ module.exports = {
     eventMessageThroughPm: false, //determines whether event message will be pmmed or said in chat, false = chatbox, true = pm box
     EVENTMESSAGE: false, //this disables / enables event message on startup - true = enabled, false = disabled
     //the messages in here are examples, it is recommended that you clear them before using
-    eventMessages: ['hello there', //enter your different event messages here, any messages that you want repeated
+    eventMessages: [ 'hello there', //enter your different event messages here, any messages that you want repeated
 
         'message 2' +
         ' this is an example message, multiple lines should be separate strings added together',
