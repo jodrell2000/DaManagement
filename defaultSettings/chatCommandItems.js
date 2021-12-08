@@ -397,9 +397,9 @@ module.exports = {
     cheeseMessages: [
         "Mmmmmmmmmm...cheeeeeeeese",
         "The cheesier the better!",
-        "Bring on the cheese @username. We love it ;-)",
+        "Bring on the cheese @receiverUsername. We love it ;-)",
         "There's no such thing as bad cheese",
-        "Cracking cheese @username"
+        "Cracking cheese @receiverUsername"
     ],
 
     cheesePics: [
