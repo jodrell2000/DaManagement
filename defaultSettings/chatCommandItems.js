@@ -472,6 +472,23 @@ module.exports = {
     thirtyKPics: [
         "https://media.giphy.com/media/4KHEnMspWRmj95AOqK/source.gif",
         "https://media.giphy.com/media/cgzF1me40AKstwINxi/source.mov"
+    ],
+
+    yachtMessages: [
+        "Come sail away...",
+        "Oooh, I wanna take ya...",
+        "The canvas can do miracles...",
+        "Yacht...Rock...",
+        "Eat your heart out Crockett..."
+
+    ],
+
+    yachtPics: [
+        "https://media.giphy.com/media/jGC37Ky8b5OxO/giphy.gif",
+        "https://media.giphy.com/media/xTkcEysN7IgrLzsYIU/giphy.gif",
+        "https://c.tenor.com/-mwuZDMYaKEAAAAC/yacht-rock-yachty-by-nature.gif",
+        "https://media.giphy.com/media/yidUzuMf6DH8cz09zO/giphy.gif",
+        "https://media.giphy.com/media/3o7aCQGNIDfvhclEty/giphy.gif"
     ]
 
 }

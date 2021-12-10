@@ -204,6 +204,9 @@ const commandFunctions = ( bot ) => {
     chatCommands.thirtyk = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.thirtyKMessages, chatCommandItems.thirtyKPics, userFunctions ); }
     chatCommands.thirtyk.help = "30k point celebration";
 
+    chatCommands.yacht = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.yachtMessages, chatCommandItems.yachtPics, userFunctions ); }
+    chatCommands.yacht.help = "because not all rock is hard";
+
     // ######################################################
     // Advanced chat commands...more than just basic messages
     // ######################################################
