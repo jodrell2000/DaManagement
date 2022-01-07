@@ -171,8 +171,11 @@ const commandFunctions = ( bot ) => {
     chatCommands.carefulNow = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.carefulNowMessages, chatCommandItems.carefulNowPics, userFunctions ); }
     chatCommands.carefulNow.help = "Woah there...careful";
 
-    chatCommands.martika = ( { data, chatFunctions } ) => { chatFunctions.martikaCommand( data, chatCommandItems.martikaPics ); }
+    chatCommands.martika = ( { data, chatFunctions } ) => { chatFunctions.multilineChatCommand( data, chatCommandItems.martikaMessages, chatCommandItems.martikaPics ); }
     chatCommands.martika.help = "M A R T I K A";
+
+    chatCommands.monkey = ( { data, chatFunctions } ) => { chatFunctions.multilineChatCommand( data, chatCommandItems.monkeyMessages, chatCommandItems.monkeyPics ); }
+    chatCommands.monkey.help = "Schock den Affen!";
 
     chatCommands.mindBlown = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.mindBlownMessages, chatCommandItems.mindBlownPics, userFunctions ); }
     chatCommands.mindBlown.help = "Huh?!? I didn't know that!";
@@ -194,6 +197,15 @@ const commandFunctions = ( bot ) => {
 
     chatCommands.drama = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.dramaMessages, chatCommandItems.dramaPics, userFunctions ); }
     chatCommands.drama.help = "Just sit back and watch the fun";
+
+    chatCommands.nope = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.nopeMessages, chatCommandItems.nopePics, userFunctions ); }
+    chatCommands.nope.help = "Nope nope nope!";
+
+    chatCommands.thirtyk = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.thirtyKMessages, chatCommandItems.thirtyKPics, userFunctions ); }
+    chatCommands.thirtyk.help = "30k point celebration";
+
+    chatCommands.yacht = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.yachtMessages, chatCommandItems.yachtPics, userFunctions ); }
+    chatCommands.yacht.help = "because not all rock is hard";
 
     // ######################################################
     // Advanced chat commands...more than just basic messages

@@ -642,7 +642,7 @@ const userFunctions = ( bot ) => {
             let minutesRemaining = idleLimit - threshold;
 
             if ( minutesRemaining !== 0 ) {
-                theMessage = 'You have less than ' + minutesRemaining + ' minutes left of idle left.';
+                theMessage = 'You have less than ' + minutesRemaining + ' minutes of idle left.';
                 if ( roomDefaults.voteMeansActive === true ) {
                     theActions += ' Awesome,';
                 }
@@ -684,9 +684,9 @@ const userFunctions = ( bot ) => {
                 if ( userID !== authModule.USERID ) {
                     let idleTImeInMinutes = this.getIdleTime( userID ) / 60;
                     if ( idleTImeInMinutes > totalIdleAllowed ) {
-                        this.idleWarning( userID, 0, chatFunctions );
+                        this.idleWarning( userID, djIdleLimit, chatFunctions );
                         this.removeDJ( userID, 'DJ has idled out' ); //remove them
-                        chatFunctions.botChat( 'The user' + '@' + this.getUsername( userID ) + ' was removed for being over the ' + totalIdleAllowed + ' minute idle limit.' );
+                        chatFunctions.botChat( 'The user ' + '@' + this.getUsername( userID ) + ' was removed for being over the ' + totalIdleAllowed + ' minute idle limit.' );
                     } else if ( ( idleTImeInMinutes > finalWarning ) && !this.hasDJHadSecondIdleWarning( userID ) ) {
                         this.setDJSecondIdleWarning( userID );
                         this.idleWarning( userID, finalWarning, chatFunctions );
@@ -998,16 +998,16 @@ const userFunctions = ( bot ) => {
         },
 
         removeDJ: function ( djID, message ) {
-            console.group( 'removeDJ');
-            console.log( '========================================');
+            console.group( '! removeDJ ===============================' );
+            console.log( '========================================' );
 
-            let currentDateTime = require('moment');
-            console.log( 'DJ removed at ' + currentDateTime().format('DD/MM/yyyy hh:mm:ss') );
-            console.log( 'The DJ ' + this.getUsername(djID) + ' with ID ' + djID + ' is being removed from the decks');
+            let currentDateTime = require( 'moment' );
+            console.log( 'DJ removed at ' + currentDateTime().format( 'DD/MM/yyyy HH:mm:ss' ) );
+            console.log( 'The DJ ' + this.getUsername( djID ) + ' with ID ' + djID + ' is being removed from the decks' );
             console.log( 'Reason: ' + message );
             bot.remDj( djID );
 
-            console.log( '========================================');
+            console.log( '========================================' );
             console.groupEnd();
         },
 

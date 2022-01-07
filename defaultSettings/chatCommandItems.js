@@ -333,8 +333,25 @@ module.exports = {
         "https://media.giphy.com/media/H8DietxBNO5YvxjLk7/giphy.gif"
     ],
 
+    martikaMessages: [
+        [ [ 'M', 1000 ], [ 'A', 1000 ], [ 'R', 1000 ], [ 'T', 1000 ], [ 'I', 1000 ], [ 'K', 1000 ], [ 'A', 1000 ], ]
+    ],
+
     martikaPics: [
         "https://media.giphy.com/media/TiVjsGVRBBb7GBzszq/giphy.gif",
+    ],
+
+    monkeyMessages: [
+        [ [ 'Shock', 250 ], [ 'the', 250 ], [ 'Monkey', 250 ] ],
+        [ [ 'Schockt', 1000 ], [ 'Schockt', 1000 ], [ 'Schockt', 2000 ], [ 'Schockt', 250 ], [ 'den', 250 ], [ 'Affen', 250 ] ]
+    ],
+
+    monkeyPics: [
+        "https://media.giphy.com/media/1iUZa41YxKQtaJq0/source.gif",
+        "https://media.giphy.com/media/26uf9OZQN3QWgiRz2/source.gif",
+        "https://media.giphy.com/media/OYJ2kbvdTPW6I/source.gif",
+        "https://media.giphy.com/media/3o6ZsZB89MSzlDo5pe/source.gif",
+        "https://media.giphy.com/media/3o6Ztpej1dvqSwvdLy/source.gif"
     ],
 
     mindBlownMessages: [
@@ -380,9 +397,9 @@ module.exports = {
     cheeseMessages: [
         "Mmmmmmmmmm...cheeeeeeeese",
         "The cheesier the better!",
-        "Bring on the cheese @username. We love it ;-)",
+        "Bring on the cheese @receiverUsername. We love it ;-)",
         "There's no such thing as bad cheese",
-        "Cracking cheese @username"
+        "Cracking cheese @receiverUsername"
     ],
 
     cheesePics: [
@@ -432,5 +449,46 @@ module.exports = {
         "https://c.tenor.com/oI8WPapaIzIAAAAM/drama-queen-drama.gif",
         "https://media.giphy.com/media/tKGFfFcHjKT9m/source.gif"
     ],
+
+    nopeMessages: [
+        "Nope nope nope!",
+        "That's the Pope of Nope to you sir!",
+        "oh HELL nope!"
+    ],
+
+    nopePics: [
+        "https://media.giphy.com/media/Wjtqf63eB4AWQ/source.gif",
+        "https://media.giphy.com/media/hicmfOv3Ue0mY/source.gif",
+        "https://media.giphy.com/media/wofftnAdDtx4s/giphy.gif",
+        "https://media.giphy.com/media/W5YVAfSttCqre/source.gif"
+    ],
+
+    thirtyKMessages: [
+        "30k baby!!!!!",
+        "Woah! Thirty...Thousand...Points"
+
+    ],
+
+    thirtyKPics: [
+        "https://media.giphy.com/media/4KHEnMspWRmj95AOqK/source.gif",
+        "https://media.giphy.com/media/cgzF1me40AKstwINxi/source.mov"
+    ],
+
+    yachtMessages: [
+        "Come sail away...",
+        "Oooh, I wanna take ya...",
+        "The canvas can do miracles...",
+        "Yacht...Rock...",
+        "Eat your heart out Crockett..."
+
+    ],
+
+    yachtPics: [
+        "https://media.giphy.com/media/jGC37Ky8b5OxO/giphy.gif",
+        "https://media.giphy.com/media/xTkcEysN7IgrLzsYIU/giphy.gif",
+        "https://c.tenor.com/-mwuZDMYaKEAAAAC/yacht-rock-yachty-by-nature.gif",
+        "https://media.giphy.com/media/yidUzuMf6DH8cz09zO/giphy.gif",
+        "https://media.giphy.com/media/3o7aCQGNIDfvhclEty/giphy.gif"
+    ]
 
 }
