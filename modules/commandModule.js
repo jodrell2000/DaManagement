@@ -513,7 +513,8 @@ const commandFunctions = ( bot ) => {
 
         getCommandAndArguments: function ( text, allCommands ) {
             const [ sentCommand, ...args ] = text.split( " " );
-            let theCommand = sentCommand.substring( 1, sentCommand.length )
+            let theCommand = sentCommand.substring( 1, sentCommand.length );
+            //let theCommand = sentCommand.substring( 1, sentCommand.length ).toLowerCase();
             const commandObj = allCommands[ theCommand ];
             if ( commandObj ) {
                 const moderatorOnly = !!moderatorCommands[ theCommand ];
