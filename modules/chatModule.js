@@ -140,7 +140,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
             }
 
             if (diceCount < 1) {
-                this.botSpeak( `You must roll at leaast 1 dice`, data );
+                this.botSpeak( `You must roll at least 1 dice`, data );
                 return;
             }
 
