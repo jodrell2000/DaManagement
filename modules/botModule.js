@@ -489,12 +489,16 @@ const botFunctions = ( bot ) => {
                 if ( roomFunctions.lastdj() === authModule.USERID || masterIndex === -1 ) //if dj is the bot or not a master
                 {
                     if ( musicDefaults.songLengthLimitOn === true ) {
-                        if ( typeof userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( roomFunctions.lastdj() ) + 1 ] !== 'undefined' ) {
-                            bot.speak( "@" + userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( roomFunctions.lastdj() ) + 1 ] + ", your song is over " + roomDefaults.songLengthLimit + " mins long, you have 20 seconds to skip before being removed." );
+                        const currentDJ = userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( roomFunctions.lastdj() ) + 1 ];
+                        let DJName = `Current dj`;
+
+                        if ( currentDJ ) {
+                            if ( currentDJ.hasOwnProperty(`name`) ) {
+                                DJName = `@${currentDJ.name}`;
+                            }
                         }
-                        else {
-                            bot.speak( 'current dj, your song is over ' + musicDefaults.songLengthLimit + ' mins long, you have 20 seconds to skip before being removed.' );
-                        }
+
+                        bot.speak( `${DJName}, your song is over ${musicDefaults.songLengthLimit} mins long, you have 20 seconds to skip before being removed.` );
 
                         //START THE 20 SEC TIMER
                         roomFunctions.songLimitTimer = setTimeout( function () {
