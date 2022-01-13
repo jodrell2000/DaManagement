@@ -247,7 +247,8 @@ module.exports = {
 
     couplesSkatePics: [
         "https://media.giphy.com/media/lryuApSUBW8mZU9K0M/giphy.gif",
-        "https://www.daily-shirts.com/wp-content/uploads/2020/05/Couples-Skate.jpg"
+        "https://www.daily-shirts.com/wp-content/uploads/2020/05/Couples-Skate.jpg",
+        "https://c.tenor.com/XiSNJ_NSvrUAAAAM/skating-skate.gif"
     ],
 
     noiceMessages: [
