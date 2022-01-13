@@ -515,6 +515,7 @@ const commandFunctions = ( bot ) => {
             const [ sentCommand, ...args ] = text.split( " " );
             let theCommand = sentCommand.substring( 1, sentCommand.length );
             theCommand = theCommand.toLowerCase();
+
             const commandObj = allCommands[ theCommand ];
             if ( commandObj ) {
                 const moderatorOnly = !!moderatorCommands[ theCommand ];
