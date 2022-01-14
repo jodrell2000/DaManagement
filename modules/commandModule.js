@@ -207,6 +207,9 @@ const commandFunctions = ( bot ) => {
     chatCommands.yacht = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.yachtMessages, chatCommandItems.yachtPics, userFunctions ); }
     chatCommands.yacht.help = "because not all rock is hard";
 
+    chatCommands.sax = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.saxMessages, chatCommandItems.saxPics, userFunctions ); }
+    chatCommands.sax.help = "I'm A SAV MAN!!";
+
     // ######################################################
     // Advanced chat commands...more than just basic messages
     // ######################################################

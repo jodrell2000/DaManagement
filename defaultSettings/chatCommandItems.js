@@ -490,6 +490,16 @@ module.exports = {
         "https://c.tenor.com/-mwuZDMYaKEAAAAC/yacht-rock-yachty-by-nature.gif",
         "https://media.giphy.com/media/yidUzuMf6DH8cz09zO/giphy.gif",
         "https://media.giphy.com/media/3o7aCQGNIDfvhclEty/giphy.gif"
+    ],
+
+    saxMessages: [
+        "Sax man time!"
+
+    ],
+
+    saxPics: [
+        "https://i.gifer.com/DMBw.gif",
+        "https://i.imgur.com/OxdB2qx.gif"
     ]
 
 }
