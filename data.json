@@ -1,0 +1,8 @@
+{
+    "aliases":[
+        {
+            "alias": "/roll",
+            "command": "/dice"
+        }
+    ]
+}
