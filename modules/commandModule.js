@@ -1,6 +1,6 @@
 let chatDefaults = require( '../defaultSettings/chatDefaults.js' );
 let chatCommandItems = require( '../defaultSettings/chatCommandItems.js' );
-const { dirname } = require('path');
+const Storage = require('node-storage');
 
 const generalCommands = {};
 const userCommands = {};
@@ -552,12 +552,16 @@ const commandFunctions = ( bot ) => {
     }
 }
 
-const checkForAlias = (theCommand) => {
-    const dataFilePath = `${dirname(require.main.filename)}/data.json`;
-    const data = require(dataFilePath);
+const checkForAlias = ( theCommand ) => {
+    const strippedCommand = theCommand.substr(1, theCommand.length-1);
 
-    let findAlias = data.aliases.find(alias => alias.alias === theCommand);
-    return findAlias ? findAlias.command.slice(1) : null;
+    const dataFilePath = `${dirname(require.main.filename)}/data/aliases.json`;
+    const store = new Storage( dataFilePath );
+
+    const theAliases = store.get('aliases');
+
+    let findAlias = theAliases.find(alias => alias.alias === strippedCommand);
+    return findAlias ? findAlias.command : undefined;
 }
 
 module.exports = commandFunctions;
