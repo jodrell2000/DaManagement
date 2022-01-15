@@ -1,0 +1,12 @@
+{
+    "aliases":[
+        {
+            "alias": "roll",
+            "command": "dice"
+        },
+        {
+            "alias": "bows",
+            "command": "bow"
+        }
+    ]
+}

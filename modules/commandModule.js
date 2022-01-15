@@ -1,5 +1,7 @@
 let chatDefaults = require( '../defaultSettings/chatDefaults.js' );
 let chatCommandItems = require( '../defaultSettings/chatCommandItems.js' );
+const Storage = require('node-storage');
+const { dirname } = require('path');
 
 const generalCommands = {};
 const userCommands = {};
@@ -515,12 +517,21 @@ const commandFunctions = ( bot ) => {
         },
 
         getCommandAndArguments: function ( text, allCommands ) {
-            const [ sentCommand, ...args ] = text.split( " " );
-            let theCommand = sentCommand.substring( 1, sentCommand.length );
-            theCommand = theCommand.toLowerCase();
+          const [ sentCommand, ...args ] = text.split( " " );
 
-            const commandObj = allCommands[ theCommand ];
-            if ( commandObj ) {
+          let theCommand = sentCommand.substring( 1, sentCommand.length )
+          theCommand = theCommand.toLowerCase();
+            
+          // Check if command exists
+          let commandObj = allCommands[ theCommand ];
+
+          // Command doesn't exist, check aliases
+          if ( !commandObj ) {
+              const aliasCommand = checkForAlias(sentCommand);
+              commandObj = allCommands[aliasCommand];
+          }
+
+          if ( commandObj ) {
                 const moderatorOnly = !!moderatorCommands[ theCommand ];
                 return [ commandObj, args, moderatorOnly ];
             } else {
@@ -541,4 +552,17 @@ const commandFunctions = ( bot ) => {
         },
     }
 }
+
+const checkForAlias = ( theCommand ) => {
+    const strippedCommand = theCommand.substr(1, theCommand.length-1);
+
+    const dataFilePath = `${dirname(require.main.filename)}/data/aliases.json`;
+    const store = new Storage( dataFilePath );
+
+    const theAliases = store.get('aliases');
+
+    let findAlias = theAliases.find(alias => alias.alias === strippedCommand);
+    return findAlias ? findAlias.command : undefined;
+}
+
 module.exports = commandFunctions;
