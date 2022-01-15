@@ -1,6 +1,7 @@
 let chatDefaults = require( '../defaultSettings/chatDefaults.js' );
 let chatCommandItems = require( '../defaultSettings/chatCommandItems.js' );
 const Storage = require('node-storage');
+const { dirname } = require('path');
 
 const generalCommands = {};
 const userCommands = {};
