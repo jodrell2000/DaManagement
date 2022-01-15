@@ -5,7 +5,7 @@ module.exports = {
     // selection of lines to pick for functions
     stageDiveMessages: [
         "@senderUsername flies throught the air with the greatest of ease",
-        "CANNONBALL!!! @senderUsername incomming",
+        "CANNONBALL!!! @senderUsername incoming",
         "People on the floor beware, @senderUsername is coming down fast!",
         "Screw you guys, @senderUsername is going home!",
         "@senderUsername dives off the stage feet first but nobody is there to catch them"
@@ -247,7 +247,8 @@ module.exports = {
 
     couplesSkatePics: [
         "https://media.giphy.com/media/lryuApSUBW8mZU9K0M/giphy.gif",
-        "https://www.daily-shirts.com/wp-content/uploads/2020/05/Couples-Skate.jpg"
+        "https://www.daily-shirts.com/wp-content/uploads/2020/05/Couples-Skate.jpg",
+        "https://c.tenor.com/XiSNJ_NSvrUAAAAM/skating-skate.gif"
     ],
 
     noiceMessages: [
@@ -489,6 +490,16 @@ module.exports = {
         "https://c.tenor.com/-mwuZDMYaKEAAAAC/yacht-rock-yachty-by-nature.gif",
         "https://media.giphy.com/media/yidUzuMf6DH8cz09zO/giphy.gif",
         "https://media.giphy.com/media/3o7aCQGNIDfvhclEty/giphy.gif"
+    ],
+
+    saxMessages: [
+        "Sax man time!"
+
+    ],
+
+    saxPics: [
+        "https://i.gifer.com/DMBw.gif",
+        "https://i.imgur.com/OxdB2qx.gif"
     ]
 
 }
