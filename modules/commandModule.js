@@ -1,5 +1,6 @@
 let chatDefaults = require( '../defaultSettings/chatDefaults.js' );
 let chatCommandItems = require( '../defaultSettings/chatCommandItems.js' );
+const { dirname } = require('path');
 
 const generalCommands = {};
 const userCommands = {};
@@ -515,12 +516,21 @@ const commandFunctions = ( bot ) => {
         },
 
         getCommandAndArguments: function ( text, allCommands ) {
-            const [ sentCommand, ...args ] = text.split( " " );
-            let theCommand = sentCommand.substring( 1, sentCommand.length );
-            theCommand = theCommand.toLowerCase();
+          const [ sentCommand, ...args ] = text.split( " " );
 
-            const commandObj = allCommands[ theCommand ];
-            if ( commandObj ) {
+          let theCommand = sentCommand.substring( 1, sentCommand.length )
+          theCommand = theCommand.toLowerCase();
+            
+          // Check if command exists
+          let commandObj = allCommands[ theCommand ];
+
+          // Command doesn't exist, check aliases
+          if ( !commandObj ) {
+              const aliasCommand = checkForAlias(sentCommand);
+              commandObj = allCommands[aliasCommand];
+          }
+
+          if ( commandObj ) {
                 const moderatorOnly = !!moderatorCommands[ theCommand ];
                 return [ commandObj, args, moderatorOnly ];
             } else {
@@ -541,4 +551,13 @@ const commandFunctions = ( bot ) => {
         },
     }
 }
+
+const checkForAlias = (theCommand) => {
+    const dataFilePath = `${dirname(require.main.filename)}/data.json`;
+    const data = require(dataFilePath);
+
+    let findAlias = data.aliases.find(alias => alias.alias === theCommand);
+    return findAlias ? findAlias.command.slice(1) : null;
+}
+
 module.exports = commandFunctions;
