@@ -7,6 +7,10 @@
         {
             "alias": "bows",
             "command": "bow"
+        },
+        {
+            "alias": "sexysax",
+            "command": "sax"
         }
     ]
 }
