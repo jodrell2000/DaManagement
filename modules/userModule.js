@@ -423,22 +423,12 @@ const userFunctions = ( bot ) => {
             chatFunctions.botSpeak( theMessage, data );
         },
 
-        refreshDJCount: function () {
-            let theCount = 0;
-            for ( let userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
-                if ( theUsersList[ userLoop ][ 'RefreshStart' ] !== undefined ) {
-                    theCount++;
-                }
-            }
-            return theCount;
-        },
-
         addRefreshToUser: function ( userID, botFunctions ) {
             if ( botFunctions.refreshingEnabled() ) {
                 if ( this.isUserInUsersList( userID ) ) {
                     if ( this.isUserIDOnStage( userID ) ) {
                         if ( !this.isUserInRefreshList( userID ) ) {
-                            let listPosition = this.getPositionOnUsersList( userID );
+                            const listPosition = this.getPositionOnUsersList( userID );
                             theUsersList[ listPosition ][ 'RefreshStart' ] = Date.now();
                             ++theUsersList[ listPosition ][ 'RefreshCount' ];
                             theUsersList[ listPosition ][ 'RefreshCurrentPlayCount' ] = this.getDJCurrentPlayCount( userID );
@@ -474,10 +464,46 @@ const userFunctions = ( bot ) => {
             }
         },
 
+        // ========================================================
+
+        // ========================================================
+        // Refresh Helper Functions
+        // ========================================================
+
         isUserInRefreshList: function ( userID ) {
             if ( this.userExists( userID ) ) {
                 return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'RefreshStart' ] !== undefined;
             }
+        },
+
+        getUsersRefreshCurrentPlayCount: function ( userID ) {
+            if ( this.userExists( userID ) ) {
+                let listPosition = this.getPositionOnUsersList( userID );
+                if ( theUsersList[ listPosition ][ 'RefreshCurrentPlayCount' ] !== undefined ) {
+                    return theUsersList[ listPosition ][ 'RefreshCurrentPlayCount' ];
+                } else {
+                    return 0;
+                }
+            }
+        },
+
+        getUsersRefreshTotalPlayCount: function ( userID ) {
+            if ( this.userExists( userID ) ) {
+                let listPosition = this.getPositionOnUsersList( userID );
+                if ( theUsersList[ listPosition ][ 'RefreshTotalPlayCount' ] !== undefined ) {
+                    return theUsersList[ listPosition ][ 'RefreshTotalPlayCount' ];
+                }
+            }
+        },
+
+        refreshDJCount: function () {
+            let theCount = 0;
+            for ( let userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
+                if ( theUsersList[ userLoop ][ 'RefreshStart' ] !== undefined ) {
+                    theCount++;
+                }
+            }
+            return theCount;
         },
 
         whosRefreshingCommand: function ( data, chatFunctions ) {
@@ -500,26 +526,6 @@ const userFunctions = ( bot ) => {
                 chatFunctions.botSpeak( 'The following users are currently refreshing. ' + userList, data );
             }
 
-        },
-
-        getUsersRefreshCurrentPlayCount: function ( userID ) {
-            if ( this.userExists( userID ) ) {
-                let listPosition = this.getPositionOnUsersList( userID );
-                if ( theUsersList[ listPosition ][ 'RefreshCurrentPlayCount' ] !== undefined ) {
-                    return theUsersList[ listPosition ][ 'RefreshCurrentPlayCount' ];
-                } else {
-                    return 0;
-                }
-            }
-        },
-
-        getUsersRefreshTotalPlayCount: function ( userID ) {
-            if ( this.userExists( userID ) ) {
-                let listPosition = this.getPositionOnUsersList( userID );
-                if ( theUsersList[ listPosition ][ 'RefreshTotalPlayCount' ] !== undefined ) {
-                    return theUsersList[ listPosition ][ 'RefreshTotalPlayCount' ];
-                }
-            }
         },
 
         // ========================================================
@@ -1393,17 +1399,17 @@ const userFunctions = ( bot ) => {
 
         updateUser: function ( data ) {
             if ( typeof data.name === 'string' ) {
-                let oldname = ''; //holds users old name if exists
+                let oldname = ''; // holds users old name if exists
                 let queueNamePosition;
                 let queueListPosition;
                 let afkPeoplePosition;
 
-                //when when person updates their profile
-                //and their name is not found in the users list then they must have changed
-                //their name
+                // when person updates their profile
+                // and their name is not found in the users list then they must have changed
+                // their name
                 if ( theUsersList.indexOf( data.name ) === -1 ) {
                     let nameIndex = theUsersList.indexOf( data.userid );
-                    if ( nameIndex !== -1 ) //if their userid was found in theUsersList
+                    if ( nameIndex !== -1 ) // if their userid was found in theUsersList
                     {
                         oldname = theUsersList[ nameIndex + 1 ];
                         theUsersList[ nameIndex + 1 ] = data.name;
@@ -1434,13 +1440,6 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        removeUserFromTheUsersList: function ( userID ) {
-            let listPosition = this.getPositionOnUsersList( userID );
-            if ( listPosition !== -1 ) {
-                theUsersList.splice( listPosition, 1 );
-            }
-        },
-
         deregisterUser: function ( userID ) {
             //double check to make sure that if someone is on stage and they disconnect, that they are being removed
             //from the current Dj's array
@@ -1466,10 +1465,7 @@ const userFunctions = ( bot ) => {
                     }
                 }
             }
-
-            // this.removeUserFromTheUsersList( userID );
         },
-
 
         bootNewUserCheck: function () {
             let bootUser = false;
