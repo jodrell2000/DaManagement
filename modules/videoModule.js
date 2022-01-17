@@ -66,7 +66,7 @@ const videoFunctions = () => {
             .then( ( { data } ) => {
                 return data.items[ 0 ].contentDetails;
             } )
-            .catch( err => console.error(`Error occured in videoFunctions.queryVideoDetails() : ${err}`) );
+            .catch( err => console.error(`Error occurred in videoFunctions.queryVideoDetails() : ${err}`) );
     }
 
     async function getRegionRestrictions ( auth, videoID ) {
@@ -134,7 +134,7 @@ const videoFunctions = () => {
                         }
 
                     } )
-                    .catch( err => console.error(`Error occured in videoFunctions.checkVideoRegionAlert() : ${err}`) );
+                    .catch( err => console.error(`Error occurred in videoFunctions.checkVideoRegionAlert() : ${err}`) );
             }
         },
 
