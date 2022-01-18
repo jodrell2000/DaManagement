@@ -1,16 +1,1 @@
-{
-    "aliases":[
-        {
-            "alias": "roll",
-            "command": "dice"
-        },
-        {
-            "alias": "bows",
-            "command": "bow"
-        },
-        {
-            "alias": "sexysax",
-            "command": "sax"
-        }
-    ]
-}
+{"aliases":{"roll":{"command":"dice"},"bows":{"command":"bow"},"sexysax":{"command":"sax"}}}
