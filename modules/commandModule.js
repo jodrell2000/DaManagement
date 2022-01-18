@@ -1,7 +1,7 @@
 let chatDefaults = require( '../defaultSettings/chatDefaults.js' );
 let chatCommandItems = require( '../defaultSettings/chatCommandItems.js' );
-const Storage = require('node-storage');
-const { dirname } = require('path');
+const Storage = require( 'node-storage' );
+const { dirname } = require( 'path' );
 
 const generalCommands = {};
 const userCommands = {};
@@ -210,7 +210,13 @@ const commandFunctions = ( bot ) => {
     chatCommands.yacht.help = "because not all rock is hard";
 
     chatCommands.sax = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.saxMessages, chatCommandItems.saxPics, userFunctions ); }
-    chatCommands.sax.help = "I'm A SAV MAN!!";
+    chatCommands.sax.help = "I'm A SAX MAN!!";
+
+    chatCommands.zod = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.zodMessages, chatCommandItems.zodPics, userFunctions ); }
+    chatCommands.zod.help = "Bro, do you even General Zod?";
+
+    chatCommands.micdrop = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.micDropMessages, chatCommandItems.micDropPics, userFunctions ); }
+    chatCommands.micdrop.help = "End of...";
 
     // ######################################################
     // Advanced chat commands...more than just basic messages
@@ -338,12 +344,12 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.lame = ( { botFunctions } ) => { botFunctions.lameCommand(); }
     moderatorCommands.lame.help = "Have the Bot downvote";
 
-    moderatorCommands.alias = ( { data, chatFunctions } ) => { addAlias(data, chatFunctions); }
+    moderatorCommands.alias = ( { data, chatFunctions } ) => { addAlias( data, chatFunctions ); }
     moderatorCommands.alias.argumentCount = 2;
     moderatorCommands.alias.help = "Add or edit an alias command, will repoint an alias to a different command if it already exists";
     moderatorCommands.alias.sampleArguments = [ "alias", "command" ];
 
-    moderatorCommands.removealias = ( { data, chatFunctions } ) => { removeAlias(data, chatFunctions); }
+    moderatorCommands.removealias = ( { data, chatFunctions } ) => { removeAlias( data, chatFunctions ); }
     moderatorCommands.removealias.argumentCount = 2;
     moderatorCommands.removealias.help = "Remove an alias from a command";
     moderatorCommands.removealias.sampleArguments = [ "alias", "command" ];
@@ -527,21 +533,21 @@ const commandFunctions = ( bot ) => {
         },
 
         getCommandAndArguments: function ( text, allCommands ) {
-          const [ sentCommand, ...args ] = text.split( " " );
+            const [ sentCommand, ...args ] = text.split( " " );
 
-          let theCommand = sentCommand.substring( 1, sentCommand.length )
-          theCommand = theCommand.toLowerCase();
-            
-          // Check if command exists
-          let commandObj = allCommands[ theCommand ];
+            let theCommand = sentCommand.substring( 1, sentCommand.length )
+            theCommand = theCommand.toLowerCase();
 
-          // Command doesn't exist, check aliases
-          if ( !commandObj ) {
-              const aliasCommand = checkForAlias(sentCommand);
-              commandObj = allCommands[aliasCommand];
-          }
+            // Check if command exists
+            let commandObj = allCommands[ theCommand ];
 
-          if ( commandObj ) {
+            // Command doesn't exist, check aliases
+            if ( !commandObj ) {
+                const aliasCommand = checkForAlias( sentCommand );
+                commandObj = allCommands[ aliasCommand ];
+            }
+
+            if ( commandObj ) {
                 const moderatorOnly = !!moderatorCommands[ theCommand ];
                 return [ commandObj, args, moderatorOnly ];
             } else {
@@ -564,24 +570,24 @@ const commandFunctions = ( bot ) => {
 }
 
 const checkForAlias = ( theCommand ) => {
-    const strippedCommand = theCommand.substr(1, theCommand.length-1);
+    const strippedCommand = theCommand.substr( 1, theCommand.length - 1 );
 
-    const dataFilePath = `${dirname(require.main.filename)}/data/aliases.json`;
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/aliases.json`;
     const store = new Storage( dataFilePath );
 
-    const theAliases = store.get('aliases');
+    const theAliases = store.get( 'aliases' );
 
-    let findAlias = theAliases[strippedCommand];
+    let findAlias = theAliases[ strippedCommand ];
     return findAlias ? findAlias.command : undefined;
 }
 
 const addAlias = ( data, chatFunctions ) => {
-    const dataFilePath = `${dirname(require.main.filename)}/data/aliases.json`;
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/aliases.json`;
     const store = new Storage( dataFilePath );
 
-    const strippedCommand = data.text.slice(1).split(" ");
+    const strippedCommand = data.text.slice( 1 ).split( " " );
 
-    store.put(`aliases.${strippedCommand[1]}`, {command: strippedCommand[2]});
+    store.put( `aliases.${ strippedCommand[ 1 ] }`, { command: strippedCommand[ 2 ] } );
 
     // TODO: Make bot respond with The command /dice now has aliases /roll and /yahtzee
     // need to use the command identifier variable when constructing those commands
@@ -589,13 +595,13 @@ const addAlias = ( data, chatFunctions ) => {
 }
 
 const removeAlias = ( data, chatFunctions ) => {
-    const dataFilePath = `${dirname(require.main.filename)}/data/aliases.json`;
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/aliases.json`;
     const store = new Storage( dataFilePath );
 
-    const strippedCommand = data.text.slice(1).split(" ");
+    const strippedCommand = data.text.slice( 1 ).split( " " );
 
-    store.remove(`aliases.${strippedCommand[1]}`);
-    
+    store.remove( `aliases.${ strippedCommand[ 1 ] }` );
+
     // TODO: Make bot respond with The command /dice now has aliases /roll and /yahtzee
     // need to use the command identifier variable when constructing those commands
     chatFunctions.botSpeak( "Alias removed.", data );
