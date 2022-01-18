@@ -511,12 +511,12 @@ module.exports = {
     ],
 
     zodPics: [
-        "https://tenor.com/KvSN.gif",
+        "https://c.tenor.com/R7KoPi7-V4kAAAAd/zod-man-of-steel.gif",
         "https://media.giphy.com/media/HGa08bNh1Dqla/giphy.gif",
         "https://media.giphy.com/media/sGhWp5r1b4sEM/giphy.gif",
-        "https://tenor.com/bm44r.gif",
-        "https://tenor.com/Jozb.gif",
-        "https://tenor.com/bHr13.gif"
+        "https://c.tenor.com/zoTVBIZTJKkAAAAC/zod-heresy.gif",
+        "https://c.tenor.com/c5XpfP_zNTkAAAAC/rolling-eyes-not-amused.gif",
+        "https://c.tenor.com/4kjGBi-K0TMAAAAC/zod-kneel-before-zod.gif"
     ],
 
     micDropMessages: [
