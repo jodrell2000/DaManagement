@@ -339,10 +339,14 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.lame.help = "Have the Bot downvote";
 
     moderatorCommands.alias = ( { data, chatFunctions } ) => { addAlias(data, chatFunctions); }
-    moderatorCommands.alias.help = "Add or edit an alias command";
+    moderatorCommands.alias.argumentCount = 2;
+    moderatorCommands.alias.help = "Add or edit an alias command, will repoint an alias to a different command if it already exists";
+    moderatorCommands.alias.sampleArguments = [ "alias", "command" ];
 
     moderatorCommands.removealias = ( { data, chatFunctions } ) => { removeAlias(data, chatFunctions); }
-    moderatorCommands.removealias.help = "Remove an alias command";
+    moderatorCommands.removealias.argumentCount = 2;
+    moderatorCommands.removealias.help = "Remove an alias from a command";
+    moderatorCommands.removealias.sampleArguments = [ "alias", "command" ];
 
     // #############################################
     // Moderator Greeting commands
@@ -580,7 +584,8 @@ const addAlias = ( data, chatFunctions ) => {
     store.put(`aliases.${strippedCommand[1]}`, {command: strippedCommand[2]});
 
     // TODO: Make bot respond with The command /dice now has aliases /roll and /yahtzee
-    chatFunctions.botSpeak( "Update sucessful.", data );
+    // need to use the command identifier variable when constructing those commands
+    chatFunctions.botSpeak( "Update successful.", data );
 }
 
 const removeAlias = ( data, chatFunctions ) => {
@@ -592,6 +597,7 @@ const removeAlias = ( data, chatFunctions ) => {
     store.remove(`aliases.${strippedCommand[1]}`);
     
     // TODO: Make bot respond with The command /dice now has aliases /roll and /yahtzee
+    // need to use the command identifier variable when constructing those commands
     chatFunctions.botSpeak( "Alias removed.", data );
 }
 
