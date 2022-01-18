@@ -338,6 +338,12 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.lame = ( { botFunctions } ) => { botFunctions.lameCommand(); }
     moderatorCommands.lame.help = "Have the Bot downvote";
 
+    moderatorCommands.alias = ( { data, chatFunctions } ) => { addAlias(data, chatFunctions); }
+    moderatorCommands.alias.help = "Add or edit an alias command";
+
+    moderatorCommands.removealias = ( { data, chatFunctions } ) => { removeAlias(data, chatFunctions); }
+    moderatorCommands.removealias.help = "Remove an alias command";
+
     // #############################################
     // Moderator Greeting commands
     // #############################################
@@ -561,8 +567,32 @@ const checkForAlias = ( theCommand ) => {
 
     const theAliases = store.get('aliases');
 
-    let findAlias = theAliases.find(alias => alias.alias === strippedCommand);
+    let findAlias = theAliases[strippedCommand];
     return findAlias ? findAlias.command : undefined;
+}
+
+const addAlias = ( data, chatFunctions ) => {
+    const dataFilePath = `${dirname(require.main.filename)}/data/aliases.json`;
+    const store = new Storage( dataFilePath );
+
+    const strippedCommand = data.text.slice(1).split(" ");
+
+    store.put(`aliases.${strippedCommand[1]}`, {command: strippedCommand[2]});
+
+    // TODO: Make bot respond with The command /dice now has aliases /roll and /yahtzee
+    chatFunctions.botSpeak( "Update sucessful.", data );
+}
+
+const removeAlias = ( data, chatFunctions ) => {
+    const dataFilePath = `${dirname(require.main.filename)}/data/aliases.json`;
+    const store = new Storage( dataFilePath );
+
+    const strippedCommand = data.text.slice(1).split(" ");
+
+    store.remove(`aliases.${strippedCommand[1]}`);
+    
+    // TODO: Make bot respond with The command /dice now has aliases /roll and /yahtzee
+    chatFunctions.botSpeak( "Alias removed.", data );
 }
 
 module.exports = commandFunctions;
