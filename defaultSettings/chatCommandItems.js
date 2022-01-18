@@ -516,7 +516,8 @@ module.exports = {
         "https://media.giphy.com/media/sGhWp5r1b4sEM/giphy.gif",
         "https://c.tenor.com/zoTVBIZTJKkAAAAC/zod-heresy.gif",
         "https://c.tenor.com/c5XpfP_zNTkAAAAC/rolling-eyes-not-amused.gif",
-        "https://c.tenor.com/4kjGBi-K0TMAAAAC/zod-kneel-before-zod.gif"
+        "https://c.tenor.com/4kjGBi-K0TMAAAAC/zod-kneel-before-zod.gif",
+        "https://c.tenor.com/j_B3qFDiElUAAAAC/superman-henry-cavill.gif"
     ],
 
     micDropMessages: [
