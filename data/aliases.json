@@ -1,1 +1,1 @@
-{"aliases":{"roll":{"command":"dice"},"bows":{"command":"bow"},"sexysax":{"command":"sax"}}}
+{"aliases":{"roll":{"command":"dice"},"yahtzee":{"command":"dice"},"bows":{"command":"bow"},"singit":{"command":"sax"}},"commands":{"dice":["roll","yahtzee"],"bow":["bows"],"sax":["singit"]}}
