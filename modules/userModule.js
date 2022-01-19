@@ -24,7 +24,6 @@ let masterIds = [ '6040a0333f4bfc001be4cf39' ]; //example (clear this before usi
 
 let index = null; //the index returned when using unban commands
 let informTimer = null; //holds the timeout for the /inform command, null lets it know that it hasn't already been set
-let refreshDJCount = 0; // how many people are currently using the refresh command
 let warnme = []; //holds the userid's of everyone using the /warnme feature
 
 let queueList = []; //holds the userid of everyone in the queue
@@ -433,7 +432,7 @@ const userFunctions = ( bot ) => {
                             ++theUsersList[ listPosition ][ 'RefreshCount' ];
                             theUsersList[ listPosition ][ 'RefreshCurrentPlayCount' ] = this.getDJCurrentPlayCount( userID );
                             theUsersList[ listPosition ][ 'RefreshTotalPlayCount' ] = this.getDJTotalPlayCount( userID );
-                            theUsersList[ listPosition ][ 'RefreshTimer' ] = setTimeout( function ( userID ) {
+                            theUsersList[ listPosition ][ 'RefreshTimer' ] = setTimeout( function ( ) {
                                 this.removeRefreshFromUser( userID );
                             }.bind( this ), roomDefaults.amountOfTimeToRefresh * 1000 );
 
@@ -453,14 +452,13 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        removeRefreshFromUser: function ( userID ) {
+        removeRefreshFromUser: function( userID ) {
             if ( this.userExists( userID ) ) {
                 let listPosition = this.getPositionOnUsersList( userID );
                 delete theUsersList[ listPosition ][ 'RefreshStart' ];
                 delete theUsersList[ listPosition ][ 'RefreshCurrentPlayCount' ]
                 delete theUsersList[ listPosition ][ 'RefreshTotalPlayCount' ]
                 delete theUsersList[ listPosition ][ 'RefreshTimer' ]
-                --refreshDJCount;
             }
         },
 
@@ -525,7 +523,6 @@ const userFunctions = ( bot ) => {
             } else {
                 chatFunctions.botSpeak( 'The following users are currently refreshing. ' + userList, data );
             }
-
         },
 
         // ========================================================
