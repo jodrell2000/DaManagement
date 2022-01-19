@@ -591,16 +591,28 @@ const listAlias = ( data, chatFunctions ) => {
     const store = new Storage( dataFilePath );
 
     const strippedCommand = data.text.slice( 1 ).split( " " );
+    const alias = checkForAlias(`/${strippedCommand[ 1 ]}`);
 
-    const aliases = store.get( `commands.${ strippedCommand[ 1 ] }` );
-
-    let returnText = `The command /${strippedCommand[ 1 ]} has no aliases`;
-
-    if ( aliases.length ) {
-        returnText = `The command /${strippedCommand[ 1 ]} now has aliases /${aliases.join(` and /`)}`;
+    if ( alias ) {
+        const aliases = store.get( `commands.${ alias }` );
+        let returnText = `${strippedCommand[ 1 ]} is an alias for the command /${alias}`;
+        
+        if (aliases.length > 1) {
+            returnText += ` which also the following aliases /${aliases.join(` and /`)}`;
+        }
+        chatFunctions.botSpeak( returnText, data );
     }
+    else {
+        const aliases = store.get( `commands.${ strippedCommand[ 1 ] }` );
 
-    chatFunctions.botSpeak( returnText, data );
+        let returnText = `The command /${strippedCommand[ 1 ]} has no aliases`;
+    
+        if ( aliases.length ) {
+            returnText = `The command /${strippedCommand[ 1 ]} now has aliases /${aliases.join(` and /`)}`;
+        }
+
+        chatFunctions.botSpeak( returnText, data );
+    } 
 }
 
 const addAlias = ( data, chatFunctions ) => {
