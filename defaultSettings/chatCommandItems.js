@@ -162,7 +162,8 @@ module.exports = {
         "https://media.giphy.com/media/L13NsH0Aij4Sf2Gdjt/giphy.gif",
         "https://media1.tenor.com/images/783e5a4c1c8fee2bfe1aa06dae7e56f5/tenor.gif",
         "https://media.giphy.com/media/HiDfhTFGZ4geI/giphy.gif",
-        "https://media.giphy.com/media/ct0qic39dyPaN92yNs/giphy.gif"
+        "https://media.giphy.com/media/ct0qic39dyPaN92yNs/giphy.gif",
+        "https://media.giphy.com/media/46yOIJDfsma5O/giphy-downsized.gif"
     ],
 
     rubMessages: [
