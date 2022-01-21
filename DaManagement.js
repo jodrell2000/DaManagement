@@ -136,7 +136,7 @@ bot.on( 'roomChanged', function ( data ) {
 
     }
     catch ( err ) {
-        logMe( 'error', 'unable to join the room the room due to err: ' + err.toString() );
+        console.log( 'error', 'unable to join the room the room due to err: ' + err.toString() );
     }
 } );
 
@@ -369,8 +369,8 @@ bot.on( 'rem_dj', function ( data ) {
     //removes user from the dj list when they leave the stage
     userFunctions.resetDJFlags( theUserID );
 
-    //gives them one chance to get off stage then after that theyre play limit is treated as normal
-    if ( typeof userFunctions.getUsersRefreshCurrentPlayCount[ theUserID ] == 'number' && userFunctions.isUserInRefreshList( theUserID ) === -1 ) {
+    //gives them one chance to get off stage, then after that they're play limit is treated as normal
+    if ( typeof userFunctions.getUsersRefreshCurrentPlayCount[ theUserID ] == 'number' && userFunctions.isUserInRefreshList( theUserID ) === false ) {
         delete userFunctions.getUsersRefreshCurrentPlayCount[ theUserID ]
     }
 
