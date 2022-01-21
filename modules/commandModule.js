@@ -230,6 +230,11 @@ const commandFunctions = ( bot ) => {
     chatCommands.dice.help = "Roll some dice";
     chatCommands.dice.sampleArguments = [ "1", "d20" ]
 
+    chatCommands.listalias = ( { data, chatFunctions } ) => { listAlias( data, chatFunctions ); }
+    chatCommands.listalias.argumentCount = 1;
+    chatCommands.listalias.help = "List aliases for a command";
+    chatCommands.listalias.sampleArguments = [ "alias" ];
+
     // #############################################
     // Bot control commands
     // #############################################
@@ -353,11 +358,6 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.removealias.argumentCount = 2;
     moderatorCommands.removealias.help = "Remove an alias from a command";
     moderatorCommands.removealias.sampleArguments = [ "alias", "command" ];
-
-    moderatorCommands.listalias = ( { data, chatFunctions } ) => { listAlias( data, chatFunctions ); }
-    moderatorCommands.listalias.argumentCount = 1;
-    moderatorCommands.listalias.help = "List aliases for a command";
-    moderatorCommands.listalias.sampleArguments = [ "alias" ];
 
     // #############################################
     // Moderator Greeting commands
@@ -575,7 +575,7 @@ const commandFunctions = ( bot ) => {
 }
 
 const checkForAlias = ( theCommand ) => {
-    const strippedCommand = theCommand.substr( 1, theCommand.length - 1 );
+    const strippedCommand = theCommand.substr( 1, theCommand.length - 1 ).toLowerCase();
 
     const dataFilePath = `${ dirname( require.main.filename ) }/data/aliases.json`;
     const store = new Storage( dataFilePath );
@@ -587,40 +587,45 @@ const checkForAlias = ( theCommand ) => {
 }
 
 const listAlias = ( data, chatFunctions ) => {
-    const dataFilePath = `${ dirname( require.main.filename ) }/data/aliases.json`;
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/${process.env.ALIASDATA}`;
     const store = new Storage( dataFilePath );
 
-    const strippedCommand = data.text.slice( 1 ).split( " " );
+    const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
     const alias = checkForAlias(`/${strippedCommand[ 1 ]}`);
 
+    const aliasLookup = alias ? `commands.${ alias }` : `commands.${ strippedCommand[ 1 ] }`;
+    
+    const aliases = store.get( aliasLookup );
+
+    chatFunctions.botSpeak( getAliasReturnText(aliases, alias, strippedCommand[ 1 ]), data );
+}
+
+const getAliasReturnText = (aliases, alias, command) => {
     let returnText;
 
     if ( alias ) {
-        const aliases = store.get( `commands.${ alias }` );
-        returnText = `${strippedCommand[ 1 ]} is an alias for the command /${alias}`;
+        returnText = `${command} is an alias for the command /${alias}`;
 
         if (aliases?.length > 1) {
             returnText += ` which has the following aliases /${aliases.join(` and /`)}`;
         }
     }
     else {
-        const aliases = store.get( `commands.${ strippedCommand[ 1 ] }` );
-
-        returnText = `The command /${strippedCommand[ 1 ]} has no aliases`;
+        returnText = `The command /${command} has no aliases`;
     
         if ( aliases?.length ) {
-            returnText = `The command /${strippedCommand[ 1 ]} now has aliases /${aliases.join(` and /`)}`;
+            returnText = `The command /${command} now has aliases /${aliases.join(` and /`)}`;
         }
-    } 
+    }
 
-    chatFunctions.botSpeak( returnText, data );
+    return returnText;
 }
 
 const addAlias = ( data, chatFunctions ) => {
-    const dataFilePath = `${ dirname( require.main.filename ) }/data/aliases.json`;
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/${process.env.ALIASDATA}`;
     const store = new Storage( dataFilePath );
 
-    const strippedCommand = data.text.slice( 1 ).split( " " );
+    const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
 
     store.put( `aliases.${ strippedCommand[ 1 ] }`, { command: strippedCommand[ 2 ] } );
     
@@ -635,16 +640,14 @@ const addAlias = ( data, chatFunctions ) => {
 
     store.put( `commands.${ strippedCommand[ 2 ] }`, newCommandWithAlias );
 
-    // TODO: Make bot respond with The command /dice now has aliases /roll and /yahtzee
-    // need to use the command identifier variable when constructing those commands
     chatFunctions.botSpeak( "Update successful.", data );
 }
 
 const removeAlias = ( data, chatFunctions ) => {
-    const dataFilePath = `${ dirname( require.main.filename ) }/data/aliases.json`;
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/${process.env.ALIASDATA}`;
     const store = new Storage( dataFilePath );
 
-    const strippedCommand = data.text.slice( 1 ).split( " " );
+    const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
 
     const aliasBeingRemoved = checkForAlias(`/${strippedCommand[ 1 ]}`);
 
@@ -661,8 +664,6 @@ const removeAlias = ( data, chatFunctions ) => {
         store.put( `commands.${ aliasBeingRemoved }`, updatedCommandList );
     }
 
-    // TODO: Make bot respond with The command /dice now has aliases /roll and /yahtzee
-    // need to use the command identifier variable when constructing those commands
     chatFunctions.botSpeak( "Alias removed.", data );
 }
 
