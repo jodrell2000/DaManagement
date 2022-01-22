@@ -1373,6 +1373,7 @@ const userFunctions = ( bot ) => {
                     listOfUsers = listOfUsers + ', [' + thisQueuePosition + '] ' + this.getUsername( userID );
 
                 }
+                thisQueuePosition++;
             }.bind( this ) );
 
             if ( listOfUsers !== '' ) {
