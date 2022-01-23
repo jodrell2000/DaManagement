@@ -432,7 +432,7 @@ const userFunctions = ( bot ) => {
                             ++theUsersList[ listPosition ][ 'RefreshCount' ];
                             theUsersList[ listPosition ][ 'RefreshCurrentPlayCount' ] = this.getDJCurrentPlayCount( userID );
                             theUsersList[ listPosition ][ 'RefreshTotalPlayCount' ] = this.getDJTotalPlayCount( userID );
-                            theUsersList[ listPosition ][ 'RefreshTimer' ] = setTimeout( function ( ) {
+                            theUsersList[ listPosition ][ 'RefreshTimer' ] = setTimeout( function () {
                                 this.removeRefreshFromUser( userID );
                             }.bind( this ), roomDefaults.amountOfTimeToRefresh * 1000 );
 
@@ -452,7 +452,7 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        removeRefreshFromUser: function( userID ) {
+        removeRefreshFromUser: function ( userID ) {
             if ( this.userExists( userID ) ) {
                 let listPosition = this.getPositionOnUsersList( userID );
                 delete theUsersList[ listPosition ][ 'RefreshStart' ];
@@ -841,11 +841,13 @@ const userFunctions = ( bot ) => {
 
         removeUserFromAFKList: function ( data, chatFunctions ) {
             const theUserID = this.whoSentTheCommand( data );
-            const listPosition = afkPeople.indexOf( theUserID );
-
-            afkPeople.splice( listPosition, 1 );
-
+            removeUserIDFromAFKArray( theUserID );
             chatFunctions.botSpeak( '@' + this.getUsername( theUserID ) + ' you are no longer afk', data )
+        },
+
+        removeUserIDFromAFKArray: function ( theUserID ) {
+            const listPosition = afkPeople.indexOf( theUserID );
+            afkPeople.splice( listPosition, 1 );
         },
 
         howManyAFKUsers: function () {
@@ -1446,6 +1448,10 @@ const userFunctions = ( bot ) => {
                 djList.splice( checkIfStillInDjArray, 1 );
             }
 
+            if ( this.isUserAFK( userID ) ) {
+                this.removeUserIDFRomAFKArray( userID );
+            }
+
             //removes people leaving the room in modpm still
             if ( modPM.length !== 0 ) {
                 let areTheyStillInModpm = modPM.indexOf( userID );
@@ -1540,6 +1546,11 @@ const userFunctions = ( bot ) => {
 
             //sets new persons spam count to zero
             this.resetUsersSpamCount( userID );
+
+            // remove the user from afk, just in case it was hanging around from a previous visit
+            if ( this.isUserAFK( userID ) ) {
+                this.removeUserIDFRomAFKArray( userID );
+            }
         },
 
         checkForEmptyUsersList: function ( data ) {
