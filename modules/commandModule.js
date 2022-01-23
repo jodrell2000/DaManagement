@@ -550,7 +550,7 @@ const commandFunctions = ( bot ) => {
 
             // Command doesn't exist, check aliases
             if ( !commandObj ) {
-                const aliasCommand = checkForAlias( sentCommand );
+                const aliasCommand = checkForAlias( theCommand );
                 commandObj = allCommands[ aliasCommand ];
             }
 
@@ -573,6 +573,10 @@ const commandFunctions = ( bot ) => {
                 chatFunctions.botSpeak( "Sorry, that's not a command I recognise. Try " + chatDefaults.commandIdentifier + "list to find out more.", data );
             }
         },
+
+        isBotCommand: (command) => {
+            return allCommands[ command ];
+        }
     }
 }
 
@@ -628,8 +632,23 @@ const getAliasReturnText = ( aliases, alias, command ) => {
 const addAlias = ( data, chatFunctions ) => {
     const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
     const store = new Storage( dataFilePath );
+    const commandModule = commandFunctions();
 
     const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
+    passedArguement = strippedCommand[ 1 ];
+    const alias = checkForAlias( passedArguement );
+
+    // Check if new alias already exists
+    if ( alias ) {
+        chatFunctions.botSpeak( `The alias ${chatDefaults.commandIdentifier}${passedArguement} already exists.`, data );
+        return;
+    }
+
+    // Check if new alias is a command
+    if (commandModule.isBotCommand(passedArguement)) {
+        chatFunctions.botSpeak( `Alias not added. ${chatDefaults.commandIdentifier}${passedArguement} is already a command.`, data );
+        return;
+    }
 
     store.put( `aliases.${ strippedCommand[ 1 ] }`, { command: strippedCommand[ 2 ] } );
 
