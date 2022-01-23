@@ -12,6 +12,8 @@ const moderatorQueueCommands = {};
 const moderatorWelcomeCommands = {};
 const moderatorCommands = {};
 
+const aliasDataFile = process.env.ALIASDATA;
+
 const ignoreCommands = [ '/me ' ];
 
 const commandFunctions = ( bot ) => {
@@ -587,34 +589,34 @@ const checkForAlias = ( theCommand ) => {
 }
 
 const listAlias = ( data, chatFunctions ) => {
-    const dataFilePath = `${ dirname( require.main.filename ) }/data/${process.env.ALIASDATA}`;
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/${ this.aliasDataFileName }`;
     const store = new Storage( dataFilePath );
 
     const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
-    const alias = checkForAlias(`/${strippedCommand[ 1 ]}`);
+    const alias = checkForAlias( `/${ strippedCommand[ 1 ] }` );
 
     const aliasLookup = alias ? `commands.${ alias }` : `commands.${ strippedCommand[ 1 ] }`;
-    
+
     const aliases = store.get( aliasLookup );
 
-    chatFunctions.botSpeak( getAliasReturnText(aliases, alias, strippedCommand[ 1 ]), data );
+    chatFunctions.botSpeak( getAliasReturnText( aliases, alias, strippedCommand[ 1 ] ), data );
 }
 
-const getAliasReturnText = (aliases, alias, command) => {
+const getAliasReturnText = ( aliases, alias, command ) => {
     let returnText;
 
     if ( alias ) {
-        returnText = `${command} is an alias for the command /${alias}`;
+        returnText = `${ command } is an alias for the command /${ alias }`;
 
-        if (aliases?.length > 1) {
-            returnText += ` which has the following aliases /${aliases.join(` and /`)}`;
+        if ( aliases?.length > 1 ) {
+            returnText += ` which has the following aliases /${ aliases.join( ` and /` ) }`;
         }
     }
     else {
-        returnText = `The command /${command} has no aliases`;
-    
+        returnText = `The command /${ command } has no aliases`;
+
         if ( aliases?.length ) {
-            returnText = `The command /${command} now has aliases /${aliases.join(` and /`)}`;
+            returnText = `The command /${ command } now has aliases /${ aliases.join( ` and /` ) }`;
         }
     }
 
@@ -622,19 +624,19 @@ const getAliasReturnText = (aliases, alias, command) => {
 }
 
 const addAlias = ( data, chatFunctions ) => {
-    const dataFilePath = `${ dirname( require.main.filename ) }/data/${process.env.ALIASDATA}`;
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/${ this.aliasDataFileName }`;
     const store = new Storage( dataFilePath );
 
     const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
 
     store.put( `aliases.${ strippedCommand[ 1 ] }`, { command: strippedCommand[ 2 ] } );
-    
+
     let newCommandWithAlias = [ strippedCommand[ 1 ] ];
 
     let commandList = store.get( `commands.${ strippedCommand[ 2 ] }` );
 
     if ( commandList ) {
-        commandList.push(strippedCommand[ 1 ]);
+        commandList.push( strippedCommand[ 1 ] );
         newCommandWithAlias = commandList;
     }
 
@@ -644,22 +646,21 @@ const addAlias = ( data, chatFunctions ) => {
 }
 
 const removeAlias = ( data, chatFunctions ) => {
-    const dataFilePath = `${ dirname( require.main.filename ) }/data/${process.env.ALIASDATA}`;
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/${ this.aliasDataFileName }`;
     const store = new Storage( dataFilePath );
 
     const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
 
-    const aliasBeingRemoved = checkForAlias(`/${strippedCommand[ 1 ]}`);
+    const aliasBeingRemoved = checkForAlias( `/${ strippedCommand[ 1 ] }` );
 
     store.remove( `aliases.${ strippedCommand[ 1 ] }` );
 
     let commandList = store.get( `commands.${ aliasBeingRemoved }` );
 
     if ( commandList ) {
-
-        var updatedCommandList = commandList.filter(function(value, index, arr){ 
+        var updatedCommandList = commandList.filter( function ( value, index, arr ) {
             return value !== strippedCommand[ 1 ];
-        });
+        } );
 
         store.put( `commands.${ aliasBeingRemoved }`, updatedCommandList );
     }
