@@ -5,7 +5,7 @@ module.exports = {
     // selection of lines to pick for functions
     stageDiveMessages: [
         "@senderUsername flies throught the air with the greatest of ease",
-        "CANNONBALL!!! @senderUsername incomming",
+        "CANNONBALL!!! @senderUsername incoming",
         "People on the floor beware, @senderUsername is coming down fast!",
         "Screw you guys, @senderUsername is going home!",
         "@senderUsername dives off the stage feet first but nobody is there to catch them"
@@ -162,7 +162,8 @@ module.exports = {
         "https://media.giphy.com/media/L13NsH0Aij4Sf2Gdjt/giphy.gif",
         "https://media1.tenor.com/images/783e5a4c1c8fee2bfe1aa06dae7e56f5/tenor.gif",
         "https://media.giphy.com/media/HiDfhTFGZ4geI/giphy.gif",
-        "https://media.giphy.com/media/ct0qic39dyPaN92yNs/giphy.gif"
+        "https://media.giphy.com/media/ct0qic39dyPaN92yNs/giphy.gif",
+        "https://media.giphy.com/media/46yOIJDfsma5O/giphy-downsized.gif"
     ],
 
     rubMessages: [
@@ -247,7 +248,8 @@ module.exports = {
 
     couplesSkatePics: [
         "https://media.giphy.com/media/lryuApSUBW8mZU9K0M/giphy.gif",
-        "https://www.daily-shirts.com/wp-content/uploads/2020/05/Couples-Skate.jpg"
+        "https://www.daily-shirts.com/wp-content/uploads/2020/05/Couples-Skate.jpg",
+        "https://c.tenor.com/XiSNJ_NSvrUAAAAM/skating-skate.gif"
     ],
 
     noiceMessages: [
@@ -489,6 +491,48 @@ module.exports = {
         "https://c.tenor.com/-mwuZDMYaKEAAAAC/yacht-rock-yachty-by-nature.gif",
         "https://media.giphy.com/media/yidUzuMf6DH8cz09zO/giphy.gif",
         "https://media.giphy.com/media/3o7aCQGNIDfvhclEty/giphy.gif"
+    ],
+
+    saxMessages: [
+        "Sax man time!"
+
+    ],
+
+    saxPics: [
+        "https://i.gifer.com/DMBw.gif",
+        "https://i.imgur.com/OxdB2qx.gif"
+    ],
+
+    zodMessages: [
+        "KNEEL BEFORE ZOD!",
+        "You will bow down before me. I swear it!",
+        "Today begins a new order. Your lands, your possessions, your very lives, will gladly be given in tribute to me",
+        "This Roboto is nothing of the kind. I've discovered his weakness. He cares. He actually cares for these people",
+        "Why do you talk to me this way, when you know that I will kill you for it?"
+    ],
+
+    zodPics: [
+        "https://c.tenor.com/R7KoPi7-V4kAAAAd/zod-man-of-steel.gif",
+        "https://media.giphy.com/media/HGa08bNh1Dqla/giphy.gif",
+        "https://media.giphy.com/media/sGhWp5r1b4sEM/giphy.gif",
+        "https://c.tenor.com/zoTVBIZTJKkAAAAC/zod-heresy.gif",
+        "https://c.tenor.com/c5XpfP_zNTkAAAAC/rolling-eyes-not-amused.gif",
+        "https://c.tenor.com/4kjGBi-K0TMAAAAC/zod-kneel-before-zod.gif",
+        "https://c.tenor.com/j_B3qFDiElUAAAAC/superman-henry-cavill.gif"
+    ],
+
+    micDropMessages: [
+        "End of...",
+        "And that's the bottom line",
+        "Drop the mic when I'm finished, and watch it smoke"
+    ],
+
+    micDropPics: [
+        "https://media.giphy.com/media/PzztizcE7jvBS/giphy.gif",
+        "https://media.giphy.com/media/d0NnEG1WnnXqg/giphy.gif",
+        "https://media.giphy.com/media/3o7qDSOvfaCO9b3MlO/giphy.gif",
+        "https://media.giphy.com/media/U23rlgyL8QmQn7xrqt/giphy-downsized.gif",
+        "https://media.giphy.com/media/McsNw88dsArrNk0srb/giphy.gif"
     ]
 
 }

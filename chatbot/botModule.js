@@ -82,7 +82,8 @@ const botModule = ( bot ) => {
 
         getCommandAndArguments: function( text ) {
             const [ sentCommand, ...args ] = text.split( " " );
-            let theCommand = sentCommand.substring( 1, sentCommand.length )
+            let theCommand = sentCommand.substring( 1, sentCommand.length );
+            theCommand = theCommand.toLowerCase();
             const commandObj = allCommands[ theCommand ];
             if ( commandObj ) {
                 return [ commandObj, args ];

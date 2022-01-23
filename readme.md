@@ -81,4 +81,4 @@ My intention was to create some kind of unit tests, and that's what the <strong>
 
 ### Disclaimer ;-)
 
-FYI: I'm a DBA, not a developer, as anyone whoknows more about javascript than I do will easily tell from the code :-)
+FYI: I'm a DBA, not a developer, as anyone who knows more about javascript than I do will easily tell from the code :-)

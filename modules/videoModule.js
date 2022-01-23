@@ -65,7 +65,8 @@ const videoFunctions = () => {
             } )
             .then( ( { data } ) => {
                 return data.items[ 0 ].contentDetails;
-            } );
+            } )
+            .catch( err => console.error(`Error occurred in videoFunctions.queryVideoDetails() : ${err}`) );
     }
 
     async function getRegionRestrictions ( auth, videoID ) {
@@ -111,18 +112,29 @@ const videoFunctions = () => {
                 authorize( CLIENT_SECRET_PATH, TOKEN_PATH, SCOPES )
                     .then( ( oauthClient ) => getRegionRestrictions( oauthClient, videoID ) )
                     .then( ( restrictions ) => {
-                        if ( restrictions !== undefined ) {
-                            if ( restrictions.allowed !== undefined ) {
+                        if ( !restrictions ) {
+                            return;
+                        }
+
+                        if ( restrictions.hasOwnProperty(`allowed`) ) {
+                            if ( restrictions.allowed ) {
                                 alertIfRegionsNotAllowed( restrictions, userFunctions, ( msg ) =>
                                     chatFunctions.botSpeak( msg, data )
                                 );
-                            } else if ( restrictions.blocked !== undefined ) {
+                            }
+                            return;
+                        }
+
+                        if ( restrictions.hasOwnProperty(`blocked`) ) {
+                            if ( restrictions.blocked ) {
                                 alertIfRegionsBlocked( restrictions, userFunctions, ( msg ) =>
                                     chatFunctions.botSpeak( msg, data )
                                 );
                             }
                         }
-                    } );
+
+                    } )
+                    .catch( err => console.error(`Error occurred in videoFunctions.checkVideoRegionAlert() : ${err}`) );
             }
         },
 

@@ -1,5 +1,7 @@
 let chatDefaults = require( '../defaultSettings/chatDefaults.js' );
 let chatCommandItems = require( '../defaultSettings/chatCommandItems.js' );
+const Storage = require( 'node-storage' );
+const { dirname } = require( 'path' );
 
 const generalCommands = {};
 const userCommands = {};
@@ -9,6 +11,8 @@ const userQueueCommands = {};
 const moderatorQueueCommands = {};
 const moderatorWelcomeCommands = {};
 const moderatorCommands = {};
+
+const aliasDataFileName = process.env.ALIASDATA;
 
 const ignoreCommands = [ '/me ' ];
 
@@ -40,23 +44,23 @@ const commandFunctions = ( bot ) => {
     generalCommands.stopescortme = ( { data, userFunctions, chatFunctions } ) => { userFunctions.disableEscortMe( data, chatFunctions ); }
     generalCommands.stopescortme.help = "Stop yourself from being removed from the decks after your track finishes playing";
 
-    generalCommands.whatsPlayLimit = ( { data, userFunctions, chatFunctions } ) => { userFunctions.whatsPlayLimit( data, chatFunctions ); }
-    generalCommands.whatsPlayLimit.help = "Is the DJ Play Limit enabled, and if so what it's set to";
+    generalCommands.whatsplaylimit = ( { data, userFunctions, chatFunctions } ) => { userFunctions.whatsPlayLimit( data, chatFunctions ); }
+    generalCommands.whatsplaylimit.help = "Is the DJ Play Limit enabled, and if so what it's set to";
 
     generalCommands.refresh = ( { data, botFunctions, userFunctions, chatFunctions } ) => { userFunctions.refreshCommand( data, chatFunctions, botFunctions ); }
     generalCommands.refresh.help = "Hold your spot on stage for one minute if you need to refresh your browser";
 
-    generalCommands.regionAlerts = ( { data, botFunctions, videoFunctions, chatFunctions } ) => { botFunctions.reportRegionCheckStatus( data, videoFunctions, chatFunctions ); }
-    generalCommands.regionAlerts.help = "Show the list of regions that DJs are alerted about ";
+    generalCommands.regionalerts = ( { data, botFunctions, videoFunctions, chatFunctions } ) => { botFunctions.reportRegionCheckStatus( data, videoFunctions, chatFunctions ); }
+    generalCommands.regionalerts.help = "Show the list of regions that DJs are alerted about ";
 
-    generalCommands.roomStatus = ( { data, botFunctions, chatFunctions, userFunctions, videoFunctions } ) => { botFunctions.reportRoomStatus( data, chatFunctions, userFunctions, videoFunctions ); }
-    generalCommands.roomStatus.help = "Show the list of regions that DJs are alerted about ";
+    generalCommands.roomstatus = ( { data, botFunctions, chatFunctions, userFunctions, videoFunctions } ) => { botFunctions.reportRoomStatus( data, chatFunctions, userFunctions, videoFunctions ); }
+    generalCommands.roomstatus.help = "Show the list of regions that DJs are alerted about ";
 
     generalCommands.dive = ( { data, botFunctions, chatFunctions, userFunctions } ) => { botFunctions.stageDiveCommand( data, chatFunctions, userFunctions, chatCommandItems.stageDiveMessages ); }
     generalCommands.dive.help = "Leave the DJ booth with style...stagedive tho' init!";
 
-    generalCommands.myStats = ( { data, userFunctions, chatFunctions } ) => { userFunctions.readSingleUserStatus( data, chatFunctions ) }
-    generalCommands.myStats.help = "What info does the Bot currently hold about you...handy for knowing how much time you've been wasting on here today!";
+    generalCommands.mystats = ( { data, userFunctions, chatFunctions } ) => { userFunctions.readSingleUserStatus( data, chatFunctions ) }
+    generalCommands.mystats.help = "What info does the Bot currently hold about you...handy for knowing how much time you've been wasting on here today!";
 
     generalCommands.theme = ( { data, roomFunctions, chatFunctions } ) => { roomFunctions.readTheme( data, chatFunctions ) }
     generalCommands.theme.help = "Tells you what the current teme is, if there is one";
@@ -147,8 +151,8 @@ const commandFunctions = ( bot ) => {
     chatCommands.lighter = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.lighterMessages, chatCommandItems.lighterPics, userFunctions ); }
     chatCommands.lighter.help = "One for the ballads...";
 
-    chatCommands.couplesSkate = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.couplesSkateMessages, chatCommandItems.couplesSkatePics, userFunctions ); }
-    chatCommands.couplesSkate.help = "Time for a slow dance?";
+    chatCommands.couplesskate = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.couplesSkateMessages, chatCommandItems.couplesSkatePics, userFunctions ); }
+    chatCommands.couplesskate.help = "Time for a slow dance?";
 
     chatCommands.noice = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.noiceMessages, chatCommandItems.noicePics, userFunctions ); }
     chatCommands.noice.help = "very nice...";
@@ -168,8 +172,8 @@ const commandFunctions = ( bot ) => {
     chatCommands.klaus = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.klausMessages, chatCommandItems.klausPics, userFunctions ); }
     chatCommands.klaus.help = "It's Klaus Nomi...what more is there to know? ;-)";
 
-    chatCommands.carefulNow = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.carefulNowMessages, chatCommandItems.carefulNowPics, userFunctions ); }
-    chatCommands.carefulNow.help = "Woah there...careful";
+    chatCommands.carefulnow = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.carefulNowMessages, chatCommandItems.carefulNowPics, userFunctions ); }
+    chatCommands.carefulnow.help = "Woah there...careful";
 
     chatCommands.martika = ( { data, chatFunctions } ) => { chatFunctions.multilineChatCommand( data, chatCommandItems.martikaMessages, chatCommandItems.martikaPics ); }
     chatCommands.martika.help = "M A R T I K A";
@@ -177,8 +181,8 @@ const commandFunctions = ( bot ) => {
     chatCommands.monkey = ( { data, chatFunctions } ) => { chatFunctions.multilineChatCommand( data, chatCommandItems.monkeyMessages, chatCommandItems.monkeyPics ); }
     chatCommands.monkey.help = "Schock den Affen!";
 
-    chatCommands.mindBlown = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.mindBlownMessages, chatCommandItems.mindBlownPics, userFunctions ); }
-    chatCommands.mindBlown.help = "Huh?!? I didn't know that!";
+    chatCommands.mindblown = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.mindBlownMessages, chatCommandItems.mindBlownPics, userFunctions ); }
+    chatCommands.mindblown.help = "Huh?!? I didn't know that!";
 
     chatCommands.rush = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.rushMessages, chatCommandItems.rushPics, userFunctions ); }
     chatCommands.rush.help = "Celebrate the Rush ;-)";
@@ -207,6 +211,15 @@ const commandFunctions = ( bot ) => {
     chatCommands.yacht = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.yachtMessages, chatCommandItems.yachtPics, userFunctions ); }
     chatCommands.yacht.help = "because not all rock is hard";
 
+    chatCommands.sax = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.saxMessages, chatCommandItems.saxPics, userFunctions ); }
+    chatCommands.sax.help = "I'm A SAX MAN!!";
+
+    chatCommands.zod = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.zodMessages, chatCommandItems.zodPics, userFunctions ); }
+    chatCommands.zod.help = "Bro, do you even General Zod?";
+
+    chatCommands.micdrop = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.micDropMessages, chatCommandItems.micDropPics, userFunctions ); }
+    chatCommands.micdrop.help = "End of...";
+
     // ######################################################
     // Advanced chat commands...more than just basic messages
     // ######################################################
@@ -218,6 +231,11 @@ const commandFunctions = ( bot ) => {
     chatCommands.dice.argumentCount = 2;
     chatCommands.dice.help = "Roll some dice";
     chatCommands.dice.sampleArguments = [ "1", "d20" ]
+
+    chatCommands.listalias = ( { data, chatFunctions } ) => { listAlias( data, chatFunctions ); }
+    chatCommands.listalias.argumentCount = 1;
+    chatCommands.listalias.help = "List aliases for a command";
+    chatCommands.listalias.sampleArguments = [ "alias" ];
 
     // #############################################
     // Bot control commands
@@ -243,83 +261,83 @@ const commandFunctions = ( bot ) => {
     // Moderator Only commands
     // #############################################
 
-    moderatorCommands.randomisePlaylist = ( { songFunctions } ) => { songFunctions.randomisePlaylist() }
-    moderatorCommands.randomisePlaylist.help = () => { }
+    moderatorCommands.randomiseplaylist = ( { songFunctions } ) => { songFunctions.randomisePlaylist() }
+    moderatorCommands.randomiseplaylist.help = () => { }
 
     moderatorCommands.autodj = () => { bot.addDj(); }
     moderatorCommands.autodj.help = "Starts the Bot DJing";
 
-    moderatorCommands.lengthLimit = ( { data, args, songFunctions, chatFunctions } ) => { songFunctions.switchLengthLimit( data, args, chatFunctions ) }
-    moderatorCommands.lengthLimit.argumentCount = 1;
-    moderatorCommands.lengthLimit.help = "Switch the song length limit on or off. Sent with a number it changes the limit";
-    moderatorCommands.lengthLimit.sampleArguments = [ "20" ];
+    moderatorCommands.lengthlimit = ( { data, args, songFunctions, chatFunctions } ) => { songFunctions.switchLengthLimit( data, args, chatFunctions ) }
+    moderatorCommands.lengthlimit.argumentCount = 1;
+    moderatorCommands.lengthlimit.help = "Switch the song length limit on or off. Sent with a number it changes the limit";
+    moderatorCommands.lengthlimit.sampleArguments = [ "20" ];
 
-    moderatorCommands.userStatus = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.readUserStatus( data, args, chatFunctions ) }
-    moderatorCommands.userStatus.argumentCount = 1;
-    moderatorCommands.userStatus.help = "Read out the activity summary of a specified user";
-    moderatorCommands.userStatus.sampleArguments = [ "Jodrell" ];
+    moderatorCommands.userstatus = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.readUserStatus( data, args, chatFunctions ) }
+    moderatorCommands.userstatus.argumentCount = 1;
+    moderatorCommands.userstatus.help = "Read out the activity summary of a specified user";
+    moderatorCommands.userstatus.sampleArguments = [ "Jodrell" ];
 
-    moderatorCommands.playLimitOn = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.playLimitOnCommand( data, args, chatFunctions ) }
-    moderatorCommands.playLimitOn.argumentCount = 1;
-    moderatorCommands.playLimitOn.help = "Enable the DJ play limits";
-    moderatorCommands.playLimitOn.sampleArguments = [ "10" ];
+    moderatorCommands.playlimiton = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.playLimitOnCommand( data, args, chatFunctions ) }
+    moderatorCommands.playlimiton.argumentCount = 1;
+    moderatorCommands.playlimiton.help = "Enable the DJ play limits";
+    moderatorCommands.playlimiton.sampleArguments = [ "10" ];
 
-    moderatorCommands.playLimitOff = ( { data, userFunctions, chatFunctions } ) => { userFunctions.playLimitOffCommand( data, chatFunctions ) }
-    moderatorCommands.playLimitOff.help = "Disable the DJ play limits";
+    moderatorCommands.playlimitoff = ( { data, userFunctions, chatFunctions } ) => { userFunctions.playLimitOffCommand( data, chatFunctions ) }
+    moderatorCommands.playlimitoff.help = "Disable the DJ play limits";
 
-    moderatorCommands.songStats = ( { data, botFunctions, chatFunctions } ) => { botFunctions.songStatsCommand( data, chatFunctions ) }
-    moderatorCommands.songStats.help = "Switch the readout of the song stats on or off";
+    moderatorCommands.songstats = ( { data, botFunctions, chatFunctions } ) => { botFunctions.songStatsCommand( data, chatFunctions ) }
+    moderatorCommands.songstats.help = "Switch the readout of the song stats on or off";
 
-    moderatorCommands.autoDJ = ( { data, botFunctions, chatFunctions } ) => { botFunctions.autoDJCommand( data, chatFunctions ) }
-    moderatorCommands.autoDJ.help = "Enables or Disables the auto DJing function";
+    moderatorCommands.autodj = ( { data, botFunctions, chatFunctions } ) => { botFunctions.autoDJCommand( data, chatFunctions ) }
+    moderatorCommands.autodj.help = "Enables or Disables the auto DJing function";
 
-    moderatorCommands.autoDJStart = ( { data, args, botFunctions, chatFunctions } ) => { botFunctions.setWhenToGetOnStage( data, args, chatFunctions ) }
-    moderatorCommands.autoDJStart.help = "Set the number of DJs that need to be on stage for the Bot to start DJing";
+    moderatorCommands.autodjstart = ( { data, args, botFunctions, chatFunctions } ) => { botFunctions.setWhenToGetOnStage( data, args, chatFunctions ) }
+    moderatorCommands.autodjstart.help = "Set the number of DJs that need to be on stage for the Bot to start DJing";
 
-    moderatorCommands.autoDJStop = ( { data, args, botFunctions, chatFunctions } ) => { botFunctions.setWhenToGetOffStage( data, args, chatFunctions ) }
-    moderatorCommands.autoDJStop.help = "Set the number of DJs that need to be on stage for the Bot to stop DJing";
+    moderatorCommands.autodjstop = ( { data, args, botFunctions, chatFunctions } ) => { botFunctions.setWhenToGetOffStage( data, args, chatFunctions ) }
+    moderatorCommands.autodjstop.help = "Set the number of DJs that need to be on stage for the Bot to stop DJing";
 
-    moderatorCommands.removeIdleDJs = ( { data, userFunctions, botFunctions, chatFunctions } ) => { botFunctions.removeIdleDJsCommand( data, userFunctions, chatFunctions ) }
-    moderatorCommands.removeIdleDJs.help = "Enable/Disable the auto removal of DJs who've idled out";
+    moderatorCommands.removeidledjs = ( { data, userFunctions, botFunctions, chatFunctions } ) => { botFunctions.removeIdleDJsCommand( data, userFunctions, chatFunctions ) }
+    moderatorCommands.removeidledjs.help = "Enable/Disable the auto removal of DJs who've idled out";
 
-    moderatorCommands.idleWarning1 = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.setIdleFirstWarningTime( data, args, chatFunctions ) }
-    moderatorCommands.idleWarning1.help = "Time in minutes for the first Idle warning to be sent";
+    moderatorCommands.idlewarning1 = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.setIdleFirstWarningTime( data, args, chatFunctions ) }
+    moderatorCommands.idlewarning1.help = "Time in minutes for the first Idle warning to be sent";
 
-    moderatorCommands.idleWarning2 = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.setIdleSecondWarningTime( data, args, chatFunctions ) }
-    moderatorCommands.idleWarning2.help = "Time in minutes for the first Idle warning to be sent";
+    moderatorCommands.idlewarning2 = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.setIdleSecondWarningTime( data, args, chatFunctions ) }
+    moderatorCommands.idlewarning2.help = "Time in minutes for the first Idle warning to be sent";
 
-    moderatorCommands.parseVideo = ( { data, args, videoFunctions, userFunctions, chatFunctions, botFunctions } ) => { videoFunctions.checkVideoRegionAlert( data, args, userFunctions, chatFunctions, botFunctions ) }
-    moderatorCommands.parseVideo.help = "Test the video region checker";
+    moderatorCommands.parsevideo = ( { data, args, videoFunctions, userFunctions, chatFunctions, botFunctions } ) => { videoFunctions.checkVideoRegionAlert( data, args, userFunctions, chatFunctions, botFunctions ) }
+    moderatorCommands.parsevideo.help = "Test the video region checker";
 
-    moderatorCommands.addAlertRegion = ( { data, args, videoFunctions, chatFunctions, botFunctions } ) => { botFunctions.addAlertRegionCommand( data, args, videoFunctions, chatFunctions ) }
-    moderatorCommands.addAlertRegion.argumentCount = 1;
-    moderatorCommands.addAlertRegion.help = "Add a new region to the list of places that DJs will be alerted about if their video is blocked from";
-    moderatorCommands.addAlertRegion.sampleArguments = [ "CA" ];
+    moderatorCommands.addalertregion = ( { data, args, videoFunctions, chatFunctions, botFunctions } ) => { botFunctions.addAlertRegionCommand( data, args, videoFunctions, chatFunctions ) }
+    moderatorCommands.addalertregion.argumentCount = 1;
+    moderatorCommands.addalertregion.help = "Add a new region to the list of places that DJs will be alerted about if their video is blocked from";
+    moderatorCommands.addalertregion.sampleArguments = [ "CA" ];
 
-    moderatorCommands.removeAlertRegion = ( { data, args, videoFunctions, chatFunctions, botFunctions } ) => { botFunctions.removeAlertRegionCommand( data, args, videoFunctions, chatFunctions ) }
-    moderatorCommands.removeAlertRegion.argumentCount = 1;
-    moderatorCommands.removeAlertRegion.help = "Remove a region from the list of places that DJs will be alerted about if their video is blocked from";
-    moderatorCommands.removeAlertRegion.sampleArguments = [ "CA" ];
+    moderatorCommands.removealertregion = ( { data, args, videoFunctions, chatFunctions, botFunctions } ) => { botFunctions.removeAlertRegionCommand( data, args, videoFunctions, chatFunctions ) }
+    moderatorCommands.removealertregion.argumentCount = 1;
+    moderatorCommands.removealertregion.help = "Remove a region from the list of places that DJs will be alerted about if their video is blocked from";
+    moderatorCommands.removealertregion.sampleArguments = [ "CA" ];
 
-    moderatorCommands.checkVideoRegions = ( { data, botFunctions, chatFunctions, videoFunctions } ) => { botFunctions.checkVideoRegionsCommand( data, videoFunctions, chatFunctions ); }
-    moderatorCommands.checkVideoRegions.help = "Switch the region alerts on/off";
+    moderatorCommands.checkvideoregions = ( { data, botFunctions, chatFunctions, videoFunctions } ) => { botFunctions.checkVideoRegionsCommand( data, videoFunctions, chatFunctions ); }
+    moderatorCommands.checkvideoregions.help = "Switch the region alerts on/off";
 
     moderatorCommands.m = ( { data, args, chatFunctions } ) => { chatFunctions.ventriloquistCommand( data, args ); }
     moderatorCommands.m.help = "Make your Bot say whatever you want it to!";
 
-    moderatorCommands.refreshOn = ( { data, botFunctions, chatFunctions } ) => { botFunctions.refreshOnCommand( data, chatFunctions ); }
-    moderatorCommands.refreshOn.help = "Enable the " + chatDefaults.commandIdentifier + "refresh command";
+    moderatorCommands.refreshon = ( { data, botFunctions, chatFunctions } ) => { botFunctions.refreshOnCommand( data, chatFunctions ); }
+    moderatorCommands.refreshon.help = "Enable the " + chatDefaults.commandIdentifier + "refresh command";
 
-    moderatorCommands.refreshOff = ( { data, botFunctions, chatFunctions } ) => { botFunctions.refreshOffCommand( data, chatFunctions ); }
-    moderatorCommands.refreshOff.help = "Disable the " + chatDefaults.commandIdentifier + "refresh command";
+    moderatorCommands.refreshoff = ( { data, botFunctions, chatFunctions } ) => { botFunctions.refreshOffCommand( data, chatFunctions ); }
+    moderatorCommands.refreshoff.help = "Disable the " + chatDefaults.commandIdentifier + "refresh command";
 
-    moderatorCommands.whosRefreshing = ( { data, userFunctions, chatFunctions } ) => { userFunctions.whosRefreshingCommand( data, chatFunctions ); }
-    moderatorCommands.whosRefreshing.help = "List of users currently using the refresh command";
+    moderatorCommands.whosrefreshing = ( { data, userFunctions, chatFunctions } ) => { userFunctions.whosRefreshingCommand( data, chatFunctions ); }
+    moderatorCommands.whosrefreshing.help = "List of users currently using the refresh command";
 
-    moderatorCommands.sarahConner = ( { data, args, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.sarahConner( data, reassembleArgs( args ), userFunctions, chatFunctions ); }
-    moderatorCommands.sarahConner.argumentCount = 1;
-    moderatorCommands.sarahConner.help = "Shut down the Bot if it's causing problems";
-    moderatorCommands.sarahConner.sampleArguments = [ "He started booting everyone!" ];
+    moderatorCommands.sarahconner = ( { data, args, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.sarahConner( data, reassembleArgs( args ), userFunctions, chatFunctions ); }
+    moderatorCommands.sarahconner.argumentCount = 1;
+    moderatorCommands.sarahconner.help = "Shut down the Bot if it's causing problems";
+    moderatorCommands.sarahconner.sampleArguments = [ "He started booting everyone!" ];
 
     moderatorCommands.removedj = ( { data, args, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.removeDJCommand( data, reassembleArgs( args ), userFunctions, chatFunctions ); }
     moderatorCommands.removedj.help = "Remove the current DJ from the decks. Add a message after the command to have it sent direct to the DJ (in public)";
@@ -333,32 +351,42 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.lame = ( { botFunctions } ) => { botFunctions.lameCommand(); }
     moderatorCommands.lame.help = "Have the Bot downvote";
 
+    moderatorCommands.alias = ( { data, chatFunctions } ) => { addAlias( data, chatFunctions ); }
+    moderatorCommands.alias.argumentCount = 2;
+    moderatorCommands.alias.help = "Add or edit an alias command, will repoint an alias to a different command if it already exists";
+    moderatorCommands.alias.sampleArguments = [ "alias", "command" ];
+
+    moderatorCommands.removealias = ( { data, chatFunctions } ) => { removeAlias( data, chatFunctions ); }
+    moderatorCommands.removealias.argumentCount = 2;
+    moderatorCommands.removealias.help = "Remove an alias from a command";
+    moderatorCommands.removealias.sampleArguments = [ "alias", "command" ];
+
     // #############################################
     // Moderator Greeting commands
     // #############################################
 
-    moderatorWelcomeCommands.greetOn = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.greetOnCommand( data, chatFunctions ); }
-    moderatorWelcomeCommands.greetOn.help = "Enable user greetings";
+    moderatorWelcomeCommands.greeton = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.greetOnCommand( data, chatFunctions ); }
+    moderatorWelcomeCommands.greeton.help = "Enable user greetings";
 
-    moderatorWelcomeCommands.greetOff = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.greetOffCommand( data, chatFunctions ); }
-    moderatorWelcomeCommands.greetOff.help = "Disable user greetings";
+    moderatorWelcomeCommands.greetoff = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.greetOffCommand( data, chatFunctions ); }
+    moderatorWelcomeCommands.greetoff.help = "Disable user greetings";
 
-    moderatorWelcomeCommands.setTheme = ( { data, args, chatFunctions, roomFunctions } ) => { roomFunctions.setThemeCommand( data, reassembleArgs( args ), chatFunctions ); }
-    moderatorWelcomeCommands.setTheme.help = "Set a theme for the room";
+    moderatorWelcomeCommands.settheme = ( { data, args, chatFunctions, roomFunctions } ) => { roomFunctions.setThemeCommand( data, reassembleArgs( args ), chatFunctions ); }
+    moderatorWelcomeCommands.settheme.help = "Set a theme for the room";
 
-    moderatorWelcomeCommands.noTheme = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.removeThemeCommand( data, chatFunctions ); }
-    moderatorWelcomeCommands.noTheme.help = "Set a theme for the room";
+    moderatorWelcomeCommands.notheme = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.removeThemeCommand( data, chatFunctions ); }
+    moderatorWelcomeCommands.notheme.help = "Set a theme for the room";
 
-    moderatorWelcomeCommands.enableRules = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.enableRulesMessageCommand( data, chatFunctions ); }
-    moderatorWelcomeCommands.enableRules.help = "Have the room rules etc read out with the room greeting";
+    moderatorWelcomeCommands.enablerules = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.enableRulesMessageCommand( data, chatFunctions ); }
+    moderatorWelcomeCommands.enablerules.help = "Have the room rules etc read out with the room greeting";
 
-    moderatorWelcomeCommands.disableRules = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.disableRulesMessageCommand( data, chatFunctions ); }
-    moderatorWelcomeCommands.disableRules.help = "Stop the room rules being read out with the room greeting";
+    moderatorWelcomeCommands.disablerules = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.disableRulesMessageCommand( data, chatFunctions ); }
+    moderatorWelcomeCommands.disablerules.help = "Stop the room rules being read out with the room greeting";
 
-    moderatorWelcomeCommands.rulesInterval = ( { data, args, chatFunctions, roomFunctions } ) => { roomFunctions.setRulesIntervalCommand( data, args, chatFunctions ); }
-    moderatorWelcomeCommands.rulesInterval.argumentCount = 1;
-    moderatorWelcomeCommands.rulesInterval.help = "Set the interval, in minutes, for how often the room rules will be read out with the room greeting";
-    moderatorWelcomeCommands.rulesInterval.sampleArguments = [ 15 ];
+    moderatorWelcomeCommands.rulesinterval = ( { data, args, chatFunctions, roomFunctions } ) => { roomFunctions.setRulesIntervalCommand( data, args, chatFunctions ); }
+    moderatorWelcomeCommands.rulesinterval.argumentCount = 1;
+    moderatorWelcomeCommands.rulesinterval.help = "Set the interval, in minutes, for how often the room rules will be read out with the room greeting";
+    moderatorWelcomeCommands.rulesinterval.sampleArguments = [ 15 ];
 
     // #############################################
     // Moderator Only Queue commands
@@ -374,16 +402,16 @@ const commandFunctions = ( bot ) => {
     moderatorQueueCommands.bumptop.help = "Move a user to the head of the queue";
     moderatorQueueCommands.bumptop.sampleArguments = [ 'jodrell' ];
 
-    moderatorQueueCommands.queueOn = ( { data, userFunctions, chatFunctions } ) => { userFunctions.enableQueue( data, chatFunctions ) }
-    moderatorQueueCommands.queueOn.help = "Enables the queue";
+    moderatorQueueCommands.queueon = ( { data, userFunctions, chatFunctions } ) => { userFunctions.enableQueue( data, chatFunctions ) }
+    moderatorQueueCommands.queueon.help = "Enables the queue";
 
-    moderatorQueueCommands.queueOff = ( { data, userFunctions, chatFunctions } ) => { userFunctions.disableQueue( data, chatFunctions ) }
-    moderatorQueueCommands.queueOff.help = "Disables the queue";
+    moderatorQueueCommands.queueoff = ( { data, userFunctions, chatFunctions } ) => { userFunctions.disableQueue( data, chatFunctions ) }
+    moderatorQueueCommands.queueoff.help = "Disables the queue";
 
-    moderatorQueueCommands.setDJPlaycount = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.setDJCurrentPlaycountCommand( data, args[ 0 ], reassembleArgs( args, 1 ), chatFunctions ) }
-    moderatorQueueCommands.setDJPlaycount.argumentCount = 2;
-    moderatorQueueCommands.setDJPlaycount.help = "Sets a DJs current playcount. This will let you give a DJ extra plays, or fewer, if the playLimit is set";
-    moderatorQueueCommands.setDJPlaycount.sampleArguments = [ 2, 'jodrell' ];
+    moderatorQueueCommands.setdjplaycount = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.setDJCurrentPlaycountCommand( data, args[ 0 ], reassembleArgs( args, 1 ), chatFunctions ) }
+    moderatorQueueCommands.setdjplaycount.argumentCount = 2;
+    moderatorQueueCommands.setdjplaycount.help = "Sets a DJs current playcount. This will let you give a DJ extra plays, or fewer, if the playLimit is set";
+    moderatorQueueCommands.setdjplaycount.sampleArguments = [ 2, 'jodrell' ];
 
     // #############################
     // end of fully checked commands
@@ -513,8 +541,19 @@ const commandFunctions = ( bot ) => {
 
         getCommandAndArguments: function ( text, allCommands ) {
             const [ sentCommand, ...args ] = text.split( " " );
+
             let theCommand = sentCommand.substring( 1, sentCommand.length )
-            const commandObj = allCommands[ theCommand ];
+            theCommand = theCommand.toLowerCase();
+
+            // Check if command exists
+            let commandObj = allCommands[ theCommand ];
+
+            // Command doesn't exist, check aliases
+            if ( !commandObj ) {
+                const aliasCommand = checkForAlias( sentCommand );
+                commandObj = allCommands[ aliasCommand ];
+            }
+
             if ( commandObj ) {
                 const moderatorOnly = !!moderatorCommands[ theCommand ];
                 return [ commandObj, args, moderatorOnly ];
@@ -536,4 +575,99 @@ const commandFunctions = ( bot ) => {
         },
     }
 }
+
+const checkForAlias = ( passedArguement ) => {
+    console.group( 'checkForAlias' );
+
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
+    const store = new Storage( dataFilePath );
+
+    const theAliases = store.get( 'aliases' );
+
+    let findAlias = theAliases[ passedArguement ];
+    console.groupEnd();
+    return findAlias ? findAlias.command : undefined;
+}
+
+const listAlias = ( data, chatFunctions ) => {
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
+    const store = new Storage( dataFilePath );
+
+    const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
+    passedArguement = strippedCommand[ 1 ];
+    const alias = checkForAlias( passedArguement );
+
+    const aliasLookup = alias ? `commands.${ alias }` : `commands.${ passedArguement }`;
+
+    const aliases = store.get( aliasLookup );
+
+    chatFunctions.botSpeak( getAliasReturnText( aliases, alias, passedArguement ), data );
+}
+
+const getAliasReturnText = ( aliases, alias, command ) => {
+    let returnText;
+
+    if ( alias ) {
+        returnText = `${ command } is an alias for the command ${ chatDefaults.commandIdentifier }${ alias }`;
+
+        if ( aliases?.length > 1 ) {
+            returnText += ` which has the following aliases ${ chatDefaults.commandIdentifier }${ aliases.join( ` and ${ chatDefaults.commandIdentifier }` ) }`;
+        }
+    }
+    else {
+        returnText = `The command ${ chatDefaults.commandIdentifier }${ command } has no aliases`;
+
+        if ( aliases?.length ) {
+            returnText = `The command ${ chatDefaults.commandIdentifier }${ command } now has aliases ${ chatDefaults.commandIdentifier }${ aliases.join( ` and ${ chatDefaults.commandIdentifier }` ) }`;
+        }
+    }
+
+    return returnText;
+}
+
+const addAlias = ( data, chatFunctions ) => {
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
+    const store = new Storage( dataFilePath );
+
+    const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
+
+    store.put( `aliases.${ strippedCommand[ 1 ] }`, { command: strippedCommand[ 2 ] } );
+
+    let newCommandWithAlias = [ strippedCommand[ 1 ] ];
+
+    let commandList = store.get( `commands.${ strippedCommand[ 2 ] }` );
+
+    if ( commandList ) {
+        commandList.push( strippedCommand[ 1 ] );
+        newCommandWithAlias = commandList;
+    }
+
+    store.put( `commands.${ strippedCommand[ 2 ] }`, newCommandWithAlias );
+
+    chatFunctions.botSpeak( "Update successful.", data );
+}
+
+const removeAlias = ( data, chatFunctions ) => {
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
+    const store = new Storage( dataFilePath );
+
+    const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
+
+    const aliasBeingRemoved = checkForAlias( `/${ strippedCommand[ 1 ] }` );
+
+    store.remove( `aliases.${ strippedCommand[ 1 ] }` );
+
+    let commandList = store.get( `commands.${ aliasBeingRemoved }` );
+
+    if ( commandList ) {
+        var updatedCommandList = commandList.filter( function ( value, index, arr ) {
+            return value !== strippedCommand[ 1 ];
+        } );
+
+        store.put( `commands.${ aliasBeingRemoved }`, updatedCommandList );
+    }
+
+    chatFunctions.botSpeak( "Alias removed.", data );
+}
+
 module.exports = commandFunctions;

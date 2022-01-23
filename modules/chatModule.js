@@ -120,8 +120,8 @@ const chatFunctions = ( bot, roomDefaults ) => {
         },
 
         dice: function ( data, args, userFunctions ) {
-            if (args.length < 2) {
-                this.botSpeak( `You didn't tell me how many dice to roll and how many sides they have`, data );
+            if ( args.length < 2 ) {
+                this.botSpeak( `You didn't tell me how many dice to roll and how many sides they have. Check "/help dice" for more info`, data );
                 return;
             }
 
@@ -129,33 +129,33 @@ const chatFunctions = ( bot, roomDefaults ) => {
             const diceCount = args[ 0 ];
             const diceType = args[ 1 ].split( "d" )[ 1 ];
 
-            if (!diceType) {
-                this.botSpeak( `The 2nd number must have a "d" before it`, data );
+            if ( !diceType ) {
+                this.botSpeak( `The 2nd number must have a "d" before it. Check "/help dice" for more info`, data );
                 return;
             }
 
-            if (!+diceCount || !+diceType) {
+            if ( !+diceCount || !+diceType ) {
                 this.botSpeak( `Unable to read non-numeric values`, data );
                 return;
             }
 
-            if (diceCount < 1) {
-                this.botSpeak( `You must roll at leaast 1 dice`, data );
+            if ( diceCount < 1 ) {
+                this.botSpeak( `You must roll at least 1 die`, data );
                 return;
             }
 
-            if (diceCount > 10000) {
-                this.botSpeak( `There's a max of 10,000 dice`, data );
+            if ( diceCount > 100 ) {
+                this.botSpeak( `There's a max of 100 dice`, data );
                 return;
             }
 
-            if (diceType < 3) {
+            if ( diceType < 3 ) {
                 this.botSpeak( `These dice need at least 3 sides, otherwise, use coinflip`, data );
                 return;
             }
 
-            if (diceType > 10000) {
-                this.botSpeak( `These dice have a max of 10,000 sides`, data );
+            if ( diceType > 100 ) {
+                this.botSpeak( `These dice have a max of 100 sides`, data );
                 return;
             }
 
