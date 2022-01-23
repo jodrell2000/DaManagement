@@ -841,7 +841,7 @@ const userFunctions = ( bot ) => {
 
         removeUserFromAFKList: function ( data, chatFunctions ) {
             const theUserID = this.whoSentTheCommand( data );
-            removeUserIDFromAFKArray( theUserID );
+            this.removeUserIDFromAFKArray( theUserID );
             chatFunctions.botSpeak( '@' + this.getUsername( theUserID ) + ' you are no longer afk', data )
         },
 
