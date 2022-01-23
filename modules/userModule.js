@@ -1449,7 +1449,7 @@ const userFunctions = ( bot ) => {
             }
 
             if ( this.isUserAFK( userID ) ) {
-                this.removeUserIDFRomAFKArray( userID );
+                this.removeUserIDFromAFKArray( userID );
             }
 
             //removes people leaving the room in modpm still
@@ -1549,7 +1549,7 @@ const userFunctions = ( bot ) => {
 
             // remove the user from afk, just in case it was hanging around from a previous visit
             if ( this.isUserAFK( userID ) ) {
-                this.removeUserIDFRomAFKArray( userID );
+                this.removeUserIDFromAFKArray( userID );
             }
         },
 
