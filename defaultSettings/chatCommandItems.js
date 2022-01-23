@@ -500,6 +500,38 @@ module.exports = {
     saxPics: [
         "https://i.gifer.com/DMBw.gif",
         "https://i.imgur.com/OxdB2qx.gif"
+    ],
+
+    zodMessages: [
+        "KNEEL BEFORE ZOD!",
+        "You will bow down before me. I swear it!",
+        "Today begins a new order. Your lands, your possessions, your very lives, will gladly be given in tribute to me",
+        "This Roboto is nothing of the kind. I've discovered his weakness. He cares. He actually cares for these people",
+        "Why do you talk to me this way, when you know that I will kill you for it?"
+    ],
+
+    zodPics: [
+        "https://c.tenor.com/R7KoPi7-V4kAAAAd/zod-man-of-steel.gif",
+        "https://media.giphy.com/media/HGa08bNh1Dqla/giphy.gif",
+        "https://media.giphy.com/media/sGhWp5r1b4sEM/giphy.gif",
+        "https://c.tenor.com/zoTVBIZTJKkAAAAC/zod-heresy.gif",
+        "https://c.tenor.com/c5XpfP_zNTkAAAAC/rolling-eyes-not-amused.gif",
+        "https://c.tenor.com/4kjGBi-K0TMAAAAC/zod-kneel-before-zod.gif",
+        "https://c.tenor.com/j_B3qFDiElUAAAAC/superman-henry-cavill.gif"
+    ],
+
+    micDropMessages: [
+        "End of...",
+        "And that's the bottom line",
+        "Drop the mic when I'm finished, and watch it smoke"
+    ],
+
+    micDropPics: [
+        "https://media.giphy.com/media/PzztizcE7jvBS/giphy.gif",
+        "https://media.giphy.com/media/d0NnEG1WnnXqg/giphy.gif",
+        "https://media.giphy.com/media/3o7qDSOvfaCO9b3MlO/giphy.gif",
+        "https://media.giphy.com/media/U23rlgyL8QmQn7xrqt/giphy-downsized.gif",
+        "https://media.giphy.com/media/McsNw88dsArrNk0srb/giphy.gif"
     ]
 
 }
