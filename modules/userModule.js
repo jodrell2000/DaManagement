@@ -841,11 +841,13 @@ const userFunctions = ( bot ) => {
 
         removeUserFromAFKList: function ( data, chatFunctions ) {
             const theUserID = this.whoSentTheCommand( data );
-            const listPosition = afkPeople.indexOf( theUserID );
-
-            afkPeople.splice( listPosition, 1 );
-
+            removeUserIDFRomAFKArray( theUserID );
             chatFunctions.botSpeak( '@' + this.getUsername( theUserID ) + ' you are no longer afk', data )
+        },
+
+        removeUserIDFRomAFKArray: function ( theUserID ) {
+            const listPosition = afkPeople.indexOf( theUserID );
+            afkPeople.splice( listPosition, 1 );
         },
 
         howManyAFKUsers: function () {
@@ -1444,6 +1446,10 @@ const userFunctions = ( bot ) => {
             let checkIfStillInDjArray = djList.indexOf( userID );
             if ( checkIfStillInDjArray !== -1 ) {
                 djList.splice( checkIfStillInDjArray, 1 );
+            }
+
+            if (this.isUserAFK(userID)) {
+                this.removeUserIDFRomAFKArray(userID);
             }
 
             //removes people leaving the room in modpm still
