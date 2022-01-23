@@ -12,7 +12,7 @@ const moderatorQueueCommands = {};
 const moderatorWelcomeCommands = {};
 const moderatorCommands = {};
 
-const aliasDataFile = process.env.ALIASDATA;
+const aliasDataFileName = process.env.ALIASDATA;
 
 const ignoreCommands = [ '/me ' ];
 
@@ -576,47 +576,49 @@ const commandFunctions = ( bot ) => {
     }
 }
 
-const checkForAlias = ( theCommand ) => {
-    const strippedCommand = theCommand.substr( 1, theCommand.length - 1 ).toLowerCase();
+const checkForAlias = ( passedArguement ) => {
+    console.group( 'checkForAlias' );
 
-    const dataFilePath = `${ dirname( require.main.filename ) }/data/aliases.json`;
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
     const store = new Storage( dataFilePath );
 
     const theAliases = store.get( 'aliases' );
 
-    let findAlias = theAliases[ strippedCommand ];
+    let findAlias = theAliases[ passedArguement ];
+    console.groupEnd();
     return findAlias ? findAlias.command : undefined;
 }
 
 const listAlias = ( data, chatFunctions ) => {
-    const dataFilePath = `${ dirname( require.main.filename ) }/data/${ this.aliasDataFileName }`;
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
     const store = new Storage( dataFilePath );
 
     const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
-    const alias = checkForAlias( `/${ strippedCommand[ 1 ] }` );
+    passedArguement = strippedCommand[ 1 ];
+    const alias = checkForAlias( passedArguement );
 
-    const aliasLookup = alias ? `commands.${ alias }` : `commands.${ strippedCommand[ 1 ] }`;
+    const aliasLookup = alias ? `commands.${ alias }` : `commands.${ passedArguement }`;
 
     const aliases = store.get( aliasLookup );
 
-    chatFunctions.botSpeak( getAliasReturnText( aliases, alias, strippedCommand[ 1 ] ), data );
+    chatFunctions.botSpeak( getAliasReturnText( aliases, alias, passedArguement ), data );
 }
 
 const getAliasReturnText = ( aliases, alias, command ) => {
     let returnText;
 
     if ( alias ) {
-        returnText = `${ command } is an alias for the command /${ alias }`;
+        returnText = `${ command } is an alias for the command ${ chatDefaults.commandIdentifier }${ alias }`;
 
         if ( aliases?.length > 1 ) {
-            returnText += ` which has the following aliases /${ aliases.join( ` and /` ) }`;
+            returnText += ` which has the following aliases ${ chatDefaults.commandIdentifier }${ aliases.join( ` and ${ chatDefaults.commandIdentifier }` ) }`;
         }
     }
     else {
-        returnText = `The command /${ command } has no aliases`;
+        returnText = `The command ${ chatDefaults.commandIdentifier }${ command } has no aliases`;
 
         if ( aliases?.length ) {
-            returnText = `The command /${ command } now has aliases /${ aliases.join( ` and /` ) }`;
+            returnText = `The command ${ chatDefaults.commandIdentifier }${ command } now has aliases ${ chatDefaults.commandIdentifier }${ aliases.join( ` and ${ chatDefaults.commandIdentifier }` ) }`;
         }
     }
 
@@ -624,7 +626,7 @@ const getAliasReturnText = ( aliases, alias, command ) => {
 }
 
 const addAlias = ( data, chatFunctions ) => {
-    const dataFilePath = `${ dirname( require.main.filename ) }/data/${ this.aliasDataFileName }`;
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
     const store = new Storage( dataFilePath );
 
     const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
@@ -646,7 +648,7 @@ const addAlias = ( data, chatFunctions ) => {
 }
 
 const removeAlias = ( data, chatFunctions ) => {
-    const dataFilePath = `${ dirname( require.main.filename ) }/data/${ this.aliasDataFileName }`;
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
     const store = new Storage( dataFilePath );
 
     const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
