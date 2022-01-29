@@ -1,4 +1,4 @@
-const chatModule = require( './chatModule' );
+const chatModule = require( '../modules/chatModule' );
 
 let chatFunctions;
 let mockBot;
