@@ -13,6 +13,7 @@ const moderatorWelcomeCommands = {};
 const moderatorCommands = {};
 
 const aliasDataFileName = process.env.ALIASDATA;
+const chatDataFileName = process.env.CHATDATA;
 
 const ignoreCommands = [ '/me ' ];
 
@@ -413,6 +414,27 @@ const commandFunctions = ( bot ) => {
     moderatorQueueCommands.setdjplaycount.help = "Sets a DJs current playcount. This will let you give a DJ extra plays, or fewer, if the playLimit is set";
     moderatorQueueCommands.setdjplaycount.sampleArguments = [ 2, 'jodrell' ];
 
+    // #############################################
+    // Moderator Only Dynamic Chat commands
+    // #############################################
+
+    moderatorCommands.addchatcommand = ( { data, chatFunctions } ) => { addChatCommand( data, chatFunctions ); }
+    moderatorCommands.addchatcommand.argumentCount = 2;
+    moderatorCommands.addchatcommand.help = "Add a new chat/picture command. You must add a message with the new command";
+    moderatorCommands.addchatcommand.sampleArguments = [ "command", "message" ];
+
+/*
+    moderatorCommands.addChatCommandMessage = ( { data, chatFunctions } ) => { addChatCommandMessage( data, chatFunctions ); }
+    moderatorCommands.addChatCommandMessage.argumentCount = 2;
+    moderatorCommands.addChatCommandMessage.help = "Add a new random message to a chat command";
+    moderatorCommands.addChatCommandMessage.sampleArguments = [ "command", "Hi there!" ];
+
+    moderatorCommands.addChatCommandPicture = ( { data, chatFunctions } ) => { addChatCommandPicture( data, chatFunctions ); }
+    moderatorCommands.addChatCommandPicture.argumentCount = 2;
+    moderatorCommands.addChatCommandPicture.help = "Add a new random picture to a chat command";
+    moderatorCommands.addChatCommandPicture.sampleArguments = [ "command", "https://media.giphy.com/media/3o7btVYvxUMxrLC3yo/giphy.gif" ];
+*/
+
     // #############################
     // end of fully checked commands
     // #############################
@@ -574,14 +596,24 @@ const commandFunctions = ( bot ) => {
             }
         },
 
-        isBotCommand: (command) => {
+        isCoreCommand: ( command ) => {
             return allCommands[ command ];
+        },
+
+        isChatCommand: ( command ) => {
+            const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
+            const store = new Storage( dataFilePath );
+
+            const theCommands = store.get( 'chatMessages' );
+
+            const findCommand = theCommands[ command ];
+
+            return findCommand !== undefined;
         }
     }
 }
 
 const checkForAlias = ( passedArguement ) => {
-    console.group( 'checkForAlias' );
 
     const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
     const store = new Storage( dataFilePath );
@@ -589,7 +621,6 @@ const checkForAlias = ( passedArguement ) => {
     const theAliases = store.get( 'aliases' );
 
     let findAlias = theAliases[ passedArguement ];
-    console.groupEnd();
     return findAlias ? findAlias.command : undefined;
 }
 
@@ -598,14 +629,14 @@ const listAlias = ( data, chatFunctions ) => {
     const store = new Storage( dataFilePath );
 
     const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
-    passedArguement = strippedCommand[ 1 ];
-    const alias = checkForAlias( passedArguement );
+    const passedArgument = strippedCommand[ 1 ];
+    const alias = checkForAlias( passedArgument );
 
-    const aliasLookup = alias ? `commands.${ alias }` : `commands.${ passedArguement }`;
+    const aliasLookup = alias ? `commands.${ alias }` : `commands.${ passedArgument }`;
 
     const aliases = store.get( aliasLookup );
 
-    chatFunctions.botSpeak( getAliasReturnText( aliases, alias, passedArguement ), data );
+    chatFunctions.botSpeak( getAliasReturnText( aliases, alias, passedArgument ), data );
 }
 
 const getAliasReturnText = ( aliases, alias, command ) => {
@@ -635,18 +666,18 @@ const addAlias = ( data, chatFunctions ) => {
     const commandModule = commandFunctions();
 
     const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
-    passedArguement = strippedCommand[ 1 ];
-    const alias = checkForAlias( passedArguement );
+    const passedArgument = strippedCommand[ 1 ];
+    const alias = checkForAlias( passedArgument );
 
     // Check if new alias already exists
     if ( alias ) {
-        chatFunctions.botSpeak( `The alias ${chatDefaults.commandIdentifier}${passedArguement} already exists.`, data );
+        chatFunctions.botSpeak( `The alias ${chatDefaults.commandIdentifier}${passedArgument} already exists.`, data );
         return;
     }
 
     // Check if new alias is a command
-    if (commandModule.isBotCommand(passedArguement)) {
-        chatFunctions.botSpeak( `Alias not added. ${chatDefaults.commandIdentifier}${passedArguement} is already a command.`, data );
+    if (commandModule.isCoreCommand(passedArgument)) {
+        chatFunctions.botSpeak( `Alias not added. ${chatDefaults.commandIdentifier}${passedArgument} is already a command.`, data );
         return;
     }
 
@@ -679,7 +710,7 @@ const removeAlias = ( data, chatFunctions ) => {
     let commandList = store.get( `commands.${ aliasBeingRemoved }` );
 
     if ( commandList ) {
-        var updatedCommandList = commandList.filter( function ( value, index, arr ) {
+        const updatedCommandList = commandList.filter( function ( value, index, arr ) {
             return value !== strippedCommand[ 1 ];
         } );
 
@@ -687,6 +718,37 @@ const removeAlias = ( data, chatFunctions ) => {
     }
 
     chatFunctions.botSpeak( "Alias removed.", data );
+}
+
+// #########################################################
+
+const addChatCommand = ( data, chatFunctions ) => {
+    console.group( 'addChatCommand' );
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
+    const store = new Storage( dataFilePath );
+    const commandModule = commandFunctions();
+
+    const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
+    const passedArgument = strippedCommand[ 1 ];
+    const theMessage = strippedCommand[ 2 ];
+    const alias = checkForAlias( passedArgument );
+
+    // Check if the command is an existing alias
+    if ( alias ) {
+        chatFunctions.botSpeak( `That command can't be added as the alias ${chatDefaults.commandIdentifier}${passedArgument} already exists. Remove it if you want to add this as a command`, data );
+        return;
+    }
+
+    // Check if the command is an existing command
+    if ( commandModule.isCoreCommand( passedArgument ) || commandModule.isChatCommand( passedArgument ) ) {
+        chatFunctions.botSpeak( `That command can't be added as it already exists.`, data );
+        return;
+    }
+
+    store.put( `chatMessages.${ passedArgument }`, theMessage );
+
+    chatFunctions.botSpeak( "Update successful.", data );
+    console.groupEnd();
 }
 
 module.exports = commandFunctions;

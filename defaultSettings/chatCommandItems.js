@@ -4,7 +4,7 @@
 module.exports = {
     // selection of lines to pick for functions
     stageDiveMessages: [
-        "@senderUsername flies throught the air with the greatest of ease",
+        "@senderUsername flies through the air with the greatest of ease",
         "CANNONBALL!!! @senderUsername incoming",
         "People on the floor beware, @senderUsername is coming down fast!",
         "Screw you guys, @senderUsername is going home!",
