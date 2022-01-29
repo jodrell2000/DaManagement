@@ -13,11 +13,13 @@
 	},
 	"devDependencies": {
 		"eslint": "^8.7.0",
+		"jest": "^27.4.7",
 		"prettier": "^2.5.1"
 	},
 	"scripts": {
 		"lint": "eslint . --ext .js --ignore-pattern node_modules/",
 		"tidy": "prettier . --check",
-		"tidy:fix": "prettier . --fix"
+		"tidy:fix": "prettier . --fix",
+		"test": "jest --config ./jest.config.json"
 	}
 }
