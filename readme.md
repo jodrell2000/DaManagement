@@ -75,9 +75,13 @@ I'm trying to put the commands into groups such as <strong>moderatorCommands</st
 Ideally the commands.[command name].help list from that file would be parsed here to act as a manual...oh well, maybe later :-)
 
 ### Testing
-Yeah, it'd be lovely to have some kind of mock turntable.fm that could be developed against, but until then I'm just having to run things against either an empty test room, or when I actuually need to see if things work with more than just me, using the fantastic people in https://turntable.fm/i_the_80s
+Thanks to an actual, genuine, honest to goodness developer @1hitsong the bot now has some king of testing framework that hopefully we can build on.
 
-My intention was to create some kind of unit tests, and that's what the <strong>*tests*</strong> folder was supposed to contain. Honestly I kinda got bored and wanted to just get things working. Yes, yes...I know that's probably the wrong way round, but we're also well beyond my javascript level here. Any help in this, and any other, area will be grafetully received
+To  run the tests use the command
+```
+npm test
+```
+The tests are written using Jest, so you'll either need to know how that works, or read the existing tests and figure it out (like I'm currently doing). If you need some more help there's documentation here: https://jestjs.io
 
 ### Disclaimer ;-)
 
