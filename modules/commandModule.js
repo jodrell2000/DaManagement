@@ -356,6 +356,9 @@ const commandFunctions = ( bot ) => {
             case "modCommands":
                 theMessage = "The Moderator Commands are " + buildListFromObject( Object.keys( moderatorCommands ) );
                 break;
+            case "modChatCommands":
+                theMessage = "The Dynamic Chat Commands are " + buildListFromObject( Object.keys( moderatorChatCommands ) );
+                break;
             case "modWelcomeCommands":
                 theMessage = "The Moderator Welcome Commands are " + buildListFromObject( Object.keys( moderatorWelcomeCommands ) );
                 break;
@@ -375,7 +378,7 @@ const commandFunctions = ( bot ) => {
                 theMessage = "The User Commands are " + buildListFromObject( Object.keys( allQueueCommands ) );
                 break;
             default:
-                theMessage = 'Top level command groups are: generalCommands, chatCommands, queueCommands, botCommands, userCommands, modCommands, modWelcomeCommands, modQueueCommands. Please use ' + chatDefaults.commandIdentifier + 'list [commandGroup] for the individual commands';
+                theMessage = 'Top level command groups are: generalCommands, chatCommands, queueCommands, botCommands, userCommands, modCommands, modChatCommands, modWelcomeCommands, modQueueCommands. Please use ' + chatDefaults.commandIdentifier + 'list [commandGroup] for the individual commands';
                 break;
         }
 
