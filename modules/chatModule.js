@@ -65,17 +65,10 @@ const chatFunctions = ( bot, roomDefaults ) => {
         },
 
         textMessageTheDJ: function( senderID, receiverID, messageArray, data, userFunctions ) {
-            console.group( 'textMessageTheDJ' );
-            console.log( 'senderID:' + senderID );
-            console.log( 'receiverID:' + receiverID );
-            console.log( 'messageArray:' + messageArray );
             const randomMessage = messageArray[ Math.floor( Math.random() * messageArray.length ) ];
-            console.log( 'randomMessage:' + randomMessage );
             const thisMessage = this.buildUserToUserRandomMessage( userFunctions, senderID, randomMessage, receiverID );
-            console.log( 'thisMessage:' + thisMessage );
 
             this.botSpeak( thisMessage, data, true );
-            console.groupEnd();
         },
 
         pictureMessageTheDJ: function( senderID, receiverID, messageArray, pictureArray, data, userFunctions ) {
@@ -88,21 +81,14 @@ const chatFunctions = ( bot, roomDefaults ) => {
         },
 
         dynamicChatCommand: function( data, userFunctions, theCommand ) {
-            console.group( 'dynamicChatCommand' );
-            console.log( 'theCommand:' + theCommand );
             if ( this.isThereADJ( userFunctions, data ) ) {
                 const receiverID = userFunctions.getCurrentDJID();
                 const senderID = userFunctions.whoSentTheCommand( data );
-                console.log( 'senderID:' + senderID );
-                console.log( 'receiverID:' + receiverID );
                 const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
-                console.log( 'dataFilePath:' + dataFilePath );
                 const store = new Storage( dataFilePath );
 
                 let thePictures = store.get( `chatMessages.${ theCommand }.pictures` );
-                console.log( 'thePictures:' + thePictures );
                 let theMessages = store.get( `chatMessages.${ theCommand }.messages` );
-                console.log( 'theMessages:' + theMessages );
 
                 if ( thePictures === undefined ) {
                     this.textMessageTheDJ( senderID, receiverID, theMessages, data, userFunctions )
@@ -110,7 +96,6 @@ const chatFunctions = ( bot, roomDefaults ) => {
                     this.pictureMessageTheDJ( senderID, receiverID, theMessages, thePictures, data, userFunctions )
                 }
             }
-            console.groupEnd();
         },
 
         // ========================================================

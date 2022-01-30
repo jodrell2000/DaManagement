@@ -463,8 +463,9 @@ const commandFunctions = ( bot ) => {
 
             // If the command doesn't exist, check the dynamic chat commands
             if ( !commandObj ) {
-                this.isChatCommand( theCommand )
-                dynamic = true;
+                if ( this.isChatCommand( theCommand ) ) {
+                    dynamic = true;
+                }
             }
 
             if ( commandObj ) {
@@ -537,7 +538,6 @@ const commandFunctions = ( bot ) => {
             const regex = new RegExp( '"[^"]+"|[\\S]+', 'g' );
             theMessage.match( regex ).forEach( element => {
                 if ( !element ) return;
-                console.log( 'element:' + element );
                 return splitData.push( element.replace( /"/g, '' ) );
             } );
 
@@ -697,9 +697,7 @@ const addMessageToChatCommand = ( data, chatFunctions ) => {
     }
 
     let theMessages = store.get( `chatMessages.${ theCommand }.messages` );
-    console.log( "Current messages:" + theMessages);
     theMessages.push( theMessage );
-    console.log( "Replacement message:" + theMessages);
 
     store.put( `chatMessages.${ theCommand }.messages`, theMessages );
     chatFunctions.botSpeak( "Update successful. The command " + theCommand + " was updated", data );
@@ -725,13 +723,10 @@ const addPictureToChatCommand = ( data, chatFunctions ) => {
     }
 
     let thePictures = store.get( `chatMessages.${ theCommand }.pictures` );
-    console.log( "Current pictures:" + thePictures);
     if ( thePictures === undefined) {
         thePictures = [];
     }
     thePictures.push( thePicture );
-
-    console.log( "Replacement pictures:" + thePictures);
 
     store.put( `chatMessages.${ theCommand }.pictures`, thePictures );
     chatFunctions.botSpeak( "Update successful. The command " + theCommand + " was updated", data );
