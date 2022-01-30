@@ -316,6 +316,16 @@ const commandFunctions = ( bot ) => {
     moderatorChatCommands.removechatcommand.help = "Delete a chat command, including any messages/pictures. Careful, this is not reversible";
     moderatorChatCommands.removechatcommand.sampleArguments = [ "command" ];
 
+    moderatorChatCommands.removechatcommandmessage = ( { data, chatFunctions } ) => { removeChatCommandMessage( data, chatFunctions ); }
+    moderatorChatCommands.removechatcommandmessage.argumentCount = 2;
+    moderatorChatCommands.removechatcommandmessage.help = "Remove a message from a dynamic chat command. The message must match exactly and be surrounded by double quotes";
+    moderatorChatCommands.removechatcommandmessage.sampleArguments = [ "command", "\"Remove this message\"" ];
+
+    moderatorChatCommands.removechatcommandpicture = ( { data, chatFunctions } ) => { removeChatCommandPicture( data, chatFunctions ); }
+    moderatorChatCommands.removechatcommandpicture.argumentCount = 2;
+    moderatorChatCommands.removechatcommandpicture.help = "Remove a pitcute from a dynamic chat command. The URL must match exactly and be surrounded by double quotes";
+    moderatorChatCommands.removechatcommandpicture.sampleArguments = [ "command", "http://url.link/image.gif" ];
+
     // #############################
     // end of fully checked commands
     // #############################
@@ -752,14 +762,74 @@ const removeChatCommand = ( data, chatFunctions ) => {
     chatFunctions.botSpeak( "Update successful. The command " + theCommand + " was removed", data );
 }
 
-/*
-const removeChatCommandMessage = (  ) => {
+const removeChatCommandMessage = ( data, chatFunctions ) => {
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
+    const store = new Storage( dataFilePath );
+    const commandModule = commandFunctions();
 
+    const splitData = commandModule.parseChatManagementCommandElements( data.text );
+    const theCommand = splitData[ 1 ];
+    const theMessage = splitData[ 2 ];
+
+    if ( commandModule.isCoreCommand( theCommand ) ) {
+        chatFunctions.botSpeak( "The command " + theCommand + " is not a dynamic chat command that can be managed like this.", data );
+        return;
+    }
+
+    if ( !commandModule.isChatCommand( theCommand ) ) {
+        chatFunctions.botSpeak( "The command " + theCommand + " does not exist.", data );
+        return;
+    }
+
+    let theMessages = store.get( `chatMessages.${ theCommand }.messages` );
+    if ( theMessages.indexOf( theMessage ) !== -1 ) {
+        theMessages.splice( theMessages.indexOf( theMessage ), 1 );
+    } else {
+        chatFunctions.botSpeak( "That message can't be found for that command " + theCommand + ". Check that you sent the message EXACTLY as displayed, wrapped in double quotes", data );
+        return;
+    }
+
+    store.put( `chatMessages.${ theCommand }.messages`, theMessages );
+    chatFunctions.botSpeak( "Update successful. The command " + theCommand + " was updated", data );
 }
 
-const removeChatCommandPicture = (  ) => {
+const removeChatCommandPicture = ( data, chatFunctions ) => {
+    console.group( 'removeChatCommandMessage' );
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
+    const store = new Storage( dataFilePath );
+    const commandModule = commandFunctions();
 
+    const splitData = commandModule.parseChatManagementCommandElements( data.text );
+    const theCommand = splitData[ 1 ];
+    console.log( 'theCommand:' + theCommand );
+    const thePicture = splitData[ 2 ];
+    console.log( 'thePicture:--' + thePicture + "--" );
+
+    if ( commandModule.isCoreCommand( theCommand ) ) {
+        chatFunctions.botSpeak( "The command " + theCommand + " is not a dynamic chat command that can be managed like this.", data );
+        return;
+    }
+
+    if ( !commandModule.isChatCommand( theCommand ) ) {
+        chatFunctions.botSpeak( "The command " + theCommand + " does not exist.", data );
+        return;
+    }
+
+    let thePictures = store.get( `chatMessages.${ theCommand }.pictures` );
+    console.log( 'thePictures:' + thePictures );
+    console.log( 'index thePictures:' + thePictures.indexOf( thePicture ) );
+    if ( thePictures.indexOf( thePicture ) !== -1 ) {
+        thePictures.splice( thePictures.indexOf( thePicture ), 1 );
+    } else {
+        chatFunctions.botSpeak( "That picture can't be found for that command " + theCommand + ". Check that you sent the URL EXACTLY as displayed, wrapped in double quotes", data );
+        return;
+    }
+    console.log( 'thePictures:' + thePictures );
+
+    store.put( `chatMessages.${ theCommand }.pictures`, thePictures );
+    chatFunctions.botSpeak( "Update successful. The command " + theCommand + " was updated", data );
+
+    console.groupEnd();
 }
-*/
 
 module.exports = commandFunctions;
