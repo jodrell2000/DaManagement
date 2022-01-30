@@ -10,6 +10,7 @@ const botCommands = {};
 const userQueueCommands = {};
 const moderatorQueueCommands = {};
 const moderatorWelcomeCommands = {};
+const moderatorChatCommands = {};
 const moderatorCommands = {};
 
 const aliasDataFileName = process.env.ALIASDATA;
@@ -104,121 +105,199 @@ const commandFunctions = ( bot ) => {
     chatCommands.hair = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.hairMessages, chatCommandItems.hairPics, userFunctions ); }
     chatCommands.hair.help = "80s hair time";
 
-    chatCommands.eddie = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.eddieMessages, chatCommandItems.eddiePics, userFunctions ); }
+    chatCommands.eddie = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.eddieMessages, chatCommandItems.eddiePics, userFunctions );
+    }
     chatCommands.eddie.help = "it's Eddie Murphy time!";
 
-    chatCommands.lonely = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.lonelyMessages, userFunctions ); }
+    chatCommands.lonely = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.textMessageTheDJ( data, chatCommandItems.lonelyMessages, userFunctions );
+    }
     chatCommands.lonely.help = "we all feel lonely sometimes...";
 
-    chatCommands.suggestions = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.suggestionsMessages, userFunctions ); }
+    chatCommands.suggestions = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.textMessageTheDJ( data, chatCommandItems.suggestionsMessages, userFunctions );
+    }
     chatCommands.suggestions.help = "find out how to make suggestions";
 
-    chatCommands.rules = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.rulesMessages, userFunctions ); }
+    chatCommands.rules = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.textMessageTheDJ( data, chatCommandItems.rulesMessages, userFunctions );
+    }
     chatCommands.rules.help = "get a link to the room rules";
 
-    chatCommands.wc = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.wcMessages, chatCommandItems.wcPics, userFunctions ); }
+    chatCommands.wc = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.wcMessages, chatCommandItems.wcPics, userFunctions );
+    }
     chatCommands.wc.help = "how do you Wang Chung?";
 
-    chatCommands.jump = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.jumpMessages, chatCommandItems.jumpPics, userFunctions ); }
+    chatCommands.jump = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.jumpMessages, chatCommandItems.jumpPics, userFunctions );
+    }
     chatCommands.jump.help = "Van Halen Rulez!";
 
-    chatCommands.flirt = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.flirtMessages, chatCommandItems.flirtPics, userFunctions ); }
+    chatCommands.flirt = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.flirtMessages, chatCommandItems.flirtPics, userFunctions );
+    }
     chatCommands.flirt.help = "you know...";
 
-    chatCommands.rub = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.rubMessages, userFunctions ); }
+    chatCommands.rub = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.textMessageTheDJ( data, chatCommandItems.rubMessages, userFunctions );
+    }
     chatCommands.rub.help = "is Buffalo Bill in?!?";
 
-    chatCommands.alice = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.aliceMessages, chatCommandItems.alicePics, userFunctions ); }
+    chatCommands.alice = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.aliceMessages, chatCommandItems.alicePics, userFunctions );
+    }
     chatCommands.alice.help = "are you? No, you're not...";
 
-    chatCommands.feart = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.feartMessages, userFunctions ); }
+    chatCommands.feart = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.textMessageTheDJ( data, chatCommandItems.feartMessages, userFunctions );
+    }
     chatCommands.feart.help = "there's some snagging going on in here";
 
-    chatCommands.beer = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.beerMessages, chatCommandItems.beerPics, userFunctions ); }
+    chatCommands.beer = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.beerMessages, chatCommandItems.beerPics, userFunctions );
+    }
     chatCommands.beer.help = "it's 5 o'clock somewhere, right?";
 
-    chatCommands.surf = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.surfMessages, chatCommandItems.surfPics, userFunctions ); }
+    chatCommands.surf = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.surfMessages, chatCommandItems.surfPics, userFunctions );
+    }
     chatCommands.surf.help = "Hang 10 dudes!";
 
-    chatCommands.hello = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.helloMessages, userFunctions ); }
+    chatCommands.hello = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.textMessageTheDJ( data, chatCommandItems.helloMessages, userFunctions );
+    }
     chatCommands.hello.help = "just saying hello...probably testing the bot tho' init";
 
-    chatCommands.macho = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.machoMessages, chatCommandItems.machoPics, userFunctions ); }
+    chatCommands.macho = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.machoMessages, chatCommandItems.machoPics, userFunctions );
+    }
     chatCommands.macho.help = "Randy Savage!!!";
 
-    chatCommands.ferris = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.ferrisMessages, chatCommandItems.ferrisPics, userFunctions ); }
+    chatCommands.ferris = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.ferrisMessages, chatCommandItems.ferrisPics, userFunctions );
+    }
     chatCommands.ferris.help = "Bueller? Bueller? Bueller?";
 
-    chatCommands.lighter = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.lighterMessages, chatCommandItems.lighterPics, userFunctions ); }
+    chatCommands.lighter = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.lighterMessages, chatCommandItems.lighterPics, userFunctions );
+    }
     chatCommands.lighter.help = "One for the ballads...";
 
-    chatCommands.couplesskate = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.couplesSkateMessages, chatCommandItems.couplesSkatePics, userFunctions ); }
+    chatCommands.couplesskate = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.couplesSkateMessages, chatCommandItems.couplesSkatePics, userFunctions );
+    }
     chatCommands.couplesskate.help = "Time for a slow dance?";
 
-    chatCommands.noice = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.noiceMessages, chatCommandItems.noicePics, userFunctions ); }
+    chatCommands.noice = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.noiceMessages, chatCommandItems.noicePics, userFunctions );
+    }
     chatCommands.noice.help = "very nice...";
 
-    chatCommands.shimmy = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.shimmyMessages, chatCommandItems.shimmyPics, userFunctions ); }
+    chatCommands.shimmy = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.shimmyMessages, chatCommandItems.shimmyPics, userFunctions );
+    }
     chatCommands.shimmy.help = "Pat Benatar time";
 
-    chatCommands.metal = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.metalMessages, chatCommandItems.metalPics, userFunctions ); }
+    chatCommands.metal = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.metalMessages, chatCommandItems.metalPics, userFunctions );
+    }
     chatCommands.metal.help = ":metal: ";
 
-    chatCommands.birthday = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.birthdayMessages, chatCommandItems.birthdayPics, userFunctions ); }
+    chatCommands.birthday = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.birthdayMessages, chatCommandItems.birthdayPics, userFunctions );
+    }
     chatCommands.birthday.help = "Happy Birthday!!!";
 
-    chatCommands.tumbleweed = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.tumbleweedMessages, chatCommandItems.tumbleweedPics, userFunctions ); }
+    chatCommands.tumbleweed = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.tumbleweedMessages, chatCommandItems.tumbleweedPics, userFunctions );
+    }
     chatCommands.tumbleweed.help = "..........";
 
-    chatCommands.klaus = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.klausMessages, chatCommandItems.klausPics, userFunctions ); }
+    chatCommands.klaus = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.klausMessages, chatCommandItems.klausPics, userFunctions );
+    }
     chatCommands.klaus.help = "It's Klaus Nomi...what more is there to know? ;-)";
 
-    chatCommands.carefulnow = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.carefulNowMessages, chatCommandItems.carefulNowPics, userFunctions ); }
+    chatCommands.carefulnow = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.carefulNowMessages, chatCommandItems.carefulNowPics, userFunctions );
+    }
     chatCommands.carefulnow.help = "Woah there...careful";
 
-    chatCommands.martika = ( { data, chatFunctions } ) => { chatFunctions.multilineChatCommand( data, chatCommandItems.martikaMessages, chatCommandItems.martikaPics ); }
+    chatCommands.martika = ( { data, chatFunctions } ) => {
+        chatFunctions.multilineChatCommand( data, chatCommandItems.martikaMessages, chatCommandItems.martikaPics );
+    }
     chatCommands.martika.help = "M A R T I K A";
 
-    chatCommands.monkey = ( { data, chatFunctions } ) => { chatFunctions.multilineChatCommand( data, chatCommandItems.monkeyMessages, chatCommandItems.monkeyPics ); }
+    chatCommands.monkey = ( { data, chatFunctions } ) => {
+        chatFunctions.multilineChatCommand( data, chatCommandItems.monkeyMessages, chatCommandItems.monkeyPics );
+    }
     chatCommands.monkey.help = "Schock den Affen!";
 
-    chatCommands.mindblown = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.mindBlownMessages, chatCommandItems.mindBlownPics, userFunctions ); }
+    chatCommands.mindblown = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.mindBlownMessages, chatCommandItems.mindBlownPics, userFunctions );
+    }
     chatCommands.mindblown.help = "Huh?!? I didn't know that!";
 
-    chatCommands.rush = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.rushMessages, chatCommandItems.rushPics, userFunctions ); }
+    chatCommands.rush = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.rushMessages, chatCommandItems.rushPics, userFunctions );
+    }
     chatCommands.rush.help = "Celebrate the Rush ;-)";
 
-    chatCommands.bow = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.bowMessages, chatCommandItems.bowPics, userFunctions ); }
+    chatCommands.bow = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.bowMessages, chatCommandItems.bowPics, userFunctions );
+    }
     chatCommands.bow.help = "Celebrate the Rush ;-)";
 
-    chatCommands.cheese = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.cheeseMessages, chatCommandItems.cheesePics, userFunctions ); }
+    chatCommands.cheese = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.cheeseMessages, chatCommandItems.cheesePics, userFunctions );
+    }
     chatCommands.cheese.help = "You want cheese, you got cheese!";
 
-    chatCommands.twofer = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.twoferMessages, chatCommandItems.twoferPics, userFunctions ); }
+    chatCommands.twofer = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.twoferMessages, chatCommandItems.twoferPics, userFunctions );
+    }
     chatCommands.twofer.help = "You played another one?";
 
-    chatCommands.goth = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.gothMessages, chatCommandItems.gothPics, userFunctions ); }
+    chatCommands.goth = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.gothMessages, chatCommandItems.gothPics, userFunctions );
+    }
     chatCommands.goth.help = "The sunlight, it burns!";
 
-    chatCommands.drama = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.dramaMessages, chatCommandItems.dramaPics, userFunctions ); }
+    chatCommands.drama = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.dramaMessages, chatCommandItems.dramaPics, userFunctions );
+    }
     chatCommands.drama.help = "Just sit back and watch the fun";
 
-    chatCommands.nope = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.nopeMessages, chatCommandItems.nopePics, userFunctions ); }
+    chatCommands.nope = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.nopeMessages, chatCommandItems.nopePics, userFunctions );
+    }
     chatCommands.nope.help = "Nope nope nope!";
 
-    chatCommands.thirtyk = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.thirtyKMessages, chatCommandItems.thirtyKPics, userFunctions ); }
+    chatCommands.thirtyk = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.thirtyKMessages, chatCommandItems.thirtyKPics, userFunctions );
+    }
     chatCommands.thirtyk.help = "30k point celebration";
 
-    chatCommands.yacht = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.yachtMessages, chatCommandItems.yachtPics, userFunctions ); }
+    chatCommands.yacht = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.yachtMessages, chatCommandItems.yachtPics, userFunctions );
+    }
     chatCommands.yacht.help = "because not all rock is hard";
 
-    chatCommands.sax = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.saxMessages, chatCommandItems.saxPics, userFunctions ); }
+    chatCommands.sax = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.saxMessages, chatCommandItems.saxPics, userFunctions );
+    }
     chatCommands.sax.help = "I'm A SAX MAN!!";
 
-    chatCommands.zod = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.zodMessages, chatCommandItems.zodPics, userFunctions ); }
+    chatCommands.zod = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.zodMessages, chatCommandItems.zodPics, userFunctions );
+    }
     chatCommands.zod.help = "Bro, do you even General Zod?";
 
-    chatCommands.micdrop = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.micDropMessages, chatCommandItems.micDropPics, userFunctions ); }
+    chatCommands.micdrop = ( { data, userFunctions, chatFunctions } ) => {
+        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.micDropMessages, chatCommandItems.micDropPics, userFunctions );
+    }
     chatCommands.micdrop.help = "End of...";
 
     // ######################################################
@@ -263,7 +342,7 @@ const commandFunctions = ( bot ) => {
     // #############################################
 
     moderatorCommands.randomiseplaylist = ( { songFunctions } ) => { songFunctions.randomisePlaylist() }
-    moderatorCommands.randomiseplaylist.help = () => { }
+    moderatorCommands.randomiseplaylist.help = "Shuffle Robos playlist";
 
     moderatorCommands.autodj = () => { bot.addDj(); }
     moderatorCommands.autodj.help = "Starts the Bot DJing";
@@ -418,22 +497,21 @@ const commandFunctions = ( bot ) => {
     // Moderator Only Dynamic Chat commands
     // #############################################
 
-    moderatorCommands.addchatcommand = ( { data, chatFunctions } ) => { addChatCommand( data, chatFunctions ); }
-    moderatorCommands.addchatcommand.argumentCount = 2;
-    moderatorCommands.addchatcommand.help = "Add a new chat/picture command. You must add a message with the new command";
-    moderatorCommands.addchatcommand.sampleArguments = [ "command", "message" ];
+    moderatorChatCommands.addchatcommand = ( { data, chatFunctions } ) => { addChatCommandWithMessage( data, chatFunctions ); }
+    moderatorChatCommands.addchatcommand.argumentCount = 2;
+    moderatorChatCommands.addchatcommand.help = "Add a new chat/picture command. You must add a message with the new command";
+    moderatorChatCommands.addchatcommand.sampleArguments = [ "command", "message" ];
 
-/*
-    moderatorCommands.addChatCommandMessage = ( { data, chatFunctions } ) => { addChatCommandMessage( data, chatFunctions ); }
-    moderatorCommands.addChatCommandMessage.argumentCount = 2;
-    moderatorCommands.addChatCommandMessage.help = "Add a new random message to a chat command";
-    moderatorCommands.addChatCommandMessage.sampleArguments = [ "command", "Hi there!" ];
+    moderatorChatCommands.addmessagetochatcommand = ( { data, chatFunctions } ) => { addMessageToChatCommand( data, chatFunctions ); }
+    moderatorChatCommands.addmessagetochatcommand.argumentCount = 2;
+    moderatorChatCommands.addmessagetochatcommand.help = "Add a new message to a chat command.";
+    moderatorChatCommands.addmessagetochatcommand.sampleArguments = [ "command", "message" ];
 
-    moderatorCommands.addChatCommandPicture = ( { data, chatFunctions } ) => { addChatCommandPicture( data, chatFunctions ); }
-    moderatorCommands.addChatCommandPicture.argumentCount = 2;
-    moderatorCommands.addChatCommandPicture.help = "Add a new random picture to a chat command";
-    moderatorCommands.addChatCommandPicture.sampleArguments = [ "command", "https://media.giphy.com/media/3o7btVYvxUMxrLC3yo/giphy.gif" ];
-*/
+    moderatorChatCommands.addpicturetochatcommand = ( { data, chatFunctions } ) => { addPictureToChatCommand( data, chatFunctions ); }
+    moderatorChatCommands.addpicturetochatcommand.argumentCount = 2;
+    moderatorChatCommands.addpicturetochatcommand.help = "Add a new picture to a chat command. It must be the full URL for a gif. Please paste it in the chat first to make sure it works!";
+    moderatorChatCommands.addpicturetochatcommand.sampleArguments = [ "command", "message" ];
+
 
     // #############################
     // end of fully checked commands
@@ -442,7 +520,8 @@ const commandFunctions = ( bot ) => {
     const allModeratorCommands = {
         ...moderatorCommands,
         ...moderatorWelcomeCommands,
-        ...moderatorQueueCommands
+        ...moderatorQueueCommands,
+        ...moderatorChatCommands
     }
 
     const allQueueCommands = {
@@ -463,7 +542,7 @@ const commandFunctions = ( bot ) => {
         ...userCommands
     }
 
-    function listCommands ( data, commandGroup, chatFunctions ) {
+    function listCommands( data, commandGroup, chatFunctions ) {
         let theCommand = commandGroup[ 0 ];
         let theMessage;
 
@@ -501,7 +580,7 @@ const commandFunctions = ( bot ) => {
         chatFunctions.botSpeak( theMessage, data );
     }
 
-    function buildListFromObject ( commandObject ) {
+    function buildListFromObject( commandObject ) {
         let theList = '';
         for ( let i in commandObject ) {
             theList += chatDefaults.commandIdentifier + commandObject[ i ] + ", ";
@@ -509,7 +588,7 @@ const commandFunctions = ( bot ) => {
         return theList.substring( 0, theList.length - 2 );
     }
 
-    function displayHelp ( data, command, chatFunctions ) {
+    function displayHelp( data, command, chatFunctions ) {
         let theMessage = "";
 
         if ( command[ 0 ] === undefined ) {
@@ -531,9 +610,11 @@ const commandFunctions = ( bot ) => {
         }
     }
 
-    function reassembleArgs ( args, startFrom ) {
+    function reassembleArgs( args, startFrom ) {
         let theString = '';
-        if ( startFrom === undefined ) { startFrom = 0; }
+        if ( startFrom === undefined ) {
+            startFrom = 0;
+        }
         for ( let argLoop = startFrom; argLoop < args.length; argLoop++ ) {
             theString += args[ argLoop ] + ' ';
         }
@@ -544,7 +625,7 @@ const commandFunctions = ( bot ) => {
 
     return {
 
-        wasThisACommand: function ( data ) {
+        wasThisACommand: function( data ) {
             let text = data.text;
 
             // was this on the ignore list
@@ -561,7 +642,7 @@ const commandFunctions = ( bot ) => {
             }
         },
 
-        getCommandAndArguments: function ( text, allCommands ) {
+        getCommandAndArguments: function( text, allCommands ) {
             const [ sentCommand, ...args ] = text.split( " " );
 
             let theCommand = sentCommand.substring( 1, sentCommand.length )
@@ -584,23 +665,32 @@ const commandFunctions = ( bot ) => {
             }
         },
 
-        parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions ) {
+        parseCommands: function( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions ) {
             const senderID = data.userid;
             const [ command, args, moderatorOnly ] = this.getCommandAndArguments( data.text, allCommands );
             if ( moderatorOnly && !userFunctions.isUserModerator( senderID ) ) {
                 chatFunctions.botSpeak( "Sorry, that function is only available to moderators", data );
             } else if ( command ) {
-                command.call( null, { data, args, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions } );
+                command.call( null, {
+                    data,
+                    args,
+                    userFunctions,
+                    botFunctions,
+                    roomFunctions,
+                    songFunctions,
+                    chatFunctions,
+                    videoFunctions
+                } );
             } else {
                 chatFunctions.botSpeak( "Sorry, that's not a command I recognise. Try " + chatDefaults.commandIdentifier + "list to find out more.", data );
             }
         },
 
-        isCoreCommand: ( command ) => {
+        isCoreCommand: function ( command ) {
             return allCommands[ command ];
         },
 
-        isChatCommand: ( command ) => {
+        isChatCommand: function ( command ) {
             const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
             const store = new Storage( dataFilePath );
 
@@ -609,6 +699,35 @@ const commandFunctions = ( bot ) => {
             const findCommand = theCommands[ command ];
 
             return findCommand !== undefined;
+        },
+
+        canCommandBeAdded: function ( theCommand ) {
+            const alias = checkForAlias( theCommand );
+
+            const messageHeader = "The command " + theCommand + " can't be added as ";
+            // Check if the command is an existing alias
+            if ( alias ) {
+                return messageHeader + " the alias " + chatDefaults.commandIdentifier + theCommand + " already exists. Remove it if you want to add this as a command";
+            }
+
+            // Check if the command is an existing command
+            if ( this.isCoreCommand( theCommand ) || this.isChatCommand( theCommand ) ) {
+                return messageHeader + "it already exists.";
+            }
+
+            return true;
+        },
+
+        parseChatManagementCommandElements: function ( theMessage ) {
+            const splitData = [];
+            const regex = new RegExp( '"[^"]+"|[\\S]+', 'g' );
+            theMessage.match( regex ).forEach( element => {
+                if ( !element ) return;
+                console.log( 'element:' + element );
+                return splitData.push( element.replace( /"/g, '' ) );
+            } );
+
+            return splitData;
         }
     }
 }
@@ -648,8 +767,7 @@ const getAliasReturnText = ( aliases, alias, command ) => {
         if ( aliases?.length > 1 ) {
             returnText += ` which has the following aliases ${ chatDefaults.commandIdentifier }${ aliases.join( ` and ${ chatDefaults.commandIdentifier }` ) }`;
         }
-    }
-    else {
+    } else {
         returnText = `The command ${ chatDefaults.commandIdentifier }${ command } has no aliases`;
 
         if ( aliases?.length ) {
@@ -671,13 +789,13 @@ const addAlias = ( data, chatFunctions ) => {
 
     // Check if new alias already exists
     if ( alias ) {
-        chatFunctions.botSpeak( `The alias ${chatDefaults.commandIdentifier}${passedArgument} already exists.`, data );
+        chatFunctions.botSpeak( `The alias ${ chatDefaults.commandIdentifier }${ passedArgument } already exists.`, data );
         return;
     }
 
     // Check if new alias is a command
-    if (commandModule.isCoreCommand(passedArgument)) {
-        chatFunctions.botSpeak( `Alias not added. ${chatDefaults.commandIdentifier}${passedArgument} is already a command.`, data );
+    if ( commandModule.isCoreCommand( passedArgument ) ) {
+        chatFunctions.botSpeak( `Alias not added. ${ chatDefaults.commandIdentifier }${ passedArgument } is already a command.`, data );
         return;
     }
 
@@ -710,7 +828,7 @@ const removeAlias = ( data, chatFunctions ) => {
     let commandList = store.get( `commands.${ aliasBeingRemoved }` );
 
     if ( commandList ) {
-        const updatedCommandList = commandList.filter( function ( value, index, arr ) {
+        const updatedCommandList = commandList.filter( function( value, index, arr ) {
             return value !== strippedCommand[ 1 ];
         } );
 
@@ -722,33 +840,87 @@ const removeAlias = ( data, chatFunctions ) => {
 
 // #########################################################
 
-const addChatCommand = ( data, chatFunctions ) => {
-    console.group( 'addChatCommand' );
+const addChatCommandWithMessage = ( data, chatFunctions ) => {
     const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
 
-    const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
-    const passedArgument = strippedCommand[ 1 ];
-    const theMessage = strippedCommand[ 2 ];
-    const alias = checkForAlias( passedArgument );
+    const splitData = commandModule.parseChatManagementCommandElements( data.text );
+    const newCommand = splitData[ 1 ];
+    const commandMessage = splitData[ 2 ];
 
-    // Check if the command is an existing alias
-    if ( alias ) {
-        chatFunctions.botSpeak( `That command can't be added as the alias ${chatDefaults.commandIdentifier}${passedArgument} already exists. Remove it if you want to add this as a command`, data );
+    const addCommand = commandModule.canCommandBeAdded( newCommand );
+    if ( addCommand === true ) {
+        store.put( `chatMessages.${ newCommand }.messages`, [ commandMessage ] );
+
+        const successMessage = "Update successful. The command "
+            + newCommand + " was added, along with the message '"
+            + commandMessage + "'";
+
+        chatFunctions.botSpeak( successMessage, data );
+    } else {
+        chatFunctions.botSpeak( addCommand, data );
+    }
+}
+
+const addMessageToChatCommand = ( data, chatFunctions ) => {
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
+    const store = new Storage( dataFilePath );
+    const commandModule = commandFunctions();
+
+    const splitData = commandModule.parseChatManagementCommandElements( data.text );
+    const theCommand = splitData[ 1 ];
+    const theMessage = splitData[ 2 ];
+
+    if ( commandModule.isCoreCommand( theCommand ) ) {
+        chatFunctions.botSpeak( "The command " + theCommand + " is not a chat command that can be managed like this.", data );
         return;
     }
 
-    // Check if the command is an existing command
-    if ( commandModule.isCoreCommand( passedArgument ) || commandModule.isChatCommand( passedArgument ) ) {
-        chatFunctions.botSpeak( `That command can't be added as it already exists.`, data );
+    if ( !commandModule.isChatCommand( theCommand ) ) {
+        addChatCommandWithMessage( data, chatFunctions );
         return;
     }
 
-    store.put( `chatMessages.${ passedArgument }`, theMessage );
+    let theMessages = store.get( `chatMessages.${ theCommand }.messages` );
+    console.log( "Current messages:" + theMessages);
+    theMessages.push( theMessage );
+    console.log( "Replacement message:" + theMessages);
 
-    chatFunctions.botSpeak( "Update successful.", data );
-    console.groupEnd();
+    store.put( `chatMessages.${ theCommand }.messages`, theMessages );
+    chatFunctions.botSpeak( "Update successful. The command " + theCommand + " was updated", data );
+}
+
+const addPictureToChatCommand = ( data, chatFunctions ) => {
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
+    const store = new Storage( dataFilePath );
+    const commandModule = commandFunctions();
+
+    const splitData = commandModule.parseChatManagementCommandElements( data.text );
+    const theCommand = splitData[ 1 ];
+    const thePicture = splitData[ 2 ];
+
+    if ( commandModule.isCoreCommand( theCommand ) ) {
+        chatFunctions.botSpeak( "The command " + theCommand + " is not a chat command that can be managed like this.", data );
+        return;
+    }
+
+    if ( !commandModule.isChatCommand( theCommand ) ) {
+        chatFunctions.botSpeak( "The chat command " + theCommand + " does not exist.", data );
+        return;
+    }
+
+    let theMessages = store.get( `chatMessages.${ theCommand }.pictures` );
+    console.log( "Current pictures:" + theMessages);
+    if ( theMessages === undefined) {
+        theMessages = [];
+    }
+    theMessages.push( thePicture );
+
+    console.log( "Replacement pictures:" + theMessages);
+
+    store.put( `chatMessages.${ theCommand }.pictures`, theMessages );
+    chatFunctions.botSpeak( "Update successful. The command " + theCommand + " was updated", data );
 }
 
 module.exports = commandFunctions;
