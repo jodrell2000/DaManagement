@@ -16,7 +16,7 @@ const moderatorCommands = {};
 const aliasDataFileName = process.env.ALIASDATA;
 const chatDataFileName = process.env.CHATDATA;
 
-const ignoreCommands = [ '/me ' ];
+const ignoreCommands = [ '/me /love' ];
 
 const commandFunctions = ( bot ) => {
     // #############################################
@@ -295,9 +295,7 @@ const commandFunctions = ( bot ) => {
     }
     chatCommands.zod.help = "Bro, do you even General Zod?";
 
-    chatCommands.micdrop = ( { data, userFunctions, chatFunctions } ) => {
-        chatFunctions.pictureMessageTheDJ( data, chatCommandItems.micDropMessages, chatCommandItems.micDropPics, userFunctions );
-    }
+    chatCommands.micdrop = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.micDropMessages, chatCommandItems.micDropPics, userFunctions ); }
     chatCommands.micdrop.help = "End of...";
 
     // ######################################################
@@ -497,6 +495,8 @@ const commandFunctions = ( bot ) => {
     // Moderator Only Dynamic Chat commands
     // #############################################
 
+    chatCommands.dynamicchatcommand = ( { data, userFunctions, theCommand } ) => { chatFunctions.dynamicChatCommand( data, userFunctions, theCommand ); }
+
     moderatorChatCommands.addchatcommand = ( { data, chatFunctions } ) => { addChatCommandWithMessage( data, chatFunctions ); }
     moderatorChatCommands.addchatcommand.argumentCount = 2;
     moderatorChatCommands.addchatcommand.help = "Add a new chat/picture command. You must add a message with the new command";
@@ -510,8 +510,12 @@ const commandFunctions = ( bot ) => {
     moderatorChatCommands.addpicturetochatcommand = ( { data, chatFunctions } ) => { addPictureToChatCommand( data, chatFunctions ); }
     moderatorChatCommands.addpicturetochatcommand.argumentCount = 2;
     moderatorChatCommands.addpicturetochatcommand.help = "Add a new picture to a chat command. It must be the full URL for a gif. Please paste it in the chat first to make sure it works!";
-    moderatorChatCommands.addpicturetochatcommand.sampleArguments = [ "command", "message" ];
+    moderatorChatCommands.addpicturetochatcommand.sampleArguments = [ "command", "http://url.link/image.gif" ];
 
+    moderatorChatCommands.removechatcommand = ( { data, chatFunctions } ) => { removeChatCommand( data, chatFunctions ); }
+    moderatorChatCommands.removechatcommand.argumentCount = 1;
+    moderatorChatCommands.removechatcommand.help = "Delete a chat command, including any messages/pictures. Careful, this is not reversible";
+    moderatorChatCommands.removechatcommand.sampleArguments = [ "command" ];
 
     // #############################
     // end of fully checked commands
@@ -644,6 +648,7 @@ const commandFunctions = ( bot ) => {
 
         getCommandAndArguments: function( text, allCommands ) {
             const [ sentCommand, ...args ] = text.split( " " );
+            let dynamic = false;
 
             let theCommand = sentCommand.substring( 1, sentCommand.length )
             theCommand = theCommand.toLowerCase();
@@ -651,15 +656,23 @@ const commandFunctions = ( bot ) => {
             // Check if command exists
             let commandObj = allCommands[ theCommand ];
 
-            // Command doesn't exist, check aliases
+            // If the command doesn't exist, check aliases
             if ( !commandObj ) {
                 const aliasCommand = checkForAlias( theCommand );
                 commandObj = allCommands[ aliasCommand ];
             }
 
+            // If the command doesn't exist, check the dynamic chat commands
+            if ( !commandObj ) {
+                this.isChatCommand( theCommand )
+                dynamic = true;
+            }
+
             if ( commandObj ) {
                 const moderatorOnly = !!moderatorCommands[ theCommand ];
                 return [ commandObj, args, moderatorOnly ];
+            } else if ( dynamic === true ) {
+                return [ theCommand, 'dynamicChat', null ];
             } else {
                 return [ null, null ];
             }
@@ -670,6 +683,8 @@ const commandFunctions = ( bot ) => {
             const [ command, args, moderatorOnly ] = this.getCommandAndArguments( data.text, allCommands );
             if ( moderatorOnly && !userFunctions.isUserModerator( senderID ) ) {
                 chatFunctions.botSpeak( "Sorry, that function is only available to moderators", data );
+            } else if ( args === 'dynamicChat' ) {
+                chatFunctions.dynamicChatCommand( data, userFunctions, command );
             } else if ( command ) {
                 command.call( null, {
                     data,
@@ -910,17 +925,44 @@ const addPictureToChatCommand = ( data, chatFunctions ) => {
         return;
     }
 
-    let theMessages = store.get( `chatMessages.${ theCommand }.pictures` );
-    console.log( "Current pictures:" + theMessages);
-    if ( theMessages === undefined) {
-        theMessages = [];
+    let thePictures = store.get( `chatMessages.${ theCommand }.pictures` );
+    console.log( "Current pictures:" + thePictures);
+    if ( thePictures === undefined) {
+        thePictures = [];
     }
-    theMessages.push( thePicture );
+    thePictures.push( thePicture );
 
-    console.log( "Replacement pictures:" + theMessages);
+    console.log( "Replacement pictures:" + thePictures);
 
-    store.put( `chatMessages.${ theCommand }.pictures`, theMessages );
+    store.put( `chatMessages.${ theCommand }.pictures`, thePictures );
     chatFunctions.botSpeak( "Update successful. The command " + theCommand + " was updated", data );
 }
+
+const removeChatCommand = ( data, chatFunctions ) => {
+    const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
+    const store = new Storage( dataFilePath );
+    const commandModule = commandFunctions();
+
+    const splitData = commandModule.parseChatManagementCommandElements( data.text );
+    const theCommand = splitData[ 1 ];
+
+    if ( !commandModule.isChatCommand( theCommand ) ) {
+        chatFunctions.botSpeak( "The chat command " + theCommand + " does not exist.", data );
+        return;
+    }
+
+    store.remove( `chatMessages.${ theCommand }` );
+    chatFunctions.botSpeak( "Update successful. The command " + theCommand + " was removed", data );
+}
+
+/*
+const removeChatCommandMessage = (  ) => {
+
+}
+
+const removeChatCommandPicture = (  ) => {
+
+}
+*/
 
 module.exports = commandFunctions;
