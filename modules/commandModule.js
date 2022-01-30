@@ -87,9 +87,6 @@ const commandFunctions = ( bot ) => {
     // Chat commands...make the bot post silly stuff
     // #############################################
 
-    chatCommands.props = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.pictureMessageTheDJ( data, chatCommandItems.propsMessages, chatCommandItems.propsPics, userFunctions ); }
-    chatCommands.props.help = "congratulate the current DJ on playing an absolute banger";
-
     chatCommands.shade = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.textMessageTheDJ( data, chatCommandItems.shadeMessages, userFunctions ); }
     chatCommands.shade.help = "lovingly, and randomly, diss the DJ ;-)";
 
