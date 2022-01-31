@@ -288,4 +288,70 @@ describe( `Test chat function`, () => {
             botSpeak.mockRestore();
         } );
     } );
+
+    describe( `sendDynamicChatMessage`, () => {
+        it( `With receiverID`, () => {
+            let botSpeakReturn = ``;
+
+            const botSpeak = jest.spyOn( chatFunctions, "botSpeak" );
+            botSpeak.mockImplementation( ( message ) => {
+                botSpeakReturn += message
+            } );
+
+            const buildUserToUserRandomMessage = jest.spyOn( chatFunctions, "buildUserToUserRandomMessage" );
+            buildUserToUserRandomMessage.mockImplementation( ( userFunctions, senderID, randomMessage, receiverID ) => {
+                return `@${ receiverID }, This is a test message`;
+            } );
+
+            const data = {
+                command: `pmmed`,
+                senderid: `abc123`
+            };
+
+            const theCommand = "props";
+
+            const userFunctions = {
+                getCurrentDJID: () => `DJ`,
+                whoSentTheCommand: () => `Sender`
+            }
+
+            chatFunctions.dynamicChatCommand( data, userFunctions, theCommand );
+
+            expect( botSpeak ).toHaveBeenCalled();
+            expect( botSpeakReturn ).toBe( `@DJ, This is a test message Picture 1` );
+
+            botSpeak.mockRestore();
+            buildUserToUserRandomMessage.mockRestore();
+        } );
+
+        it( `Without receiverID`, () => {
+            let botSpeakReturn = ``;
+
+            const botSpeak = jest.spyOn( chatFunctions, "botSpeak" );
+            botSpeak.mockImplementation( ( message ) => {
+                botSpeakReturn = message
+            } );
+
+            const data = {
+                command: `pmmed`,
+                senderid: `abc123`
+            };
+
+            const theCommand = "props";
+
+            const userFunctions = {
+                getCurrentDJID: () => null,
+                whoSentTheCommand: () => `Sender`,
+                getUsername: ( sender ) => sender
+            }
+
+            chatFunctions.dynamicChatCommand( data, userFunctions, theCommand );
+
+            expect( botSpeak ).toHaveBeenCalled();
+            expect( botSpeakReturn ).toBe( "@Sender you can't send the DJ a message if there's no DJ?!?" );
+
+            botSpeak.mockRestore();
+        } );
+    } );
+
 } );
