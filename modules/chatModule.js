@@ -91,8 +91,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
 
                 let thePictures = this.getDynamicChatPictures( theCommand );
                 let theMessages = this.getDynamicChatMessages( theCommand );
-
-                if ( thePictures === undefined ) {
+                if ( thePictures === undefined || thePictures.length === 0 ) {
                     this.textMessageTheDJ( senderID, receiverID, theMessages, data, userFunctions )
                 } else {
                     this.pictureMessageTheDJ( senderID, receiverID, theMessages, thePictures, data, userFunctions )
