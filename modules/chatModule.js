@@ -64,23 +64,27 @@ const chatFunctions = ( bot, roomDefaults ) => {
             }
         },
 
-        textMessageTheDJ: function( senderID, receiverID, messageArray, data, userFunctions ) {
-            const randomMessage = messageArray[ Math.floor( Math.random() * messageArray.length ) ];
-            const thisMessage = this.buildUserToUserRandomMessage( userFunctions, senderID, randomMessage, receiverID );
+        textMessageTheDJ: function ( senderID, receiverID, messageArray, data, userFunctions ) {
+            if ( this.isThereADJ( userFunctions, data ) ) {
+                const randomMessage = messageArray[ Math.floor( Math.random() * messageArray.length ) ];
+                const thisMessage = this.buildUserToUserRandomMessage( userFunctions, senderID, randomMessage, receiverID );
 
-            this.botSpeak( thisMessage, data, true );
+                this.botSpeak( thisMessage, data, true );
+            }
         },
 
-        pictureMessageTheDJ: function( senderID, receiverID, messageArray, pictureArray, data, userFunctions ) {
-            const randomMessage = messageArray[ Math.floor( Math.random() * messageArray.length ) ];
-            const randomPic = pictureArray[ Math.floor( Math.random() * pictureArray.length ) ];
-            const thisMessage = this.buildUserToUserRandomMessage( userFunctions, senderID, randomMessage, receiverID );
+        pictureMessageTheDJ: function ( senderID, receiverID, messageArray, pictureArray, data, userFunctions ) {
+            if ( this.isThereADJ( userFunctions, data ) ) {
+                const randomMessage = messageArray[ Math.floor( Math.random() * messageArray.length ) ];
+                const randomPic = pictureArray[ Math.floor( Math.random() * pictureArray.length ) ];
+                const thisMessage = this.buildUserToUserRandomMessage( userFunctions, senderID, randomMessage, receiverID );
 
-            this.botSpeak( thisMessage, data, true );
-            this.botSpeak( randomPic, data, true );
+                this.botSpeak( thisMessage, data, true );
+                this.botSpeak( randomPic, data, true );
+            }
         },
 
-        dynamicChatCommand: function( data, userFunctions, theCommand ) {
+        dynamicChatCommand: function ( data, userFunctions, theCommand ) {
             if ( this.isThereADJ( userFunctions, data ) ) {
                 const receiverID = userFunctions.getCurrentDJID();
                 const senderID = userFunctions.whoSentTheCommand( data );
