@@ -88,11 +88,9 @@ const chatFunctions = ( bot, roomDefaults ) => {
             if ( this.isThereADJ( userFunctions, data ) ) {
                 const receiverID = userFunctions.getCurrentDJID();
                 const senderID = userFunctions.whoSentTheCommand( data );
-                const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
-                const store = new Storage( dataFilePath );
 
-                let thePictures = store.get( `chatMessages.${ theCommand }.pictures` );
-                let theMessages = store.get( `chatMessages.${ theCommand }.messages` );
+                let thePictures = this.getDynamicChatPictures( theCommand );
+                let theMessages = this.getDynamicChatMessages( theCommand );
 
                 if ( thePictures === undefined ) {
                     this.textMessageTheDJ( senderID, receiverID, theMessages, data, userFunctions )
@@ -100,6 +98,26 @@ const chatFunctions = ( bot, roomDefaults ) => {
                     this.pictureMessageTheDJ( senderID, receiverID, theMessages, thePictures, data, userFunctions )
                 }
             }
+        },
+
+        getDynamicChatMessages: function ( theCommand ) {
+            const store = this.getChatCommandData();
+            return store.get( `chatMessages.${ theCommand }.messages` );
+        },
+
+        getDynamicChatPictures: function ( theCommand ) {
+            const store = this.getChatCommandData();
+            return store.get( `chatMessages.${ theCommand }.pictures` );
+        },
+
+        getChatCommandData: function () {
+            return this.returnStore( chatDataFileName );
+        },
+
+        returnStore: function ( filename ) {
+            const dataFilePath = `${ dirname( require.main.filename ) }/data/${ filename }`;
+            const store = new Storage( dataFilePath );
+            return store;
         },
 
         // ========================================================
