@@ -294,8 +294,6 @@ const commandFunctions = ( bot ) => {
     // Moderator Only Dynamic Chat commands
     // #############################################
 
-    chatCommands.dynamicchatcommand = ( { data, userFunctions, theCommand } ) => { chatFunctions.dynamicChatCommand( data, userFunctions, theCommand ); }
-
     moderatorChatCommands.addchatcommand = ( { data, chatFunctions } ) => { addChatCommandWithMessage( data, chatFunctions ); }
     moderatorChatCommands.addchatcommand.argumentCount = 2;
     moderatorChatCommands.addchatcommand.help = "Add a new chat/picture command. You must add a message with the new command";
@@ -355,7 +353,7 @@ const commandFunctions = ( bot ) => {
         ...userCommands
     }
 
-    function listCommands( data, commandGroup, chatFunctions ) {
+    function listCommands ( data, commandGroup, chatFunctions ) {
         let theCommand = commandGroup[ 0 ];
         let theMessage;
 
@@ -396,7 +394,7 @@ const commandFunctions = ( bot ) => {
         chatFunctions.botSpeak( theMessage, data );
     }
 
-    function buildListFromObject( commandObject ) {
+    function buildListFromObject ( commandObject ) {
         let theList = '';
         for ( let i in commandObject ) {
             theList += chatDefaults.commandIdentifier + commandObject[ i ] + ", ";
@@ -404,7 +402,7 @@ const commandFunctions = ( bot ) => {
         return theList.substring( 0, theList.length - 2 );
     }
 
-    function displayHelp( data, command, chatFunctions ) {
+    function displayHelp ( data, command, chatFunctions ) {
         let theMessage = "";
 
         if ( command[ 0 ] === undefined ) {
@@ -426,7 +424,7 @@ const commandFunctions = ( bot ) => {
         }
     }
 
-    function reassembleArgs( args, startFrom ) {
+    function reassembleArgs ( args, startFrom ) {
         let theString = '';
         if ( startFrom === undefined ) {
             startFrom = 0;
@@ -441,7 +439,7 @@ const commandFunctions = ( bot ) => {
 
     return {
 
-        wasThisACommand: function( data ) {
+        wasThisACommand: function ( data ) {
             let text = data.text;
 
             // was this on the ignore list
@@ -458,7 +456,7 @@ const commandFunctions = ( bot ) => {
             }
         },
 
-        getCommandAndArguments: function( text, allCommands ) {
+        getCommandAndArguments: function ( text, allCommands ) {
             const [ sentCommand, ...args ] = text.split( " " );
             let dynamic = false;
 
@@ -491,7 +489,7 @@ const commandFunctions = ( bot ) => {
             }
         },
 
-        parseCommands: function( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions ) {
+        parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions ) {
             const senderID = data.userid;
             const [ command, args, moderatorOnly ] = this.getCommandAndArguments( data.text, allCommands );
             if ( moderatorOnly && !userFunctions.isUserModerator( senderID ) ) {
@@ -655,7 +653,7 @@ const removeAlias = ( data, chatFunctions ) => {
     let commandList = store.get( `commands.${ aliasBeingRemoved }` );
 
     if ( commandList ) {
-        const updatedCommandList = commandList.filter( function( value, index, arr ) {
+        const updatedCommandList = commandList.filter( function ( value, index, arr ) {
             return value !== strippedCommand[ 1 ];
         } );
 
@@ -736,7 +734,7 @@ const addPictureToChatCommand = ( data, chatFunctions ) => {
     }
 
     let thePictures = store.get( `chatMessages.${ theCommand }.pictures` );
-    if ( thePictures === undefined) {
+    if ( thePictures === undefined ) {
         thePictures = [];
     }
     thePictures.push( thePicture );
