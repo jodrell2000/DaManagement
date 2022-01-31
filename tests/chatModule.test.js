@@ -298,7 +298,8 @@ describe( `Test chat function`, () => {
                 botSpeakReturn += message
             } );
 
-            const messageArray = [ "Test message" ];
+            const testMessage = `Test message`;
+            const messageArray = [ `@receiverUsername ${ testMessage }` ];
             const returnMessages = jest.spyOn( chatFunctions, "getDynamicChatMessages" );
             returnMessages.mockImplementation( () => {
                 return messageArray;
@@ -310,11 +311,6 @@ describe( `Test chat function`, () => {
                 return pictureArray;
             } );
 
-            const buildUserToUserRandomMessage = jest.spyOn( chatFunctions, "buildUserToUserRandomMessage" );
-            buildUserToUserRandomMessage.mockImplementation( ( userFunctions, senderID, randomMessage, receiverID ) => {
-                return `@${ receiverID }, Test message `;
-            } );
-
             const data = {
                 command: `pmmed`,
                 senderid: `abc123`
@@ -324,16 +320,16 @@ describe( `Test chat function`, () => {
 
             const userFunctions = {
                 getCurrentDJID: () => `DJ`,
-                whoSentTheCommand: () => `Sender`
+                whoSentTheCommand: () => `Sender`,
+                getUsername: () => `DJ`
             }
 
             chatFunctions.dynamicChatCommand( data, userFunctions, theCommand );
 
             expect( botSpeak ).toHaveBeenCalled();
-            expect( botSpeakReturn ).toBe( `@DJ, ${ messageArray[ 0 ] } ${ pictureArray[ 0 ] }` );
+            expect( botSpeakReturn ).toBe( `@DJ ${ testMessage }${ pictureArray[ 0 ] }` );
 
             botSpeak.mockRestore();
-            buildUserToUserRandomMessage.mockRestore();
         } );
 
         it( `Without receiverID`, () => {
