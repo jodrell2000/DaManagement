@@ -792,16 +792,13 @@ const removeChatCommandMessage = ( data, chatFunctions ) => {
 }
 
 const removeChatCommandPicture = ( data, chatFunctions ) => {
-    console.group( 'removeChatCommandMessage' );
     const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
 
     const splitData = commandModule.parseChatManagementCommandElements( data.text );
     const theCommand = splitData[ 1 ];
-    console.log( 'theCommand:' + theCommand );
     const thePicture = splitData[ 2 ];
-    console.log( 'thePicture:--' + thePicture + "--" );
 
     if ( commandModule.isCoreCommand( theCommand ) ) {
         chatFunctions.botSpeak( "The command " + theCommand + " is not a dynamic chat command that can be managed like this.", data );
@@ -814,20 +811,15 @@ const removeChatCommandPicture = ( data, chatFunctions ) => {
     }
 
     let thePictures = store.get( `chatMessages.${ theCommand }.pictures` );
-    console.log( 'thePictures:' + thePictures );
-    console.log( 'index thePictures:' + thePictures.indexOf( thePicture ) );
     if ( thePictures.indexOf( thePicture ) !== -1 ) {
         thePictures.splice( thePictures.indexOf( thePicture ), 1 );
     } else {
         chatFunctions.botSpeak( "That picture can't be found for that command " + theCommand + ". Check that you sent the URL EXACTLY as displayed, wrapped in double quotes", data );
         return;
     }
-    console.log( 'thePictures:' + thePictures );
 
     store.put( `chatMessages.${ theCommand }.pictures`, thePictures );
     chatFunctions.botSpeak( "Update successful. The command " + theCommand + " was updated", data );
-
-    console.groupEnd();
 }
 
 module.exports = commandFunctions;
