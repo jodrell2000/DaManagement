@@ -1,5 +1,9 @@
 let botDefaults = require( '../defaultSettings/botDefaults.js' );
 let userMessages = require( '../defaultSettings/customGreetings.js' );
+const { dirname } = require( "path" );
+const Storage = require( "node-storage" );
+const chatDataFileName = process.env.CHATDATA;
+
 
 const chatFunctions = ( bot, roomDefaults ) => {
 
@@ -48,35 +52,71 @@ const chatFunctions = ( bot, roomDefaults ) => {
         // Misc chat functions
         // ========================================================
 
-        textMessageTheDJ: function ( data, messageVariable, userFunctions ) {
+        isThereADJ: function ( userFunctions, data ) {
             const receiverID = userFunctions.getCurrentDJID();
             const senderID = userFunctions.whoSentTheCommand( data );
 
-            if ( receiverID !== null ) {
-                const randomMessage = messageVariable[ Math.floor( Math.random() * messageVariable.length ) ];
-                const thisMessage = this.buildUserToUserRandomMessage( userFunctions, senderID, randomMessage, receiverID );
-
-                this.botSpeak( thisMessage, data, true );
+            if ( receiverID === null ) {
+                this.botSpeak( "@" + userFunctions.getUsername( senderID ) + " you can't send the DJ a message if there's no DJ?!?", data, true );
+                return false;
             } else {
-                this.botSpeak( "@" + userFunctions.getUsername( senderID ) + " you can't send that message if there's no DJ?!?", data, true );
+                return true;
             }
         },
 
-        pictureMessageTheDJ: function ( data, messageVariable, pictureVariable, userFunctions ) {
-            const receiverID = userFunctions.getCurrentDJID();
-            const senderID = userFunctions.whoSentTheCommand( data );
+        textMessageTheDJ: function ( senderID, receiverID, messageArray, data, userFunctions ) {
+            if ( this.isThereADJ( userFunctions, data ) ) {
+                const randomMessage = messageArray[ Math.floor( Math.random() * messageArray.length ) ];
+                const thisMessage = this.buildUserToUserRandomMessage( userFunctions, senderID, randomMessage, receiverID );
 
+                this.botSpeak( thisMessage, data, true );
+            }
+        },
 
-            if ( receiverID !== null ) {
-                const randomMessage = messageVariable[ Math.floor( Math.random() * messageVariable.length ) ];
-                const randomPic = pictureVariable[ Math.floor( Math.random() * pictureVariable.length ) ];
+        pictureMessageTheDJ: function ( senderID, receiverID, messageArray, pictureArray, data, userFunctions ) {
+            if ( this.isThereADJ( userFunctions, data ) ) {
+                const randomMessage = messageArray[ Math.floor( Math.random() * messageArray.length ) ];
+                const randomPic = pictureArray[ Math.floor( Math.random() * pictureArray.length ) ];
                 const thisMessage = this.buildUserToUserRandomMessage( userFunctions, senderID, randomMessage, receiverID );
 
                 this.botSpeak( thisMessage, data, true );
                 this.botSpeak( randomPic, data, true );
-            } else {
-                this.botSpeak( "@" + userFunctions.getUsername( senderID ) + " you can't send that message if there's no DJ?!?", data, true );
             }
+        },
+
+        dynamicChatCommand: function ( data, userFunctions, theCommand ) {
+            if ( this.isThereADJ( userFunctions, data ) ) {
+                const receiverID = userFunctions.getCurrentDJID();
+                const senderID = userFunctions.whoSentTheCommand( data );
+
+                let thePictures = this.getDynamicChatPictures( theCommand );
+                let theMessages = this.getDynamicChatMessages( theCommand );
+                if ( thePictures === undefined || thePictures.length === 0 ) {
+                    this.textMessageTheDJ( senderID, receiverID, theMessages, data, userFunctions )
+                } else {
+                    this.pictureMessageTheDJ( senderID, receiverID, theMessages, thePictures, data, userFunctions )
+                }
+            }
+        },
+
+        getDynamicChatMessages: function ( theCommand ) {
+            const store = this.getChatCommandData();
+            return store.get( `chatMessages.${ theCommand }.messages` );
+        },
+
+        getDynamicChatPictures: function ( theCommand ) {
+            const store = this.getChatCommandData();
+            return store.get( `chatMessages.${ theCommand }.pictures` );
+        },
+
+        getChatCommandData: function () {
+            return this.returnStore( chatDataFileName );
+        },
+
+        returnStore: function ( filename ) {
+            const dataFilePath = `${ dirname( require.main.filename ) }/data/${ filename }`;
+            const store = new Storage( dataFilePath );
+            return store;
         },
 
         // ========================================================
