@@ -83,23 +83,15 @@ const commandFunctions = ( bot ) => {
     userQueueCommands.position = ( { data, userFunctions, chatFunctions } ) => { userFunctions.whatsMyQueuePosition( data, chatFunctions ); }
     userQueueCommands.position.help = "Tells a user where they are in the queue";
 
-    // #############################################
-    // Chat commands...make the bot post silly stuff
-    // #############################################
-
-    chatCommands.martika = ( { data, chatFunctions } ) => {
-        chatFunctions.multilineChatCommand( data, chatCommandItems.martikaMessages, chatCommandItems.martikaPics );
-    }
-    chatCommands.martika.help = "M A R T I K A";
-
-    chatCommands.monkey = ( { data, chatFunctions } ) => {
-        chatFunctions.multilineChatCommand( data, chatCommandItems.monkeyMessages, chatCommandItems.monkeyPics );
-    }
-    chatCommands.monkey.help = "Schock den Affen!";
-
     // ######################################################
     // Advanced chat commands...more than just basic messages
     // ######################################################
+
+    chatCommands.martika = ( { data, chatFunctions } ) => { chatFunctions.multilineChatCommand( data, chatCommandItems.martikaMessages, chatCommandItems.martikaPics ); }
+    chatCommands.martika.help = "M A R T I K A";
+
+    chatCommands.monkey = ( { data, chatFunctions } ) => { chatFunctions.multilineChatCommand( data, chatCommandItems.monkeyMessages, chatCommandItems.monkeyPics ); }
+    chatCommands.monkey.help = "Schock den Affen!";
 
     chatCommands.coinflip = ( { data, userFunctions, chatFunctions } ) => { chatFunctions.coinflip( data, userFunctions ); }
     chatCommands.coinflip.help = "Flip a coin and return heads or tails?";
