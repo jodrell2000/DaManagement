@@ -1,5 +1,5 @@
-// change the switch uused to identify commands sent to yout bot in your .env file
-// copy the .env.example file to .env and fill ouut the details for your Bot user
+// change the switch used to identify commands sent to yout bot in your .env file
+// copy the .env.example file to .env and fill out the details for your Bot user
 
 const dotenv = require('dotenv')
 

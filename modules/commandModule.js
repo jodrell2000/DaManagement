@@ -16,7 +16,7 @@ const moderatorCommands = {};
 const aliasDataFileName = process.env.ALIASDATA;
 const chatDataFileName = process.env.CHATDATA;
 
-const ignoreCommands = [ '/me /love' ];
+const ignoreCommands = [ '/me ', '/love' ];
 
 const commandFunctions = ( bot ) => {
     // #############################################
@@ -433,6 +433,7 @@ const commandFunctions = ( bot ) => {
 
         wasThisACommand: function ( data ) {
             let text = data.text;
+            console.log('identifier:' + chatDefaults.commandIdentifier );
 
             // was this on the ignore list
             for ( let ignoreLoop = 0; ignoreLoop < ignoreCommands.length; ignoreLoop++ ) {
