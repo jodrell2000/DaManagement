@@ -1,5 +1,7 @@
 const dotenv = require('dotenv');
-process.env.COMMANDIDENTIFIER = '/';
+process.env.COMMANDIDENTIFIER = "/";
+process.env.ALIASDATA = "aliases.json";
+process.env.CHATDATA = "chat.json";
 
 const commandModule = require( '../modules/commandModule.js' );
 const chatDefaults = require( "../defaultSettings/chatDefaults" );
@@ -71,4 +73,25 @@ describe( `Test command functions`, () => {
             expect( commandFunctions.isCoreCommand( theCommand ) ).toBe( false );
         } );
     } );
+
+    describe( 'isChatCommand: is the text an existing dynamic chat commands', () => {
+        it( "Sending a valid command", () => {
+            const theCommand = "props";
+
+            expect( commandFunctions.isChatCommand( theCommand ) ).toBe( true );
+        } );
+
+        // it( "Sending a non existent command", () => {
+        //     const theCommand = "testCommand";
+        //
+        //     expect( commandFunctions.isChatCommand( theCommand ) ).toBe( false );
+        // } );
+        //
+        // it( "Sending undefined", () => {
+        //     const theCommand = undefined;
+        //
+        //     expect( commandFunctions.isChatCommand( theCommand ) ).toBe( false );
+        // } );
+    } );
+
 } );

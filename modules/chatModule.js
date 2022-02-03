@@ -109,14 +109,18 @@ const chatFunctions = ( bot, roomDefaults ) => {
             return store.get( `chatMessages.${ theCommand }.pictures` );
         },
 
+        getDynamicChatCommands: function ( ) {
+            const store = this.getChatCommandData();
+            return store.get( 'chatMessages' );
+        },
+
         getChatCommandData: function () {
             return this.returnStore( chatDataFileName );
         },
 
         returnStore: function ( filename ) {
             const dataFilePath = `${ dirname( require.main.filename ) }/data/${ filename }`;
-            const store = new Storage( dataFilePath );
-            return store;
+            return new Storage( dataFilePath );
         },
 
         // ========================================================

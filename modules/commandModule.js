@@ -507,12 +507,17 @@ const commandFunctions = ( bot ) => {
         },
 
         isChatCommand: function ( command ) {
+            console.log("command:" + command);
             const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
+            // const dataFilePath = "/Users/Arreynol/git/DaManagement/data/chat.json";
+            console.log("dataFilePath:" + dataFilePath);
             const store = new Storage( dataFilePath );
 
             const theCommands = store.get( 'chatMessages' );
+            console.log( "theCommands:" + theCommands);
 
             const findCommand = theCommands[ command ];
+            console.log( "findCommand:" + findCommand);
 
             return findCommand !== undefined;
         },
