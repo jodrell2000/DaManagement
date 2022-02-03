@@ -26,10 +26,10 @@ beforeEach( () => {
 } );
 
 describe( `Test command functions`, () => {
-    describe( `wasThisACommand: was the message in the correct command structure, and not on the ignore commands list`, () => {
+    describe( `wasThisACommand: was the message in the correct command format, and not on the ignore commands list`, () => {
         it( "Sending a valid command", () => {
             const data = {
-                text: "/testCommand wibble wibble"
+                text: process.env.COMMANDIDENTIFIER + "testCommand wibble wibble"
             }
 
             expect( commandFunctions.wasThisACommand( data ) ).toBe( true );
