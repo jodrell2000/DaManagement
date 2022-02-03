@@ -433,7 +433,6 @@ const commandFunctions = ( bot ) => {
 
         wasThisACommand: function ( data ) {
             let text = data.text;
-            console.log('identifier:' + chatDefaults.commandIdentifier );
 
             // was this on the ignore list
             for ( let ignoreLoop = 0; ignoreLoop < ignoreCommands.length; ignoreLoop++ ) {
@@ -442,11 +441,9 @@ const commandFunctions = ( bot ) => {
                 }
             }
 
-            // check if this was a command
+            // check if this was formatted as a command
             const commandString = "^" + chatDefaults.commandIdentifier;
-            if ( text.match( commandString ) ) {
-                return true;
-            }
+            return !!text.match( commandString );
         },
 
         getCommandAndArguments: function ( text, allCommands ) {
