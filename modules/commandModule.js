@@ -503,7 +503,7 @@ const commandFunctions = ( bot ) => {
         },
 
         isCoreCommand: function ( command ) {
-            return allCommands[ command ];
+            return !!allCommands[ command ];
         },
 
         isChatCommand: function ( command ) {

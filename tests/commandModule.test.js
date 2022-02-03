@@ -51,4 +51,24 @@ describe( `Test command functions`, () => {
             expect( commandFunctions.wasThisACommand( data )).toBe( false );
         } );
     } );
+
+    describe( 'isCoreCommand: is the text one of the static core commands.', () => {
+        it( "Sending a valid command", () => {
+            const theCommand = "uptime";
+
+            expect( commandFunctions.isCoreCommand( theCommand ) ).toBe( true );
+        } );
+
+        it( "Sending a non existent command", () => {
+            const theCommand = "testCommand";
+
+            expect( commandFunctions.isCoreCommand( theCommand ) ).toBe( false );
+        } );
+
+        it( "Sending undefined", () => {
+            const theCommand = undefined;
+
+            expect( commandFunctions.isCoreCommand( theCommand ) ).toBe( false );
+        } );
+    } );
 } );
