@@ -1,5 +1,5 @@
 // configured using environment variables in a .env file
-// copy the .env.example file to .env and fill ouut the details for your Bot user
+// copy the .env.example file to .env and fill out the details for your Bot user
 const dotenv = require('dotenv').config()
 
 module.exports = {
