@@ -455,10 +455,11 @@ const commandFunctions = ( bot ) => {
 
             // Check if command exists
             let commandObj = allCommands[ theCommand ];
+            console.log( "commandObj:" + commandObj );
 
             // If the command doesn't exist, check aliases
             if ( !commandObj ) {
-                const aliasCommand = checkForAlias( theCommand );
+                const aliasCommand = this.checkForAlias( theCommand );
                 commandObj = allCommands[ aliasCommand ];
             }
 
@@ -502,22 +503,19 @@ const commandFunctions = ( bot ) => {
             }
         },
 
+
         isCoreCommand: function ( command ) {
             return !!allCommands[ command ];
         },
 
         isChatCommand: function ( command ) {
-            console.log("command:" + command);
             const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
             // const dataFilePath = "/Users/Arreynol/git/DaManagement/data/chat.json";
-            console.log("dataFilePath:" + dataFilePath);
             const store = new Storage( dataFilePath );
 
             const theCommands = store.get( 'chatMessages' );
-            console.log( "theCommands:" + theCommands);
 
             const findCommand = theCommands[ command ];
-            console.log( "findCommand:" + findCommand);
 
             return findCommand !== undefined;
         },
@@ -548,19 +546,19 @@ const commandFunctions = ( bot ) => {
             } );
 
             return splitData;
+        },
+
+        checkForAlias: function ( passedArguement ) {
+
+            const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
+            const store = new Storage( dataFilePath );
+
+            const theAliases = store.get( 'aliases' );
+
+            let findAlias = theAliases[ passedArguement ];
+            return findAlias ? findAlias.command : undefined;
         }
     }
-}
-
-const checkForAlias = ( passedArguement ) => {
-
-    const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
-    const store = new Storage( dataFilePath );
-
-    const theAliases = store.get( 'aliases' );
-
-    let findAlias = theAliases[ passedArguement ];
-    return findAlias ? findAlias.command : undefined;
 }
 
 const listAlias = ( data, chatFunctions ) => {

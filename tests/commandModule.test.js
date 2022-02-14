@@ -1,7 +1,7 @@
-const dotenv = require('dotenv');
+const dotenv = require( 'dotenv' );
 process.env.COMMANDIDENTIFIER = "/";
 process.env.ALIASDATA = "aliases.json";
-process.env.CHATDATA = "chat.json";
+process.env.CHATDATA = "chat_example.json";
 
 const commandModule = require( '../modules/commandModule.js' );
 const chatDefaults = require( "../defaultSettings/chatDefaults" );
@@ -42,7 +42,7 @@ describe( `Test command functions`, () => {
                 text: "lol, thanks"
             }
 
-            expect( commandFunctions.wasThisACommand( data )).toBe( false );
+            expect( commandFunctions.wasThisACommand( data ) ).toBe( false );
         } );
 
         it( "Sending something that should be ignored", () => {
@@ -50,7 +50,7 @@ describe( `Test command functions`, () => {
                 text: "/me does a happy dance"
             }
 
-            expect( commandFunctions.wasThisACommand( data )).toBe( false );
+            expect( commandFunctions.wasThisACommand( data ) ).toBe( false );
         } );
     } );
 
@@ -81,17 +81,83 @@ describe( `Test command functions`, () => {
             expect( commandFunctions.isChatCommand( theCommand ) ).toBe( true );
         } );
 
-        // it( "Sending a non existent command", () => {
-        //     const theCommand = "testCommand";
-        //
-        //     expect( commandFunctions.isChatCommand( theCommand ) ).toBe( false );
-        // } );
-        //
-        // it( "Sending undefined", () => {
-        //     const theCommand = undefined;
-        //
-        //     expect( commandFunctions.isChatCommand( theCommand ) ).toBe( false );
-        // } );
+        it( "Sending a non existent command", () => {
+            const theCommand = "testCommand";
+
+            expect( commandFunctions.isChatCommand( theCommand ) ).toBe( false );
+        } );
+
+        it( "Sending undefined", () => {
+            const theCommand = undefined;
+
+            expect( commandFunctions.isChatCommand( theCommand ) ).toBe( false );
+        } );
+    } );
+
+    describe( 'getCommandAndArguments: is the right thing/s being returned for the command sent?', () => {
+        it( "Sending actual command", () => {
+            const theCommand = process.env.COMMANDIDENTIFIER + "uptime";
+            const botCommands = {};
+            botCommands.uptime = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.reportUptime( data, userFunctions, chatFunctions ); }
+            botCommands.uptime.help = "Tells you how long the bot has been running for";
+            const allCommands = {
+                ...botCommands
+            }
+
+            const expected = expect.arrayContaining( [
+                expect.any( Function ),
+                expect.any( Array ),
+                false
+            ] );
+
+            expect( commandFunctions.getCommandAndArguments( theCommand, allCommands ) ).toEqual( expected );
+        } );
+
+        it( "Sending invalid command", () => {
+            const checkForAlias = jest.spyOn( commandFunctions, "checkForAlias" );
+            checkForAlias.mockImplementation( ( passedArguement ) => {
+                checkForAliasReturn = undefined
+            } );
+
+            const theCommand = process.env.COMMANDIDENTIFIER + "wibhfkjhgkjhgble";
+            const botCommands = {};
+            botCommands.uptime = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.reportUptime( data, userFunctions, chatFunctions ); }
+            botCommands.uptime.help = "Tells you how long the bot has been running for";
+            const allCommands = {
+                ...botCommands
+            }
+
+            const expected = expect.arrayContaining( [
+                null,
+                null
+            ] );
+
+            expect( commandFunctions.getCommandAndArguments( theCommand, allCommands ) ).toEqual( expected );
+        } );
+
+        it( "Sending alias of a command", () => {
+            const checkForAlias = jest.spyOn( commandFunctions, "checkForAlias" );
+            checkForAlias.mockImplementation( ( passedArguement ) => {
+                checkForAliasReturn = undefined
+            } );
+
+            const theCommand = "wibble";
+            const commandToSend = process.env.COMMANDIDENTIFIER + theCommand;
+            const botCommands = {};
+            botCommands.uptime = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.reportUptime( data, userFunctions, chatFunctions ); }
+            botCommands.uptime.help = "Tells you how long the bot has been running for";
+            const allCommands = {
+                ...botCommands
+            }
+
+            const expected = expect.arrayContaining( [
+                theCommand,
+                "dynamicChat",
+                null
+            ] );
+
+            expect( commandFunctions.getCommandAndArguments( commandToSend, allCommands ) ).toEqual( expected );
+        } );
     } );
 
 } );
