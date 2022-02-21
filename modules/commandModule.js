@@ -509,7 +509,6 @@ const commandFunctions = ( bot ) => {
 
         isChatCommand: function ( command ) {
             const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
-            // const dataFilePath = "/Users/Arreynol/git/DaManagement/data/chat.json";
             const store = new Storage( dataFilePath );
 
             const theCommands = store.get( 'chatMessages' );

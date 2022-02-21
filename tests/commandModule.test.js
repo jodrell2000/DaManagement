@@ -112,6 +112,32 @@ describe( `Test command functions`, () => {
             expect( commandFunctions.getCommandAndArguments( theCommand, allCommands ) ).toEqual( expected );
         } );
 
+        it( "Sending a dynamic chat command", () => {
+            jest.mock('../modules/commandModule.js', () => {
+                const originalModule = jest.requireActual('../modules/commandModule.js');
+                return {
+                    __esModule: true,
+                    ...originalModule,
+                    isChatCommand: jest.fn(() => 'bow'),
+                };
+            });
+
+            const theCommand = process.env.COMMANDIDENTIFIER + "bow";
+            const botCommands = {};
+            botCommands.uptime = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.reportUptime( data, userFunctions, chatFunctions ); }
+            const allCommands = {
+                ...botCommands
+            }
+
+            const expected = expect.arrayContaining( [
+                "bow",
+                "dynamicChat",
+                null
+            ] );
+
+            expect( commandFunctions.getCommandAndArguments( theCommand, allCommands ) ).toEqual( expected );
+        } );
+
         it( "Sending neither static command, dynamic chat command nor alias", () => {
             jest.mock('../modules/commandModule.js', () => {
                 const originalModule = jest.requireActual('../modules/commandModule.js');
