@@ -455,7 +455,6 @@ const commandFunctions = ( bot ) => {
 
             // Check if command exists
             let commandObj = allCommands[ theCommand ];
-            console.log( "commandObj:" + commandObj );
 
             // If the command doesn't exist, check aliases
             if ( !commandObj ) {
@@ -548,14 +547,13 @@ const commandFunctions = ( bot ) => {
             return splitData;
         },
 
-        checkForAlias: function ( passedArguement ) {
-
+        checkForAlias: function ( passedArgument ) {
             const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
             const store = new Storage( dataFilePath );
 
             const theAliases = store.get( 'aliases' );
 
-            let findAlias = theAliases[ passedArguement ];
+            let findAlias = theAliases[ passedArgument ];
             return findAlias ? findAlias.command : undefined;
         }
     }

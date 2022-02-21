@@ -1,6 +1,6 @@
 const dotenv = require( 'dotenv' );
 process.env.COMMANDIDENTIFIER = "/";
-process.env.ALIASDATA = "aliases.json";
+process.env.ALIASDATA = "aliases_example.json";
 process.env.CHATDATA = "chat_example.json";
 
 const commandModule = require( '../modules/commandModule.js' );
@@ -99,7 +99,6 @@ describe( `Test command functions`, () => {
             const theCommand = process.env.COMMANDIDENTIFIER + "uptime";
             const botCommands = {};
             botCommands.uptime = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.reportUptime( data, userFunctions, chatFunctions ); }
-            botCommands.uptime.help = "Tells you how long the bot has been running for";
             const allCommands = {
                 ...botCommands
             }
@@ -113,16 +112,19 @@ describe( `Test command functions`, () => {
             expect( commandFunctions.getCommandAndArguments( theCommand, allCommands ) ).toEqual( expected );
         } );
 
-        it( "Sending invalid command", () => {
-            const checkForAlias = jest.spyOn( commandFunctions, "checkForAlias" );
-            checkForAlias.mockImplementation( ( passedArguement ) => {
-                checkForAliasReturn = undefined
-            } );
+        it( "Sending neither static command, dynamic chat command nor alias", () => {
+            jest.mock('../modules/commandModule.js', () => {
+                const originalModule = jest.requireActual('../modules/commandModule.js');
+                return {
+                    __esModule: true,
+                    ...originalModule,
+                    checkForAlias: jest.fn(() => 'dice'),
+                };
+            });
 
             const theCommand = process.env.COMMANDIDENTIFIER + "wibhfkjhgkjhgble";
             const botCommands = {};
             botCommands.uptime = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.reportUptime( data, userFunctions, chatFunctions ); }
-            botCommands.uptime.help = "Tells you how long the bot has been running for";
             const allCommands = {
                 ...botCommands
             }
@@ -136,24 +138,33 @@ describe( `Test command functions`, () => {
         } );
 
         it( "Sending alias of a command", () => {
-            const checkForAlias = jest.spyOn( commandFunctions, "checkForAlias" );
-            checkForAlias.mockImplementation( ( passedArguement ) => {
-                checkForAliasReturn = undefined
-            } );
+            jest.mock('../modules/commandModule.js', () => {
+                const originalModule = jest.requireActual('../modules/commandModule.js');
+                return {
+                    __esModule: true,
+                    ...originalModule,
+                    checkForAlias: jest.fn(() => 'dice'),
+                };
+            });
 
-            const theCommand = "wibble";
+            const theCommand = "yahtzee";
             const commandToSend = process.env.COMMANDIDENTIFIER + theCommand;
+
             const botCommands = {};
             botCommands.uptime = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.reportUptime( data, userFunctions, chatFunctions ); }
-            botCommands.uptime.help = "Tells you how long the bot has been running for";
+
+            const chatCommands = {};
+            chatCommands.dice = ( { data, args, userFunctions, chatFunctions } ) => { chatFunctions.dice( data, args, userFunctions ); }
+
             const allCommands = {
-                ...botCommands
+                ...botCommands,
+                ...chatCommands
             }
 
             const expected = expect.arrayContaining( [
-                theCommand,
-                "dynamicChat",
-                null
+                expect.any( Function ),
+                [],
+                false
             ] );
 
             expect( commandFunctions.getCommandAndArguments( commandToSend, allCommands ) ).toEqual( expected );
