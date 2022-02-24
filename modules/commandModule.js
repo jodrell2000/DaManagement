@@ -16,7 +16,7 @@ const moderatorCommands = {};
 const aliasDataFileName = process.env.ALIASDATA;
 const chatDataFileName = process.env.CHATDATA;
 
-const ignoreCommands = [ '/me /love' ];
+const ignoreCommands = [ '/me ', '/love' ];
 
 const commandFunctions = ( bot ) => {
     // #############################################
@@ -441,11 +441,9 @@ const commandFunctions = ( bot ) => {
                 }
             }
 
-            // check if this was a command
+            // check if this was formatted as a command
             const commandString = "^" + chatDefaults.commandIdentifier;
-            if ( text.match( commandString ) ) {
-                return true;
-            }
+            return !!text.match( commandString );
         },
 
         getCommandAndArguments: function ( text, allCommands ) {
@@ -458,10 +456,17 @@ const commandFunctions = ( bot ) => {
             // Check if command exists
             let commandObj = allCommands[ theCommand ];
 
-            // If the command doesn't exist, check aliases
+            // If the command doesn't exist, check aliases and switch the sent alias for the returned command
             if ( !commandObj ) {
-                const aliasCommand = checkForAlias( theCommand );
-                commandObj = allCommands[ aliasCommand ];
+                const aliasCommand = this.checkForAlias( theCommand );
+                if ( aliasCommand !== undefined ) {
+                    if ( this.isChatCommand( aliasCommand ) ) {
+                        dynamic = true;
+                        theCommand = aliasCommand;
+                    } else {
+                        commandObj = allCommands[ aliasCommand ];
+                    }
+                }
             }
 
             // If the command doesn't exist, check the dynamic chat commands
@@ -504,8 +509,9 @@ const commandFunctions = ( bot ) => {
             }
         },
 
+
         isCoreCommand: function ( command ) {
-            return allCommands[ command ];
+            return !!allCommands[ command ];
         },
 
         isChatCommand: function ( command ) {
@@ -545,19 +551,18 @@ const commandFunctions = ( bot ) => {
             } );
 
             return splitData;
+        },
+
+        checkForAlias: function ( passedArgument ) {
+            const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
+            const store = new Storage( dataFilePath );
+
+            const theAliases = store.get( 'aliases' );
+
+            let findAlias = theAliases[ passedArgument ];
+            return findAlias ? findAlias.command : undefined;
         }
     }
-}
-
-const checkForAlias = ( passedArguement ) => {
-
-    const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
-    const store = new Storage( dataFilePath );
-
-    const theAliases = store.get( 'aliases' );
-
-    let findAlias = theAliases[ passedArguement ];
-    return findAlias ? findAlias.command : undefined;
 }
 
 const listAlias = ( data, chatFunctions ) => {
