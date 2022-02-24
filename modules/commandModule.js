@@ -456,10 +456,17 @@ const commandFunctions = ( bot ) => {
             // Check if command exists
             let commandObj = allCommands[ theCommand ];
 
-            // If the command doesn't exist, check aliases
+            // If the command doesn't exist, check aliases and switch the sent alias for the returned command
             if ( !commandObj ) {
                 const aliasCommand = this.checkForAlias( theCommand );
-                commandObj = allCommands[ aliasCommand ];
+                if ( aliasCommand !== undefined ) {
+                    if ( this.isChatCommand( aliasCommand ) ) {
+                        dynamic = true;
+                        theCommand = aliasCommand;
+                    } else {
+                        commandObj = allCommands[ aliasCommand ];
+                    }
+                }
             }
 
             // If the command doesn't exist, check the dynamic chat commands

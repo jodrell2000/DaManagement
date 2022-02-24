@@ -96,7 +96,8 @@ describe( `Test command functions`, () => {
 
     describe( 'getCommandAndArguments: is the right thing/s being returned for the command sent?', () => {
         it( "Sending actual command", () => {
-            const theCommand = process.env.COMMANDIDENTIFIER + "uptime";
+            const theCommand = "uptime";
+            const commandToSend = process.env.COMMANDIDENTIFIER + theCommand;
             const botCommands = {};
             botCommands.uptime = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.reportUptime( data, userFunctions, chatFunctions ); }
             const allCommands = {
@@ -109,20 +110,21 @@ describe( `Test command functions`, () => {
                 false
             ] );
 
-            expect( commandFunctions.getCommandAndArguments( theCommand, allCommands ) ).toEqual( expected );
+            expect( commandFunctions.getCommandAndArguments( commandToSend, allCommands ) ).toEqual( expected );
         } );
 
         it( "Sending a dynamic chat command", () => {
-            jest.mock('../modules/commandModule.js', () => {
-                const originalModule = jest.requireActual('../modules/commandModule.js');
+            jest.mock( '../modules/commandModule.js', () => {
+                const originalModule = jest.requireActual( '../modules/commandModule.js' );
                 return {
                     __esModule: true,
                     ...originalModule,
-                    isChatCommand: jest.fn(() => 'bow'),
+                    isChatCommand: jest.fn( () => 'bow' ),
                 };
-            });
+            } );
 
-            const theCommand = process.env.COMMANDIDENTIFIER + "bow";
+            const theCommand = "bow";
+            const commandToSend = process.env.COMMANDIDENTIFIER + theCommand;
             const botCommands = {};
             botCommands.uptime = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.reportUptime( data, userFunctions, chatFunctions ); }
             const allCommands = {
@@ -135,20 +137,21 @@ describe( `Test command functions`, () => {
                 null
             ] );
 
-            expect( commandFunctions.getCommandAndArguments( theCommand, allCommands ) ).toEqual( expected );
+            expect( commandFunctions.getCommandAndArguments( commandToSend, allCommands ) ).toEqual( expected );
         } );
 
         it( "Sending neither static command, dynamic chat command nor alias", () => {
-            jest.mock('../modules/commandModule.js', () => {
-                const originalModule = jest.requireActual('../modules/commandModule.js');
+            jest.mock( '../modules/commandModule.js', () => {
+                const originalModule = jest.requireActual( '../modules/commandModule.js' );
                 return {
                     __esModule: true,
                     ...originalModule,
-                    checkForAlias: jest.fn(() => 'dice'),
+                    checkForAlias: jest.fn( () => 'dice' ),
                 };
-            });
+            } );
 
-            const theCommand = process.env.COMMANDIDENTIFIER + "wibhfkjhgkjhgble";
+            const theCommand = "wibhfkjhgkjhgble";
+            const commandToSend = process.env.COMMANDIDENTIFIER + theCommand;
             const botCommands = {};
             botCommands.uptime = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.reportUptime( data, userFunctions, chatFunctions ); }
             const allCommands = {
@@ -160,18 +163,18 @@ describe( `Test command functions`, () => {
                 null
             ] );
 
-            expect( commandFunctions.getCommandAndArguments( theCommand, allCommands ) ).toEqual( expected );
+            expect( commandFunctions.getCommandAndArguments( commandToSend, allCommands ) ).toEqual( expected );
         } );
 
         it( "Sending alias of a command", () => {
-            jest.mock('../modules/commandModule.js', () => {
-                const originalModule = jest.requireActual('../modules/commandModule.js');
+            jest.mock( '../modules/commandModule.js', () => {
+                const originalModule = jest.requireActual( '../modules/commandModule.js' );
                 return {
                     __esModule: true,
                     ...originalModule,
-                    checkForAlias: jest.fn(() => 'dice'),
+                    checkForAlias: jest.fn( () => 'dice' ),
                 };
-            });
+            } );
 
             const theCommand = "yahtzee";
             const commandToSend = process.env.COMMANDIDENTIFIER + theCommand;
@@ -189,8 +192,37 @@ describe( `Test command functions`, () => {
 
             const expected = expect.arrayContaining( [
                 expect.any( Function ),
-                [],
+                expect.any( Array ),
                 false
+            ] );
+
+            expect( commandFunctions.getCommandAndArguments( commandToSend, allCommands ) ).toEqual( expected );
+        } );
+
+        it( "Sending alias of a dynamic command", () => {
+            jest.mock( '../modules/commandModule.js', () => {
+                const originalModule = jest.requireActual( '../modules/commandModule.js' );
+                return {
+                    __esModule: true,
+                    ...originalModule,
+                    checkForAlias: jest.fn( () => 'dice' ),
+                };
+            } );
+
+            const theCommand = "bows";
+            const commandToSend = process.env.COMMANDIDENTIFIER + theCommand;
+
+            const botCommands = {};
+            botCommands.uptime = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.reportUptime( data, userFunctions, chatFunctions ); }
+
+            const allCommands = {
+                ...botCommands
+            }
+
+            const expected = expect.arrayContaining( [
+                "bow",
+                "dynamicChat",
+                null
             ] );
 
             expect( commandFunctions.getCommandAndArguments( commandToSend, allCommands ) ).toEqual( expected );
