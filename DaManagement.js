@@ -20,6 +20,14 @@ let chatModule = require( './modules/chatModule.js' );
 let songModule = require( './modules/songModule.js' );
 let commandModule = require( './modules/commandModule.js' );
 let videoModule = require( './modules/videoModule.js' );
+
+const express = require('express')
+const app = express();
+const pug = require('pug');
+
+app.use(`/scripts`, express.static('./scripts'));
+app.use(`/modules`, express.static('./node_modules'));
+app.use(express.json());
 /************************************EndSetUp**********************************************************************/
 
 let bot = new Bot( authModule.AUTH, authModule.USERID, authModule.ROOMID ); //initializes the bot
@@ -435,3 +443,36 @@ bot.on( 'endsong', function ( data ) {
 
     roomFunctions.escortDJsDown( data, djID, botFunctions, userFunctions, chatFunctions );
 } );
+
+
+app.get('/', function (req, res) {
+    bot.playlistAll( (playlistData) => {
+        // console.table(playlistData.list);
+        let html = pug.renderFile('./templates/index.pug', {playlistData: playlistData.list});
+        res.send(html);
+    });
+});
+
+app.post('/movesong', (req, res) => {
+    bot.playlistReorder(Number.parseInt(req.body.indexFrom), Number.parseInt(req.body.indexTo));
+    res.json(`refresh`);
+});
+
+app.get('/findsong', (req, res) => {
+    bot.searchSong(req.query.term, (data) => {
+        let html = pug.renderFile('./templates/search.pug', {playlistData: data.docs});
+        res.send(html);
+    });
+});
+
+app.get('/addsong', (req, res) => {
+    bot.playlistAdd(req.query.songid);
+    res.json(`refresh`);
+});
+
+app.get('/deletesong', (req, res) => {
+    bot.playlistRemove(Number.parseInt(req.query.songindex));
+    res.json(`refresh`);
+});
+
+app.listen(8585)
