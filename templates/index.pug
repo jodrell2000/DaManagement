@@ -1,0 +1,45 @@
+mixin song(index, songdata)
+    tr.song(data-index=index)
+        td
+            img(src= songdata.metadata.coverart style='height: 50px; width: 50px;')
+        td= songdata.metadata.artist
+        td: a(href='https://www.youtube.com/watch?v=' + songdata.sourceid target='_blank') #{songdata.metadata.song}
+        td= fmtMSS(songdata.metadata.length)
+        td 
+            a(href='#' class='top' data-index=index)
+                i.fa-solid.fa-arrow-turn-up
+            a(href='#' class='bottom' data-index=index)
+                i.fa-solid.fa-arrow-turn-down
+            a(href='#' class='delete' data-index=index) 
+                i.fa-solid.fa-trash-can
+
+doctype html
+html(lang="en")
+  head
+    title DaManagement
+    - var fmtMSS = function(s){return(s-(s%=60))/60+(9<s?':':':0')+s}
+    link(href='/modules/dragula/dist/dragula.css' rel='stylesheet' type='text/css')
+    link(href="/modules/@fortawesome/fontawesome-free/css/fontawesome.css" rel="stylesheet")
+    link(href="/modules/@fortawesome/fontawesome-free/css/solid.css" rel="stylesheet")
+  body
+    h1 DaManagement
+    
+    div
+        input#songsearch(name='songsearch')
+        button#search Search
+    
+    div#searchresults
+    
+    table#songqueue
+        thead
+            tr
+                th 
+                th Artist
+                th Song
+                th Length
+                th Action
+        tbody
+            each songdata, index in playlistData
+                +song(index, songdata)
+    script(src='/modules/dragula/dist/dragula.js')
+    script(src='/scripts/app.js')

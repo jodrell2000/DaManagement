@@ -1,0 +1,33 @@
+mixin song(songdata)
+    tr
+        td
+            img(src= songdata.metadata.coverart style='height: 50px; width: 50px;')
+        td= songdata.metadata.artist
+        td: a(href='https://www.youtube.com/watch?v=' + songdata.sourceid target='_blank') #{songdata.metadata.song}
+        td= fmtMSS(songdata.metadata.length)
+        td: a(href='#' class='add' data-songid=songdata._id) Add
+
+doctype html
+html(lang="en")
+  head
+    title turntable.fm bot
+    - var fmtMSS = function(s){return(s-(s%=60))/60+(9<s?':':':0')+s}
+  body
+    h1 turntable.fm bot manager
+    
+    div
+        input#songsearch(name='songsearch')
+        button#search Search
+    
+    div#searchresults
+    
+    table
+        tr
+            th 
+            th Artist
+            th Song
+            th Length
+            th Action
+        each songdata in playlistData
+            +song(songdata)
+    script(src='/scripts/app.js')
