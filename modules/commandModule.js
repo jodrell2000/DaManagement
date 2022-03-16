@@ -526,7 +526,7 @@ const commandFunctions = ( bot ) => {
         },
 
         canCommandBeAdded: function ( theCommand ) {
-            const alias = checkForAlias( theCommand );
+            const alias = this.checkForAlias( theCommand );
 
             const messageHeader = "The command " + theCommand + " can't be added as ";
             // Check if the command is an existing alias
@@ -568,10 +568,11 @@ const commandFunctions = ( bot ) => {
 const listAlias = ( data, chatFunctions ) => {
     const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
     const store = new Storage( dataFilePath );
+    const commandModule = commandFunctions();
 
     const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
     const passedArgument = strippedCommand[ 1 ];
-    const alias = checkForAlias( passedArgument );
+    const alias = commandModule.checkForAlias( passedArgument );
 
     const aliasLookup = alias ? `commands.${ alias }` : `commands.${ passedArgument }`;
 
@@ -607,7 +608,7 @@ const addAlias = ( data, chatFunctions ) => {
 
     const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
     const passedArgument = strippedCommand[ 1 ];
-    const alias = checkForAlias( passedArgument );
+    const alias = commandModule.checkForAlias( passedArgument );
 
     // Check if new alias already exists
     if ( alias ) {
@@ -640,10 +641,11 @@ const addAlias = ( data, chatFunctions ) => {
 const removeAlias = ( data, chatFunctions ) => {
     const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
     const store = new Storage( dataFilePath );
+    const commandModule = commandFunctions();
 
     const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
 
-    const aliasBeingRemoved = checkForAlias( `/${ strippedCommand[ 1 ] }` );
+    const aliasBeingRemoved = commandModule.checkForAlias( `/${ strippedCommand[ 1 ] }` );
 
     store.remove( `aliases.${ strippedCommand[ 1 ] }` );
 
