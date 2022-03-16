@@ -554,16 +554,12 @@ const commandFunctions = ( bot ) => {
         },
 
         checkForAlias: function ( passedArgument ) {
-            console.group( "checkForAlias" );
-            console.log( "passedArgument:" + passedArgument );
             const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
             const store = new Storage( dataFilePath );
 
             const theAliases = store.get( 'aliases' );
 
             let findAlias = theAliases[ passedArgument ];
-            console.log( 'findAlias:' + findAlias );
-            console.groupEnd();
             return findAlias ? findAlias.command : undefined;
         }
     }
