@@ -554,12 +554,16 @@ const commandFunctions = ( bot ) => {
         },
 
         checkForAlias: function ( passedArgument ) {
+            console.group( "checkForAlias" );
+            console.log( "passedArgument:" + passedArgument );
             const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
             const store = new Storage( dataFilePath );
 
             const theAliases = store.get( 'aliases' );
 
             let findAlias = theAliases[ passedArgument ];
+            console.log( 'findAlias:' + findAlias );
+            console.groupEnd();
             return findAlias ? findAlias.command : undefined;
         }
     }
@@ -607,33 +611,40 @@ const addAlias = ( data, chatFunctions ) => {
     const commandModule = commandFunctions();
 
     const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
-    const passedArgument = strippedCommand[ 1 ];
-    const alias = commandModule.checkForAlias( passedArgument );
+    const newAlias = strippedCommand[ 1 ];
+    const currentAlias = commandModule.checkForAlias( newAlias );
+
+    // does the command we're aliasing actually exist
+    const commandToLink = strippedCommand[ 2 ];
+    if ( !commandModule.isCoreCommand( commandToLink ) && !commandModule.isChatCommand( commandToLink )) {
+        chatFunctions.botSpeak( `The command ${ chatDefaults.commandIdentifier }${ commandToLink } doesn't exist to be aliased.`, data );
+        return;
+    }
 
     // Check if new alias already exists
-    if ( alias ) {
-        chatFunctions.botSpeak( `The alias ${ chatDefaults.commandIdentifier }${ passedArgument } already exists.`, data );
+    if ( currentAlias ) {
+        chatFunctions.botSpeak( `The alias ${ chatDefaults.commandIdentifier }${ newAlias } already exists.`, data );
         return;
     }
 
     // Check if new alias is a command
-    if ( commandModule.isCoreCommand( passedArgument ) ) {
-        chatFunctions.botSpeak( `Alias not added. ${ chatDefaults.commandIdentifier }${ passedArgument } is already a command.`, data );
+    if ( commandModule.isCoreCommand( newAlias ) || commandModule.isChatCommand( newAlias ) ) {
+        chatFunctions.botSpeak( `Alias not added. ${ chatDefaults.commandIdentifier }${ newAlias } is already a command.`, data );
         return;
     }
 
-    store.put( `aliases.${ strippedCommand[ 1 ] }`, { command: strippedCommand[ 2 ] } );
+    store.put( `aliases.${ newAlias }`, { command: commandToLink } );
 
-    let newCommandWithAlias = [ strippedCommand[ 1 ] ];
+    let newCommandWithAlias = [ newAlias ];
 
-    let commandList = store.get( `commands.${ strippedCommand[ 2 ] }` );
+    let commandList = store.get( `commands.${ commandToLink }` );
 
     if ( commandList ) {
-        commandList.push( strippedCommand[ 1 ] );
+        commandList.push( newAlias );
         newCommandWithAlias = commandList;
     }
 
-    store.put( `commands.${ strippedCommand[ 2 ] }`, newCommandWithAlias );
+    store.put( `commands.${ commandToLink }`, newCommandWithAlias );
 
     chatFunctions.botSpeak( "Update successful.", data );
 }
@@ -645,18 +656,23 @@ const removeAlias = ( data, chatFunctions ) => {
 
     const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
 
-    const aliasBeingRemoved = commandModule.checkForAlias( `/${ strippedCommand[ 1 ] }` );
+    const aliasBeingRemoved = strippedCommand[ 1 ];
+    const rootCommand = commandModule.checkForAlias( `${ strippedCommand[ 1 ] }` );
 
-    store.remove( `aliases.${ strippedCommand[ 1 ] }` );
+    store.remove( `aliases.${ aliasBeingRemoved }` );
 
-    let commandList = store.get( `commands.${ aliasBeingRemoved }` );
+    let commandList = store.get( `commands.${ rootCommand }` );
 
     if ( commandList ) {
         const updatedCommandList = commandList.filter( function ( value, index, arr ) {
-            return value !== strippedCommand[ 1 ];
+            return value !== aliasBeingRemoved;
         } );
 
-        store.put( `commands.${ aliasBeingRemoved }`, updatedCommandList );
+        if ( updatedCommandList.length === 0 ) {
+            store.remove( `commands.${ rootCommand }` );
+        } else {
+            store.put( `commands.${ rootCommand }`, updatedCommandList );
+        }
     }
 
     chatFunctions.botSpeak( "Alias removed.", data );
