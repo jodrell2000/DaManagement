@@ -24,9 +24,11 @@ let videoModule = require( './modules/videoModule.js' );
 const express = require('express')
 const app = express();
 const pug = require('pug');
+app.use(express.json());
 
 app.use(`/scripts`, express.static('./scripts'));
 app.use(`/modules`, express.static('./node_modules'));
+app.use(`/styles`, express.static('./styles'));
 app.use(express.json());
 /************************************EndSetUp**********************************************************************/
 
@@ -447,10 +449,14 @@ bot.on( 'endsong', function ( data ) {
 
 app.get('/', function (req, res) {
     bot.playlistAll( (playlistData) => {
-        // console.table(playlistData.list);
         let html = pug.renderFile('./templates/index.pug', {playlistData: playlistData.list});
         res.send(html);
     });
+});
+
+app.post('/songstatus', async function (req, res) {
+    let videoStatus = await videoFunctions.checkVideoStatus(req.body.videoIDs)
+    res.send(videoStatus);
 });
 
 app.post('/movesong', (req, res) => {

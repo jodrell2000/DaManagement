@@ -1,5 +1,5 @@
 mixin song(index, songdata)
-    tr.song(data-index=index)
+    tr.song(data-index=index id=songdata.sourceid class=songdata.source)
         td
             img(src= songdata.metadata.coverart style='height: 50px; width: 50px;')
         td= songdata.metadata.artist
@@ -16,13 +16,27 @@ mixin song(index, songdata)
 doctype html
 html(lang="en")
   head
-    title DaManagement
+    title DaManagement bot
     - var fmtMSS = function(s){return(s-(s%=60))/60+(9<s?':':':0')+s}
+    link(href='/styles/app.css' rel='stylesheet' type='text/css')
     link(href='/modules/dragula/dist/dragula.css' rel='stylesheet' type='text/css')
     link(href="/modules/@fortawesome/fontawesome-free/css/fontawesome.css" rel="stylesheet")
     link(href="/modules/@fortawesome/fontawesome-free/css/solid.css" rel="stylesheet")
   body
-    h1 DaManagement
+    h1 DaManagement bot manager
+
+    div#stats
+        div#totalSongs #{playlistData.length} Songs in Queue
+        div#ytSongs
+            span.count ### 
+            span Song(s) From Youtube
+        div#scSongs
+            span.count ### 
+            span Song(s) From SoundCloud
+    
+    div#actions
+        button#checkStatus Check YouTube Status
+        button#unavailableview Toggle Unavailable View
     
     div
         input#songsearch(name='songsearch')
