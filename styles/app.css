@@ -1,0 +1,4 @@
+tr[status="not available"] { background: #c00; color: #fff }
+tr[status="not available"] a { color: #fff }
+
+.hide{display: none;}

@@ -1,6 +1,8 @@
 // load the googleAPI
 let { google } = require( "googleapis" );
 let authorize = require( "./oauth2lib" );
+const request = require('request');
+
 
 let { setIntersection, setDifference } = require( "../modules/setlib" );
 
@@ -80,6 +82,28 @@ const videoFunctions = () => {
             let regionReport = `The list of regions that will trigger a blocked alert is currently ` + turnCodesIntoCountries( regionsAsArray );
 
             chatFunctions.botSpeak( regionReport, data );
+        },
+
+        checkVideoStatus: function (videoIDs) {
+            return new Promise( (resolve, reject) => {
+                let youtubeURL = `https://www.googleapis.com/youtube/v3/videos?id=${videoIDs}&part=status&key=${process.env.YOUTUBE_API_KEY}`
+                request(youtubeURL, {json: true}, (error, res, body) => {
+        
+                    if (error) {
+                        reject(`Something went wrong. Try again later.`);
+                    }
+        
+                    if (!body.hasOwnProperty('items')) {
+                        reject(`No data returned`);
+                    }
+        
+                    if (!Array.isArray(body.items) || !body.items.length) {
+                        reject(`No data returned`);
+                    }
+        
+                    resolve(body.items);
+                });
+            });
         },
 
         addAlertRegion: function ( data, [ region ], chatFunctions ) {
