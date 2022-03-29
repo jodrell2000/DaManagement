@@ -696,6 +696,8 @@ const userFunctions = ( bot ) => {
                     } else if ( ( idleTImeInMinutes > firstWarning ) && !this.hasDJHadFirstIdleWarning( userID ) ) {
                         this.setDJFirstIdleWarning( userID );
                         this.idleWarning( userID, firstWarning, chatFunctions );
+                    } else if ( idleTImeInMinutes < firstWarning && ( this.hasDJHadFirstIdleWarning( userID ) || this.hasDJHadSecondIdleWarning( userID ) ) ) {
+                        this.resetDJIdleWarnings( userID );
                     }
                 }
             }
@@ -704,12 +706,6 @@ const userFunctions = ( bot ) => {
         setDJFirstIdleWarning: function ( userID ) {
             if ( this.userExists( userID ) ) {
                 theUsersList[ this.getPositionOnUsersList( userID ) ][ 'firstIdleWarning' ] = true;
-            }
-        },
-
-        clearDJFirstIdleWarning: function ( userID ) {
-            if ( this.userExists( userID ) ) {
-                theUsersList[ this.getPositionOnUsersList( userID ) ][ 'firstIdleWarning' ] = false;
             }
         },
 
@@ -725,15 +721,26 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        clearDJSecondIdleWarning: function ( userID ) {
-            if ( this.userExists( userID ) ) {
-                theUsersList[ this.getPositionOnUsersList( userID ) ][ 'secondIdleWarning' ] = false;
-            }
-        },
-
         hasDJHadSecondIdleWarning: function ( userID ) {
             if ( this.userExists( userID ) ) {
                 return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'secondIdleWarning' ];
+            }
+        },
+
+        resetDJIdleWarnings: function ( userID ) {
+            this.clearDJFirstIdleWarning( userID );
+            this.clearDJSecondIdleWarning( userID );
+        },
+
+        clearDJFirstIdleWarning: function ( userID ) {
+            if ( this.userExists( userID ) ) {
+                theUsersList[ this.getPositionOnUsersList( userID ) ][ 'firstIdleWarning' ] = false;
+            }
+        },
+
+        clearDJSecondIdleWarning: function ( userID ) {
+            if ( this.userExists( userID ) ) {
+                theUsersList[ this.getPositionOnUsersList( userID ) ][ 'secondIdleWarning' ] = false;
             }
         },
 
