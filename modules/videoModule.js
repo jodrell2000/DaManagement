@@ -84,12 +84,14 @@ const videoFunctions = () => {
 
         addAlertRegion: function ( data, [ region ], chatFunctions ) {
             let message;
-            if ( countryLookup.byIso( region ) !== null ) {
-                if ( regionsWeCareAbout.has( region ) ) {
-                    message = countryLookup.byIso( region ).country + ' is already in the region alerts list';
+            let theRegion = region.toUpperCase();
+
+            if ( countryLookup.byIso( theRegion ) !== null ) {
+                if ( regionsWeCareAbout.has( theRegion ) ) {
+                    message = countryLookup.byIso( theRegion ).country + ' is already in the region alerts list';
                 } else {
-                    regionsWeCareAbout.add( region );
-                    message = countryLookup.byIso( region ).country + ' has been added to the region alerts list';
+                    regionsWeCareAbout.add( theRegion );
+                    message = countryLookup.byIso( theRegion ).country + ' has been added to the region alerts list';
                 }
                 chatFunctions.botSpeak( message, data );
             } else {
@@ -99,10 +101,12 @@ const videoFunctions = () => {
 
         removeAlertRegion: function ( data, [ region ], chatFunctions ) {
             let message;
-            if ( regionsWeCareAbout.delete( region ) ) {
-                message = countryLookup.byIso( region ).country + ' has been removed from the region alerts list';
+            let theRegion = region.toUpperCase();
+
+            if ( regionsWeCareAbout.delete( theRegion ) ) {
+                message = countryLookup.byIso( theRegion ).country + ' has been removed from the region alerts list';
             } else {
-                message = countryLookup.byIso( region ).country + ' is not in the region alerts list';
+                message = countryLookup.byIso( theRegion ).country + ' is not in the region alerts list';
             }
             chatFunctions.botSpeak( message, data );
         },
