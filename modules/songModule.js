@@ -76,28 +76,53 @@ const songFunctions = (bot) => {
         // ========================================================
 
         switchLengthLimit: function ( data, songLength, chatFunctions ) {
-            if ( songLength[0] === undefined ) {
-                if ( musicDefaults.songLengthLimitOn === true ) {
-                    musicDefaults.songLengthLimitOn = false;
-                } else {
-                    musicDefaults.songLengthLimitOn = true;
-                    musicDefaults.songLengthLimit = musicDefaults.songLengthLimitDefault;
-                }
+            let theMessage = "";
+            const theSongLength = songLength[0];
+
+            if ( theSongLength === undefined ) {
+                this.swapSongLengthLimit( data, chatFunctions );
+            } else if ( isNaN(theSongLength) ) {
+                theMessage = "The max song length must be a number"
+                chatFunctions.botSpeak( theMessage, data )
             } else {
                 musicDefaults.songLengthLimitOn = true;
-                musicDefaults.songLengthLimit = songLength;
+                musicDefaults.songLengthLimit = theSongLength;
+
+                console.log( data );
+                console.log( chatFunctions );
+
+                this.announceSongLengthLimit( data, chatFunctions );
+            }
+        },
+
+        swapSongLengthLimit: function ( data, chatFunctions ) {
+            if ( musicDefaults.songLengthLimitOn === true ) {
+                musicDefaults.songLengthLimitOn = false;
+            } else {
+                musicDefaults.songLengthLimitOn = true;
+                if ( musicDefaults.songLengthLimit === undefined ) {
+                    musicDefaults.songLengthLimit = 10;
+                }
             }
 
+            this.announceSongLengthLimit( data, chatFunctions );
+        },
 
-            let theMessage = "The song length limit is now";
+        announceSongLengthLimit: function ( data, chatFunctions ) {
+            console.log( data );
+            console.log( chatFunctions );
+
+            let theMessage = "";
+
+            theMessage = "The song length limit is now";
             if ( musicDefaults.songLengthLimitOn ) {
                 theMessage += " active, and the length limit is " + musicDefaults.songLengthLimit + " minutes";
             } else {
-                theMessage += " innactive";
+                theMessage += " inactive";
             }
-
-            chatFunctions.botSpeak( theMessage, data, true)
+            chatFunctions.botSpeak( theMessage, data, true )
         },
+
 
         // ========================================================
 
