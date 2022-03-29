@@ -24,6 +24,12 @@ let videoModule = require( './modules/videoModule.js' );
 const express = require('express')
 const app = express();
 const pug = require('pug');
+const fs = require("fs");
+let path = require('path');
+
+// client authentication
+app.use(authentication)
+
 app.use(express.json());
 
 app.use(`/scripts`, express.static('./scripts'));
@@ -481,4 +487,35 @@ app.get('/deletesong', (req, res) => {
     res.json(`refresh`);
 });
 
-app.listen(8585)
+function authentication(req, res, next) {
+    let authheader = req.headers.authorization;
+    // console.log(req.headers);
+
+    if (!authheader) {
+        let err = new Error('You are not authenticated!');
+        res.setHeader('WWW-Authenticate', 'Basic');
+        err.status = 401;
+        return next(err)
+    }
+
+    let auth = new Buffer.from(authheader.split(' ')[1],
+        'base64').toString().split(':');
+    let user = auth[0];
+    let pass = auth[1];
+
+    if (user === process.env.PLAYLIST_USERNAME && pass === process.env.PLAYLIST_PASSWORD ) {
+
+        // If Authorized user
+        next();
+    } else {
+        let err = new Error('You are not authenticated!');
+        res.setHeader('WWW-Authenticate', 'Basic');
+        err.status = 401;
+        return next(err);
+    }
+
+}
+
+app.listen((8585), () => {
+    console.log("Server is Running ");
+})
