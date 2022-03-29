@@ -4,6 +4,8 @@ let chatDefaults = require( '../defaultSettings/chatDefaults.js' );
 
 let authModule = require( '../auth.js' );
 const auth = require( '../auth.js' );
+const { dirname } = require( "path" );
+const Storage = require( "node-storage" );
 
 let theUsersList = []; // object array of everyone in the room
 let afkPeople = []; //holds the userid of everyone who has used the /afk command
@@ -35,6 +37,7 @@ let djIdleLimit = roomDefaults.djIdleLimitThresholds[ 0 ]; // how long can DJs b
 let idleFirstWarningTime = roomDefaults.djIdleLimitThresholds[ 1 ];
 let idleSecondWarningTime = roomDefaults.djIdleLimitThresholds[ 2 ];
 
+const userDataFileName = process.env.USERDATA;
 
 const userFunctions = ( bot ) => {
 
@@ -66,6 +69,31 @@ const userFunctions = ( bot ) => {
             return formatDays( seconds );
         }
     }
+
+    // ========================================================
+    // Persistent User Functions
+    // ========================================================
+
+    async function persistUserInfo( store, userID, key, value ) {
+        await removeUserKey( store, userID, key );
+        await storeUserKeyValue( store, userID, key, value );
+    }
+
+    function removeUserKey ( store, userID, key ) {
+        return new Promise( resolve => {
+            store.remove( userID + "." + key );
+            resolve();
+        })
+    }
+
+    function storeUserKeyValue ( store, userID, key, value ) {
+        return new Promise( resolve => {
+            store.put( userID + "." + key, value );
+            resolve();
+        })
+    }
+
+    // ========================================================
 
     return {
         debugPrintTheUsersList: function () {
@@ -187,6 +215,26 @@ const userFunctions = ( bot ) => {
                 return data.userid;
             }
         },
+
+        // ========================================================
+        // Persistent User Functions
+        // ========================================================
+
+        storeUserData: function ( userID, key, value ) {
+            const dataFilePath = `${ dirname( require.main.filename ) }/data/${ userDataFileName }`;
+            const store = new Storage( dataFilePath );
+
+            theUsersList[ this.getPositionOnUsersList( userID ) ][ key ] = value;
+
+            persistUserInfo( store, userID, key, value );
+
+        },
+
+        loadAllUsersFromStorage: function () {
+
+        },
+
+        // ========================================================
 
         // ========================================================
         // User Helper Functions
@@ -582,25 +630,33 @@ const userFunctions = ( bot ) => {
 
         updateUserLastSpoke: function ( userID ) {
             if ( this.userExists( userID ) === true ) {
-                theUsersList[ this.getPositionOnUsersList( userID ) ][ 'lastSpoke' ] = Date.now();
+                const key   = "lastSpoke";
+                const value = Date.now();
+                this.storeUserData( userID, key, value)
             }
         },
 
         updateUserLastVoted: function ( userID ) {
             if ( this.userExists( userID ) === true ) {
-                theUsersList[ this.getPositionOnUsersList( userID ) ][ 'lastVoted' ] = Date.now();
+                const key   = "lastVoted";
+                const value = Date.now();
+                this.storeUserData( userID, key, value)
             }
         },
 
         updateUserLastSnagged: function ( userID ) {
             if ( this.userExists( userID ) === true ) {
-                theUsersList[ this.getPositionOnUsersList( userID ) ][ 'lastSnagged' ] = Date.now();
+                const key   = "lastSnagged";
+                const value = Date.now();
+                this.storeUserData( userID, key, value)
             }
         },
 
         updateUserJoinedStage: function ( userID ) {
             if ( this.userExists( userID ) === true ) {
-                theUsersList[ this.getPositionOnUsersList( userID ) ][ 'joinedStage' ] = Date.now();
+                const key   = "joinedStage";
+                const value = Date.now();
+                this.storeUserData( userID, key, value)
             }
         },
 

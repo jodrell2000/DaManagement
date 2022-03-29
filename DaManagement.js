@@ -508,7 +508,7 @@ function authentication(req, res, next) {
         // If Authorized user
         next();
     } else {
-        let err = new Error('You are not authenticated!');
+        let err = new Error('You are not authenticated to access the playlist controls!');
         res.setHeader('WWW-Authenticate', 'Basic');
         err.status = 401;
         return next(err);
