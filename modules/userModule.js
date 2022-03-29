@@ -75,7 +75,10 @@ const userFunctions = ( bot ) => {
     // ========================================================
 
     async function persistUserInfo( store, userID, key, value ) {
+        const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
+
         await removeUserKey( store, userID, key );
+        await sleep( 100 )
         await storeUserKeyValue( store, userID, key, value );
     }
 
@@ -92,6 +95,7 @@ const userFunctions = ( bot ) => {
             resolve();
         })
     }
+
 
     // ========================================================
 
@@ -221,7 +225,7 @@ const userFunctions = ( bot ) => {
         // ========================================================
 
         storeUserData: function ( userID, key, value ) {
-            const dataFilePath = `${ dirname( require.main.filename ) }/data/${ userDataFileName }`;
+            const dataFilePath = `${ dirname( require.main.filename ) }/data/users/${ userID }.json`;
             const store = new Storage( dataFilePath );
 
             theUsersList[ this.getPositionOnUsersList( userID ) ][ key ] = value;
@@ -629,7 +633,7 @@ const userFunctions = ( bot ) => {
         },
 
         updateUserLastSpoke: function ( userID ) {
-            if ( this.userExists( userID ) === true ) {
+            if ( this.userExists( userID ) ) {
                 const key   = "lastSpoke";
                 const value = Date.now();
                 this.storeUserData( userID, key, value)
@@ -637,7 +641,7 @@ const userFunctions = ( bot ) => {
         },
 
         updateUserLastVoted: function ( userID ) {
-            if ( this.userExists( userID ) === true ) {
+            if ( this.userExists( userID ) ) {
                 const key   = "lastVoted";
                 const value = Date.now();
                 this.storeUserData( userID, key, value)
@@ -645,7 +649,7 @@ const userFunctions = ( bot ) => {
         },
 
         updateUserLastSnagged: function ( userID ) {
-            if ( this.userExists( userID ) === true ) {
+            if ( this.userExists( userID ) ) {
                 const key   = "lastSnagged";
                 const value = Date.now();
                 this.storeUserData( userID, key, value)
@@ -653,7 +657,7 @@ const userFunctions = ( bot ) => {
         },
 
         updateUserJoinedStage: function ( userID ) {
-            if ( this.userExists( userID ) === true ) {
+            if ( this.userExists( userID ) ) {
                 const key   = "joinedStage";
                 const value = Date.now();
                 this.storeUserData( userID, key, value)
@@ -1195,10 +1199,14 @@ const userFunctions = ( bot ) => {
             if ( theCount === undefined ) {
                 theCount = 0
             }
+
             if ( this.userExists( userID ) ) {
-                theUsersList[ this.getPositionOnUsersList( userID ) ][ 'currentPlayCount' ] = theCount;
+                const key   = "currentPlayCount";
+                const value = theCount;
+                this.storeUserData( userID, key, value)
             }
         },
+
 
         resetDJTotalPlayCount: function ( userID ) {
             if ( this.userExists( userID ) ) {
@@ -1207,10 +1215,17 @@ const userFunctions = ( bot ) => {
         },
 
         setDJTotalPlayCount: function ( userID, theCount ) {
+            if ( theCount === undefined ) {
+                theCount = 0
+            }
+
             if ( this.userExists( userID ) ) {
-                theUsersList[ this.getPositionOnUsersList( userID ) ][ 'totalPlayCount' ] = theCount;
+                const key   = "totalPlayCount";
+                const value = theCount;
+                this.storeUserData( userID, key, value)
             }
         },
+
 
         deleteAllDJPlayCounts: function ( userID ) {
             if ( this.userExists( userID ) ) {
@@ -1592,9 +1607,12 @@ const userFunctions = ( bot ) => {
 
         addUserJoinedTime: function ( userID ) {
             if ( this.userExists( userID ) ) {
-                theUsersList[ this.getPositionOnUsersList( userID ) ][ 'joinTime' ] = Date.now();
+                const key   = "joinTime";
+                const value = Date.now();
+                this.storeUserData( userID, key, value)
             }
         },
+
 
         getPositionOnUsersList: function ( userID ) {
             return theUsersList.findIndex( ( { id } ) => id === userID )
