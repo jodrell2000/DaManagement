@@ -4,3 +4,6 @@ DaManagement.sublime-workspace
 .env
 .idea
 client_secret.json
+/data/chat.json
+/data/aliases.json
+/data/chatDoc.html
