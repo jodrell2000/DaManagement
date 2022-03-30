@@ -102,9 +102,6 @@ const userFunctions = ( bot ) => {
             if ( !theStartTime ) {
                 botFunctions.setBotStartTime();
             }
-
-            // read any available user data on disk into memory
-            this.readAllUserDataFromDisk();
         },
 
         isPMerInRoom: function ( userID ) {
