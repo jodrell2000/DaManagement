@@ -24,8 +24,6 @@ let videoModule = require( './modules/videoModule.js' );
 const express = require('express')
 const app = express();
 const pug = require('pug');
-const fs = require("fs");
-let path = require('path');
 
 // client authentication
 app.use(authentication)
@@ -131,17 +129,15 @@ bot.on( 'registered', function ( data ) {
 bot.on( 'roomChanged', function ( data ) {
     try {
         //reset arrays in case this was triggered by the bot restarting
-        userFunctions.botStartReset( botFunctions, songFunctions );
-
         userFunctions.resetAllWarnMe( data );
 
         //get & set information
         roomFunctions.setRoomDefaults( data );
 
         userFunctions.rebuildUserList( data );
-        userFunctions.resetModerators( data );
+        userFunctions.readAllUserDataFromDisk();
 
-        userFunctions.resetAllSpamCounts();
+        userFunctions.resetModerators( data );
 
         userFunctions.startAllUserTimers();
 
@@ -176,7 +172,8 @@ bot.on( 'newsong', function ( data ) {
     roomDefaults.detail = data.room.description; //set room description again in case it was changed
 
     // set user as current DJ
-    userFunctions.setCurrentDJ( data.room.metadata.current_dj );
+    let djID = data.room.metadata.current_dj;
+    userFunctions.setCurrentDJ( djID );
 
     if ( songFunctions.ytid() !== undefined ) {
         videoFunctions.checkVideoRegionAlert( data, songFunctions.ytid(), userFunctions, chatFunctions, botFunctions );
@@ -213,7 +210,6 @@ bot.on( 'newsong', function ( data ) {
     if ( musicDefaults.bannedArtists.length !== 0 && typeof songFunctions.artist() !== 'undefined' && typeof songFunctions.song() !== 'undefined' ) {
         const djCheck = userFunctions.getCurrentDJID();
         let checkIfAdmin = userFunctions.masterIds().indexOf( djCheck ); //is user an exempt admin?
-        let nameDj = userFunctions.theUsersList().indexOf( djCheck ) + 1; //the currently playing dj's name
 
         if ( checkIfAdmin === -1 ) {
             //if matching is enabled for both songs and artists
@@ -221,8 +217,8 @@ bot.on( 'newsong', function ( data ) {
                 if ( songFunctions.artist().match( roomFunctions.bannedArtistsMatcher() ) || songFunctions.song().match( roomFunctions.bannedArtistsMatcher() ) ) {
                     userFunctions.removeDJ( djCheck, 'DJ has played a banned song or artist' );
 
-                    if ( typeof userFunctions.theUsersList()[ nameDj ] !== 'undefined' ) {
-                        bot.speak( '@' + userFunctions.theUsersList()[ nameDj ] + ' you have played a banned track or artist.' );
+                    if ( typeof userFunctions.getUsername( djCheck ) !== 'undefined' ) {
+                        bot.speak( '@' + userFunctions.getUsername( djCheck ) + ' you have played a banned track or artist.' );
                     }
                     else {
                         bot.speak( 'current dj, you have played a banned track or artist.' );
@@ -234,8 +230,8 @@ bot.on( 'newsong', function ( data ) {
                 if ( songFunctions.artist().match( roomFunctions.bannedArtistsMatcher() ) ) {
                     userFunctions.removeDJ( djCheck, 'DJ has played a banned song or artist' );
 
-                    if ( typeof userFunctions.theUsersList()[ nameDj ] !== 'undefined' ) {
-                        bot.speak( '@' + userFunctions.theUsersList()[ nameDj ] + ' you have played a banned artist.' );
+                    if ( typeof userFunctions.getUsername( djCheck ) !== 'undefined' ) {
+                        bot.speak( '@' + userFunctions.getUsername( djCheck ) + ' you have played a banned artist.' );
                     }
                     else {
                         bot.speak( 'current dj, you have played a banned artist.' );
@@ -247,8 +243,8 @@ bot.on( 'newsong', function ( data ) {
                 if ( songFunctions.song().match( roomFunctions.bannedArtistsMatcher() ) ) {
                     userFunctions.removeDJ( djCheck, 'DJ has played a banned song or artist' );
 
-                    if ( typeof userFunctions.theUsersList()[ nameDj ] !== 'undefined' ) {
-                        bot.speak( '@' + userFunctions.theUsersList()[ nameDj ] + ' you have played a banned track.' );
+                    if ( typeof userFunctions.getUsername( djCheck ) !== 'undefined' ) {
+                        bot.speak( '@' + userFunctions.getUsername( djCheck ) + ' you have played a banned track.' );
                     }
                     else {
                         bot.speak( 'current dj, you have played a banned track.' );
