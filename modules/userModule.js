@@ -218,8 +218,6 @@ const userFunctions = ( bot ) => {
         },
 
         readAllUserDataFromDisk: function (  ) {
-            this.resetUsersList();
-
             const dataFilePath = `${ dirname( require.main.filename ) }/data/users/`;
             fs.readdirSync( dataFilePath ).forEach( file => {
                 this.readUserData( dataFilePath + file );
@@ -1583,9 +1581,7 @@ const userFunctions = ( bot ) => {
 
         addUserJoinedTime: function ( userID ) {
             if ( this.userExists( userID ) && !this.getUserJoinedRoom( userID ) ) {
-                const key   = "joinTime";
-                const value = Date.now();
-                this.storeUserData( userID, key, value)
+                this.storeUserData( userID, "joinTime", Date.now())
             }
         },
 
