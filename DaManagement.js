@@ -128,24 +128,26 @@ bot.on( 'registered', function ( data ) {
 //starts up when bot first enters the room
 bot.on( 'roomChanged', function ( data ) {
     try {
+        userFunctions.resetUsersList();
+
+        // load in and user data on disk first
+        userFunctions.readAllUserDataFromDisk();
+
         //reset arrays in case this was triggered by the bot restarting
         userFunctions.resetAllWarnMe( data );
 
         //get & set information
         roomFunctions.setRoomDefaults( data );
 
+        // build in the users in the room, skip any already loaded from disk
         userFunctions.rebuildUserList( data );
-        userFunctions.readAllUserDataFromDisk();
 
         userFunctions.resetModerators( data );
-
         userFunctions.startAllUserTimers();
-
         userFunctions.resetDJs( data );
 
         // set user as current DJ
         userFunctions.setCurrentDJ( data.room.metadata.current_dj );
-
     }
     catch ( err ) {
         console.log( 'error', 'unable to join the room the room due to err: ' + err.toString() );

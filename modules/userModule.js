@@ -221,21 +221,21 @@ const userFunctions = ( bot ) => {
             })
         },
 
-        readUserData: function ( file ) {
-            return new Promise( resolve => {
-                fs.readFile( file, 'utf8', (err, data) => {
+        readUserData: function( file ) {
+            console.group( "readUserData" );
+            const theData = fs.readFileSync( file, { encoding: 'utf8' } )
 
-                    if (err) {
-                        console.error(`Error reading file from disk: ${err}`);
-                    } else {
-                        const userInfo = JSON.parse(data);
-                        theUsersList.push( userInfo );
-                    }
+            const userInfo = JSON.parse( theData );
+            console.log( "userInfo:" + JSON.stringify( userInfo ) );
+            const userIDFromFile = userInfo[ 'id' ];
+            if ( this.userExists( userIDFromFile ) ) {
+                console.log( "User already exists so remove them" );
+                theUsersList.splice( this.getPositionOnUsersList( userIDFromFile ), 1 );
+            }
+            theUsersList.push( userInfo );
 
-                });
-                resolve();
-            });
-
+            console.log( "readUserData theUsersList:" + JSON.stringify( theUsersList ) );
+            console.groupEnd();
         },
 
         // ========================================================
@@ -1620,16 +1620,20 @@ const userFunctions = ( bot ) => {
         },
 
         rebuildUserList: function ( data ) {
-            this.resetUsersList();
-            let thisUserID;
+            console.group( "rebuildUserList" );
+            let userID;
 
             for ( let i = 0; i < data.users.length; i++ ) {
                 if ( typeof data.users[ i ] !== 'undefined' ) {
-                    thisUserID = data.users[ i ].userid;
-                    this.addUserToTheUsersList( thisUserID, data.users[ i ].name );
+                    userID = data.users[ i ].userid;
+                    if ( !this.userExists( userID ) ) {
+                        console.log( "UserID:" + userID + " does not exist" );
+                        this.addUserToTheUsersList( userID, data.users[ i ].name );
+                    }
                 }
             }
-
+            console.log( "after thisUsersList:" + JSON.stringify( theUsersList ) );
+            console.groupEnd();
         },
 
         startAllUserTimers: function () {
