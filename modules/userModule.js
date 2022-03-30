@@ -376,29 +376,23 @@ const userFunctions = ( bot ) => {
         // ========================================================
 
         resetModerators: function ( data ) {
-            let theUserID;
+            let userID;
             if ( data.room !== undefined ) {
                 for ( let modLoop = 0; modLoop < data.room.metadata.moderator_id.length; modLoop++ ) {
-                    theUserID = data.room.metadata.moderator_id[ modLoop ];
-                    if ( this.userExists( theUserID ) ) {
-                        theUsersList[ this.getPositionOnUsersList( theUserID ) ][ 'moderator' ] = true;
+                    userID = data.room.metadata.moderator_id[ modLoop ];
+                    if ( this.userExists( userID ) ) {
+                        this.storeUserData( userID, 'moderator', true );
                     }
                 }
             }
         },
 
-        addModerator: function ( theUserID ) {
-            if ( this.userExists( theUserID ) ) {
-                let userPosition = this.getPositionOnUsersList( theUserID );
-                theUsersList[ userPosition ][ 'moderator' ] = true;
-            }
+        addModerator: function ( userID ) {
+            this.storeUserData( userID, 'moderator', true );
         },
 
-        removeModerator: function ( theUserID ) {
-            if ( this.userExists( theUserID ) ) {
-                let userPosition = this.getPositionOnUsersList( theUserID );
-                theUsersList[ userPosition ][ 'moderator' ] = false;
-            }
+        removeModerator: function ( userID ) {
+            this.storeUserData( userID, 'moderator', false );
         },
 
         isUserModerator: function ( theUserID ) {
