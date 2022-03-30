@@ -231,11 +231,10 @@ const userFunctions = ( bot ) => {
                 fs.readFile( file, 'utf8', (err, data) => {
 
                     if (err) {
-                        console.log(`Error reading file from disk: ${err}`);
+                        console.error(`Error reading file from disk: ${err}`);
                     } else {
                         const userInfo = JSON.parse(data);
                         theUsersList.push( userInfo );
-                        console.log( "theUsersList:" + JSON.stringify( theUsersList ) );
                     }
 
                 });
