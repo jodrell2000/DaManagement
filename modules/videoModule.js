@@ -110,7 +110,7 @@ const videoFunctions = () => {
             });
         },
 
-        addAlertRegion: function ( data, region, chatFunctions ) {
+        addAlertRegion: function ( data, region, chatFunctions, announce = true ) {
             let message;
             let theRegion = region.toUpperCase();
 
@@ -121,13 +121,17 @@ const videoFunctions = () => {
                     regionsWeCareAbout.add( theRegion );
                     message = countryLookup.byIso( theRegion ).country + ' has been added to the region alerts list';
                 }
-                chatFunctions.botSpeak( message, data );
+                if ( announce === true ) {
+                    chatFunctions.botSpeak( message, data );
+                }
             } else {
-                chatFunctions.botSpeak( 'That region is not recognised. Please use one of the 2 character ISO country codes, https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2', data );
+                if ( announce === true ) {
+                    chatFunctions.botSpeak( 'That region is not recognised. Please use one of the 2 character ISO country codes, https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2', data );
+                }
             }
         },
 
-        removeAlertRegion: function ( data, region, chatFunctions ) {
+        removeAlertRegion: function ( data, region, chatFunctions, announce = true ) {
             let message;
             let theRegion = region.toUpperCase();
 
@@ -136,7 +140,9 @@ const videoFunctions = () => {
             } else {
                 message = countryLookup.byIso( theRegion ).country + ' is not in the region alerts list';
             }
-            chatFunctions.botSpeak( message, data );
+            if ( announce === true ) {
+                chatFunctions.botSpeak( message, data );
+            }
         },
 
         resetAlertRegions: function () {

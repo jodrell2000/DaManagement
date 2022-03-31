@@ -273,7 +273,7 @@ const userFunctions = ( bot ) => {
                 for ( let userRegionLoop = 0; userRegionLoop < userRegionsArray.length; userRegionLoop++ ) {
                     thisRegion = userRegionsArray[ userRegionLoop ];
                     if ( thisRegion !== {} ) {
-                        videoFunctions.addAlertRegion( data, thisRegion, chatFunctions );
+                        videoFunctions.addAlertRegion( data, thisRegion, chatFunctions, false );
                     }
                 }
             }
