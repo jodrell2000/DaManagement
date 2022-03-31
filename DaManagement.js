@@ -110,8 +110,6 @@ bot.on( 'ready', function () {
 
 //starts up when a new person joins the room
 bot.on( 'registered', function ( data ) {
-    console.log( "User arrived" );
-    console.log( data );
     const userID = data.user[ 0 ].userid;
     const username = data.user[ 0 ].name;
 
@@ -132,8 +130,6 @@ bot.on( 'registered', function ( data ) {
 
 //starts up when a user leaves the room
 bot.on( 'deregistered', function ( data ) {
-    console.log( "User left" );
-    console.log( data );
     let theUserID = data.user[ 0 ].userid;
     userFunctions.deregisterUser( theUserID );
     userFunctions.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );

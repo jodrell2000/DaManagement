@@ -261,7 +261,6 @@ const userFunctions = ( bot ) => {
 
         deleteUserWantsNoRegion: function ( userID, data, videoFunctions, chatFunctions ) {
             this.deleteUserData( userID, "noregion" );
-            this.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
         },
 
         updateRegionAlertsFromUsers: function ( data, videoFunctions, chatFunctions ) {
