@@ -110,20 +110,34 @@ bot.on( 'ready', function () {
 
 //starts up when a new person joins the room
 bot.on( 'registered', function ( data ) {
-    const theUserID = data.user[ 0 ].userid;
+    console.log( "User arrived" );
+    console.log( data );
+    const userID = data.user[ 0 ].userid;
     const username = data.user[ 0 ].name;
 
-    userFunctions.userJoinsRoom( theUserID, username );
+    userFunctions.userJoinsRoom( userID, username );
 
     const bootThisUser = userFunctions.bootNewUserCheck[ 0 ];
     const bootMessage = userFunctions.bootNewUserCheck[ 1 ];
 
     if ( bootThisUser ) {
-        userFunctions.bootThisUser( theUserID, bootMessage );
+        userFunctions.bootThisUser( userID, bootMessage );
     } else {
-        chatFunctions.userGreeting( data, theUserID, username, roomFunctions, userFunctions )
+        chatFunctions.userGreeting( data, userID, username, roomFunctions, userFunctions )
     }
+
+    userFunctions.askUserToSetRegion( userID, chatFunctions);
+    userFunctions.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
 } );
+
+//starts up when a user leaves the room
+bot.on( 'deregistered', function ( data ) {
+    console.log( "User left" );
+    console.log( data );
+    let theUserID = data.user[ 0 ].userid;
+    userFunctions.deregisterUser( theUserID );
+    userFunctions.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
+} )
 
 //starts up when bot first enters the room
 bot.on( 'roomChanged', function ( data ) {
@@ -148,6 +162,10 @@ bot.on( 'roomChanged', function ( data ) {
 
         // set user as current DJ
         userFunctions.setCurrentDJ( data.room.metadata.current_dj );
+
+        // ask users for their regions if we don't have them
+        userFunctions.checkUsersHaveRegions( data, chatFunctions );
+        userFunctions.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
     }
     catch ( err ) {
         console.log( 'error', 'unable to join the room the room due to err: ' + err.toString() );
@@ -426,12 +444,6 @@ bot.on( 'new_moderator', function ( data ) {
 bot.on( 'rem_moderator', function ( data ) {
     const theUserID = data.userid;
     userFunctions.removeModerator( theUserID )
-} )
-
-//starts up when a user leaves the room
-bot.on( 'deregistered', function ( data ) {
-    let theUserID = data.user[ 0 ].userid;
-    userFunctions.deregisterUser( theUserID )
 } )
 
 //activates at the end of a song.

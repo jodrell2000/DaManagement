@@ -14,7 +14,7 @@ let TOKEN_PATH = TOKEN_DIR + "theManagementCredentials.json";
 const countryLookup = require( 'country-code-lookup' );
 
 let musicDefaults = require( "../defaultSettings/musicDefaults.js" );
-let regionsWeCareAbout = new Set( musicDefaults.alertRegions ); //song play limit, this is for the playLimit variable up above(off by default)
+let regionsWeCareAbout = new Set( musicDefaults.alertRegions );
 
 const videoFunctions = () => {
     function alertIfRegionsNotAllowed ( restrictions, userFunctions, notifier ) {
@@ -54,7 +54,11 @@ const videoFunctions = () => {
             countriesString = countriesString.substring( 0, lastComma ) + ' and' + countriesString.substring( lastComma + 1 )
         }
 
-        return countriesString;
+        if ( countriesString.length === 0 ) {
+            return "empty";
+        } else {
+            return countriesString;
+        }
     }
 
     async function queryVideoDetails ( auth, videoID ) {
@@ -106,7 +110,7 @@ const videoFunctions = () => {
             });
         },
 
-        addAlertRegion: function ( data, [ region ], chatFunctions ) {
+        addAlertRegion: function ( data, region, chatFunctions ) {
             let message;
             let theRegion = region.toUpperCase();
 
@@ -123,7 +127,7 @@ const videoFunctions = () => {
             }
         },
 
-        removeAlertRegion: function ( data, [ region ], chatFunctions ) {
+        removeAlertRegion: function ( data, region, chatFunctions ) {
             let message;
             let theRegion = region.toUpperCase();
 
@@ -133,6 +137,10 @@ const videoFunctions = () => {
                 message = countryLookup.byIso( theRegion ).country + ' is not in the region alerts list';
             }
             chatFunctions.botSpeak( message, data );
+        },
+
+        resetAlertRegions: function () {
+            regionsWeCareAbout = new Set( musicDefaults.alertRegions );
         },
 
         checkVideoRegionAlert: function ( data, videoID, userFunctions, chatFunctions, botFunctions ) {

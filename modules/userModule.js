@@ -6,6 +6,7 @@ let authModule = require( '../auth.js' );
 const auth = require( '../auth.js' );
 const { dirname } = require( "path" );
 const fs = require("fs");
+const countryLookup = require( "country-code-lookup" );
 
 let theUsersList = []; // object array of everyone in the room
 let afkPeople = []; //holds the userid of everyone who has used the /afk command
@@ -188,6 +189,116 @@ const userFunctions = ( bot ) => {
         },
 
         // ========================================================
+
+        // ========================================================
+        // User Region Functions
+        // ========================================================
+
+        checkUsersHaveRegions: function ( data, chatFunctions ) {
+            let userID;
+
+            for ( let userCount = 0; userCount < data.users.length; userCount++ ) {
+                if ( typeof data.users[ userCount ] !== 'undefined' ) {
+                    userID = data.users[ userCount ].userid;
+                    if ( this.userExists( userID ) ) {
+                        this.askUserToSetRegion( userID, chatFunctions );
+                    }
+                }
+            }
+        },
+
+        askUserToSetRegion: function ( userID, chatFunctions ) {
+            if ( !this.getUserRegion( userID ) && !this.userWantsNoRegion( userID ) ) {
+                chatFunctions.botPM( "If you'd like me to check that videos are playable in your region, please set it using the command '" + chatDefaults.commandIdentifier + "myRegion XX'. Replace XX with a valid 2 letter country code https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2 If you want to not be asked this again please user the command '" + chatDefaults.commandIdentifier + "noRegion'", userID  );
+            }
+        },
+
+        getUserRegion: function ( userID ) {
+            if ( this.userExists( userID ) ) {
+                if ( theUsersList[ this.getPositionOnUsersList( userID ) ][ 'region' ] !== undefined) {
+                    return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'region' ]
+                }
+            }
+        },
+
+        checkAndStoreUserRegion: function ( data, args, chatFunctions, videoFunctions ) {
+            let theRegion = args[0].toUpperCase();
+            const userID = this.whoSentTheCommand( data );
+
+            if ( countryLookup.byIso( theRegion ) === null ) {
+                chatFunctions.botSpeak( 'That region is not recognised. Please use one of the 2 character ISO country codes, https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2', data );
+            } else {
+                this.storeUserRegion( data, userID, theRegion, chatFunctions, videoFunctions )
+            }
+        },
+
+        userWantsNoRegion: function ( userID ) {
+            return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'noregion' ];
+        },
+
+        storeUserRegion: function ( data, userID, region, chatFunctions, videoFunctions ) {
+            this.deleteUserWantsNoRegion( userID, data, videoFunctions, chatFunctions );
+            this.storeUserData( userID, "region", region );
+
+            chatFunctions.botSpeak( "The region " + countryLookup.byIso( region ).country + " has been added to your user", data );
+            this.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
+        },
+
+        deleteUserRegion: function ( userID, data, videoFunctions, chatFunctions ) {
+            this.deleteUserData( userID, "region" );
+            this.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
+        },
+
+        storeNoRegion: function ( data, chatFunctions, videoFunctions ) {
+            const userID = this.whoSentTheCommand( data );
+
+            this.deleteUserRegion( userID, data, videoFunctions, chatFunctions );
+            this.storeUserData( userID, "noregion", true );
+
+            chatFunctions.botSpeak( "You won't be asked again to set a region", data );
+            this.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
+        },
+
+        deleteUserWantsNoRegion: function ( userID, data, videoFunctions, chatFunctions ) {
+            this.deleteUserData( userID, "noregion" );
+            this.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
+        },
+
+        updateRegionAlertsFromUsers: function ( data, videoFunctions, chatFunctions ) {
+            videoFunctions.resetAlertRegions();
+            const userRegionsArray = this.getUniqueRegionsFromUsersInTheRoom( data );
+            let thisRegion;
+
+            // add regions that users have set that aren't being checked
+            if ( userRegionsArray !== undefined ) {
+                for ( let userRegionLoop = 0; userRegionLoop < userRegionsArray.length; userRegionLoop++ ) {
+                    thisRegion = userRegionsArray[ userRegionLoop ];
+                    if ( thisRegion !== {} ) {
+                        videoFunctions.addAlertRegion( data, thisRegion, chatFunctions );
+                    }
+                }
+            }
+        },
+
+        getUniqueRegionsFromUsersInTheRoom: function() {
+            let regionsArray = [];
+            let userRegion;
+            let userHere;
+
+            for ( let userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
+                userRegion = this.getUserRegion( theUsersList[ userLoop ][ "id" ] );
+                userHere = this.isUserHere( theUsersList[ userLoop ][ "id" ] );
+                if ( userHere && userRegion !== undefined ) {
+                    regionsArray.push( this.getUserRegion( theUsersList[ userLoop ][ "id" ] ) );
+                }
+            }
+            console.log( "Regions array:" + regionsArray.filter( ( v, i, a ) => a.indexOf( v ) === i ) );
+            return regionsArray.filter( ( v, i, a ) => a.indexOf( v ) === i );
+        },
+
+        // ========================================================
+
+        // ========================================================
         // Persistent User Functions
         // ========================================================
 
@@ -222,20 +333,15 @@ const userFunctions = ( bot ) => {
         },
 
         readUserData: function( file ) {
-            console.group( "readUserData" );
             const theData = fs.readFileSync( file, { encoding: 'utf8' } )
 
             const userInfo = JSON.parse( theData );
-            console.log( "userInfo:" + JSON.stringify( userInfo ) );
             const userIDFromFile = userInfo[ 'id' ];
             if ( this.userExists( userIDFromFile ) ) {
                 console.log( "User already exists so remove them" );
                 theUsersList.splice( this.getPositionOnUsersList( userIDFromFile ), 1 );
             }
             theUsersList.push( userInfo );
-
-            console.log( "readUserData theUsersList:" + JSON.stringify( theUsersList ) );
-            console.groupEnd();
         },
 
         // ========================================================
@@ -1518,6 +1624,8 @@ const userFunctions = ( bot ) => {
                     }
                 }
             }
+
+            this.removeUserIsHere( userID);
         },
 
         bootNewUserCheck: function () {
@@ -1600,6 +1708,26 @@ const userFunctions = ( bot ) => {
             if ( this.isUserAFK( userID ) ) {
                 this.removeUserIDFromAFKArray( userID );
             }
+
+            this.addUserIsHere( userID );
+        },
+
+        isUserHere: function ( userID ) {
+            if ( this.userExists( userID )) {
+                return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'here' ];
+            }
+        },
+
+        addUserIsHere: function ( userID ) {
+            if ( this.userExists( userID )) {
+                this.storeUserData( userID, "here", true );
+            }
+        },
+
+        removeUserIsHere: function ( userID ) {
+            if ( this.userExists( userID )) {
+                this.deleteUserData( userID, "here" );
+            }
         },
 
         checkForEmptyUsersList: function ( data ) {
@@ -1617,23 +1745,20 @@ const userFunctions = ( bot ) => {
             if ( !this.isUserInUsersList( userID ) ) {
                 theUsersList.push( { id: userID, username: username } );
             }
+            this.addUserIsHere( userID );
         },
 
         rebuildUserList: function ( data ) {
-            console.group( "rebuildUserList" );
             let userID;
 
             for ( let i = 0; i < data.users.length; i++ ) {
                 if ( typeof data.users[ i ] !== 'undefined' ) {
                     userID = data.users[ i ].userid;
                     if ( !this.userExists( userID ) ) {
-                        console.log( "UserID:" + userID + " does not exist" );
                         this.addUserToTheUsersList( userID, data.users[ i ].name );
                     }
                 }
             }
-            console.log( "after thisUsersList:" + JSON.stringify( theUsersList ) );
-            console.groupEnd();
         },
 
         startAllUserTimers: function () {

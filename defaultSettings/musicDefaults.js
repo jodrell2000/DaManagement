@@ -19,5 +19,5 @@ module.exports = {
     DJsPlayLimit: 3, //set the playlimit here (default 4 songs)
 
     alertIfRegionBlocked: true,
-    alertRegions: [ 'GB', 'US' ], // default list of regions that, if the video is blocked, will alert the DJ
+    alertRegions: [ ], // default list of regions that, if the video is blocked, will alert the DJ
 }
