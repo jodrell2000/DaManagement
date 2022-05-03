@@ -391,7 +391,7 @@ const botFunctions = ( bot ) => {
         shouldTheBotDJ: function ( userFunctions ) {
             console.group( "shouldTheBotDJ" );
             console.log( "howManyDJs:" + userFunctions.howManyDJs() );
-            console.log( "whenToGetOnStage:" + userFunctions.this.whenToGetOnStage() );
+            console.log( "whenToGetOnStage:" + this.whenToGetOnStage() );
             console.log( "queueList:" + userFunctions.queueList().length );
             console.log( "vipList:" + userFunctions.vipList.length );
             console.log( "refreshDJCount:" + userFunctions.refreshDJCount() );
