@@ -414,14 +414,14 @@ const botFunctions = ( bot ) => {
             if ( this.autoDJEnabled() === true ) {
 
                 autoDjingTimer = setTimeout( function () {
-                    console.log( "isBotOnStage:" + isBotOnStage );
+                    console.log( "isBotOnStage:" + isBotOnStage( userFunctions ) );
                     if ( !this.isBotOnStage( userFunctions ) ) { //if the bot is not already on stage
-                        console.log( "shouldTheBotDJ:" + shouldTheBotDJ );
+                        console.log( "shouldTheBotDJ:" + shouldTheBotDJ( userFunctions ) );
                         if ( this.shouldTheBotDJ( userFunctions ) ) {
                             this.startBotDJing();
                         }
                     } else { //else it is on stage
-                        console.log( "shouldStopBotDJing:" + shouldStopBotDJing );
+                        console.log( "shouldStopBotDJing:" + shouldStopBotDJing( userFunctions ) );
                         if ( this.shouldStopBotDJing( userFunctions ) ) {
                             this.removeBotFromStage(); // remove the Bot from stage
                         }
