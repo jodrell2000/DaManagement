@@ -24,8 +24,6 @@ let videoModule = require( './modules/videoModule.js' );
 const express = require('express')
 const app = express();
 const pug = require('pug');
-const fs = require("fs");
-let path = require('path');
 
 // client authentication
 app.use(authentication)
@@ -112,44 +110,58 @@ bot.on( 'ready', function () {
 
 //starts up when a new person joins the room
 bot.on( 'registered', function ( data ) {
-    const theUserID = data.user[ 0 ].userid;
+    const userID = data.user[ 0 ].userid;
     const username = data.user[ 0 ].name;
 
-    userFunctions.userJoinsRoom( theUserID, username );
+    userFunctions.userJoinsRoom( userID, username );
 
     const bootThisUser = userFunctions.bootNewUserCheck[ 0 ];
     const bootMessage = userFunctions.bootNewUserCheck[ 1 ];
 
     if ( bootThisUser ) {
-        userFunctions.bootThisUser( theUserID, bootMessage );
+        userFunctions.bootThisUser( userID, bootMessage );
     } else {
-        chatFunctions.userGreeting( data, theUserID, username, roomFunctions, userFunctions )
+        chatFunctions.userGreeting( data, userID, username, roomFunctions, userFunctions )
     }
+
+    userFunctions.askUserToSetRegion( userID, chatFunctions);
+    userFunctions.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
 } );
+
+//starts up when a user leaves the room
+bot.on( 'deregistered', function ( data ) {
+    let theUserID = data.user[ 0 ].userid;
+    userFunctions.deregisterUser( theUserID );
+    userFunctions.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
+} )
 
 //starts up when bot first enters the room
 bot.on( 'roomChanged', function ( data ) {
     try {
-        //reset arrays in case this was triggered by the bot restarting
-        userFunctions.botStartReset( botFunctions, songFunctions );
+        userFunctions.resetUsersList();
 
+        // load in and user data on disk first
+        userFunctions.readAllUserDataFromDisk();
+
+        //reset arrays in case this was triggered by the bot restarting
         userFunctions.resetAllWarnMe( data );
 
         //get & set information
         roomFunctions.setRoomDefaults( data );
 
+        // build in the users in the room, skip any already loaded from disk
         userFunctions.rebuildUserList( data );
+
         userFunctions.resetModerators( data );
-
-        userFunctions.resetAllSpamCounts();
-
         userFunctions.startAllUserTimers();
-
         userFunctions.resetDJs( data );
 
         // set user as current DJ
         userFunctions.setCurrentDJ( data.room.metadata.current_dj );
 
+        // ask users for their regions if we don't have them
+        userFunctions.checkUsersHaveRegions( data, chatFunctions );
+        userFunctions.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
     }
     catch ( err ) {
         console.log( 'error', 'unable to join the room the room due to err: ' + err.toString() );
@@ -176,7 +188,8 @@ bot.on( 'newsong', function ( data ) {
     roomDefaults.detail = data.room.description; //set room description again in case it was changed
 
     // set user as current DJ
-    userFunctions.setCurrentDJ( data.room.metadata.current_dj );
+    let djID = data.room.metadata.current_dj;
+    userFunctions.setCurrentDJ( djID );
 
     if ( songFunctions.ytid() !== undefined ) {
         videoFunctions.checkVideoRegionAlert( data, songFunctions.ytid(), userFunctions, chatFunctions, botFunctions );
@@ -213,7 +226,6 @@ bot.on( 'newsong', function ( data ) {
     if ( musicDefaults.bannedArtists.length !== 0 && typeof songFunctions.artist() !== 'undefined' && typeof songFunctions.song() !== 'undefined' ) {
         const djCheck = userFunctions.getCurrentDJID();
         let checkIfAdmin = userFunctions.masterIds().indexOf( djCheck ); //is user an exempt admin?
-        let nameDj = userFunctions.theUsersList().indexOf( djCheck ) + 1; //the currently playing dj's name
 
         if ( checkIfAdmin === -1 ) {
             //if matching is enabled for both songs and artists
@@ -221,8 +233,8 @@ bot.on( 'newsong', function ( data ) {
                 if ( songFunctions.artist().match( roomFunctions.bannedArtistsMatcher() ) || songFunctions.song().match( roomFunctions.bannedArtistsMatcher() ) ) {
                     userFunctions.removeDJ( djCheck, 'DJ has played a banned song or artist' );
 
-                    if ( typeof userFunctions.theUsersList()[ nameDj ] !== 'undefined' ) {
-                        bot.speak( '@' + userFunctions.theUsersList()[ nameDj ] + ' you have played a banned track or artist.' );
+                    if ( typeof userFunctions.getUsername( djCheck ) !== 'undefined' ) {
+                        bot.speak( '@' + userFunctions.getUsername( djCheck ) + ' you have played a banned track or artist.' );
                     }
                     else {
                         bot.speak( 'current dj, you have played a banned track or artist.' );
@@ -234,8 +246,8 @@ bot.on( 'newsong', function ( data ) {
                 if ( songFunctions.artist().match( roomFunctions.bannedArtistsMatcher() ) ) {
                     userFunctions.removeDJ( djCheck, 'DJ has played a banned song or artist' );
 
-                    if ( typeof userFunctions.theUsersList()[ nameDj ] !== 'undefined' ) {
-                        bot.speak( '@' + userFunctions.theUsersList()[ nameDj ] + ' you have played a banned artist.' );
+                    if ( typeof userFunctions.getUsername( djCheck ) !== 'undefined' ) {
+                        bot.speak( '@' + userFunctions.getUsername( djCheck ) + ' you have played a banned artist.' );
                     }
                     else {
                         bot.speak( 'current dj, you have played a banned artist.' );
@@ -247,8 +259,8 @@ bot.on( 'newsong', function ( data ) {
                 if ( songFunctions.song().match( roomFunctions.bannedArtistsMatcher() ) ) {
                     userFunctions.removeDJ( djCheck, 'DJ has played a banned song or artist' );
 
-                    if ( typeof userFunctions.theUsersList()[ nameDj ] !== 'undefined' ) {
-                        bot.speak( '@' + userFunctions.theUsersList()[ nameDj ] + ' you have played a banned track.' );
+                    if ( typeof userFunctions.getUsername( djCheck ) !== 'undefined' ) {
+                        bot.speak( '@' + userFunctions.getUsername( djCheck ) + ' you have played a banned track.' );
                     }
                     else {
                         bot.speak( 'current dj, you have played a banned track.' );
@@ -430,12 +442,6 @@ bot.on( 'rem_moderator', function ( data ) {
     userFunctions.removeModerator( theUserID )
 } )
 
-//starts up when a user leaves the room
-bot.on( 'deregistered', function ( data ) {
-    let theUserID = data.user[ 0 ].userid;
-    userFunctions.deregisterUser( theUserID )
-} )
-
 //activates at the end of a song.
 bot.on( 'endsong', function ( data ) {
     songFunctions.grabSongStats();
@@ -508,7 +514,7 @@ function authentication(req, res, next) {
         // If Authorized user
         next();
     } else {
-        let err = new Error('You are not authenticated!');
+        let err = new Error('You are not authenticated to access the playlist controls!');
         res.setHeader('WWW-Authenticate', 'Basic');
         err.status = 401;
         return next(err);

@@ -134,7 +134,8 @@ const botFunctions = ( bot ) => {
         addAlertRegionCommand: function ( data, args, videoFunctions, chatFunctions ) {
             const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
             const doInOrder = async () => {
-                videoFunctions.addAlertRegion( data, args, chatFunctions );
+                console.log( "args:" + args );
+                videoFunctions.addAlertRegion( data, args[0], chatFunctions );
                 await sleep( 1000 )
 
                 this.reportRegionCheckStatus( data, videoFunctions, chatFunctions );
@@ -146,7 +147,7 @@ const botFunctions = ( bot ) => {
         removeAlertRegionCommand: function ( data, args, videoFunctions, chatFunctions ) {
             const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
             const doInOrder = async () => {
-                videoFunctions.removeAlertRegion( data, args, chatFunctions )
+                videoFunctions.removeAlertRegion( data, args[0], chatFunctions )
                 await sleep( 1000 )
 
                 this.reportRegionCheckStatus( data, videoFunctions, chatFunctions );
