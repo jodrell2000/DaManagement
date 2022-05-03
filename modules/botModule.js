@@ -389,18 +389,11 @@ const botFunctions = ( bot ) => {
         },
 
         shouldTheBotDJ: function ( userFunctions ) {
-            console.group( "shouldTheBotDJ" );
-            console.log( "howManyDJs:" + userFunctions.howManyDJs() );
-            console.log( "whenToGetOnStage:" + this.whenToGetOnStage() );
-            console.log( "queueList:" + userFunctions.queueList().length );
-            console.log( "vipList:" + userFunctions.vipList.length );
-            console.log( "refreshDJCount:" + userFunctions.refreshDJCount() );
             return userFunctions.howManyDJs() >= 1 && // is there at least one DJ on stage
                 userFunctions.howManyDJs() <= this.whenToGetOnStage() && // are there fewer than the limit of DJs on stage
                 userFunctions.queueList().length === 0 && // is the queue empty
                 userFunctions.vipList.length === 0 && // there no VIPs
                 userFunctions.refreshDJCount() === 0; // is there someone currently using the refresh command
-            console.groupEnd();
         },
 
         shouldStopBotDJing: function ( userFunctions ) {
@@ -409,35 +402,25 @@ const botFunctions = ( bot ) => {
         },
 
         checkAutoDJing: function ( userFunctions ) {
-            console.group( "checkAutoDJing" );
-            console.log( "autoDjingTimer:" + autoDjingTimer );
             if ( autoDjingTimer != null ) {
                 clearTimeout( autoDjingTimer );
                 autoDjingTimer = null;
             }
-            console.log( "autoDjingTimer:" + autoDjingTimer );
 
-            console.log( "autoDJEnabled:" + autoDJEnabled );
             if ( this.autoDJEnabled() === true ) {
 
                 autoDjingTimer = setTimeout( function () {
-                    console.log( "isBotOnStage:" + this.isBotOnStage( userFunctions ) );
                     if ( !this.isBotOnStage( userFunctions ) ) { //if the bot is not already on stage
-                        console.log( "shouldTheBotDJ:" + this.shouldTheBotDJ( userFunctions ) );
                         if ( this.shouldTheBotDJ( userFunctions ) ) {
-                            console.log( "Start DJing " );
                             this.startBotDJing();
                         }
                     } else { //else it is on stage
-                        console.log( "shouldStopBotDJing:" + this.shouldStopBotDJing( userFunctions ) );
                         if ( this.shouldStopBotDJing( userFunctions ) ) {
-                            console.log( "Stop DJing " );
                             this.removeBotFromStage(); // remove the Bot from stage
                         }
                     }
                 }.bind( this ), 1000 * 10 ); //delay for 10 seconds
             }
-            console.groupEnd();
         },
 
         removeBotFromStage: function () {
