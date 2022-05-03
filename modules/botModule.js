@@ -401,11 +401,15 @@ const botFunctions = ( bot ) => {
         },
 
         checkAutoDJing: function ( userFunctions ) {
+            console.group( "checkAutoDJing" );
+            console.log( "autoDjingTimer:" + autoDjingTimer );
             if ( autoDjingTimer != null ) {
                 clearTimeout( autoDjingTimer );
                 autoDjingTimer = null;
             }
+            console.log( "autoDjingTimer:" + autoDjingTimer );
 
+            console.log( "autoDJEnabled:" + autoDJEnabled );
             if ( this.autoDJEnabled() === true ) {
 
                 autoDjingTimer = setTimeout( function () {
@@ -420,6 +424,7 @@ const botFunctions = ( bot ) => {
                     }
                 }.bind( this ), 1000 * 10 ); //delay for 10 seconds
             }
+            console.groupEnd();
         },
 
         removeBotFromStage: function () {
@@ -427,6 +432,7 @@ const botFunctions = ( bot ) => {
         },
 
         startBotDJing: function () {
+            console.log( "Start DJing" );
             bot.addDj(); // start the Bot DJing
         },
 
@@ -493,12 +499,12 @@ const botFunctions = ( bot ) => {
                         let DJName = `Current dj`;
 
                         if ( currentDJ ) {
-                            if ( currentDJ.hasOwnProperty(`name`) ) {
-                                DJName = `@${currentDJ.name}`;
+                            if ( currentDJ.hasOwnProperty( `name` ) ) {
+                                DJName = `@${ currentDJ.name }`;
                             }
                         }
 
-                        bot.speak( `${DJName}, your song is over ${musicDefaults.songLengthLimit} mins long, you have 20 seconds to skip before being removed.` );
+                        bot.speak( `${ DJName }, your song is over ${ musicDefaults.songLengthLimit } mins long, you have 20 seconds to skip before being removed.` );
 
                         //START THE 20 SEC TIMER
                         roomFunctions.songLimitTimer = setTimeout( function () {
