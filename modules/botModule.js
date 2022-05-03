@@ -425,11 +425,13 @@ const botFunctions = ( bot ) => {
                     if ( !this.isBotOnStage( userFunctions ) ) { //if the bot is not already on stage
                         console.log( "shouldTheBotDJ:" + this.shouldTheBotDJ( userFunctions ) );
                         if ( this.shouldTheBotDJ( userFunctions ) ) {
+                            console.log( "Start DJing " );
                             this.startBotDJing();
                         }
                     } else { //else it is on stage
                         console.log( "shouldStopBotDJing:" + this.shouldStopBotDJing( userFunctions ) );
                         if ( this.shouldStopBotDJing( userFunctions ) ) {
+                            console.log( "Stop DJing " );
                             this.removeBotFromStage(); // remove the Bot from stage
                         }
                     }
