@@ -135,7 +135,7 @@ const botFunctions = ( bot ) => {
             const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
             const doInOrder = async () => {
                 console.log( "args:" + args );
-                videoFunctions.addAlertRegion( data, args[0], chatFunctions );
+                videoFunctions.addAlertRegion( data, args[ 0 ], chatFunctions );
                 await sleep( 1000 )
 
                 this.reportRegionCheckStatus( data, videoFunctions, chatFunctions );
@@ -147,7 +147,7 @@ const botFunctions = ( bot ) => {
         removeAlertRegionCommand: function ( data, args, videoFunctions, chatFunctions ) {
             const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
             const doInOrder = async () => {
-                videoFunctions.removeAlertRegion( data, args[0], chatFunctions )
+                videoFunctions.removeAlertRegion( data, args[ 0 ], chatFunctions )
                 await sleep( 1000 )
 
                 this.reportRegionCheckStatus( data, videoFunctions, chatFunctions );
@@ -414,11 +414,14 @@ const botFunctions = ( bot ) => {
             if ( this.autoDJEnabled() === true ) {
 
                 autoDjingTimer = setTimeout( function () {
+                    console.log( "isBotOnStage:" + isBotOnStage );
                     if ( !this.isBotOnStage( userFunctions ) ) { //if the bot is not already on stage
+                        console.log( "shouldTheBotDJ:" + shouldTheBotDJ );
                         if ( this.shouldTheBotDJ( userFunctions ) ) {
                             this.startBotDJing();
                         }
                     } else { //else it is on stage
+                        console.log( "shouldStopBotDJing:" + shouldStopBotDJing );
                         if ( this.shouldStopBotDJing( userFunctions ) ) {
                             this.removeBotFromStage(); // remove the Bot from stage
                         }
