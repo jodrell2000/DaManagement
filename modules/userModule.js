@@ -5,7 +5,7 @@ let chatDefaults = require( '../defaultSettings/chatDefaults.js' );
 let authModule = require( '../auth.js' );
 const auth = require( '../auth.js' );
 const { dirname } = require( "path" );
-const fs = require("fs");
+const fs = require( "fs" );
 const countryLookup = require( "country-code-lookup" );
 
 let theUsersList = []; // object array of everyone in the room
@@ -209,20 +209,20 @@ const userFunctions = ( bot ) => {
 
         askUserToSetRegion: function ( userID, chatFunctions ) {
             if ( !this.getUserRegion( userID ) && !this.userWantsNoRegion( userID ) ) {
-                chatFunctions.botPM( "If you'd like me to check that videos are playable in your region, please set it using the command '" + chatDefaults.commandIdentifier + "myRegion XX'. Replace XX with a valid 2 letter country code https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2 If you want to not be asked this again please user the command '" + chatDefaults.commandIdentifier + "noRegion'", userID  );
+                chatFunctions.botPM( "If you'd like me to check that videos are playable in your region, please set it using the command '" + chatDefaults.commandIdentifier + "myRegion XX'. Replace XX with a valid 2 letter country code https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2 If you want to not be asked this again please user the command '" + chatDefaults.commandIdentifier + "noRegion'", userID );
             }
         },
 
         getUserRegion: function ( userID ) {
             if ( this.userExists( userID ) ) {
-                if ( theUsersList[ this.getPositionOnUsersList( userID ) ][ 'region' ] !== undefined) {
+                if ( theUsersList[ this.getPositionOnUsersList( userID ) ][ 'region' ] !== undefined ) {
                     return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'region' ]
                 }
             }
         },
 
         checkAndStoreUserRegion: function ( data, args, chatFunctions, videoFunctions ) {
-            let theRegion = args[0].toUpperCase();
+            let theRegion = args[ 0 ].toUpperCase();
             const userID = this.whoSentTheCommand( data );
 
             if ( countryLookup.byIso( theRegion ) === null ) {
@@ -279,7 +279,7 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        getUniqueRegionsFromUsersInTheRoom: function() {
+        getUniqueRegionsFromUsersInTheRoom: function () {
             let regionsArray = [];
             let userRegion;
             let userHere;
@@ -316,22 +316,24 @@ const userFunctions = ( bot ) => {
         },
 
         writeUserDataToDisk: function ( userID ) {
+            // delete the spamTimer if it's in the object or it'll crash the save due to a circular reference
+            var userObjectWithoutSpamTimer = Object.assign( {}, theUsersList[ this.getPositionOnUsersList( userID ) ], { spamTimer: undefined } )
             const dataFilePath = `${ dirname( require.main.filename ) }/data/users/${ userID }.json`;
-            fs.writeFileSync( dataFilePath, JSON.stringify( theUsersList[ this.getPositionOnUsersList( userID ) ] ), function(err) {
+            fs.writeFileSync( dataFilePath, JSON.stringify( userObjectWithoutSpamTimer ), function ( err ) {
                 if ( err ) {
                     return console.error( err );
                 }
-            });
+            } );
         },
 
-        readAllUserDataFromDisk: function (  ) {
+        readAllUserDataFromDisk: function () {
             const dataFilePath = `${ dirname( require.main.filename ) }/data/users/`;
             fs.readdirSync( dataFilePath ).forEach( file => {
                 this.readUserData( dataFilePath + file );
-            })
+            } )
         },
 
-        readUserData: function( file ) {
+        readUserData: function ( file ) {
             const theData = fs.readFileSync( file, { encoding: 'utf8' } )
 
             const userInfo = JSON.parse( theData );
@@ -528,7 +530,7 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        incrementSpamCounter: function( userID ) {
+        incrementSpamCounter: function ( userID ) {
             if ( this.userExists( userID ) ) {
                 const key = "spamCount";
                 const value = this.getUserSpamCount( userID );
@@ -539,17 +541,17 @@ const userFunctions = ( bot ) => {
                     this.resetUserSpamTimer( userID );
                 }
 
-                theUsersList[ this.getPositionOnUsersList( userID ) ][ 'spamTimer' ] = setTimeout( function( userID ) {
+                theUsersList[ this.getPositionOnUsersList( userID ) ][ 'spamTimer' ] = setTimeout( function ( userID ) {
                     this.resetUsersSpamCount( userID );
                 }.bind( this ), 10 * 1000 );
             }
         },
 
-        resetUserSpamTimer: function( userID ) {
+        resetUserSpamTimer: function ( userID ) {
             this.storeUserData( userID, "spamTimer", null )
         },
 
-        resetUsersSpamCount: function( userID ) {
+        resetUsersSpamCount: function ( userID ) {
             this.storeUserData( userID, "spamCount", 0 );
         },
 
@@ -608,7 +610,7 @@ const userFunctions = ( bot ) => {
             return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'RefreshCount' ];
         },
 
-        removeRefreshFromUser: function( userID ) {
+        removeRefreshFromUser: function ( userID ) {
             this.deleteUserData( userID, "RefreshStart" );
             this.deleteUserData( userID, "RefreshCurrentPlayCount" );
             this.deleteUserData( userID, "RefreshTotalPlayCount" );
@@ -734,19 +736,19 @@ const userFunctions = ( bot ) => {
         },
 
         updateUserLastSpoke: function ( userID ) {
-            this.storeUserData( userID, "lastSpoke", Date.now())
+            this.storeUserData( userID, "lastSpoke", Date.now() )
         },
 
         updateUserLastVoted: function ( userID ) {
-            this.storeUserData( userID, "lastVoted", Date.now())
+            this.storeUserData( userID, "lastVoted", Date.now() )
         },
 
         updateUserLastSnagged: function ( userID ) {
-            this.storeUserData( userID, "lastSnagged", Date.now())
+            this.storeUserData( userID, "lastSnagged", Date.now() )
         },
 
         updateUserJoinedStage: function ( userID ) {
-            this.storeUserData( userID, "joinedStage", Date.now())
+            this.storeUserData( userID, "joinedStage", Date.now() )
         },
 
         getIdleTime: function ( userID ) {
@@ -1284,7 +1286,7 @@ const userFunctions = ( bot ) => {
             if ( theCount === undefined ) {
                 theCount = 0
             }
-            this.storeUserData( userID, "currentPlayCount", theCount)
+            this.storeUserData( userID, "currentPlayCount", theCount )
         },
 
 
@@ -1548,7 +1550,7 @@ const userFunctions = ( bot ) => {
         // ========================================================
 
         resetUsersList: function () {
-            theUsersList.splice(0, theUsersList.length);
+            theUsersList.splice( 0, theUsersList.length );
         },
 
         updateUser: function ( data ) {
@@ -1624,7 +1626,7 @@ const userFunctions = ( bot ) => {
                 }
             }
 
-            this.removeUserIsHere( userID);
+            this.removeUserIsHere( userID );
         },
 
         bootNewUserCheck: function () {
@@ -1685,7 +1687,7 @@ const userFunctions = ( bot ) => {
 
         addUserJoinedTime: function ( userID ) {
             if ( this.userExists( userID ) && !this.getUserJoinedRoom( userID ) ) {
-                this.storeUserData( userID, "joinTime", Date.now())
+                this.storeUserData( userID, "joinTime", Date.now() )
             }
         },
 
@@ -1712,19 +1714,19 @@ const userFunctions = ( bot ) => {
         },
 
         isUserHere: function ( userID ) {
-            if ( this.userExists( userID )) {
+            if ( this.userExists( userID ) ) {
                 return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'here' ];
             }
         },
 
         addUserIsHere: function ( userID ) {
-            if ( this.userExists( userID )) {
+            if ( this.userExists( userID ) ) {
                 this.storeUserData( userID, "here", true );
             }
         },
 
         removeUserIsHere: function ( userID ) {
-            if ( this.userExists( userID )) {
+            if ( this.userExists( userID ) ) {
                 this.deleteUserData( userID, "here" );
             }
         },
