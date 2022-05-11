@@ -389,13 +389,6 @@ const botFunctions = ( bot ) => {
         },
 
         shouldTheBotDJ: function ( userFunctions ) {
-            console.group( "shouldTheBotDJ" );
-            console.log( "userFunctions.howManyDJs():" + userFunctions.howManyDJs() );
-            console.log( "this.whenToGetOnStage():" + this.whenToGetOnStage() );
-            console.log( "userFunctions.queueList().length:" + userFunctions.queueList().length );
-            console.log( "userFunctions.vipList.length:" + userFunctions.vipList.length );
-            console.log( "userFunctions.refreshDJCount():" + userFunctions.refreshDJCount() );
-            console.groupEnd();
             return userFunctions.howManyDJs() >= 1 && // is there at least one DJ on stage
                 userFunctions.howManyDJs() <= this.whenToGetOnStage() && // are there fewer than the limit of DJs on stage
                 userFunctions.queueList().length === 0 && // is the queue empty
