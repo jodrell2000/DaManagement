@@ -21,19 +21,19 @@ let songModule = require( './modules/songModule.js' );
 let commandModule = require( './modules/commandModule.js' );
 let videoModule = require( './modules/videoModule.js' );
 
-const express = require('express')
+const express = require( 'express' )
 const app = express();
-const pug = require('pug');
+const pug = require( 'pug' );
 
 // client authentication
-app.use(authentication)
+app.use( authentication )
 
-app.use(express.json());
+app.use( express.json() );
 
-app.use(`/scripts`, express.static('./scripts'));
-app.use(`/modules`, express.static('./node_modules'));
-app.use(`/styles`, express.static('./styles'));
-app.use(express.json());
+app.use( `/scripts`, express.static( './scripts' ) );
+app.use( `/modules`, express.static( './node_modules' ) );
+app.use( `/styles`, express.static( './styles' ) );
+app.use( express.json() );
 /************************************EndSetUp**********************************************************************/
 
 let bot = new Bot( authModule.AUTH, authModule.USERID, authModule.ROOMID ); //initializes the bot
@@ -124,7 +124,7 @@ bot.on( 'registered', function ( data ) {
         chatFunctions.userGreeting( data, userID, username, roomFunctions, userFunctions )
     }
 
-    userFunctions.askUserToSetRegion( userID, chatFunctions);
+    userFunctions.askUserToSetRegion( userID, chatFunctions );
     userFunctions.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
 } );
 
@@ -459,69 +459,69 @@ bot.on( 'endsong', function ( data ) {
 } );
 
 
-app.get('/', function (req, res) {
-    bot.playlistAll( (playlistData) => {
-        let html = pug.renderFile('./templates/index.pug', {playlistData: playlistData.list});
-        res.send(html);
-    });
-});
+app.get( '/', function ( req, res ) {
+    bot.playlistAll( ( playlistData ) => {
+        let html = pug.renderFile( './templates/index.pug', { playlistData: playlistData.list } );
+        res.send( html );
+    } );
+} );
 
-app.post('/songstatus', async function (req, res) {
-    let videoStatus = await videoFunctions.checkVideoStatus(req.body.videoIDs)
-    res.send(videoStatus);
-});
+app.post( '/songstatus', async function ( req, res ) {
+    let videoStatus = await videoFunctions.checkVideoStatus( req.body.videoIDs )
+    res.send( videoStatus );
+} );
 
-app.post('/movesong', (req, res) => {
-    bot.playlistReorder(Number.parseInt(req.body.indexFrom), Number.parseInt(req.body.indexTo));
-    res.json(`refresh`);
-});
+app.post( '/movesong', ( req, res ) => {
+    bot.playlistReorder( Number.parseInt( req.body.indexFrom ), Number.parseInt( req.body.indexTo ) );
+    res.json( `refresh` );
+} );
 
-app.get('/findsong', (req, res) => {
-    bot.searchSong(req.query.term, (data) => {
-        let html = pug.renderFile('./templates/search.pug', {playlistData: data.docs});
-        res.send(html);
-    });
-});
+app.get( '/findsong', ( req, res ) => {
+    bot.searchSong( req.query.term, ( data ) => {
+        let html = pug.renderFile( './templates/search.pug', { playlistData: data.docs } );
+        res.send( html );
+    } );
+} );
 
-app.get('/addsong', (req, res) => {
-    bot.playlistAdd(req.query.songid);
-    res.json(`refresh`);
-});
+app.get( '/addsong', ( req, res ) => {
+    bot.playlistAdd( req.query.songid );
+    res.json( `refresh` );
+} );
 
-app.get('/deletesong', (req, res) => {
-    bot.playlistRemove(Number.parseInt(req.query.songindex));
-    res.json(`refresh`);
-});
+app.get( '/deletesong', ( req, res ) => {
+    bot.playlistRemove( Number.parseInt( req.query.songindex ) );
+    res.json( `refresh` );
+} );
 
-function authentication(req, res, next) {
+function authentication ( req, res, next ) {
     let authheader = req.headers.authorization;
     // console.log(req.headers);
 
-    if (!authheader) {
-        let err = new Error('You are not authenticated!');
-        res.setHeader('WWW-Authenticate', 'Basic');
+    if ( !authheader ) {
+        let err = new Error( 'You are not authenticated!' );
+        res.setHeader( 'WWW-Authenticate', 'Basic' );
         err.status = 401;
-        return next(err)
+        return next( err )
     }
 
-    let auth = new Buffer.from(authheader.split(' ')[1],
-        'base64').toString().split(':');
-    let user = auth[0];
-    let pass = auth[1];
+    let auth = new Buffer.from( authheader.split( ' ' )[ 1 ],
+        'base64' ).toString().split( ':' );
+    let user = auth[ 0 ];
+    let pass = auth[ 1 ];
 
-    if (user === process.env.PLAYLIST_USERNAME && pass === process.env.PLAYLIST_PASSWORD ) {
+    if ( user === process.env.PLAYLIST_USERNAME && pass === process.env.PLAYLIST_PASSWORD ) {
 
         // If Authorized user
         next();
     } else {
-        let err = new Error('You are not authenticated to access the playlist controls!');
-        res.setHeader('WWW-Authenticate', 'Basic');
+        let err = new Error( 'You are not authenticated to access the playlist controls!' );
+        res.setHeader( 'WWW-Authenticate', 'Basic' );
         err.status = 401;
-        return next(err);
+        return next( err );
     }
 
 }
 
-app.listen((8585), () => {
-    console.log("Server is Running ");
-})
+app.listen( ( 8585 ), () => {
+    console.log( "Server is Running " );
+} )
