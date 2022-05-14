@@ -316,14 +316,29 @@ const userFunctions = ( bot ) => {
         },
 
         writeUserDataToDisk: function ( userID ) {
-            // delete the spamTimer if it's in the object or it'll crash the save due to a circular reference
-            var userObjectWithoutSpamTimer = Object.assign( {}, theUsersList[ this.getPositionOnUsersList( userID ) ], { spamTimer: undefined } )
             const dataFilePath = `${ dirname( require.main.filename ) }/data/users/${ userID }.json`;
-            fs.writeFileSync( dataFilePath, JSON.stringify( userObjectWithoutSpamTimer ), function ( err ) {
+            fs.writeFileSync( dataFilePath, JSON.stringify( this.removeUnsavableDataFromUser( userID ) ), function ( err ) {
                 if ( err ) {
                     return console.error( err );
                 }
             } );
+        },
+
+        removeUnsavableDataFromUser: function ( userID ) {
+            // delete the spamTimer if it's in the object or it'll crash the save due to a circular reference
+            var editedUser = Object.assign( {}, theUsersList[ this.getPositionOnUsersList( userID ) ], { spamTimer: undefined } )
+
+            // remove refresh properties from permanent storage
+            delete editedUser[ "RefreshCount" ];
+            delete editedUser[ "RefreshStart" ];
+            delete editedUser[ "RefreshCurrentPlayCount" ];
+            delete editedUser[ "RefreshTotalPlayCount" ];
+            delete editedUser[ "RefreshTimer" ];
+
+            // don't store the welcome timer in permanent storage
+            delete editedUser[ "welcomeTimer" ];
+
+            return editedUser;
         },
 
         readAllUserDataFromDisk: function () {
@@ -342,7 +357,6 @@ const userFunctions = ( bot ) => {
                 console.log( "User already exists so remove them" );
                 theUsersList.splice( this.getPositionOnUsersList( userIDFromFile ), 1 );
             }
-            theUsersList.push( userInfo );
         },
 
         // ========================================================
@@ -607,7 +621,9 @@ const userFunctions = ( bot ) => {
         },
 
         getUsersRefreshCount: function ( userID ) {
-            return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'RefreshCount' ];
+            if ( this.userExists( userID ) ) {
+                return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'RefreshCount' ];
+            }
         },
 
         removeRefreshFromUser: function ( userID ) {

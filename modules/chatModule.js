@@ -109,7 +109,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
             return store.get( `chatMessages.${ theCommand }.pictures` );
         },
 
-        getDynamicChatCommands: function ( ) {
+        getDynamicChatCommands: function () {
             const store = this.getChatCommandData();
             return store.get( 'chatMessages' );
         },
