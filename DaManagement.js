@@ -49,6 +49,7 @@ const commandFunctions = commandModule( bot );
 const videoFunctions = videoModule( bot );
 
 // do something when the bot disconnects?
+// eslint-disable-next-line no-unused-vars
 bot.on( 'disconnected', function ( data ) { } );
 
 // check if the bot is still connected every 5 seconds
@@ -69,20 +70,28 @@ setInterval( function () {
 setInterval( function () { userFunctions.roomIdleCheck( roomDefaults, chatFunctions ) }, 60 * 1000 )
 
 // every 5 seconds, check if the there's an empty DJ slot, and prompt the next in the queue to join the decks, remove them if they don't
-setInterval( function () {
-    if ( roomDefaults.queueActive === true && userFunctions.queueList().length !== 0 && ( userFunctions.refreshDJCount() + userFunctions.howManyDJs() ) < 5 ) {
-        userFunctions.setDJToNotify( userFunctions.headOfQueue() );
-        if ( botFunctions.sayOnce() === true ) {
-            botFunctions.setSayOnce( false );
+setInterval( function ( data, chatFunctions ) {
+    if ( roomDefaults.queueActive !== true && userFunctions.howManyDJs() === roomDefaults.maxDJs ) {
+        userFunctions.enableQueue( data, chatFunctions )
+    }
 
-            roomFunctions.queuePromptToDJ( chatFunctions, userFunctions );
+    if ( roomDefaults.queueActive === true && ( userFunctions.refreshDJCount() + userFunctions.howManyDJs() ) < roomDefaults.maxDJs ) {
+        if ( userFunctions.queueList().length > 0 ) {
+            userFunctions.setDJToNotify( userFunctions.headOfQueue() );
+            if ( botFunctions.sayOnce() === true ) {
+                botFunctions.setSayOnce( false );
 
-            // start a timer to remove the DJ from the queue if they don't DJ
-            roomFunctions.queueTimer = setTimeout( function () {
-                if ( userFunctions.notifyThisDJ() !== null ) {
-                    userFunctions.removeNotifyDJFromQueue( botFunctions, userFunctions );
-                }
-            }, roomDefaults.queueWaitTime * 1000 );
+                roomFunctions.queuePromptToDJ( chatFunctions, userFunctions );
+
+                // start a timer to remove the DJ from the queue if they don't DJ
+                roomFunctions.queueTimer = setTimeout( function () {
+                    if ( userFunctions.notifyThisDJ() !== null ) {
+                        userFunctions.removeNotifyDJFromQueue( botFunctions, userFunctions );
+                    }
+                }, roomDefaults.queueWaitTime * 1000 );
+            }
+        } else {
+            userFunctions.disableQueue( data, chatFunctions );
         }
     }
 }, 5 * 1000 )
