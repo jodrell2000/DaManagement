@@ -70,7 +70,7 @@ setInterval( function () {
 setInterval( function () { userFunctions.roomIdleCheck( roomDefaults, chatFunctions ) }, 60 * 1000 )
 
 // every 5 seconds, check if the there's an empty DJ slot, and prompt the next in the queue to join the decks, remove them if they don't
-setInterval( function () {
+setInterval( function ( data ) {
     if ( roomDefaults.queueActive !== true && userFunctions.howManyDJs() === roomDefaults.maxDJs ) {
         userFunctions.enableQueue( data, chatFunctions )
     }
