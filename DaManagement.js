@@ -1,7 +1,7 @@
 /** The Management, Turntable.fm bot
-    Adam Reynolds 2021
-    version 0.1 (forked from Mr. Roboto by Jake Smith)
-    version 1.0 (forked from chillybot)
+    Adam Reynolds 2021-2022
+    version 0.1 (forked from chillybot)
+    version 0.2 (forked from Mr. Roboto by Jake Smith)
 */
 
 /*******************************BeginSetUp*****************************************************************************/
@@ -49,6 +49,7 @@ const commandFunctions = commandModule( bot );
 const videoFunctions = videoModule( bot );
 
 // do something when the bot disconnects?
+// eslint-disable-next-line no-unused-vars
 bot.on( 'disconnected', function ( data ) { } );
 
 // check if the bot is still connected every 5 seconds
@@ -69,20 +70,30 @@ setInterval( function () {
 setInterval( function () { userFunctions.roomIdleCheck( roomDefaults, chatFunctions ) }, 60 * 1000 )
 
 // every 5 seconds, check if the there's an empty DJ slot, and prompt the next in the queue to join the decks, remove them if they don't
-setInterval( function () {
-    if ( roomDefaults.queueActive === true && userFunctions.queueList().length !== 0 && ( userFunctions.refreshDJCount() + userFunctions.howManyDJs() ) < 5 ) {
-        userFunctions.setDJToNotify( userFunctions.headOfQueue() );
-        if ( botFunctions.sayOnce() === true ) {
-            botFunctions.setSayOnce( false );
+setInterval( function ( data ) {
+    if ( roomDefaults.queueActive !== true && userFunctions.howManyDJs() === roomDefaults.maxDJs ) {
+        roomDefaults.queueActive = true;
+        chatFunctions.botSpeak( "The Queue is now active", null, true, null );
+    }
 
-            roomFunctions.queuePromptToDJ( chatFunctions, userFunctions );
+    if ( roomDefaults.queueActive === true && ( userFunctions.refreshDJCount() + userFunctions.howManyDJs() ) < roomDefaults.maxDJs ) {
+        if ( userFunctions.queueList().length > 0 ) {
+            userFunctions.setDJToNotify( userFunctions.headOfQueue() );
+            if ( botFunctions.sayOnce() === true ) {
+                botFunctions.setSayOnce( false );
 
-            // start a timer to remove the DJ from the queue if they don't DJ
-            roomFunctions.queueTimer = setTimeout( function () {
-                if ( userFunctions.notifyThisDJ() !== null ) {
-                    userFunctions.removeNotifyDJFromQueue( botFunctions, userFunctions );
-                }
-            }, roomDefaults.queueWaitTime * 1000 );
+                roomFunctions.queuePromptToDJ( chatFunctions, userFunctions );
+
+                // start a timer to remove the DJ from the queue if they don't DJ
+                roomFunctions.queueTimer = setTimeout( function () {
+                    if ( userFunctions.notifyThisDJ() !== null ) {
+                        userFunctions.removeNotifyDJFromQueue( botFunctions, userFunctions );
+                    }
+                }, roomDefaults.queueWaitTime * 1000 );
+            }
+        } else {
+            roomDefaults.queueActive = false;
+            chatFunctions.botSpeak( "The Queue is now disabled", null, true, null );
         }
     }
 }, 5 * 1000 )
@@ -143,6 +154,7 @@ bot.on( 'roomChanged', function ( data ) {
         // load in and user data on disk first
         userFunctions.readAllUserDataFromDisk();
 
+        console.log( "================= Finished reading ===============" );
         //reset arrays in case this was triggered by the bot restarting
         userFunctions.resetAllWarnMe( data );
 
