@@ -1,7 +1,7 @@
 /** The Management, Turntable.fm bot
-    Adam Reynolds 2021
-    version 0.1 (forked from Mr. Roboto by Jake Smith)
-    version 1.0 (forked from chillybot)
+    Adam Reynolds 2021-2022
+    version 0.1 (forked from chillybot)
+    version 0.2 (forked from Mr. Roboto by Jake Smith)
 */
 
 /*******************************BeginSetUp*****************************************************************************/
@@ -72,7 +72,8 @@ setInterval( function () { userFunctions.roomIdleCheck( roomDefaults, chatFuncti
 // every 5 seconds, check if the there's an empty DJ slot, and prompt the next in the queue to join the decks, remove them if they don't
 setInterval( function ( data ) {
     if ( roomDefaults.queueActive !== true && userFunctions.howManyDJs() === roomDefaults.maxDJs ) {
-        userFunctions.enableQueue( data, chatFunctions )
+        roomDefaults.queueActive = true;
+        chatFunctions.botSpeak( "The Queue is now active", null, true, null );
     }
 
     if ( roomDefaults.queueActive === true && ( userFunctions.refreshDJCount() + userFunctions.howManyDJs() ) < roomDefaults.maxDJs ) {
@@ -91,7 +92,8 @@ setInterval( function ( data ) {
                 }, roomDefaults.queueWaitTime * 1000 );
             }
         } else {
-            userFunctions.disableQueue( data, chatFunctions );
+            roomDefaults.queueActive = false;
+            chatFunctions.botSpeak( "The Queue is now disabled", null, true, null );
         }
     }
 }, 5 * 1000 )
@@ -152,6 +154,7 @@ bot.on( 'roomChanged', function ( data ) {
         // load in and user data on disk first
         userFunctions.readAllUserDataFromDisk();
 
+        console.log( "================= Finished reading ===============" );
         //reset arrays in case this was triggered by the bot restarting
         userFunctions.resetAllWarnMe( data );
 

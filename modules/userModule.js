@@ -354,9 +354,9 @@ const userFunctions = ( bot ) => {
             const userInfo = JSON.parse( theData );
             const userIDFromFile = userInfo[ 'id' ];
             if ( this.userExists( userIDFromFile ) ) {
-                console.log( "User already exists so remove them" );
                 theUsersList.splice( this.getPositionOnUsersList( userIDFromFile ), 1 );
             }
+            theUsersList.push( userInfo );
         },
 
         // ========================================================
