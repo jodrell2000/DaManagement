@@ -61,11 +61,19 @@ const commandFunctions = ( bot ) => {
     generalCommands.dive = ( { data, botFunctions, chatFunctions, userFunctions } ) => { botFunctions.stageDiveCommand( data, chatFunctions, userFunctions, chatCommandItems.stageDiveMessages ); }
     generalCommands.dive.help = "Leave the DJ booth with style...stagedive tho' init!";
 
-    generalCommands.mystats = ( { data, userFunctions, chatFunctions } ) => { userFunctions.readSingleUserStatus( data, chatFunctions ) }
+    generalCommands.mystats = ( { data, userFunctions, chatFunctions } ) => { userFunctions.readSingleUserStatus( data, chatFunctions ); }
     generalCommands.mystats.help = "What info does the Bot currently hold about you...handy for knowing how much time you've been wasting on here today!";
 
-    generalCommands.theme = ( { data, roomFunctions, chatFunctions } ) => { roomFunctions.readTheme( data, chatFunctions ) }
+    generalCommands.theme = ( { data, roomFunctions, chatFunctions } ) => { roomFunctions.readTheme( data, chatFunctions ); }
     generalCommands.theme.help = "Tells you what the current teme is, if there is one";
+
+    generalCommands.myregion = ( { data, args, userFunctions, chatFunctions, videoFunctions } ) => { userFunctions.checkAndStoreUserRegion( data, args, chatFunctions, videoFunctions ); }
+    generalCommands.myregion.argumentCount = 1;
+    generalCommands.myregion.help = "Set the region you're in so that video regions can be checked automatically";
+    generalCommands.myregion.sampleArguments = [ "GB" ];
+
+    generalCommands.noregion = ( { data, userFunctions, chatFunctions, videoFunctions } ) => { userFunctions.storeNoRegion( data, chatFunctions, videoFunctions ); }
+    generalCommands.noregion.help = "Your regions will be removed and you won't be asked again to set one";
 
     // #############################################
     // General user Queue commands

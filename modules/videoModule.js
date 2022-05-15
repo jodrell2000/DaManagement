@@ -1,6 +1,8 @@
 // load the googleAPI
 let { google } = require( "googleapis" );
 let authorize = require( "./oauth2lib" );
+const request = require('request');
+
 
 let { setIntersection, setDifference } = require( "../modules/setlib" );
 
@@ -12,7 +14,7 @@ let TOKEN_PATH = TOKEN_DIR + "theManagementCredentials.json";
 const countryLookup = require( 'country-code-lookup' );
 
 let musicDefaults = require( "../defaultSettings/musicDefaults.js" );
-let regionsWeCareAbout = new Set( musicDefaults.alertRegions ); //song play limit, this is for the playLimit variable up above(off by default)
+let regionsWeCareAbout = new Set( musicDefaults.alertRegions );
 
 const videoFunctions = () => {
     function alertIfRegionsNotAllowed ( restrictions, userFunctions, notifier ) {
@@ -52,7 +54,11 @@ const videoFunctions = () => {
             countriesString = countriesString.substring( 0, lastComma ) + ' and' + countriesString.substring( lastComma + 1 )
         }
 
-        return countriesString;
+        if ( countriesString.length === 0 ) {
+            return "empty";
+        } else {
+            return countriesString;
+        }
     }
 
     async function queryVideoDetails ( auth, videoID ) {
@@ -82,29 +88,65 @@ const videoFunctions = () => {
             chatFunctions.botSpeak( regionReport, data );
         },
 
-        addAlertRegion: function ( data, [ region ], chatFunctions ) {
+        checkVideoStatus: function (videoIDs) {
+            return new Promise( (resolve, reject) => {
+                let youtubeURL = `https://www.googleapis.com/youtube/v3/videos?id=${videoIDs}&part=status&key=${process.env.YOUTUBE_API_KEY}`
+                request(youtubeURL, {json: true}, (error, res, body) => {
+        
+                    if (error) {
+                        reject(`Something went wrong. Try again later.`);
+                    }
+        
+                    if (!body.hasOwnProperty('items')) {
+                        reject(`No data returned`);
+                    }
+        
+                    if (!Array.isArray(body.items) || !body.items.length) {
+                        reject(`No data returned`);
+                    }
+        
+                    resolve(body.items);
+                });
+            });
+        },
+
+        addAlertRegion: function ( data, region, chatFunctions, announce = true ) {
             let message;
-            if ( countryLookup.byIso( region ) !== null ) {
-                if ( regionsWeCareAbout.has( region ) ) {
-                    message = countryLookup.byIso( region ).country + ' is already in the region alerts list';
+            let theRegion = region.toUpperCase();
+
+            if ( countryLookup.byIso( theRegion ) !== null ) {
+                if ( regionsWeCareAbout.has( theRegion ) ) {
+                    message = countryLookup.byIso( theRegion ).country + ' is already in the region alerts list';
                 } else {
-                    regionsWeCareAbout.add( region );
-                    message = countryLookup.byIso( region ).country + ' has been added to the region alerts list';
+                    regionsWeCareAbout.add( theRegion );
+                    message = countryLookup.byIso( theRegion ).country + ' has been added to the region alerts list';
                 }
-                chatFunctions.botSpeak( message, data );
+                if ( announce === true ) {
+                    chatFunctions.botSpeak( message, data );
+                }
             } else {
-                chatFunctions.botSpeak( 'That region is not recognised. Please use one of the 2 character ISO country codes, https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2', data );
+                if ( announce === true ) {
+                    chatFunctions.botSpeak( 'That region is not recognised. Please use one of the 2 character ISO country codes, https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2', data );
+                }
             }
         },
 
-        removeAlertRegion: function ( data, [ region ], chatFunctions ) {
+        removeAlertRegion: function ( data, region, chatFunctions, announce = true ) {
             let message;
-            if ( regionsWeCareAbout.delete( region ) ) {
-                message = countryLookup.byIso( region ).country + ' has been removed from the region alerts list';
+            let theRegion = region.toUpperCase();
+
+            if ( regionsWeCareAbout.delete( theRegion ) ) {
+                message = countryLookup.byIso( theRegion ).country + ' has been removed from the region alerts list';
             } else {
-                message = countryLookup.byIso( region ).country + ' is not in the region alerts list';
+                message = countryLookup.byIso( theRegion ).country + ' is not in the region alerts list';
             }
-            chatFunctions.botSpeak( message, data );
+            if ( announce === true ) {
+                chatFunctions.botSpeak( message, data );
+            }
+        },
+
+        resetAlertRegions: function () {
+            regionsWeCareAbout = new Set( musicDefaults.alertRegions );
         },
 
         checkVideoRegionAlert: function ( data, videoID, userFunctions, chatFunctions, botFunctions ) {

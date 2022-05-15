@@ -17,6 +17,15 @@ const ready = () => {
         });
     });
 
+    // Bind Unavailable Toggle link
+    let toggle = { state: true };
+    
+    document.querySelector(`#unavailableview`).addEventListener('click', (event) => {
+        event.preventDefault();
+        toggleUnavailable(toggle);
+        return false;
+    });
+
     // Bind Add links
     Array.from(document.querySelectorAll(`.add`)).forEach(link => {
         link.addEventListener('click', (event) => {
@@ -56,7 +65,15 @@ const ready = () => {
         return false;
     });
 
-    
+    // Bind CheckStatus click
+    document.getElementById(`checkStatus`).addEventListener(`click`, (event) => {
+        event.preventDefault();
+
+        checkStatus();
+
+        return false;
+    });
+
     if (typeof dragula !== `undefined`) {
         dragula([document.querySelector('#songqueue tbody')])
         .on(`drop`, (el, target, source, sibling) => {
@@ -65,6 +82,23 @@ const ready = () => {
             movesong(oldIndex, newIndex);
         })
     }
+}
+
+const toggleUnavailable = (toggle) => {
+    if (toggle.state) {
+        Array.from(document.querySelectorAll(`#songqueue tr:not([status="not available"])`)).forEach(item => {
+            item.classList.add("hide");
+        });
+        toggle.state = false
+
+        return;
+    }
+
+    Array.from(document.querySelectorAll(`#songqueue tr.hide`)).forEach(item => {
+        item.classList.remove("hide");
+    });
+
+    toggle.state = true
 }
 
 const movesong = (indexFrom, indexTo) => {
@@ -81,6 +115,54 @@ const movesong = (indexFrom, indexTo) => {
         if (data === `refresh`) {
             window.location.reload();
         }
+    });
+}
+
+function* chunks(arr, n) {
+    for (let i = 0; i < arr.length; i += n) {
+      yield arr.slice(i, i + n);
+    }
+  }
+
+const checkStatus = async () => {
+
+    document.querySelector(`#ytSongs .count`).textContent = document.querySelectorAll(`#songqueue tbody tr.yt`).length + ` `;
+    document.querySelector(`#scSongs .count`).textContent = document.querySelectorAll(`#songqueue tbody tr.sc`).length + ` `;
+
+    let allSongs = document.querySelectorAll(`#songqueue tbody tr.yt`)
+    allSongs.forEach((song, index) => {
+        song.setAttribute(`status`, `not available`);
+      });
+
+    let videoIDs = Array(...document.querySelectorAll(`#songqueue tbody tr.yt`)).map( (item) => item.getAttribute(`id`) );
+    let videoIDsChunks = [...chunks(videoIDs, 50)];
+
+    videoIDsChunks.forEach( (chunk) => {
+        let videoList = chunk.join(`,`);
+
+        fetch('/songstatus', {
+            headers: { "Content-Type": "application/json; charset=utf-8" },
+            method: 'POST',
+            body: JSON.stringify({
+                videoIDs: videoList
+            })
+        })
+        .then( (res) => res.json() )
+        .then( (data) => {            
+            data.forEach((item) => {
+                if (item.status.uploadStatus.toLowerCase() === `processed`) {
+                    if (item.status.privacyStatus.toLowerCase() === `public`) {
+                        document.getElementById(item.id).setAttribute(`status`, `available`)
+                    }
+                    else {
+                        document.getElementById(item.id).setAttribute(`status`, `not available`)
+                    }
+                }
+                else {
+                    document.getElementById(item.id).setAttribute(`status`, `not available`)
+                }
+            });
+        });
     });
 }
 
