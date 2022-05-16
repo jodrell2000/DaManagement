@@ -707,7 +707,7 @@ const addChatCommandWithMessage = ( data, chatFunctions, documentationFunctions 
         chatFunctions.botSpeak( addCommand, data );
     }
 
-    documentationFunctions.rebuildChatDocumentation();
+    chatDocumentationRebuild( documentationFunctions );
 }
 
 const addMessageToChatCommand = ( data, chatFunctions, documentationFunctions ) => {
@@ -734,7 +734,8 @@ const addMessageToChatCommand = ( data, chatFunctions, documentationFunctions ) 
 
     store.put( `chatMessages.${ theCommand }.messages`, theMessages );
     chatFunctions.botSpeak( "Update successful. The command " + theCommand + " was updated", data );
-    documentationFunctions.rebuildChatDocumentation();
+
+    chatDocumentationRebuild( documentationFunctions );
 }
 
 const addPictureToChatCommand = ( data, chatFunctions, documentationFunctions ) => {
@@ -764,7 +765,8 @@ const addPictureToChatCommand = ( data, chatFunctions, documentationFunctions ) 
 
     store.put( `chatMessages.${ theCommand }.pictures`, thePictures );
     chatFunctions.botSpeak( "Update successful. The command " + theCommand + " was updated", data );
-    documentationFunctions.rebuildChatDocumentation();
+
+    chatDocumentationRebuild( documentationFunctions );
 }
 
 const removeChatCommand = ( data, chatFunctions, documentationFunctions ) => {
@@ -782,7 +784,8 @@ const removeChatCommand = ( data, chatFunctions, documentationFunctions ) => {
 
     store.remove( `chatMessages.${ theCommand }` );
     chatFunctions.botSpeak( "Update successful. The command " + theCommand + " was removed", data );
-    documentationFunctions.rebuildChatDocumentation();
+
+    chatDocumentationRebuild( documentationFunctions );
 }
 
 const removeChatCommandMessage = ( data, chatFunctions, documentationFunctions ) => {
@@ -814,7 +817,8 @@ const removeChatCommandMessage = ( data, chatFunctions, documentationFunctions )
 
     store.put( `chatMessages.${ theCommand }.messages`, theMessages );
     chatFunctions.botSpeak( "Update successful. The command " + theCommand + " was updated", data );
-    documentationFunctions.rebuildChatDocumentation();
+
+    chatDocumentationRebuild( documentationFunctions );
 }
 
 const removeChatCommandPicture = ( data, chatFunctions, documentationFunctions ) => {
@@ -846,7 +850,14 @@ const removeChatCommandPicture = ( data, chatFunctions, documentationFunctions )
 
     store.put( `chatMessages.${ theCommand }.pictures`, thePictures );
     chatFunctions.botSpeak( "Update successful. The command " + theCommand + " was updated", data );
-    documentationFunctions.rebuildChatDocumentation();
+
+    chatDocumentationRebuild( documentationFunctions );
+}
+
+const chatDocumentationRebuild = ( documentationFunctions ) => {
+    setTimeout( function () {
+        documentationFunctions.rebuildChatDocumentation();
+    }, 5 * 1000 );
 }
 
 module.exports = commandFunctions;

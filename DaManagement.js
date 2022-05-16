@@ -156,7 +156,6 @@ bot.on( 'roomChanged', function ( data ) {
         // load in and user data on disk first
         userFunctions.readAllUserDataFromDisk();
 
-        console.log( "================= Finished reading ===============" );
         //reset arrays in case this was triggered by the bot restarting
         userFunctions.resetAllWarnMe( data );
 
