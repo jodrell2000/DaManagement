@@ -620,7 +620,7 @@ const addAlias = ( data, chatFunctions ) => {
 
     // does the command we're aliasing actually exist
     const commandToLink = strippedCommand[ 2 ];
-    if ( !commandModule.isCoreCommand( commandToLink ) && !commandModule.isChatCommand( commandToLink )) {
+    if ( !commandModule.isCoreCommand( commandToLink ) && !commandModule.isChatCommand( commandToLink ) ) {
         chatFunctions.botSpeak( `The command ${ chatDefaults.commandIdentifier }${ commandToLink } doesn't exist to be aliased.`, data );
         return;
     }

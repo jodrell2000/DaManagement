@@ -74,4 +74,5 @@ module.exports = {
 
     vipsOnly: false, // is true ONLY users on the VIP list will be able to play, otherwise a space will be reserved for everyone on the list but others will be allowed to play
 
+    maxDJs: 5 // max number of DJs allowed on stage at once
 }
