@@ -69,7 +69,7 @@ const documentationFunctions = () => {
                         if ( thePictures !== undefined ) {
                             thePictures.forEach( ( key, index ) => {
                                 // console.log( key );
-                                writeData.writeFileSync( outputFile, "<img src=\"" + key + "\" width=\"100\"><br>", { flag: 'a+' } );
+                                writeData.writeFileSync( outputFile, "<img src=\"" + key + "\" width=\"100\"> ", { flag: 'a+' } );
                             } );
                         }
                         writeData.writeFileSync( outputFile, "</td>", { flag: 'a+' } );
