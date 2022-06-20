@@ -294,32 +294,32 @@ const commandFunctions = ( bot ) => {
     // Moderator Only Dynamic Chat commands
     // #############################################
 
-    moderatorChatCommands.addchatcommand = ( { data, chatFunctions } ) => { addChatCommandWithMessage( data, chatFunctions ); }
+    moderatorChatCommands.addchatcommand = ( { data, chatFunctions, documentationFunctions } ) => { addChatCommandWithMessage( data, chatFunctions, documentationFunctions ); }
     moderatorChatCommands.addchatcommand.argumentCount = 2;
     moderatorChatCommands.addchatcommand.help = "Add a new chat/picture command. You must add a message with the new command";
     moderatorChatCommands.addchatcommand.sampleArguments = [ "command", "message" ];
 
-    moderatorChatCommands.addmessagetochatcommand = ( { data, chatFunctions } ) => { addMessageToChatCommand( data, chatFunctions ); }
+    moderatorChatCommands.addmessagetochatcommand = ( { data, chatFunctions, documentationFunctions } ) => { addMessageToChatCommand( data, chatFunctions, documentationFunctions ); }
     moderatorChatCommands.addmessagetochatcommand.argumentCount = 2;
     moderatorChatCommands.addmessagetochatcommand.help = "Add a new message to a chat command.";
     moderatorChatCommands.addmessagetochatcommand.sampleArguments = [ "command", "message" ];
 
-    moderatorChatCommands.addpicturetochatcommand = ( { data, chatFunctions } ) => { addPictureToChatCommand( data, chatFunctions ); }
+    moderatorChatCommands.addpicturetochatcommand = ( { data, chatFunctions, documentationFunctions } ) => { addPictureToChatCommand( data, chatFunctions, documentationFunctions ); }
     moderatorChatCommands.addpicturetochatcommand.argumentCount = 2;
     moderatorChatCommands.addpicturetochatcommand.help = "Add a new picture to a chat command. It must be the full URL for a gif. Please paste it in the chat first to make sure it works!";
     moderatorChatCommands.addpicturetochatcommand.sampleArguments = [ "command", "http://url.link/image.gif" ];
 
-    moderatorChatCommands.removechatcommand = ( { data, chatFunctions } ) => { removeChatCommand( data, chatFunctions ); }
+    moderatorChatCommands.removechatcommand = ( { data, chatFunctions, documentationFunctions } ) => { removeChatCommand( data, chatFunctions, documentationFunctions ); }
     moderatorChatCommands.removechatcommand.argumentCount = 1;
     moderatorChatCommands.removechatcommand.help = "Delete a chat command, including any messages/pictures. Careful, this is not reversible";
     moderatorChatCommands.removechatcommand.sampleArguments = [ "command" ];
 
-    moderatorChatCommands.removechatcommandmessage = ( { data, chatFunctions } ) => { removeChatCommandMessage( data, chatFunctions ); }
+    moderatorChatCommands.removechatcommandmessage = ( { data, chatFunctions, documentationFunctions } ) => { removeChatCommandMessage( data, chatFunctions, documentationFunctions ); }
     moderatorChatCommands.removechatcommandmessage.argumentCount = 2;
     moderatorChatCommands.removechatcommandmessage.help = "Remove a message from a dynamic chat command. The message must match exactly and be surrounded by double quotes";
     moderatorChatCommands.removechatcommandmessage.sampleArguments = [ "command", "\"Remove this message\"" ];
 
-    moderatorChatCommands.removechatcommandpicture = ( { data, chatFunctions } ) => { removeChatCommandPicture( data, chatFunctions ); }
+    moderatorChatCommands.removechatcommandpicture = ( { data, chatFunctions, documentationFunctions } ) => { removeChatCommandPicture( data, chatFunctions, documentationFunctions ); }
     moderatorChatCommands.removechatcommandpicture.argumentCount = 2;
     moderatorChatCommands.removechatcommandpicture.help = "Remove a pitcute from a dynamic chat command. The URL must match exactly and be surrounded by double quotes";
     moderatorChatCommands.removechatcommandpicture.sampleArguments = [ "command", "http://url.link/image.gif" ];
@@ -494,7 +494,7 @@ const commandFunctions = ( bot ) => {
             }
         },
 
-        parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions ) {
+        parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions ) {
             const senderID = data.userid;
             const [ command, args, moderatorOnly ] = this.getCommandAndArguments( data.text, allCommands );
             if ( moderatorOnly && !userFunctions.isUserModerator( senderID ) ) {
@@ -510,7 +510,8 @@ const commandFunctions = ( bot ) => {
                     roomFunctions,
                     songFunctions,
                     chatFunctions,
-                    videoFunctions
+                    videoFunctions,
+                    documentationFunctions
                 } );
             } else {
                 chatFunctions.botSpeak( "Sorry, that's not a command I recognise. Try " + chatDefaults.commandIdentifier + "list to find out more.", data );
@@ -684,7 +685,7 @@ const removeAlias = ( data, chatFunctions ) => {
 
 // #########################################################
 
-const addChatCommandWithMessage = ( data, chatFunctions ) => {
+const addChatCommandWithMessage = ( data, chatFunctions, documentationFunctions ) => {
     const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
@@ -705,9 +706,11 @@ const addChatCommandWithMessage = ( data, chatFunctions ) => {
     } else {
         chatFunctions.botSpeak( addCommand, data );
     }
+
+    chatDocumentationRebuild( documentationFunctions );
 }
 
-const addMessageToChatCommand = ( data, chatFunctions ) => {
+const addMessageToChatCommand = ( data, chatFunctions, documentationFunctions ) => {
     const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
@@ -722,7 +725,7 @@ const addMessageToChatCommand = ( data, chatFunctions ) => {
     }
 
     if ( !commandModule.isChatCommand( theCommand ) ) {
-        addChatCommandWithMessage( data, chatFunctions );
+        addChatCommandWithMessage( data, chatFunctions, documentationFunctions );
         return;
     }
 
@@ -731,9 +734,11 @@ const addMessageToChatCommand = ( data, chatFunctions ) => {
 
     store.put( `chatMessages.${ theCommand }.messages`, theMessages );
     chatFunctions.botSpeak( "Update successful. The command " + theCommand + " was updated", data );
+
+    chatDocumentationRebuild( documentationFunctions );
 }
 
-const addPictureToChatCommand = ( data, chatFunctions ) => {
+const addPictureToChatCommand = ( data, chatFunctions, documentationFunctions ) => {
     const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
@@ -760,9 +765,11 @@ const addPictureToChatCommand = ( data, chatFunctions ) => {
 
     store.put( `chatMessages.${ theCommand }.pictures`, thePictures );
     chatFunctions.botSpeak( "Update successful. The command " + theCommand + " was updated", data );
+
+    chatDocumentationRebuild( documentationFunctions );
 }
 
-const removeChatCommand = ( data, chatFunctions ) => {
+const removeChatCommand = ( data, chatFunctions, documentationFunctions ) => {
     const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
@@ -777,9 +784,11 @@ const removeChatCommand = ( data, chatFunctions ) => {
 
     store.remove( `chatMessages.${ theCommand }` );
     chatFunctions.botSpeak( "Update successful. The command " + theCommand + " was removed", data );
+
+    chatDocumentationRebuild( documentationFunctions );
 }
 
-const removeChatCommandMessage = ( data, chatFunctions ) => {
+const removeChatCommandMessage = ( data, chatFunctions, documentationFunctions ) => {
     const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
@@ -808,9 +817,11 @@ const removeChatCommandMessage = ( data, chatFunctions ) => {
 
     store.put( `chatMessages.${ theCommand }.messages`, theMessages );
     chatFunctions.botSpeak( "Update successful. The command " + theCommand + " was updated", data );
+
+    chatDocumentationRebuild( documentationFunctions );
 }
 
-const removeChatCommandPicture = ( data, chatFunctions ) => {
+const removeChatCommandPicture = ( data, chatFunctions, documentationFunctions ) => {
     const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
@@ -839,6 +850,14 @@ const removeChatCommandPicture = ( data, chatFunctions ) => {
 
     store.put( `chatMessages.${ theCommand }.pictures`, thePictures );
     chatFunctions.botSpeak( "Update successful. The command " + theCommand + " was updated", data );
+
+    chatDocumentationRebuild( documentationFunctions );
+}
+
+const chatDocumentationRebuild = ( documentationFunctions ) => {
+    setTimeout( function () {
+        documentationFunctions.rebuildChatDocumentation();
+    }, 5 * 1000 );
 }
 
 module.exports = commandFunctions;
