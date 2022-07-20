@@ -7,7 +7,7 @@ module.exports = {
     matchSongs: true, //set this true to enable banned song matching
 
     //banned artist / song list
-    bannedArtists: ['dj tiesto', 'skrillex', 'lil wayne', 't-pain', 'tpain', 'katy perry', 'eminem', 'porter robinson', 'gorgoroth', 'justin bieber', 'deadmau5', 'nosia', 'infected mushroom', 'spongebob squarepants', 'usher'],
+    bannedArtists: [ 'dj tiesto', 'skrillex' ],
 
     voteSkip: false, //voteskipping(off by default)
 
@@ -19,5 +19,5 @@ module.exports = {
     DJsPlayLimit: 3, //set the playlimit here (default 4 songs)
 
     alertIfRegionBlocked: true,
-    alertRegions: [ ], // default list of regions that, if the video is blocked, will alert the DJ
+    alertRegions: [], // default list of regions that, if the video is blocked, will alert the DJ
 }
