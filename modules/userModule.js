@@ -1715,6 +1715,10 @@ const userFunctions = ( bot ) => {
             //adds users who join the room to the user list if their not already on the list
             this.addUserToTheUsersList( userID, username );
 
+            // if they;ve previously been in the room as a guest we won't have their name
+            // best update it from the raw data that was passed into this function to be sure
+            this.updateUsername( userID, username );
+
             //starts time for everyone that joins the room
             this.addUserJoinedTime( userID );
 
