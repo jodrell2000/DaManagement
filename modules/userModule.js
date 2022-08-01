@@ -1733,6 +1733,12 @@ const userFunctions = ( bot ) => {
             this.addUserIsHere( userID );
         },
 
+        updateUsername: function ( userID, username ) {
+            if ( this.userExists( userID ) ) {
+                this.storeUserData( userID, "username", username );
+            }
+        },
+
         isUserHere: function ( userID ) {
             if ( this.userExists( userID ) ) {
                 return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'here' ];
