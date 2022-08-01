@@ -485,7 +485,7 @@ const commandFunctions = ( bot ) => {
             }
 
             if ( commandObj ) {
-                const moderatorOnly = !!moderatorCommands[ theCommand ];
+                const moderatorOnly = !!allModeratorCommands[ theCommand ];
                 return [ commandObj, args, moderatorOnly ];
             } else if ( dynamic === true ) {
                 return [ theCommand, 'dynamicChat', null ];
