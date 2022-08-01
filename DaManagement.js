@@ -20,6 +20,7 @@ let chatModule = require( './modules/chatModule.js' );
 let songModule = require( './modules/songModule.js' );
 let commandModule = require( './modules/commandModule.js' );
 let videoModule = require( './modules/videoModule.js' );
+let documentationModule = require( './modules/documentationModule.js' );
 
 const express = require( 'express' )
 const app = express();
@@ -47,6 +48,7 @@ const songFunctions = songModule( bot );
 const roomFunctions = roomModule( bot );
 const commandFunctions = commandModule( bot );
 const videoFunctions = videoModule( bot );
+const documentationFunctions = documentationModule();
 
 // do something when the bot disconnects?
 // eslint-disable-next-line no-unused-vars
@@ -154,7 +156,6 @@ bot.on( 'roomChanged', function ( data ) {
         // load in and user data on disk first
         userFunctions.readAllUserDataFromDisk();
 
-        console.log( "================= Finished reading ===============" );
         //reset arrays in case this was triggered by the bot restarting
         userFunctions.resetAllWarnMe( data );
 
@@ -318,7 +319,7 @@ bot.on( 'speak', function ( data ) {
     userFunctions.updateUserLastSpoke( theUserID ); //update the afk position of the speaker
 
     if ( commandFunctions.wasThisACommand( data ) ) {
-        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions );
+        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions );
     }
 
     //checks to see if someone is trying to speak to an afk person or not.
@@ -335,7 +336,7 @@ bot.on( 'speak', function ( data ) {
 //checks when the bot recieves a pm
 bot.on( 'pmmed', function ( data ) {
     if ( commandFunctions.wasThisACommand( data ) ) {
-        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions );
+        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions );
     }
 } );
 
