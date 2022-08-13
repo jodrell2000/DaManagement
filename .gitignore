@@ -6,7 +6,7 @@ DaManagement.sublime-workspace
 client_secret.json
 /data/chat.json
 /data/aliases.json
+/data/themes.json
 /data/chatDoc.html
-/data/users.json
 /data/users/*
 /html/chatDoc.html
