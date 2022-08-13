@@ -238,6 +238,28 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.removealias.help = "Remove an alias from a command";
     moderatorCommands.removealias.sampleArguments = [ "alias", "command" ];
 
+    moderatorCommands.settheme = ( { data, args, chatFunctions, roomFunctions } ) => { roomFunctions.setThemeCommand( data, reassembleArgs( args ), chatFunctions ); }
+    moderatorCommands.settheme.help = "Set a theme for the room";
+
+    moderatorCommands.notheme = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.removeThemeCommand( data, chatFunctions ); }
+    moderatorCommands.notheme.help = "Set a theme for the room";
+
+    moderatorCommands.randomtheme = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.themeRandomizer( data, chatFunctions ); }
+    moderatorCommands.randomtheme.help = "Enable/Disable the theme randomizer";
+
+    moderatorCommands.readrandomthemes = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.readRandomThemes( data, chatFunctions ); }
+    moderatorCommands.randomtheme.help = "Enable/Disable the theme randomizer";
+
+    moderatorCommands.randomthemeadd = ( { data, args, chatFunctions, roomFunctions } ) => { roomFunctions.randomThemeAdd( data, reassembleArgs( args ), chatFunctions ); }
+    moderatorCommands.randomthemeadd.argumentCount = 1;
+    moderatorCommands.randomthemeadd.help = "Add a theme to the randomizer";
+    moderatorCommands.randomthemeadd.sampleArguments = [ "The Weather" ];
+
+    moderatorCommands.randomthemeremove = ( { data, args, chatFunctions, roomFunctions } ) => { roomFunctions.randomThemeRemove( data, reassembleArgs( args ), chatFunctions ); }
+    moderatorCommands.randomthemeremove.argumentCount = 1;
+    moderatorCommands.randomthemeremove.help = "Remove a theme from the randomizer";
+    moderatorCommands.randomthemeremove.sampleArguments = [ "The Weather" ];
+
     // #############################################
     // Moderator Greeting commands
     // #############################################
@@ -247,12 +269,6 @@ const commandFunctions = ( bot ) => {
 
     moderatorWelcomeCommands.greetoff = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.greetOffCommand( data, chatFunctions ); }
     moderatorWelcomeCommands.greetoff.help = "Disable user greetings";
-
-    moderatorWelcomeCommands.settheme = ( { data, args, chatFunctions, roomFunctions } ) => { roomFunctions.setThemeCommand( data, reassembleArgs( args ), chatFunctions ); }
-    moderatorWelcomeCommands.settheme.help = "Set a theme for the room";
-
-    moderatorWelcomeCommands.notheme = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.removeThemeCommand( data, chatFunctions ); }
-    moderatorWelcomeCommands.notheme.help = "Set a theme for the room";
 
     moderatorWelcomeCommands.enablerules = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.enableRulesMessageCommand( data, chatFunctions ); }
     moderatorWelcomeCommands.enablerules.help = "Have the room rules etc read out with the room greeting";
@@ -264,6 +280,7 @@ const commandFunctions = ( bot ) => {
     moderatorWelcomeCommands.rulesinterval.argumentCount = 1;
     moderatorWelcomeCommands.rulesinterval.help = "Set the interval, in minutes, for how often the room rules will be read out with the room greeting";
     moderatorWelcomeCommands.rulesinterval.sampleArguments = [ 15 ];
+
 
     // #############################################
     // Moderator Only Queue commands
