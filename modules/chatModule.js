@@ -213,6 +213,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
                 theCount = theCount + thisDice;
             }
 
+            theMessage = theMessage.substring( 0, theMessage.length - 2 );
             theMessage = theMessage + " for a total of " + theCount;
             this.botSpeak( theMessage, data );
         },

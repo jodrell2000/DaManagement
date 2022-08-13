@@ -183,7 +183,15 @@ const roomFunctions = ( bot ) => {
 
         readRandomThemes: function ( data, chatFunctions ) {
             const store = this.getThemeRandomizerStore();
-            chatFunctions.botSpeak( 'The theme randomizer currently contains ' + this.getRandomThemes( store ), data );
+            const theThemes = this.getRandomThemes( store );
+            let formattedThemes = "";
+            for ( let themeLoop of theThemes ) {
+                formattedThemes += ( '"' + themeLoop + '", ' );
+            }
+
+            formattedThemes = formattedThemes.substring( 0, formattedThemes.length - 2 );
+
+            chatFunctions.botSpeak( 'The theme randomizer currently contains ' + formattedThemes, data );
         },
 
         getRandomThemes: function ( store ) {
