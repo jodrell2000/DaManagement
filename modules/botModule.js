@@ -483,10 +483,10 @@ const botFunctions = ( bot ) => {
                 console.group( '! delete track ===============================' );
                 const senderID = userFunctions.whoSentTheCommand( data );
                 const senderUsername = userFunctions.getUsername( senderID );
-                const currentDateTime = require( 'moment' );
+                let currentDateTime = require( 'moment' );
 
-                console.log( "The deletetrack command was issued by " + senderUsername + " at " + + currentDateTime().format( 'DD/MM/yyyy HH:mm:ss' ) );
-                console.log( "The track removed was " + songFunctions.track() + " by " + songFunctions.artist() );
+                console.log( "The deletetrack command was issued by " + senderUsername + " at " + currentDateTime().format( 'DD/MM/yyyy HH:mm:ss' ) );
+                console.log( "The track removed was " + songFunctions.song() + " by " + songFunctions.artist() );
                 console.log( '========================================' );
 
                 bot.playlistRemove( this.getPlaylistCount() - 1 );
