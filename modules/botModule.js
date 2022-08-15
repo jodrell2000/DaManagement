@@ -479,7 +479,8 @@ const botFunctions = ( bot ) => {
                 chatFunctions.botSpeak( "I can't delete anything if I'm not playing anything?!?", data, true );
             } else {
                 chatFunctions.botSpeak( "OK, I'll delete that", data, true );
-                bot.playlistRemove( 0 );
+                bot.playlistRemove( this.getPlaylistCount() - 1 );
+                bot.skip();
             }
         },
 
