@@ -466,6 +466,23 @@ const botFunctions = ( bot ) => {
             }
         },
 
+        isBotCurrentDJ: function ( userFunctions ) {
+            if ( userFunctions.getCurrentDJID() === authModule.USERID ) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+
+        deleteCurrentTrackFromBotPlaylist: function ( data, userFunctions, chatFunctions ) {
+            if ( this.isBotCurrentDJ( userFunctions ) !== true ) {
+                chatFunctions.botSpeak( "I can't delete anything if I'm not playing anything?!?", data, true );
+            } else {
+                chatFunctions.botSpeak( "OK, I'll delete that", data, true );
+                bot.playlistRemove( 0 );
+            }
+        },
+
         clearAllTimers: function ( userFunctions, roomFunctions, songFunctions ) {
             userFunctions.clearInformTimer( roomFunctions );
             roomFunctions.clearSongLimitTimer( userFunctions, roomFunctions );
