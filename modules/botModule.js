@@ -474,11 +474,19 @@ const botFunctions = ( bot ) => {
             }
         },
 
-        deleteCurrentTrackFromBotPlaylist: function ( data, userFunctions, chatFunctions ) {
+        deleteCurrentTrackFromBotPlaylist: function ( data, userFunctions, chatFunctions, songFunctions ) {
             if ( this.isBotCurrentDJ( userFunctions ) !== true ) {
                 chatFunctions.botSpeak( "I can't delete anything if I'm not playing anything?!?", data, true );
             } else {
                 chatFunctions.botSpeak( "OK, I'll delete that", data, true );
+
+                console.group( '! delete track ===============================' );
+                const senderID = userFunctions.whoSentTheCommand( data );
+                const senderUsername = userFunctions.getUsername( senderID );
+                console.log( "The deletetrack command was issued by " + senderUsername );
+                console.log( "The track removed was " + songFunctions.track + " by " + songFunctions.artist );
+                console.log( '========================================' );
+
                 bot.playlistRemove( this.getPlaylistCount() - 1 );
                 bot.skip();
             }

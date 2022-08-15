@@ -75,7 +75,7 @@ const commandFunctions = ( bot ) => {
     generalCommands.noregion = ( { data, userFunctions, chatFunctions, videoFunctions } ) => { userFunctions.storeNoRegion( data, chatFunctions, videoFunctions ); }
     generalCommands.noregion.help = "Your regions will be removed and you won't be asked again to set one";
 
-    generalCommands.deletetrack = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.deleteCurrentTrackFromBotPlaylist( data, userFunctions, chatFunctions ); }
+    generalCommands.deletetrack = ( { data, botFunctions, userFunctions, chatFunctions, songFunctions } ) => { botFunctions.deleteCurrentTrackFromBotPlaylist( data, userFunctions, chatFunctions, songFunctions ); }
     generalCommands.deletetrack.help = "Delete whatever track Robo is currently playing";
 
     // #############################################
