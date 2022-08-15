@@ -1,3 +1,6 @@
+const Storage = require( 'node-storage' );
+const { dirname } = require( 'path' );
+
 let roomDefaults = require( '../defaultSettings/roomDefaults.js' );
 let musicDefaults = require( '../defaultSettings/musicDefaults.js' );
 let botDefaults = require( '../defaultSettings/botDefaults.js' );
@@ -21,6 +24,9 @@ let theme = false; //has a current theme been set? true or false. handled by com
 let rulesTimerRunning = false;
 let rulesMessageOn = true;
 let rulesInterval = 15; // how ofter, in minutes, the room rules will be displayed with the welcome messages
+let themeRandomizerEnabled = false;
+
+const themeDataFileName = process.env.THEMEDATA;
 
 const roomFunctions = ( bot ) => {
 
@@ -38,6 +44,14 @@ const roomFunctions = ( bot ) => {
 
         resetSkipVoteUsers: function () {
             skipVoteUsers = []
+        },
+
+        themeRandomizerEnabled: () => themeRandomizerEnabled,
+        setthemeRandomizer: function ( value ) { themeRandomizerEnabled = value; },
+
+        theTimer: function () {
+            const timer = ms => new Promise( res => setTimeout( res, ms ) );
+            return timer;
         },
 
         // ========================================================
@@ -81,7 +95,7 @@ const roomFunctions = ( bot ) => {
         // ========================================================
 
         // ========================================================
-        // Greeting Functions
+        // Theme Functions
         // ========================================================
 
         theme: () => theme,
@@ -106,8 +120,113 @@ const roomFunctions = ( bot ) => {
             if ( this.theme() === false ) {
                 chatFunctions.botSpeak( 'There is currently no theme', data );
             } else {
-                chatFunctions.botSpeak( 'The Theme is currently set to ' + this.theme(), data );
+                chatFunctions.botSpeak( 'The Theme is ' + this.theme(), data );
             }
+        },
+
+        themeRandomizer: function ( data, chatFunctions ) {
+            if ( this.themeRandomizerEnabled() === false ) {
+                this.enableThemeRandomizer( data, chatFunctions );
+            } else {
+                this.disableThemeRandomizer( data, chatFunctions );
+            }
+        },
+
+        enableThemeRandomizer: function ( data, chatFunctions ) {
+            this.setthemeRandomizer( true );
+            chatFunctions.botSpeak( 'The theme randomizer is now active', data );
+        },
+
+        disableThemeRandomizer: function ( data, chatFunctions ) {
+            this.setthemeRandomizer( false );
+            chatFunctions.botSpeak( 'The theme randomizer is now disabled', data );
+        },
+
+        getThemeRandomizerStore: function () {
+            const dataFilePath = `${ dirname( require.main.filename ) }/data/${ themeDataFileName }`;
+            const store = new Storage( dataFilePath );
+
+            return store;
+        },
+
+        randomThemeAdd: function ( data, newTheme, chatFunctions ) {
+            const store = this.getThemeRandomizerStore();
+            const timer = this.theTimer();
+            let themeList = this.getRandomThemes( store );
+
+            if ( this.doesThemeExistInRandomizer( store, newTheme ) ) {
+                chatFunctions.botSpeak( 'That theme is already in the randomizer.', data );
+                timer( 1000 ).then( _ => this.readRandomThemes( data, chatFunctions ) );
+            } else {
+                themeList.push( newTheme );
+                this.storeThemes( store, themeList );
+                chatFunctions.botSpeak( 'The theme "' + newTheme + '" has been added to the randomizer.', data );
+                timer( 1000 ).then( _ => this.readRandomThemes( data, chatFunctions ) );
+            }
+        },
+
+        randomThemeRemove: function ( data, theme, chatFunctions ) {
+            const store = this.getThemeRandomizerStore();
+            const timer = this.theTimer();
+            let themeList = this.getRandomThemes( store );
+
+            if ( this.doesThemeExistInRandomizer( store, theme ) ) {
+                themeList.splice( themeList.indexOf( theme ), 1 )
+                this.storeThemes( store, themeList );
+                chatFunctions.botSpeak( 'The theme "' + theme + '" has been removed from the randomizer.', data );
+                timer( 1000 ).then( _ => this.readRandomThemes( data, chatFunctions ) );
+            } else {
+                chatFunctions.botSpeak( 'The theme "' + theme + '" is not in the randomizer.', data );
+                timer( 1000 ).then( _ => this.readRandomThemes( data, chatFunctions ) );
+            }
+        },
+
+        readRandomThemes: function ( data, chatFunctions ) {
+            const store = this.getThemeRandomizerStore();
+            const theThemes = this.getRandomThemes( store );
+            let formattedThemes = "";
+            for ( let themeLoop of theThemes ) {
+                formattedThemes += ( '"' + themeLoop + '", ' );
+            }
+
+            formattedThemes = formattedThemes.substring( 0, formattedThemes.length - 2 );
+
+            chatFunctions.botSpeak( 'The theme randomizer currently contains ' + formattedThemes, data );
+        },
+
+        getRandomThemes: function ( store ) {
+            const theThemes = store.get( 'themes' );
+            return theThemes;
+        },
+
+        storeThemes: function ( store, themeList ) {
+            store.put( "themes", themeList );
+        },
+
+        doesThemeExistInRandomizer: function ( store, themeToCheck ) {
+            const theThemes = store.get( 'themes' );
+
+            if ( theThemes !== undefined || theThemes.length > 0 ) {
+                if ( theThemes.indexOf( themeToCheck ) === -1 ) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                return false;
+            }
+        },
+
+        getRandomTheme: function () {
+            const theThemes = this.getRandomThemes( this.getThemeRandomizerStore() )
+            const thisTheme = theThemes[ Math.ceil( Math.random() * theThemes.length ) ];
+            return thisTheme;
+        },
+
+        announceNewRandomThene: function ( data, chatFunctions ) {
+            chatFunctions.botSpeak( 'Drum roll please. Time to find out what the theme for the next round is.... ', data );
+            const timer = this.theTimer();
+            timer( 3000 ).then( _ => this.setThemeCommand( data, this.getRandomTheme(), chatFunctions ) );
         },
 
         // ========================================================

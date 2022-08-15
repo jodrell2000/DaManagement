@@ -293,7 +293,10 @@ bot.on( 'newsong', function ( data ) {
         console.warn( botFunctions.getFormattedDate() + ' The DJ counts don\'t match...resetting them. Count from data is ' + data.room.metadata.djs.length + ', count from Bot is ' + userFunctions.howManyDJs() );
         userFunctions.resetDJs( data ); //reset current djs array
     }
-    console.groupEnd();
+
+    if ( roomFunctions.themeRandomizerEnabled() === true && userFunctions.lastDJPlaying() ) {
+        roomFunctions.announceNewRandomThene( data, chatFunctions );
+    }
 } );
 
 //bot gets on stage and starts djing if no song is playing.
