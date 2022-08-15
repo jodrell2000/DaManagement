@@ -486,7 +486,7 @@ const botFunctions = ( bot ) => {
                 const currentDateTime = require( 'moment' );
 
                 console.log( "The deletetrack command was issued by " + senderUsername + " at " + + currentDateTime().format( 'DD/MM/yyyy HH:mm:ss' ) );
-                console.log( "The track removed was " + songFunctions.track + " by " + songFunctions.artist );
+                console.log( "The track removed was " + songFunctions.track() + " by " + songFunctions.artist() );
                 console.log( '========================================' );
 
                 bot.playlistRemove( this.getPlaylistCount() - 1 );
