@@ -76,7 +76,7 @@ const commandFunctions = ( bot ) => {
     generalCommands.noregion.help = "Your regions will be removed and you won't be asked again to set one";
 
     generalCommands.deletetrack = ( { data, botFunctions, userFunctions, chatFunctions } ) => { botFunctions.deleteCurrentTrackFromBotPlaylist( data, userFunctions, chatFunctions ); }
-    generalCommands.delete.help = "Delete whatever track Robo is currently playing";
+    generalCommands.deletetrack.help = "Delete whatever track Robo is currently playing";
 
     // #############################################
     // General user Queue commands
