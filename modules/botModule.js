@@ -480,14 +480,15 @@ const botFunctions = ( bot ) => {
             } else {
                 chatFunctions.botSpeak( "OK, I'll delete that", data, true );
 
-                console.group( '! delete track ===============================' );
                 const senderID = userFunctions.whoSentTheCommand( data );
                 const senderUsername = userFunctions.getUsername( senderID );
                 let currentDateTime = require( 'moment' );
 
+                console.group( '! delete track ===============================' );
                 console.log( "The deletetrack command was issued by " + senderUsername + " at " + currentDateTime().format( 'DD/MM/yyyy HH:mm:ss' ) );
                 console.log( "The track removed was " + songFunctions.song() + " by " + songFunctions.artist() );
                 console.log( '========================================' );
+                console.groupEnd();
 
                 bot.playlistRemove( this.getPlaylistCount() - 1 );
                 bot.skip();
