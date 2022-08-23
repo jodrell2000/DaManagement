@@ -186,16 +186,16 @@ const roomFunctions = ( bot ) => {
         },
 
         readRandomThemes: function ( data, chatFunctions ) {
-            const store = this.getThemeRandomizerStore();
-            const theThemes = this.getRandomThemes( store );
-            let formattedThemes = "";
-            for ( let themeLoop of theThemes ) {
-                formattedThemes += ( '"' + themeLoop + '", ' );
-            }
+            // const store = this.getThemeRandomizerStore();
+            // const theThemes = this.getRandomThemes( store );
+            // let formattedThemes = "";
+            // for ( let themeLoop of theThemes ) {
+            //     formattedThemes += ( '"' + themeLoop + '", ' );
+            // }
 
-            formattedThemes = formattedThemes.substring( 0, formattedThemes.length - 2 );
+            // formattedThemes = formattedThemes.substring( 0, formattedThemes.length - 2 );
 
-            chatFunctions.botSpeak( 'The theme randomizer currently contains ' + formattedThemes, data );
+            chatFunctions.botSpeak( 'Check the room info for the full list', data );
         },
 
         getRandomThemes: function ( store ) {
