@@ -17,7 +17,6 @@ const documentationFunctions = () => {
         rebuildChatDocumentation: function () {
 
             let writeData = require( 'fs' );
-            console.log( "chatDocOutputFile:" + chatDocOutputFile );
             writeData.writeFileSync( chatDocOutputFile, "<html><body><style type=\"text/css\">\n" +
                 ".tg  {border-collapse:collapse;border-spacing:0;}\n" +
                 ".tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;\n" +
@@ -45,7 +44,6 @@ const documentationFunctions = () => {
                 "<tbody>" );
 
             let readData = require( 'fs' );
-            console.log( "chatDataFileName:" + chatDataFileName );
             readData.readFile( chatDataFileName,
                 // callback function that is called when reading file is done
                 function ( err, data ) {
