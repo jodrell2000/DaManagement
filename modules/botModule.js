@@ -466,6 +466,35 @@ const botFunctions = ( bot ) => {
             }
         },
 
+        isBotCurrentDJ: function ( userFunctions ) {
+            if ( userFunctions.getCurrentDJID() === authModule.USERID ) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+
+        deleteCurrentTrackFromBotPlaylist: function ( data, userFunctions, chatFunctions, songFunctions ) {
+            if ( this.isBotCurrentDJ( userFunctions ) !== true ) {
+                chatFunctions.botSpeak( "I can't delete anything if I'm not playing anything?!?", data, true );
+            } else {
+                chatFunctions.botSpeak( "OK, I'll delete that", data, true );
+
+                const senderID = userFunctions.whoSentTheCommand( data );
+                const senderUsername = userFunctions.getUsername( senderID );
+                let currentDateTime = require( 'moment' );
+
+                console.group( '! delete track ===============================' );
+                console.log( "The deletetrack command was issued by " + senderUsername + " at " + currentDateTime().format( 'DD/MM/yyyy HH:mm:ss' ) );
+                console.log( "The track removed was " + songFunctions.song() + " by " + songFunctions.artist() );
+                console.log( '========================================' );
+                console.groupEnd();
+
+                bot.playlistRemove( this.getPlaylistCount() - 1 );
+                bot.skip();
+            }
+        },
+
         clearAllTimers: function ( userFunctions, roomFunctions, songFunctions ) {
             userFunctions.clearInformTimer( roomFunctions );
             roomFunctions.clearSongLimitTimer( userFunctions, roomFunctions );
