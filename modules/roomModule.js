@@ -26,7 +26,7 @@ let rulesMessageOn = true;
 let rulesInterval = 15; // how ofter, in minutes, the room rules will be displayed with the welcome messages
 let themeRandomizerEnabled = false;
 
-const themeDataFileName = process.env.THEMEDATA;
+const themesDataFileName = process.env.THEMESDATA;
 
 const roomFunctions = ( bot ) => {
 
@@ -143,13 +143,13 @@ const roomFunctions = ( bot ) => {
         },
 
         getThemeRandomizerStore: function () {
-            const dataFilePath = `${ dirname( require.main.filename ) }/data/${ themeDataFileName }`;
+            const dataFilePath = `${ dirname( require.main.filename ) }/data/${ themesDataFileName }`;
             const store = new Storage( dataFilePath );
 
             return store;
         },
 
-        randomThemeAdd: function ( data, newTheme, chatFunctions ) {
+        randomThemeAdd: function ( data, newTheme, chatFunctions, documentationFunctions ) {
             const store = this.getThemeRandomizerStore();
             const timer = this.theTimer();
             let themeList = this.getRandomThemes( store );
@@ -163,9 +163,11 @@ const roomFunctions = ( bot ) => {
                 chatFunctions.botSpeak( 'The theme "' + newTheme + '" has been added to the randomizer.', data );
                 timer( 1000 ).then( _ => this.readRandomThemes( data, chatFunctions ) );
             }
+
+            documentationFunctions.rebuildThemesDocumentation();
         },
 
-        randomThemeRemove: function ( data, theme, chatFunctions ) {
+        randomThemeRemove: function ( data, theme, chatFunctions, documentationFunctions ) {
             const store = this.getThemeRandomizerStore();
             const timer = this.theTimer();
             let themeList = this.getRandomThemes( store );
@@ -179,6 +181,8 @@ const roomFunctions = ( bot ) => {
                 chatFunctions.botSpeak( 'The theme "' + theme + '" is not in the randomizer.', data );
                 timer( 1000 ).then( _ => this.readRandomThemes( data, chatFunctions ) );
             }
+
+            documentationFunctions.rebuildThemesDocumentation();
         },
 
         readRandomThemes: function ( data, chatFunctions ) {

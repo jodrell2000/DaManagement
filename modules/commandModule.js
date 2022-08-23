@@ -253,12 +253,12 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.readrandomthemes = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.readRandomThemes( data, chatFunctions ); }
     moderatorCommands.randomtheme.help = "Enable/Disable the theme randomizer";
 
-    moderatorCommands.randomthemeadd = ( { data, args, chatFunctions, roomFunctions } ) => { roomFunctions.randomThemeAdd( data, reassembleArgs( args ), chatFunctions ); }
+    moderatorCommands.randomthemeadd = ( { data, args, chatFunctions, roomFunctions, documentationFunctions } ) => { roomFunctions.randomThemeAdd( data, reassembleArgs( args ), chatFunctions, documentationFunctions ); }
     moderatorCommands.randomthemeadd.argumentCount = 1;
     moderatorCommands.randomthemeadd.help = "Add a theme to the randomizer";
     moderatorCommands.randomthemeadd.sampleArguments = [ "The Weather" ];
 
-    moderatorCommands.randomthemeremove = ( { data, args, chatFunctions, roomFunctions } ) => { roomFunctions.randomThemeRemove( data, reassembleArgs( args ), chatFunctions ); }
+    moderatorCommands.randomthemeremove = ( { data, args, chatFunctions, roomFunctions, documentationFunctions } ) => { roomFunctions.randomThemeRemove( data, reassembleArgs( args ), chatFunctions, documentationFunctions ); }
     moderatorCommands.randomthemeremove.argumentCount = 1;
     moderatorCommands.randomthemeremove.help = "Remove a theme from the randomizer";
     moderatorCommands.randomthemeremove.sampleArguments = [ "The Weather" ];
