@@ -164,7 +164,7 @@ const roomFunctions = ( bot ) => {
                 timer( 1000 ).then( _ => this.readRandomThemes( data, chatFunctions ) );
             }
 
-            documentationFunctions.rebuildThemesDocumentation();
+            documentationFunctions.rebuildThemesDocumentation( themeList );
         },
 
         randomThemeRemove: function ( data, theme, chatFunctions, documentationFunctions ) {
@@ -182,7 +182,7 @@ const roomFunctions = ( bot ) => {
                 timer( 1000 ).then( _ => this.readRandomThemes( data, chatFunctions ) );
             }
 
-            documentationFunctions.rebuildThemesDocumentation();
+            documentationFunctions.rebuildThemesDocumentation( themeList );
         },
 
         readRandomThemes: function ( data, chatFunctions ) {

@@ -95,13 +95,9 @@ const documentationFunctions = () => {
                 } );
         },
 
-        rebuildThemesDocumentation: function () {
+        rebuildThemesDocumentation: function ( theThemes ) {
             let writeData = require( 'fs' );
             writeData.writeFileSync( themesDocOutputFile, "<html><body>The Theme Randomizer currently contains the following themes!!<p><ul>\n" );
-
-            const dataFilePath = `${ dirname( require.main.filename ) }/data/` + themesDataFilename;
-            const store = new Storage( dataFilePath );
-            const theThemes = store.get( 'themes' );
 
             for ( let themeLoop of theThemes ) {
                 writeData.writeFileSync( themesDocOutputFile, "<li>" + themeLoop + "</li>\n", { flag: 'a+' } );
