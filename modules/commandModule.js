@@ -515,8 +515,15 @@ const commandFunctions = ( bot ) => {
         },
 
         parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions ) {
+            let senderID;
+
+            if ( data.command === "pmmed" ) {
+                senderID = data.senderid;
+            } else {
+                senderID = data.userid;
+            }
+
             console.log( "data:" + JSON.stringify( data ) );
-            const senderID = data.userid;
             console.log( "senderID:" + senderID + " Username:" + userFunctions.getUsername( senderID ) );
             console.log( "idMod:" + userFunctions.isUserModerator( senderID ) );
             const [ command, args, moderatorOnly ] = this.getCommandAndArguments( data.text, allCommands );
