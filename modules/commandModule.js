@@ -517,7 +517,7 @@ const commandFunctions = ( bot ) => {
         parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions ) {
             console.log( "data:" + data );
             const senderID = data.userid;
-            console.log( "senderID:" + senderID );
+            console.log( "senderID:" + senderID + " Username:" + userFunctions.getUsername( senderID ) );
             console.log( "idMod:" + userFunctions.isUserModerator( senderID ) );
             const [ command, args, moderatorOnly ] = this.getCommandAndArguments( data.text, allCommands );
             console.log( "command:" + command );
