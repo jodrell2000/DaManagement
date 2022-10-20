@@ -518,6 +518,7 @@ const commandFunctions = ( bot ) => {
             console.log( "data:" + data );
             const senderID = data.userid;
             console.log( "senderID:" + senderID );
+            console.log( "idMod:" + userFunctions.isUserModerator( senderID ) );
             const [ command, args, moderatorOnly ] = this.getCommandAndArguments( data.text, allCommands );
             if ( moderatorOnly && !userFunctions.isUserModerator( senderID ) ) {
                 chatFunctions.botSpeak( "Sorry, that function is only available to moderators", data );
