@@ -515,7 +515,7 @@ const commandFunctions = ( bot ) => {
         },
 
         parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions ) {
-            console.log( "data:" + data );
+            console.log( "data:" + JSON.stringify( data ) );
             const senderID = data.userid;
             console.log( "senderID:" + senderID + " Username:" + userFunctions.getUsername( senderID ) );
             console.log( "idMod:" + userFunctions.isUserModerator( senderID ) );
