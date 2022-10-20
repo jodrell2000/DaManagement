@@ -515,7 +515,9 @@ const commandFunctions = ( bot ) => {
         },
 
         parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions ) {
+            console.log( "data:" + data );
             const senderID = data.userid;
+            console.log( "senderID:" + senderID );
             const [ command, args, moderatorOnly ] = this.getCommandAndArguments( data.text, allCommands );
             if ( moderatorOnly && !userFunctions.isUserModerator( senderID ) ) {
                 chatFunctions.botSpeak( "Sorry, that function is only available to moderators", data );
