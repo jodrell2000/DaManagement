@@ -523,13 +523,7 @@ const commandFunctions = ( bot ) => {
                 senderID = data.userid;
             }
 
-            console.log( "data:" + JSON.stringify( data ) );
-            console.log( "senderID:" + senderID + " Username:" + userFunctions.getUsername( senderID ) );
-            console.log( "idMod:" + userFunctions.isUserModerator( senderID ) );
             const [ command, args, moderatorOnly ] = this.getCommandAndArguments( data.text, allCommands );
-            console.log( "command:" + command );
-            console.log( "args:" + args );
-            console.log( "moderatorOnly:" + moderatorOnly );
             if ( moderatorOnly && !userFunctions.isUserModerator( senderID ) ) {
                 chatFunctions.botSpeak( "Sorry, that function is only available to moderators", data );
             } else if ( args === 'dynamicChat' ) {
