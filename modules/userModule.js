@@ -223,12 +223,19 @@ const userFunctions = ( bot ) => {
 
         checkAndStoreUserRegion: function ( data, args, chatFunctions, videoFunctions ) {
             let theRegion = args[ 0 ].toUpperCase();
+            let validRegion = true;
             const userID = this.whoSentTheCommand( data );
 
-            if ( countryLookup.byIso( theRegion ) === null ) {
-                chatFunctions.botSpeak( 'That region is not recognised. Please use one of the 2 character ISO country codes, https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2', data );
-            } else {
+            if ( theRegion.length !== 2 ) {
+                validRegion = false;
+            } else if ( countryLookup.byIso( theRegion ) === null ) {
+                validRegion = false;
+            }
+
+            if ( validRegion ) {
                 this.storeUserRegion( data, userID, theRegion, chatFunctions, videoFunctions )
+            } else {
+                chatFunctions.botSpeak( 'That region is not recognised. Please use one of the 2 character ISO country codes, https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2', data );
             }
         },
 
