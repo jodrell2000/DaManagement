@@ -1107,7 +1107,11 @@ const userFunctions = ( bot ) => {
         },
 
         isUserBannedFromRoom: function ( userID ) {
+            console.group( "isUserBannedFromRoom" );
+            console.log( "userID:" + userID );
             const banned = bannedUsers.findIndex( ( { id } ) => id === userID );
+            console.log( "banned:" + banned );
+            console.groupEnd();
             return banned !== -1;
         },
 
