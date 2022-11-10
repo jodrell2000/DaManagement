@@ -1107,11 +1107,7 @@ const userFunctions = ( bot ) => {
         },
 
         isUserBannedFromRoom: function ( userID ) {
-            console.group( "isUserBannedFromRoom" );
-            console.log( "userID:" + userID );
             const banned = bannedUsers.findIndex( ( { id } ) => id === userID );
-            console.log( "banned:" + banned );
-            console.groupEnd();
 
             if ( banned !== -1 ) {
                 return true;
@@ -1671,11 +1667,8 @@ const userFunctions = ( bot ) => {
         },
 
         bootNewUserCheck: function ( userID, username ) {
-            console.group( "bootNewUserCheck" );
             let bootUser = false;
             let bootMessage = null;
-            console.log( "userID:" + userID );
-            console.log( "username:" + username );
 
             if ( roomDefaults.kickTTSTAT === true && username === "@ttstat" ) {
                 bootUser = true;
@@ -1692,7 +1685,6 @@ const userFunctions = ( bot ) => {
 
             //checks if user is on the banned list
             const thisUserIsBanned = this.isUserBannedFromRoom( userID );
-            console.log( "thisUserIsBanned;" + thisUserIsBanned );
             if ( thisUserIsBanned ) {
                 bootUser = true;
                 bootMessage = 'You are on the banned user list.';
@@ -1702,12 +1694,12 @@ const userFunctions = ( bot ) => {
             if ( userID === authModule.USERID ) {
                 bootUser = false;
             }
-            console.groupEnd();
             return [ bootUser, bootMessage ];
         },
 
         bootThisUser: function ( userID, bootMessage ) {
-            console.group( "bootThisUser" );
+            console.group( "! bootThisUser ===============================" );
+            console.log( '========================================' );
             if ( bootMessage == null ) {
                 console.log( "Booting userID:" + userID );
                 bot.boot( userID );

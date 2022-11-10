@@ -129,7 +129,6 @@ bot.on( 'registered', function ( data ) {
     userFunctions.userJoinsRoom( userID, username );
 
     const bootThisUser = userFunctions.bootNewUserCheck( userID, username );
-    console.log( "bootThisuser:" + bootThisUser )
     const bootUser = bootThisUser[ 0 ];
     const bootUserMessage = bootThisUser[ 1 ];
 
