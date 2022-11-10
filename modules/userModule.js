@@ -14,7 +14,7 @@ let modPM = []; //holds the userid's of everyone in the /modpm feature
 let djList = []; //holds the userid of all the dj's who are on stage currently
 let notifyThisDJ = null; // holds the ID of the DJ being told they're next in the queue
 
-let bannedUsers = [ { id: 636473737373 }, { id: 535253533353 }, { id: "604cfaa047c69b001b52cea5" }, { id: "60d14bf5cd1ec800127fb964" }, { id: "6042311dc2dbd9001be7872f" } ]; //banned users list, put userids in string form here for permanent banning(put their name after their userid to tell who is banned).
+let bannedUsers = [ { id: 636473737373 }, { id: 535253533353 }, { id: "604cfaa047c69b001b52cea5" }, { id: "60d14bf5cd1ec800127fb964" }, { id: "6042311dc2dbd9001be7872f" }, { id: "617a2526d1a3d9001c8cd086" } ]; //banned users list, put userids in string form here for permanent banning(put their name after their userid to tell who is banned).
 let permanentStageBan = [ { id: 636473737373 }, { id: 535253533353 } ]; //put userids in here to ban from djing permanently(put their name after their userid to tell who is banned)
 let vipList = [];
 /* this is the vip list, it accepts userids as input, this is for when you have a special guest or guests in your room and you only
@@ -1112,7 +1112,12 @@ const userFunctions = ( bot ) => {
             const banned = bannedUsers.findIndex( ( { id } ) => id === userID );
             console.log( "banned:" + banned );
             console.groupEnd();
-            return banned !== -1;
+
+            if ( banned !== -1 ) {
+                return true;
+            } else {
+                return false;
+            }
         },
 
         isUserIDOnStage: function ( userID ) {
