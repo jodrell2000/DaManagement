@@ -130,6 +130,8 @@ bot.on( 'registered', function ( data ) {
 
     const bootThisUser = userFunctions.bootNewUserCheck( userID, username );
     console.log( "bootThisuser:" + bootThisUser )
+    console.log( "bootThisuser:" + bootThisUser[ 0 ] )
+    console.log( "bootThisuser:" + bootThisUser[ 1 ] )
 
     if ( bootThisUser[ "bootUser" ] ) {
         userFunctions.bootThisUser( userID, bootThisUser[ "bootMessage" ] );
