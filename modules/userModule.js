@@ -1710,10 +1710,10 @@ const userFunctions = ( bot ) => {
             console.group( "bootThisUser" );
             if ( bootMessage == null ) {
                 console.log( "Booting userID:" + userID );
-                // bot.boot( userID )
+                bot.boot( userID )
             } else {
                 console.log( bootMessage );
-                // bot.bootUser(userID, bootMessage);
+                bot.bootUser( userID, bootMessage );
             }
             console.groupEnd();
         },
