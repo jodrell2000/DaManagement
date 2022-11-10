@@ -130,11 +130,11 @@ bot.on( 'registered', function ( data ) {
 
     const bootThisUser = userFunctions.bootNewUserCheck( userID, username );
     console.log( "bootThisuser:" + bootThisUser )
-    const bootUserID = bootThisUser[ 0 ];
+    const bootUser = bootThisUser[ 0 ];
     const bootUserMessage = bootThisUser[ 1 ];
 
-    if ( bootUserID !== false ) {
-        userFunctions.bootThisUser( bootUserID, bootUserMessage );
+    if ( bootUser !== false ) {
+        userFunctions.bootThisUser( userID, bootUserMessage );
     } else {
         chatFunctions.userGreeting( data, userID, username, roomFunctions, userFunctions )
     }
