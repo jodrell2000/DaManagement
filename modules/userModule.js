@@ -1712,7 +1712,7 @@ const userFunctions = ( bot ) => {
                 console.log( "Booting userID:" + userID );
                 bot.boot( userID );
             } else {
-                console.log( "Booting userID:" + userID + " with message:" + userIDbootMessage );
+                console.log( "Booting userID:" + userID + " with message:" + bootMessage );
                 bot.bootUser( userID, bootMessage );
             }
             console.groupEnd();
