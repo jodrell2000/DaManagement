@@ -129,9 +129,10 @@ bot.on( 'registered', function ( data ) {
     userFunctions.userJoinsRoom( userID, username );
 
     const bootThisUser = userFunctions.bootNewUserCheck( userID, username );
+    console.log( "bootThisuser:" + bootThisUser )
 
-    if ( bootThisUser.bootUser ) {
-        userFunctions.bootThisUser( userID, bootThisUser.bootMessage );
+    if ( bootThisUser[ "bootUser" ] ) {
+        userFunctions.bootThisUser( userID, bootThisUser[ "bootMessage" ] );
     } else {
         chatFunctions.userGreeting( data, userID, username, roomFunctions, userFunctions )
     }
