@@ -56,7 +56,7 @@ const botFunctions = ( bot ) => {
             const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve( "done" ), delay ) )
 
             const shutMeDown = async () => {
-                chatFunctions.botSpeak( "Going away now...", data, true );
+                chatFunctions.botSpeak( "I'll be back...", data, true );
                 await sleep( 100 )
                 userFunctions.debugPrintTheUsersList();
                 await sleep( 100 )
