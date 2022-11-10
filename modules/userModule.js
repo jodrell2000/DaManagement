@@ -1665,18 +1665,20 @@ const userFunctions = ( bot ) => {
             this.removeUserIsHere( userID );
         },
 
-        bootNewUserCheck: function () {
+        bootNewUserCheck: function ( userID, username ) {
+            console.group( "bootNewUserCheck" );
             let bootUser = false;
             let bootMessage = null;
-            const user = bot.data.user[ 0 ];
+            console.log( "userID:" + userID );
+            console.log( "username:" + username );
 
-            if ( roomDefaults.kickTTSTAT === true && user.name.match( '@ttstat' ) ) {
+            if ( roomDefaults.kickTTSTAT === true && username === "@ttstat" ) {
                 bootUser = true;
             }
 
             //checks to see if user is on the blacklist, if they are they are booted from the room.
             for ( let i = 0; i < roomDefaults.blackList.length; i++ ) {
-                if ( user.userid === roomDefaults.blackList[ i ] ) {
+                if ( userID === roomDefaults.blackList[ i ] ) {
                     bootUser = true;
                     bootMessage = 'You are on the user banned list.';
                     break;
@@ -1684,16 +1686,16 @@ const userFunctions = ( bot ) => {
             }
 
             //checks if user is on the banned list
-            if ( this.isUserBannedFromRoom( user.userid ) ) {
+            if ( this.isUserBannedFromRoom( userID ) ) {
                 bootUser = true;
                 bootMessage = 'You are on the banned user list.';
             }
 
             // don't let the bot boot itself!
-            if ( user.userid === authModule.USERID ) {
+            if ( userID === authModule.USERID ) {
                 bootUser = false;
             }
-
+            console.groupEnd();
             return [ bootUser, bootMessage ];
         },
 
