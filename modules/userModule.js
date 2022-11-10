@@ -1691,7 +1691,9 @@ const userFunctions = ( bot ) => {
             }
 
             //checks if user is on the banned list
-            if ( this.isUserBannedFromRoom( userID ) ) {
+            const thisUserIsBanned = this.isUserBannedFromRoom( userID );
+            console.log( "thisUserIsBanned;" + thisUserIsBanned );
+            if ( thisUserIsBanned ) {
                 bootUser = true;
                 bootMessage = 'You are on the banned user list.';
             }
@@ -1705,11 +1707,15 @@ const userFunctions = ( bot ) => {
         },
 
         bootThisUser: function ( userID, bootMessage ) {
+            console.group( bootThisUser );
             if ( bootMessage == null ) {
+                console.log( "Booting userID:" + userID );
                 // bot.boot( userID )
             } else {
+                console.log( bootMessage );
                 // bot.bootUser(userID, bootMessage);
             }
+            console.groupEnd();
         },
 
         greetNewuser: function ( userID, username, roomFunctions ) {
