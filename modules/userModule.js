@@ -1707,7 +1707,7 @@ const userFunctions = ( bot ) => {
         },
 
         bootThisUser: function ( userID, bootMessage ) {
-            console.group( bootThisUser );
+            console.group( "bootThisUser" );
             if ( bootMessage == null ) {
                 console.log( "Booting userID:" + userID );
                 // bot.boot( userID )
