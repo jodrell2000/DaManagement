@@ -531,7 +531,7 @@ const botFunctions = ( bot ) => {
                         // start the timer
                         roomFunctions.songLimitTimer = setTimeout( function () {
                             roomFunctions.songLimitTimer = null;
-                            userFunctions.removeDJ( roomFunctions.lastdj(), 'DJ removed because their song is over the length limit' ); // Remove Saved DJ from last newsong call
+                            userFunctions.removeDJ( theDJID, `DJ @${ djName } was removed because their song was over the length limit` ); // Remove Saved DJ from last newsong call
                         }, theTimeout * 1000 ); // Current DJ has 20 seconds to skip before they are removed
                     }
                 }
