@@ -511,6 +511,7 @@ const botFunctions = ( bot ) => {
             console.log( "data.room.metadata.current_dj:" + data.room.metadata.current_dj );
             console.log( "theDJID:" + theDJID );
             console.log( "djName:" + djName );
+            console.log( "djList:" + userFunctions.djList );
 
             //clears timers if previously set
             this.clearAllTimers( userFunctions, roomFunctions, songFunctions );
@@ -524,9 +525,10 @@ const botFunctions = ( bot ) => {
                 if ( theDJID === authModule.USERID || masterIndex === -1 ) //if dj is the bot or not a master
                 {
                     if ( musicDefaults.songLengthLimitOn === true ) {
+                        //nextDJName = ;
                         bot.speak( `@${ djName }, your song is over ${ musicDefaults.songLengthLimit } mins long, you have 60 seconds to skip before being removed.` );
 
-                        //START THE 20 SEC TIMER
+                        // start the timer
                         roomFunctions.songLimitTimer = setTimeout( function () {
                             roomFunctions.songLimitTimer = null;
                             userFunctions.removeDJ( roomFunctions.lastdj(), 'DJ removed because their song is over the length limit' ); // Remove Saved DJ from last newsong call
