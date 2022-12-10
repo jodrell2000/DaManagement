@@ -526,7 +526,7 @@ const botFunctions = ( bot ) => {
                     if ( musicDefaults.songLengthLimitOn === true ) {
                         console.log( "roomFunctions.lastdj():" + roomFunctions.lastdj() );
                         console.log( "userFunctions.theUsersList():" + userFunctions.theUsersList() );
-                        console.log( "userFunctions.theUsersList().indexOf( roomFunctions.lastdj():" + userFunctions.theUsersList().indexOf( roomFunctions.lastdj() );
+                        console.log( "userFunctions.theUsersList().indexOf( roomFunctions.lastdj():" + userFunctions.theUsersList().indexOf( roomFunctions.lastdj() ) );
                         const currentDJ = userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( roomFunctions.lastdj() ) + 1 ];
                         console.log( "currentDJ:" + currentDJ );
                         let DJName = userFunctions.getUsername( currentDJ );
