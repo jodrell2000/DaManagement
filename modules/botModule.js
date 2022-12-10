@@ -504,10 +504,10 @@ const botFunctions = ( bot ) => {
 
         checkOnNewSong: function ( data, roomFunctions, songFunctions, userFunctions ) {
             console.group( "checkOnNewSong" );
-            let length = data.room.metadata.current_song.metadata.length;
-            let masterIndex; //used to tell whether current dj is on the master id's list or not
-            let theDJID = data.room.metadata.current_dj;
-            let djName = userFunctions.getUsername( theDJID );
+            const length = data.room.metadata.current_song.metadata.length;
+            const masterIndex = userFunctions.masterIds().indexOf( roomFunctions.lastdj() ); //used to tell whether current dj is on the master id's list or not
+            const theDJID = data.room.metadata.current_dj;
+            const djName = userFunctions.getUsername( theDJID );
             console.log( "data.room.metadata.current_dj:" + data.room.metadata.current_dj );
             console.log( "theDJID:" + theDJID );
             console.log( "djName:" + djName );
@@ -515,8 +515,6 @@ const botFunctions = ( bot ) => {
 
             //clears timers if previously set
             this.clearAllTimers( userFunctions, roomFunctions, songFunctions );
-
-            masterIndex = userFunctions.masterIds().indexOf( roomFunctions.lastdj() ); //master id's check
 
             songFunctions.startSongWatchdog( data, userFunctions, roomFunctions );
 
@@ -526,8 +524,9 @@ const botFunctions = ( bot ) => {
                 if ( theDJID === authModule.USERID || masterIndex === -1 ) //if dj is the bot or not a master
                 {
                     if ( musicDefaults.songLengthLimitOn === true ) {
-                        //nextDJName = ;
+                        const nextDJName = userFunctions.getUsername( userFunctions.getNextDJ() );
                         bot.speak( `@${ djName }, your song is over ${ musicDefaults.songLengthLimit } mins long, you have 60 seconds to skip before being removed.` );
+                        bot.speak( `@${ nextDJName }, make sure you've got something ready ;-)` );
 
                         // start the timer
                         roomFunctions.songLimitTimer = setTimeout( function () {
