@@ -1095,20 +1095,15 @@ const userFunctions = ( bot ) => {
         },
 
         getNextDJ: function () {
-            console.group( "getNextDJ" );
             let nextDJID;
             const currentDJID = this.getCurrentDJID();
-            console.log( "currentDJ:" + currentDJID );
             const currentDJPosition = djList.indexOf( currentDJID );
-            console.log( "currentDJPosition:" + currentDJPosition );
 
             nextDJID = djList[ currentDJPosition + 1 ];
-            console.log( "nextDJID:" + nextDJID );
 
             if ( nextDJID + 1 > this.howManyDJs() || nextDJID === undefined ) {
                 nextDJID = djList[ 0 ];
             }
-            console.log( "nextDJID:" + nextDJID );
 
             return nextDJID;
         },
