@@ -503,39 +503,31 @@ const botFunctions = ( bot ) => {
         },
 
         checkOnNewSong: function ( data, roomFunctions, songFunctions, userFunctions ) {
-            let length = data.room.metadata.current_song.metadata.length;
-            let masterIndex; //used to tell whether current dj is on the master id's list or not
+            const length = data.room.metadata.current_song.metadata.length;
+            const theDJID = data.room.metadata.current_dj;
+            const masterIndex = userFunctions.masterIds().indexOf( theDJID ); //used to tell whether current dj is on the master id's list or not
+            const djName = userFunctions.getUsername( theDJID );
 
             //clears timers if previously set
             this.clearAllTimers( userFunctions, roomFunctions, songFunctions );
 
-            // Set this after processing things from last timer calls
-            roomFunctions.setLastDJ( data.room.metadata.current_dj );
-            masterIndex = userFunctions.masterIds().indexOf( roomFunctions.lastdj() ); //master id's check
-
             songFunctions.startSongWatchdog( data, userFunctions, roomFunctions );
 
-            //this boots the user if their song is over the length limit
-            if ( ( length / 60 ) >= musicDefaults.songLengthLimit ) {
-                if ( roomFunctions.lastdj() === authModule.USERID || masterIndex === -1 ) //if dj is the bot or not a master
+            //this removes the user from the stage if their song is over the length limit and the don't skip
+            let theTimeout = 60;
+            if ( ( length / theTimeout ) >= musicDefaults.songLengthLimit ) {
+                if ( theDJID === authModule.USERID || masterIndex === -1 ) //if dj is the bot or not a master
                 {
                     if ( musicDefaults.songLengthLimitOn === true ) {
-                        const currentDJ = userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( roomFunctions.lastdj() ) + 1 ];
-                        let DJName = `Current dj`;
+                        const nextDJName = userFunctions.getUsername( userFunctions.getNextDJ() );
+                        bot.speak( `@${ djName }, your song is over ${ musicDefaults.songLengthLimit } mins long, you have 60 seconds to skip before being removed.` );
+                        bot.speak( `@${ nextDJName }, make sure you've got something ready ;-)` );
 
-                        if ( currentDJ ) {
-                            if ( currentDJ.hasOwnProperty( `name` ) ) {
-                                DJName = `@${ currentDJ.name }`;
-                            }
-                        }
-
-                        bot.speak( `${ DJName }, your song is over ${ musicDefaults.songLengthLimit } mins long, you have 20 seconds to skip before being removed.` );
-
-                        //START THE 20 SEC TIMER
+                        // start the timer
                         roomFunctions.songLimitTimer = setTimeout( function () {
                             roomFunctions.songLimitTimer = null;
-                            userFunctions.removeDJ( roomFunctions.lastdj(), 'DJ removed because their song is over the length limit' ); // Remove Saved DJ from last newsong call
-                        }, 20 * 1000 ); // Current DJ has 20 seconds to skip before they are removed
+                            userFunctions.removeDJ( theDJID, `DJ @${ djName } was removed because their song was over the length limit` ); // Remove Saved DJ from last newsong call
+                        }, theTimeout * 1000 ); // Current DJ has 20 seconds to skip before they are removed
                     }
                 }
             }

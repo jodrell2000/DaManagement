@@ -1094,6 +1094,20 @@ const userFunctions = ( bot ) => {
             return this.getCurrentDJID() === this.getLastDJID();
         },
 
+        getNextDJ: function () {
+            let nextDJID;
+            const currentDJID = this.getCurrentDJID();
+            const currentDJPosition = djList.indexOf( currentDJID );
+
+            nextDJID = djList[ currentDJPosition + 1 ];
+
+            if ( nextDJID + 1 > this.howManyDJs() || nextDJID === undefined ) {
+                nextDJID = djList[ 0 ];
+            }
+
+            return nextDJID;
+        },
+
 
         // ========================================================
 
