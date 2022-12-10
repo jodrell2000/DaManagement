@@ -106,9 +106,6 @@ const songFunctions = ( bot ) => {
         },
 
         announceSongLengthLimit: function ( data, chatFunctions ) {
-            console.log( data );
-            console.log( chatFunctions );
-
             let theMessage = "";
 
             theMessage = "The song length limit is now";
