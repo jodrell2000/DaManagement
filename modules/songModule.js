@@ -1,6 +1,6 @@
-let roomDefaults = require('../defaultSettings/roomDefaults.js');
-let botDefaults = require('../defaultSettings/botDefaults.js');
-let musicDefaults = require('../defaultSettings/musicDefaults.js');
+let roomDefaults = require( '../defaultSettings/roomDefaults.js' );
+let botDefaults = require( '../defaultSettings/botDefaults.js' );
+let musicDefaults = require( '../defaultSettings/musicDefaults.js' );
 
 let song = null; // info for the currently playing song, so default to null
 let album = null; // info for the currently playing song, so default to null
@@ -22,7 +22,7 @@ let curSongWatchdog = null; //used to hold the timer for stuck songs
 let takedownTimer = null; //used to hold the timer that fires after curSongWatchDog which represents the time a person with a stuck song has left to skip their song
 let votesLeft = roomDefaults.HowManyVotesToSkip;
 
-const songFunctions = (bot) => {
+const songFunctions = ( bot ) => {
     return {
         song: () => song,
         album: () => album,
@@ -39,34 +39,34 @@ const songFunctions = (bot) => {
         ALLREADYCALLED: () => ALLREADYCALLED,
 
         votesLeft: () => votesLeft,
-        setVotesLeft: function (value) { votesLeft = value; },
-        decrementVotesLeft: function ( ) { --votesLeft; },
+        setVotesLeft: function ( value ) { votesLeft = value; },
+        decrementVotesLeft: function () { --votesLeft; },
 
         // ========================================================
         // Playlist Functions
         // ========================================================
 
         loadPlaylist: function () {
-            bot.playlistAll(function (callback) {
+            bot.playlistAll( function ( callback ) {
                 botDefaults.botPlaylist = callback.list;
-            });
+            } );
         },
 
         randomisePlaylist: function () {
             let ez = 0;
-            bot.speak("Reorder initiated.");
-            let reorder = setInterval(function () {
-                if (ez <= botDefaults.botPlaylist.length) {
-                    let nextId = Math.ceil(Math.random() * botDefaults.botPlaylist.length);
-                    bot.playlistReorder(ez, nextId);
-                    console.log("Song " + ez + " changed.");
+            bot.speak( "Reorder initiated." );
+            let reorder = setInterval( function () {
+                if ( ez <= botDefaults.botPlaylist.length ) {
+                    let nextId = Math.ceil( Math.random() * botDefaults.botPlaylist.length );
+                    bot.playlistReorder( ez, nextId );
+                    console.log( "Song " + ez + " changed." );
                     ez++;
                 } else {
-                    clearInterval(reorder);
-                    console.log("Reorder Ended");
-                    bot.speak("Reorder completed.");
+                    clearInterval( reorder );
+                    console.log( "Reorder Ended" );
+                    bot.speak( "Reorder completed." );
                 }
-            }, 1000);
+            }, 1000 );
         },
 
         // ========================================================
@@ -77,19 +77,16 @@ const songFunctions = (bot) => {
 
         switchLengthLimit: function ( data, songLength, chatFunctions ) {
             let theMessage = "";
-            const theSongLength = songLength[0];
+            const theSongLength = songLength[ 0 ];
 
             if ( theSongLength === undefined ) {
                 this.swapSongLengthLimit( data, chatFunctions );
-            } else if ( isNaN(theSongLength) ) {
+            } else if ( isNaN( theSongLength ) ) {
                 theMessage = "The max song length must be a number"
                 chatFunctions.botSpeak( theMessage, data )
             } else {
                 musicDefaults.songLengthLimitOn = true;
                 musicDefaults.songLengthLimit = theSongLength;
-
-                console.log( data );
-                console.log( chatFunctions );
 
                 this.announceSongLengthLimit( data, chatFunctions );
             }
@@ -148,14 +145,14 @@ const songFunctions = (bot) => {
         // Song Stats Functions
         // ========================================================
 
-        previousUpVotes: () => previousSongStats['upvotes'],
-        previousDownVotes: () => previousSongStats['downvotes'],
-        previousSnags: () => previousSongStats['snags'],
+        previousUpVotes: () => previousSongStats[ 'upvotes' ],
+        previousDownVotes: () => previousSongStats[ 'downvotes' ],
+        previousSnags: () => previousSongStats[ 'snags' ],
 
-        grabSongStats: function ( ) {
-            previousSongStats['upvotes'] = upVotes;
-            previousSongStats['downvotes'] = downVotes;
-            previousSongStats['snags'] = this.snagCount();
+        grabSongStats: function () {
+            previousSongStats[ 'upvotes' ] = upVotes;
+            previousSongStats[ 'downvotes' ] = downVotes;
+            previousSongStats[ 'snags' ] = this.snagCount();
         },
 
         // ========================================================
@@ -170,7 +167,7 @@ const songFunctions = (bot) => {
             ytid = current_song.metadata.ytid;
         },
 
-        recordUpVotes: function (data) {
+        recordUpVotes: function ( data ) {
             upVotes = data.room.metadata.upvotes;
         },
 
@@ -178,7 +175,7 @@ const songFunctions = (bot) => {
             upVotes = 0;
         },
 
-        recordDownVotes: function (data) {
+        recordDownVotes: function ( data ) {
             downVotes = data.room.metadata.downvotes;
         },
 
@@ -198,7 +195,7 @@ const songFunctions = (bot) => {
             voteCountSkip += 1;
         },
 
-        resetVotesLeft: function (votesToSkip) {
+        resetVotesLeft: function ( votesToSkip ) {
             votesLeft = votesToSkip;
         },
 
@@ -210,36 +207,35 @@ const songFunctions = (bot) => {
             ALLREADYCALLED = true; //this makes it so that it can only be called once per song
         },
 
-        clearWatchDogTimer() {
+        clearWatchDogTimer () {
             // If watch dog has been previously set,
             // clear since we've made it to the next song
-            if (curSongWatchdog !== null)
-            {
-                clearTimeout(curSongWatchdog);
+            if ( curSongWatchdog !== null ) {
+                clearTimeout( curSongWatchdog );
                 curSongWatchdog = null;
             }
         },
 
-        clearTakedownTimer(userFunctions, roomFunctions) {
+        clearTakedownTimer ( userFunctions, roomFunctions ) {
             // If takedown Timer has been set, clear since we've made it to the next song
             if ( takedownTimer !== null && roomFunctions.lastdj() !== undefined ) {
-                clearTimeout(takedownTimer);
+                clearTimeout( takedownTimer );
                 takedownTimer = null;
 
-                if (typeof userFunctions.theUsersList()[userFunctions.theUsersList().indexOf(roomFunctions.lastdj()) + 1] !== 'undefined') {
-                    bot.speak("@" + userFunctions.theUsersList()[userFunctions.theUsersList().indexOf(roomFunctions.lastdj()) + 1] + ", Thanks buddy ;-)");
+                if ( typeof userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( roomFunctions.lastdj() ) + 1 ] !== 'undefined' ) {
+                    bot.speak( "@" + userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( roomFunctions.lastdj() ) + 1 ] + ", Thanks buddy ;-)" );
                 } else {
-                    bot.speak('Thanks buddy ;-)');
+                    bot.speak( 'Thanks buddy ;-)' );
                 }
             }
         },
 
-        startSongWatchdog(data, userFunctions, roomFunctions) {
+        startSongWatchdog ( data, userFunctions, roomFunctions ) {
             const length = data.room.metadata.current_song.metadata.length;
             const lastDJ = roomFunctions.lastdj();
 
             // Set a new watchdog timer for the current song.
-            curSongWatchdog = setTimeout(function () {
+            curSongWatchdog = setTimeout( function () {
                 curSongWatchdog = null;
 
                 if ( lastDJ !== undefined ) {
@@ -251,11 +247,11 @@ const songFunctions = (bot) => {
                 }
 
                 //START THE 20 SEC TIMER
-                takedownTimer = setTimeout(function () {
+                takedownTimer = setTimeout( function () {
                     takedownTimer = null;
                     userFunctions.removeDJ( lastDJ, 'DJ removed because of a stuck song issue' ); // Remove Saved DJ from last newsong call
-                }, 20 * 1000); // Current DJ has 20 seconds to skip before they are removed
-            }, (length + 10) * 1000); //Timer expires 10 seconds after the end of the song, if not cleared by a newsong
+                }, 20 * 1000 ); // Current DJ has 20 seconds to skip before they are removed
+            }, ( length + 10 ) * 1000 ); //Timer expires 10 seconds after the end of the song, if not cleared by a newsong
         }
     }
 }
