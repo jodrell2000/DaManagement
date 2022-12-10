@@ -128,11 +128,12 @@ bot.on( 'registered', function ( data ) {
 
     userFunctions.userJoinsRoom( userID, username );
 
-    const bootThisUser = userFunctions.bootNewUserCheck[ 0 ];
-    const bootMessage = userFunctions.bootNewUserCheck[ 1 ];
+    const bootThisUser = userFunctions.bootNewUserCheck( userID, username );
+    const bootUser = bootThisUser[ 0 ];
+    const bootUserMessage = bootThisUser[ 1 ];
 
-    if ( bootThisUser ) {
-        userFunctions.bootThisUser( userID, bootMessage );
+    if ( bootUser !== false ) {
+        userFunctions.bootThisUser( userID, bootUserMessage );
     } else {
         chatFunctions.userGreeting( data, userID, username, roomFunctions, userFunctions )
     }

@@ -14,13 +14,13 @@ let modPM = []; //holds the userid's of everyone in the /modpm feature
 let djList = []; //holds the userid of all the dj's who are on stage currently
 let notifyThisDJ = null; // holds the ID of the DJ being told they're next in the queue
 
-let bannedUsers = [ { id: 636473737373 }, { id: 535253533353 } ]; //banned users list, put userids in string form here for permanent banning(put their name after their userid to tell who is banned).
+let bannedUsers = [ { id: "625a5dd088b736001f4160c3", name: "MustardX" }, { id: "636e831117f5ac001d2331c7", name: "wub the fuzzizzle" }, { id: "6041125b3f4bfc001b27de48", name: "Eggman" }, { id: "617a2526d1a3d9001c8cd086", name: "Eggman" }, { id: "62b94b7388b736001dfd42da", name: "Eggman" }, { id: "61b457a8d1a3d9001ce3b8b0", name: "Eggman" }, { id: "604cfaa047c69b001b52cea5", name: "Eggman" }, { id: "61b460d8261cf0001dd4a8c6", name: "Eggman" }, { id: "61837c92caf438001c80d56a", name: "Eggman" } ]; //banned users list, put userids in string form here for permanent banning(put their name after their userid to tell who is banned).
 let permanentStageBan = [ { id: 636473737373 }, { id: 535253533353 } ]; //put userids in here to ban from djing permanently(put their name after their userid to tell who is banned)
 let vipList = [];
 /* this is the vip list, it accepts userids as input, this is for when you have a special guest or guests in your room and you only
    want to hear them dj, leave this empty unless you want everyone other than the people whos userids are in the vip list to be automatically kicked from stage. */
 
-let masterIds = [ '6040a0333f4bfc001be4cf39' ]; //example (clear this before using)
+let masterIds = [ '6040a0333f4bfc001be4cf39' ]; //example (clear this before using) 
 /*  This is the master id list, userid's that are put in here will not be affected by the song length limit, artist / song banning, the /skip command, or the dj afk limit.
     This is meant to explicitly give extra privileges to yourself and anyone else you want to put in here. It takes userid's as input in string format separated by commas.
     You can put the person's name in the array either before or after a userid to tell who it belongs to, it will not affect its ability to function. */
@@ -223,12 +223,19 @@ const userFunctions = ( bot ) => {
 
         checkAndStoreUserRegion: function ( data, args, chatFunctions, videoFunctions ) {
             let theRegion = args[ 0 ].toUpperCase();
+            let validRegion = true;
             const userID = this.whoSentTheCommand( data );
 
-            if ( countryLookup.byIso( theRegion ) === null ) {
-                chatFunctions.botSpeak( 'That region is not recognised. Please use one of the 2 character ISO country codes, https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2', data );
-            } else {
+            if ( theRegion.length !== 2 ) {
+                validRegion = false;
+            } else if ( countryLookup.byIso( theRegion ) === null ) {
+                validRegion = false;
+            }
+
+            if ( validRegion ) {
                 this.storeUserRegion( data, userID, theRegion, chatFunctions, videoFunctions )
+            } else {
+                chatFunctions.botSpeak( 'That region is not recognised. Please use one of the 2 character ISO country codes, https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2', data );
             }
         },
 
@@ -1101,7 +1108,12 @@ const userFunctions = ( bot ) => {
 
         isUserBannedFromRoom: function ( userID ) {
             const banned = bannedUsers.findIndex( ( { id } ) => id === userID );
-            return banned !== -1;
+
+            if ( banned !== -1 ) {
+                return true;
+            } else {
+                return false;
+            }
         },
 
         isUserIDOnStage: function ( userID ) {
@@ -1654,18 +1666,17 @@ const userFunctions = ( bot ) => {
             this.removeUserIsHere( userID );
         },
 
-        bootNewUserCheck: function () {
+        bootNewUserCheck: function ( userID, username ) {
             let bootUser = false;
             let bootMessage = null;
-            const user = bot.data.user[ 0 ];
 
-            if ( roomDefaults.kickTTSTAT === true && user.name.match( '@ttstat' ) ) {
+            if ( roomDefaults.kickTTSTAT === true && username === "@ttstat" ) {
                 bootUser = true;
             }
 
             //checks to see if user is on the blacklist, if they are they are booted from the room.
             for ( let i = 0; i < roomDefaults.blackList.length; i++ ) {
-                if ( user.userid === roomDefaults.blackList[ i ] ) {
+                if ( userID === roomDefaults.blackList[ i ] ) {
                     bootUser = true;
                     bootMessage = 'You are on the user banned list.';
                     break;
@@ -1673,25 +1684,30 @@ const userFunctions = ( bot ) => {
             }
 
             //checks if user is on the banned list
-            if ( this.isUserBannedFromRoom( user.userid ) ) {
+            const thisUserIsBanned = this.isUserBannedFromRoom( userID );
+            if ( thisUserIsBanned ) {
                 bootUser = true;
                 bootMessage = 'You are on the banned user list.';
             }
 
             // don't let the bot boot itself!
-            if ( user.userid === authModule.USERID ) {
+            if ( userID === authModule.USERID ) {
                 bootUser = false;
             }
-
             return [ bootUser, bootMessage ];
         },
 
         bootThisUser: function ( userID, bootMessage ) {
+            console.group( "! bootThisUser ===============================" );
+            console.log( '========================================' );
             if ( bootMessage == null ) {
-                // bot.boot( userID )
+                console.log( "Booting userID:" + userID );
+                bot.boot( userID );
             } else {
-                // bot.bootUser(userID, bootMessage);
+                console.log( "Booting userID:" + userID + " with message:" + bootMessage );
+                bot.bootUser( userID, bootMessage );
             }
+            console.groupEnd();
         },
 
         greetNewuser: function ( userID, username, roomFunctions ) {
