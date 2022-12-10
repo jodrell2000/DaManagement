@@ -66,12 +66,16 @@ const botFunctions = ( bot ) => {
             shutMeDown();
         },
 
+        getUptime: function () {
+            this.setUptimeTime( Date.now() );
+            return this.uptimeTime() - this.botStartTime();
+        },
+
         reportUptime: function ( data, userFunctions, chatFunctions ) {
             let msecPerMinute = 1000 * 60;
             let msecPerHour = msecPerMinute * 60;
             let msecPerDay = msecPerHour * 24;
-            this.setUptimeTime( Date.now() );
-            let currentTime = this.uptimeTime() - this.botStartTime();
+            let currentTime = this.getUptime();
 
             let days = Math.floor( currentTime / msecPerDay );
             currentTime = currentTime - ( days * msecPerDay );

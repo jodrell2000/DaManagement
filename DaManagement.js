@@ -63,8 +63,12 @@ setInterval( function () {
 
 // check if DJs are idle every minute
 setInterval( function () {
-    if ( userFunctions.removeIdleDJs() === true ) {
-        userFunctions.idledOutDJCheck( roomDefaults, chatFunctions );
+    console.log( "botFunctions.getUptime():" + botFunctions.getUptime() );
+    // only check for idle DJs if the bot has been up for more than a minute
+    if ( botFunctions.getUptime() > 6000 ) {
+        if ( userFunctions.removeIdleDJs() === true ) {
+            userFunctions.idledOutDJCheck( roomDefaults, chatFunctions );
+        }
     }
 }, 10 * 1000 );
 
