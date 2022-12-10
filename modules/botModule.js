@@ -508,10 +508,6 @@ const botFunctions = ( bot ) => {
             const theDJID = data.room.metadata.current_dj;
             const masterIndex = userFunctions.masterIds().indexOf( theDJID ); //used to tell whether current dj is on the master id's list or not
             const djName = userFunctions.getUsername( theDJID );
-            console.log( "data.room.metadata.current_dj:" + data.room.metadata.current_dj );
-            console.log( "theDJID:" + theDJID );
-            console.log( "djName:" + djName );
-            console.log( "djList:" + JSON.stringify( userFunctions.djList() ) );
 
             //clears timers if previously set
             this.clearAllTimers( userFunctions, roomFunctions, songFunctions );
