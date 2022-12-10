@@ -1105,7 +1105,7 @@ const userFunctions = ( bot ) => {
             nextDJID = djList[ currentDJPosition + 1 ];
             console.log( "nextDJID:" + nextDJID );
 
-            if ( nextDJID + 1 > this.howManyDJs() ) {
+            if ( nextDJID + 1 > this.howManyDJs() || nextDJID === undefined ) {
                 nextDJID = djList[ 0 ];
             }
             console.log( "nextDJID:" + nextDJID );
