@@ -511,7 +511,7 @@ const botFunctions = ( bot ) => {
             console.log( "data.room.metadata.current_dj:" + data.room.metadata.current_dj );
             console.log( "theDJID:" + theDJID );
             console.log( "djName:" + djName );
-            console.log( "djList:" + userFunctions.djList );
+            console.log( "djList:" + JSON.stringify( userFunctions.djList() ) );
 
             //clears timers if previously set
             this.clearAllTimers( userFunctions, roomFunctions, songFunctions );
@@ -521,7 +521,8 @@ const botFunctions = ( bot ) => {
             songFunctions.startSongWatchdog( data, userFunctions, roomFunctions );
 
             //this removes the user from the stage if their song is over the length limit and the don't skip
-            if ( ( length / 60 ) >= musicDefaults.songLengthLimit ) {
+            let theTimeout = 60;
+            if ( ( length / theTimeout ) >= musicDefaults.songLengthLimit ) {
                 if ( theDJID === authModule.USERID || masterIndex === -1 ) //if dj is the bot or not a master
                 {
                     if ( musicDefaults.songLengthLimitOn === true ) {
@@ -532,7 +533,7 @@ const botFunctions = ( bot ) => {
                         roomFunctions.songLimitTimer = setTimeout( function () {
                             roomFunctions.songLimitTimer = null;
                             userFunctions.removeDJ( roomFunctions.lastdj(), 'DJ removed because their song is over the length limit' ); // Remove Saved DJ from last newsong call
-                        }, 60 * 1000 ); // Current DJ has 20 seconds to skip before they are removed
+                        }, theTimeout * 1000 ); // Current DJ has 20 seconds to skip before they are removed
                     }
                 }
             }
