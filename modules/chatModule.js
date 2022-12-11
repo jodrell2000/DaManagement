@@ -99,7 +99,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
                     this.pictureMessageTheDJ( senderID, receiverID, theMessages, thePictures, data, userFunctions )
                 }
 
-                if ( this.commandsToCount().indexOf( theCommand ) ) {
+                if ( this.commandsToCount().indexOf( theCommand ) !== -1 ) {
                     console.log( "theCommand:" + theCommand );
                     console.log( "receiverID:" + receiverID );
                     userFunctions.updateCommandCount( receiverID, theCommand );
