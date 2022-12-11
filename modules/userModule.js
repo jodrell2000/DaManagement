@@ -532,23 +532,15 @@ const userFunctions = ( bot ) => {
         // ========================================================
 
         getCommandCount: function ( receiverID, theCommand ) {
-            console.group( "getCommandCount" );
-            console.log( "count:" + theUsersList[ this.getPositionOnUsersList( receiverID ) ][ theCommand + 'Count' ] );
             if ( this.userExists( receiverID ) ) {
                 return theUsersList[ this.getPositionOnUsersList( receiverID ) ][ theCommand + 'Count' ];
             }
-            console.groupEnd();
         },
 
         updateCommandCount: function ( receiverID, theCommand ) {
-            console.group( "updateCommandCount" );
             let commandCount = this.getCommandCount( receiverID, theCommand );
             if ( commandCount === undefined ) { commandCount = 0 }
-            console.log( "receiverID:" + receiverID );
-            console.log( "theCommand:" + theCommand + 'Count' );
-            console.log( "commandCount:" + commandCount + 1 );
             this.storeUserData( receiverID, theCommand + 'Count', commandCount + 1 );
-            console.groupEnd();
         },
 
 

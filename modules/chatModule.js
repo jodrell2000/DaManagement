@@ -86,7 +86,6 @@ const chatFunctions = ( bot, roomDefaults ) => {
         },
 
         dynamicChatCommand: function ( data, userFunctions, theCommand ) {
-            console.group( "dynamicChatCommand" );
             if ( this.isThereADJ( userFunctions, data ) ) {
                 const receiverID = userFunctions.getCurrentDJID();
                 const senderID = userFunctions.whoSentTheCommand( data );
@@ -99,13 +98,10 @@ const chatFunctions = ( bot, roomDefaults ) => {
                     this.pictureMessageTheDJ( senderID, receiverID, theMessages, thePictures, data, userFunctions )
                 }
 
-                if ( this.commandsToCount().indexOf( theCommand ) !== -1 ) {
-                    console.log( "theCommand:" + theCommand );
-                    console.log( "receiverID:" + receiverID );
+                if ( this.commandsToCount().indexOf( theCommand ) !== -1 && receiverID !== senderID ) {
                     userFunctions.updateCommandCount( receiverID, theCommand );
                 }
             }
-            console.groupEnd();
         },
 
         commandsToCount: function () {
