@@ -1982,13 +1982,21 @@ const userFunctions = ( bot ) => {
 
         bbBoot: function ( data, chatFunctions ) {
             const theUserID = this.whoSentTheCommand( data );
-            const lastBooted = formatRelativeTime( ( Date.now() - this.getBBBootedTimestamp() ) / 1000 );
+            const msSinceLastBoot = Date.now() - this.getBBBootedTimestamp();
+            const formatttedLastBooted = formatRelativeTime( msSinceLastBoot );
 
-            chatFunctions.botSpeak( 'The date it ' + Date.now(), data );
-            chatFunctions.botSpeak( 'last timestamp is ' + this.getBBBootedTimestamp(), data );
-            chatFunctions.botSpeak( '@' + this.getUsername( theUserID ) + ' BB was last booted ' + lastBooted, data );
+            chatFunctions.botSpeak( 'The date is ' + Date.now(), data );
+            chatFunctions.botSpeak( 'last boot timestamp is ' + this.getBBBootedTimestamp(), data );
+            chatFunctions.botSpeak( 'ms since last boot ' + msSinceLastBoot, data );
 
-            this.updateBBBootedTimestamp();
+            chatFunctions.botSpeak( '@' + this.getUsername( theUserID ) + ' BB was last booted ' + formatttedLastBooted, data );
+
+            if ( msSinceLastBoot < 86400000 ) {
+                chatFunctions.botSpeak( "I'm not that mean...I'll only boot BB once every 24 hours", data );
+            } else {
+                this.updateBBBootedTimestamp();
+            }
+
         },
 
         getBBBootedTimestamp: function () {
