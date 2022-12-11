@@ -2013,7 +2013,7 @@ const userFunctions = ( bot ) => {
                         chatFunctions.botSpeak( "Goodbye @Bukkake", data );
                         await sleep( 5000 )
 
-                        const bootMessage = "Sorry @bukkake, you got booted by " + this.getUsername( bootingUserID );
+                        const bootMessage = "Sorry @bukkake, you got booted by @" + this.getUsername( bootingUserID );
                         this.bootThisUser( this.bbUserID(), bootMessage )
                         await sleep( 100 )
 
