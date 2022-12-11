@@ -1984,6 +1984,8 @@ const userFunctions = ( bot ) => {
             const theUserID = this.whoSentTheCommand( data );
             const lastBooted = formatRelativeTime( ( Date.now() - this.getBBBootedTimestamp() ) / 1000 );
 
+            chatFunctions.botSpeak( 'The date it ' + Date.now(), data );
+            chatFunctions.botSpeak( 'last timestamp is ' + this.getBBBootedTimestamp(), data );
             chatFunctions.botSpeak( '@' + this.getUsername( theUserID ) + ' BB was last booted ' + lastBooted, data );
 
             this.updateBBBootedTimestamp();
