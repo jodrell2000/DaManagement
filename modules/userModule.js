@@ -1989,11 +1989,32 @@ const userFunctions = ( bot ) => {
             chatFunctions.botSpeak( 'last boot timestamp is ' + this.getBBBootedTimestamp(), data );
             chatFunctions.botSpeak( 'ms since last boot ' + msSinceLastBoot, data );
 
-            chatFunctions.botSpeak( '@' + this.getUsername( theUserID ) + ' BB was last booted ' + formatttedLastBooted, data );
-
             if ( msSinceLastBoot < 86400000 ) {
-                chatFunctions.botSpeak( "I'm not that mean...I'll only boot BB once every 24 hours", data );
+                const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
+
+                const readInOrder = async () => {
+                    chatFunctions.botSpeak( "I'm not that mean...I'll only boot BB once every 24 hours", data );
+                    await sleep( 100 )
+
+                    chatFunctions.botSpeak( '@' + this.getUsername( theUserID ) + ' BB was last booted ' + formatttedLastBooted, data );
+                    await sleep( 100 )
+                }
+                readInOrder();
             } else {
+                const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
+
+                const performInOrder = async () => {
+                    chatFunctions.botSpeak( "Nah Nah Nah Nah, Nah Nah Nah Nah, Hey Hey Hey, Goodbye @Bukkake", data );
+                    await sleep( 1000 )
+
+                    chatFunctions.botSpeak( 'boot BB goes here', data );
+                    await sleep( 100 )
+
+                    this.updateBBBootedTimestamp();
+                    await sleep( 100 )
+                }
+                performInOrder();
+
                 this.updateBBBootedTimestamp();
             }
 
