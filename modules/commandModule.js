@@ -78,6 +78,9 @@ const commandFunctions = ( bot ) => {
     generalCommands.deletetrack = ( { data, botFunctions, userFunctions, chatFunctions, songFunctions } ) => { botFunctions.deleteCurrentTrackFromBotPlaylist( data, userFunctions, chatFunctions, songFunctions ); }
     generalCommands.deletetrack.help = "Delete whatever track Robo is currently playing";
 
+    generalCommands.bbboot = ( { data, userFunctions, chatFunctions } ) => { userFunctions.bbBoot( data, chatFunctions ); }
+    generalCommands.bbboot.help = "BBBoot @Bukkake";
+
     // #############################################
     // General user Queue commands
     // #############################################

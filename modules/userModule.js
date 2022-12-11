@@ -1970,6 +1970,75 @@ const userFunctions = ( bot ) => {
             }
         },
 
+        // ========================================================
+
+        // ========================================================
+        // Special Functions
+        // ========================================================
+
+        bbUserID: function () {
+            return "604154083f4bfc001c3a42ed";
+        },
+
+        bbBoot: function ( data, chatFunctions ) {
+            const bootingUserID = this.whoSentTheCommand( data );
+            if ( this.isUserHere( this.bbUserID() ) ) {
+                const msSinceLastBoot = Date.now() - this.getBBBootedTimestamp();
+                const formatttedLastBooted = formatRelativeTime( msSinceLastBoot / 1000 );
+
+                if ( msSinceLastBoot < 86400000 ) {
+                    const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
+
+                    const readInOrder = async () => {
+                        chatFunctions.botSpeak( "I'm not that mean...I'll only boot BB once every 24 hours", data );
+                        await sleep( 100 )
+
+                        chatFunctions.botSpeak( '@' + this.getUsername( bootingUserID ) + ' BB was last booted ' + formatttedLastBooted + ' ago', data );
+                        await sleep( 100 )
+                    }
+                    readInOrder();
+                } else {
+                    const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
+
+                    const performInOrder = async () => {
+                        chatFunctions.botSpeak( "Nah Nah Nah Nah...", data );
+                        await sleep( 2000 )
+
+                        chatFunctions.botSpeak( "Nah Nah Nah Nah...", data );
+                        await sleep( 2000 )
+
+                        chatFunctions.botSpeak( "Hey Hey Hey...", data );
+                        await sleep( 2000 )
+
+                        chatFunctions.botSpeak( "Goodbye @Bukkake", data );
+                        await sleep( 5000 )
+
+                        const bootMessage = "Sorry @bukkake, you got booted by @" + this.getUsername( bootingUserID );
+                        this.bootThisUser( this.bbUserID(), bootMessage )
+                        await sleep( 100 )
+
+                        this.updateBBBootedTimestamp();
+                        await sleep( 100 )
+                    }
+                    performInOrder();
+
+                    this.updateBBBootedTimestamp();
+                }
+            } else {
+                chatFunctions.botSpeak( 'Sorry @' + this.getUsername( bootingUserID ) + ", but I can't boot BB if they're not here!", data );
+            }
+
+        },
+
+        getBBBootedTimestamp: function () {
+            if ( this.userExists( this.bbUserID() ) ) {
+                return theUsersList[ this.getPositionOnUsersList( this.bbUserID() ) ][ 'BBBootTimestamp' ];
+            }
+        },
+
+        updateBBBootedTimestamp: function () {
+            this.storeUserData( this.bbUserID(), "BBBootTimestamp", Date.now() );
+        },
 
         // ========================================================
 
