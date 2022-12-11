@@ -1982,36 +1982,49 @@ const userFunctions = ( bot ) => {
 
         bbBoot: function ( data, chatFunctions ) {
             const theUserID = this.whoSentTheCommand( data );
-            const msSinceLastBoot = Date.now() - this.getBBBootedTimestamp();
-            const formatttedLastBooted = formatRelativeTime( msSinceLastBoot / 1000 );
+            if ( this.isUserHere( this.bbUserID() ) ) {
+                const msSinceLastBoot = Date.now() - this.getBBBootedTimestamp();
+                const formatttedLastBooted = formatRelativeTime( msSinceLastBoot / 1000 );
 
-            if ( msSinceLastBoot < 86400000 ) {
-                const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
+                if ( msSinceLastBoot < 86400000 ) {
+                    const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
 
-                const readInOrder = async () => {
-                    chatFunctions.botSpeak( "I'm not that mean...I'll only boot BB once every 24 hours", data );
-                    await sleep( 100 )
+                    const readInOrder = async () => {
+                        chatFunctions.botSpeak( "I'm not that mean...I'll only boot BB once every 24 hours", data );
+                        await sleep( 100 )
 
-                    chatFunctions.botSpeak( '@' + this.getUsername( theUserID ) + ' BB was last booted ' + formatttedLastBooted + ' ago', data );
-                    await sleep( 100 )
-                }
-                readInOrder();
-            } else {
-                const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
+                        chatFunctions.botSpeak( '@' + this.getUsername( theUserID ) + ' BB was last booted ' + formatttedLastBooted + ' ago', data );
+                        await sleep( 100 )
+                    }
+                    readInOrder();
+                } else {
+                    const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
 
-                const performInOrder = async () => {
-                    chatFunctions.botSpeak( "Nah Nah Nah Nah, Nah Nah Nah Nah, Hey Hey Hey, Goodbye @Bukkake", data );
-                    await sleep( 1000 )
+                    const performInOrder = async () => {
+                        chatFunctions.botSpeak( "Nah Nah Nah Nah...", data );
+                        await sleep( 2000 )
 
-                    chatFunctions.botSpeak( 'boot BB goes here', data );
-                    await sleep( 100 )
+                        chatFunctions.botSpeak( "Nah Nah Nah Nah...", data );
+                        await sleep( 2000 )
+
+                        chatFunctions.botSpeak( "Hey Hey Hey...", data );
+                        await sleep( 2000 )
+
+                        chatFunctions.botSpeak( "Goodbye @Bukkake", data );
+                        await sleep( 5000 )
+
+                        chatFunctions.botSpeak( 'boot BB command goes here', data );
+                        await sleep( 100 )
+
+                        this.updateBBBootedTimestamp();
+                        await sleep( 100 )
+                    }
+                    performInOrder();
 
                     this.updateBBBootedTimestamp();
-                    await sleep( 100 )
                 }
-                performInOrder();
-
-                this.updateBBBootedTimestamp();
+            } else {
+                chatFunctions.botSpeak( 'Sorry @' + this.getUsername( theUserID ) + ", but I can't boot BB if they're not here!", data );
             }
 
         },
