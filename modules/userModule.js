@@ -1985,10 +1985,6 @@ const userFunctions = ( bot ) => {
             const msSinceLastBoot = Date.now() - this.getBBBootedTimestamp();
             const formatttedLastBooted = formatRelativeTime( msSinceLastBoot / 1000 );
 
-            chatFunctions.botSpeak( 'The date is ' + Date.now(), data );
-            chatFunctions.botSpeak( 'last boot timestamp is ' + this.getBBBootedTimestamp(), data );
-            chatFunctions.botSpeak( 'ms since last boot ' + msSinceLastBoot, data );
-
             if ( msSinceLastBoot < 86400000 ) {
                 const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
 
@@ -1996,7 +1992,7 @@ const userFunctions = ( bot ) => {
                     chatFunctions.botSpeak( "I'm not that mean...I'll only boot BB once every 24 hours", data );
                     await sleep( 100 )
 
-                    chatFunctions.botSpeak( '@' + this.getUsername( theUserID ) + ' BB was last booted ' + formatttedLastBooted, data );
+                    chatFunctions.botSpeak( '@' + this.getUsername( theUserID ) + ' BB was last booted ' + formatttedLastBooted + ' ago', data );
                     await sleep( 100 )
                 }
                 readInOrder();
