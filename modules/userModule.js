@@ -528,6 +528,25 @@ const userFunctions = ( bot ) => {
         // ========================================================
 
         // ========================================================
+        // Command Count Functions
+        // ========================================================
+
+        getCommandCount: function ( receiverID, theCommand ) {
+            if ( this.userExists( receiverID ) ) {
+                return theUsersList[ this.getPositionOnUsersList( receiverID ) ][ theCommand + 'Count' ];
+            }
+        },
+
+        updateCommandCount: function ( receiverID, theCommand ) {
+            let commandCount = this.getCommandCount( receiverID, theCommand );
+            if ( commandCount === undefined ) { commandCount = 0 }
+            this.storeUserData( receiverID, theCommand + 'Count', commandCount + 1 );
+        },
+
+
+        // ========================================================
+
+        // ========================================================
         // VIP Functions
         // ========================================================
 

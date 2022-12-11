@@ -47,6 +47,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
             return theMessage
         },
 
+        // ========================================================
 
         // ========================================================
         // Misc chat functions
@@ -96,7 +97,16 @@ const chatFunctions = ( bot, roomDefaults ) => {
                 } else {
                     this.pictureMessageTheDJ( senderID, receiverID, theMessages, thePictures, data, userFunctions )
                 }
+
+                if ( this.commandsToCount().indexOf( theCommand ) !== -1 && receiverID !== senderID ) {
+                    userFunctions.updateCommandCount( receiverID, theCommand );
+                }
             }
+        },
+
+        commandsToCount: function () {
+            const countTheseCommands = [ "props", "noice", "epic" ];
+            return countTheseCommands;
         },
 
         getDynamicChatMessages: function ( theCommand ) {
