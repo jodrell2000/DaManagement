@@ -309,7 +309,9 @@ const userFunctions = ( bot ) => {
         // ========================================================
 
         storeUserData: function ( userID, key, value ) {
-            if ( this.userExists( userID ) ) {
+            console.log( "userID:" + userID );
+            console.log( "this.getUsername( userID ):" + this.getUsername( userID ) );
+            if ( this.userExists( userID ) && this.getUsername( userID ) !== "Guest" ) {
                 theUsersList[ this.getPositionOnUsersList( userID ) ][ key ] = value;
                 this.writeUserDataToDisk( userID );
             }
