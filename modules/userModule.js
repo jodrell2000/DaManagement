@@ -1970,6 +1970,34 @@ const userFunctions = ( bot ) => {
             }
         },
 
+        // ========================================================
+
+        // ========================================================
+        // Special Functions
+        // ========================================================
+
+        bbUserID: function () {
+            return "604154083f4bfc001c3a42ed";
+        },
+
+        bbBoot: function ( data, chatFunctions ) {
+            const theUserID = this.whoSentTheCommand( data );
+            const lastBooted = formatRelativeTime( ( Date.now() - this.getBBBootedTimestamp() ) / 1000 );
+
+            chatFunctions.botSpeak( '@' + this.getUsername( theUserID ) + ' BB was last booted ' + lastBooted, data );
+
+            this.updateBBBootedTimestamp();
+        },
+
+        getBBBootedTimestamp: function () {
+            if ( this.userExists( this.bbUserID() ) ) {
+                return theUsersList[ this.getPositionOnUsersList( this.bbUserID() ) ][ 'BBBootTimestamp' ];
+            }
+        },
+
+        updateBBBootedTimestamp: function () {
+            this.storeUserData( this.bbUserID(), "BBBootTimestamp", Date.now() );
+        },
 
         // ========================================================
 
