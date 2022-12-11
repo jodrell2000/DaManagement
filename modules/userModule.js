@@ -1977,12 +1977,11 @@ const userFunctions = ( bot ) => {
         // ========================================================
 
         bbUserID: function () {
-            return "604154083f4bfc001c3a42ef";
-            //return "604154083f4bfc001c3a42ed";
+            return "604154083f4bfc001c3a42ed";
         },
 
         bbBoot: function ( data, chatFunctions ) {
-            const theUserID = this.whoSentTheCommand( data );
+            const bootingUserID = this.whoSentTheCommand( data );
             if ( this.isUserHere( this.bbUserID() ) ) {
                 const msSinceLastBoot = Date.now() - this.getBBBootedTimestamp();
                 const formatttedLastBooted = formatRelativeTime( msSinceLastBoot / 1000 );
@@ -1994,7 +1993,7 @@ const userFunctions = ( bot ) => {
                         chatFunctions.botSpeak( "I'm not that mean...I'll only boot BB once every 24 hours", data );
                         await sleep( 100 )
 
-                        chatFunctions.botSpeak( '@' + this.getUsername( theUserID ) + ' BB was last booted ' + formatttedLastBooted + ' ago', data );
+                        chatFunctions.botSpeak( '@' + this.getUsername( bootingUserID ) + ' BB was last booted ' + formatttedLastBooted + ' ago', data );
                         await sleep( 100 )
                     }
                     readInOrder();
@@ -2014,7 +2013,8 @@ const userFunctions = ( bot ) => {
                         chatFunctions.botSpeak( "Goodbye @Bukkake", data );
                         await sleep( 5000 )
 
-                        chatFunctions.botSpeak( 'boot BB command goes here', data );
+                        const bootMessage = "Sorry @bukkake, you got booted by " + this.getUsername( bootingUserID );
+                        this.bootThisUser( this.bbUserID(), bootMessage )
                         await sleep( 100 )
 
                         this.updateBBBootedTimestamp();
@@ -2025,7 +2025,7 @@ const userFunctions = ( bot ) => {
                     this.updateBBBootedTimestamp();
                 }
             } else {
-                chatFunctions.botSpeak( 'Sorry @' + this.getUsername( theUserID ) + ", but I can't boot BB if they're not here!", data );
+                chatFunctions.botSpeak( 'Sorry @' + this.getUsername( bootingUserID ) + ", but I can't boot BB if they're not here!", data );
             }
 
         },
