@@ -2008,10 +2008,10 @@ const userFunctions = ( bot ) => {
                 if ( this.isBBHere() ) {
                     if ( this.canBBBoot( bootingUserID ) ) {
                         if ( this.canBBBeBooted() ) {
-                            const bootMessage = "Sorry @Bukkake, you got booted by @" + this.getUsername( bootingUserID ) + ". They win 5 RoboPoints!!!";
+                            const bootMessage = "Sorry @Bukkake, you got booted by @" + this.getUsername( bootingUserID ) + ". They win 5 RoboCoins!!!";
                             this.bbBootSomeone( data, this.bbUserID(), bootingUserID, bootMessage, chatFunctions );
                         } else {
-                            const bootMessage = "Sorry " + this.getUsername( bootingUserID ) + ", you lose. BB was booted within the last 24Hrs. @Bukkake wins 1 RoboPoint!";
+                            const bootMessage = "Sorry " + this.getUsername( bootingUserID ) + ", you lose. BB was booted within the last 24Hrs. @Bukkake wins 1 RoboCoin!";
                             this.bbBootSomeone( data, bootingUserID, bootingUserID, bootMessage, chatFunctions );
                         }
                     } else {
@@ -2088,37 +2088,37 @@ const userFunctions = ( bot ) => {
             performInOrder();
 
             if ( bootedUserID === this.bbUserID() ) {
-                this.updateRoboPoints( bootingUserID, this.getRoboPoints( bootingUserID ) + 5 )
+                this.updateRoboCoins( bootingUserID, this.getRoboCoins( bootingUserID ) + 5 )
             } else {
-                this.updateRoboPoints( this.bbUserID(), this.getRoboPoints( this.bbUserID() ) + 1 )
+                this.updateRoboCoins( this.bbUserID(), this.getRoboCoins( this.bbUserID() ) + 1 )
             }
         },
 
         // ========================================================
 
         // ========================================================
-        // Points Functions
+        // Coins Functions
         // ========================================================
 
-        getRoboPoints: function ( userID ) {
+        getRoboCoins: function ( userID ) {
             if ( this.userExists( userID ) ) {
-                let thePoints = theUsersList[ this.getPositionOnUsersList( userID ) ][ 'RoboPoints' ];
-                if ( thePoints === undefined ) {
-                    thePoints = 0;
+                let theCoins = theUsersList[ this.getPositionOnUsersList( userID ) ][ 'RoboCoins' ];
+                if ( theCoins === undefined ) {
+                    theCoins = 0;
                 }
 
-                return thePoints;
+                return theCoins;
             }
         },
 
-        updateRoboPoints: function ( userID, points ) {
-            this.storeUserData( userID, "RoboPoints", points );
+        updateRoboCoins: function ( userID, coins ) {
+            this.storeUserData( userID, "RoboCoins", coins );
         },
 
         readMyRoboCoin: function ( data, chatFunctions ) {
             const userID = this.whoSentTheCommand( data );
-            const thePoints = this.getRoboPoints( userID );
-            chatFunctions.botSpeak( '@' + this.getUsername( userID ) + " you currently have " + thePoints + " RoboCoins", data );
+            const theCoins = this.getRoboCoins( userID );
+            chatFunctions.botSpeak( '@' + this.getUsername( userID ) + " you currently have " + theCoins + " RoboCoins", data );
 
         },
 
