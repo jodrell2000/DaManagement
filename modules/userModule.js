@@ -2081,7 +2081,7 @@ const userFunctions = ( bot ) => {
                 chatFunctions.botSpeak( "Goodbye @" + this.getUsername( bootingUserID ), data );
                 await sleep( 5000 )
 
-                this.bootThisUser( this.bbUserID(), bootMessage )
+                this.bootThisUser( bootedUserID, bootMessage )
                 //chatFunctions.botSpeak( bootMessage, data );
                 await sleep( 100 )
 
