@@ -2003,14 +2003,18 @@ const userFunctions = ( bot ) => {
             const bootingUserID = this.whoSentTheCommand( data );
 
             if ( this.isBBHere() ) {
-                if ( this.canBBBeBooted() ) {
-                    const bootMessage = "Sorry @Bukkake, you got booted by @" + this.getUsername( bootingUserID ) + ". They win 5 RoboPoints!!!";
-                    this.bbBootSomeone( data, this.bbUserID(), bootingUserID, bootMessage, chatFunctions );
+                if ( this.canBBBoot( bootingUserID ) ) {
+                    if ( this.canBBBeBooted() ) {
+                        const bootMessage = "Sorry @Bukkake, you got booted by @" + this.getUsername( bootingUserID ) + ". They win 5 RoboPoints!!!";
+                        this.bbBootSomeone( data, this.bbUserID(), bootingUserID, bootMessage, chatFunctions );
+                    } else {
+                        const bootMessage = "Sorry " + this.getUsername( bootingUserID ) + ", you lose. BB was booted within the last 24Hrs. @Bukkake wins 1 RoboPoint!";
+                        this.bbBootSomeone( data, bootingUserID, bootingUserID, bootMessage, chatFunctions );
+                    }
                 } else {
-                    const bootMessage = "Sorry " + this.getUsername( bootingUserID ) + ", you lose. BB was booted within the last 24Hrs. @Bukkake wins 1 RoboPoint!";
-                    this.bbBootSomeone( data, bootingUserID, bootingUserID, bootMessage, chatFunctions );
+                    const formatttedLastBBBooted = formatRelativeTime( Date.now() - this.getBBBootedTimestamp( bootingUserID ) / 1000 );
+                    chatFunctions.botSpeak( 'Sorry @' + this.getUsername( bootingUserID ) + ", you can only play BBBoot once every 24Hrs. You last played " + formatttedLastBBBooted + " ago", data );
                 }
-
             } else {
                 chatFunctions.botSpeak( 'Sorry @' + this.getUsername( bootingUserID ) + ", but I can't boot BB if they're not here!", data );
             }
@@ -2037,6 +2041,10 @@ const userFunctions = ( bot ) => {
 
         canBBBeBooted: function () {
             return this.bbBootedMoreThan24Hrs( this.bbUserID() );
+        },
+
+        canBBBoot: function ( userID ) {
+            return this.bbBootedMoreThan24Hrs( userID );
         },
 
         bbBootedMoreThan24Hrs: function ( userID ) {
@@ -2105,7 +2113,7 @@ const userFunctions = ( bot ) => {
         readMyRoboCoin: function ( data, chatFunctions ) {
             const userID = this.whoSentTheCommand( data );
             const thePoints = this.getRoboPoints( userID );
-            chatFunctions.botSpeak( '@' + this.getUsername( userID ) + " you currently have " + thePoints + " Robo Coins", data );
+            chatFunctions.botSpeak( '@' + this.getUsername( userID ) + " you currently have " + thePoints + " RoboCoins", data );
 
         },
 
