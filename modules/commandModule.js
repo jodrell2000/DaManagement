@@ -79,7 +79,7 @@ const commandFunctions = ( bot ) => {
     generalCommands.deletetrack.help = "Delete whatever track Robo is currently playing";
 
     generalCommands.bbboot = ( { data, userFunctions, chatFunctions } ) => { userFunctions.bbBoot( data, chatFunctions ); }
-    generalCommands.bbboot.help = "BBBoot @Bukkake";
+    generalCommands.bbboot.help = "BBBoot @Bukkake. If it's been more thatn 24hrs since the last boot, BB gets booted. If it's been less, you do! ;-)";
 
     // #############################################
     // General user Queue commands

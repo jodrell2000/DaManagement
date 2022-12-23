@@ -1999,67 +1999,107 @@ const userFunctions = ( bot ) => {
             return "604154083f4bfc001c3a42ed";
         },
 
-        bbBoot: function ( data, chatFunctions ) {
+        bbboot: function ( data, chatFunctions ) {
             const bootingUserID = this.whoSentTheCommand( data );
-            if ( this.isUserHere( this.bbUserID() ) ) {
-                const msSinceLastBoot = Date.now() - this.getBBBootedTimestamp();
-                const formatttedLastBooted = formatRelativeTime( msSinceLastBoot / 1000 );
 
-                if ( msSinceLastBoot < 86400000 ) {
-                    const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
-
-                    const readInOrder = async () => {
-                        chatFunctions.botSpeak( "I'm not that mean...I'll only boot BB once every 24 hours", data );
-                        await sleep( 100 )
-
-                        chatFunctions.botSpeak( '@' + this.getUsername( bootingUserID ) + ' BB was last booted ' + formatttedLastBooted + ' ago', data );
-                        await sleep( 100 )
-                    }
-                    readInOrder();
+            if ( this.isBBHere() ) {
+                if ( this.canBBBeBooted() ) {
+                    const bootMessage = "Sorry @Bukkake, you got booted by @" + this.getUsername( bootingUserID ) + ". They win 5 RoboPoints!!!";
+                    this.bbBootSomeone( data, this.bbUserID(), bootingUserID, bootMessage, chatFunctions );
                 } else {
-                    const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
-
-                    const performInOrder = async () => {
-                        chatFunctions.botSpeak( "Nah Nah Nah Nah...", data );
-                        await sleep( 2000 )
-
-                        chatFunctions.botSpeak( "Nah Nah Nah Nah...", data );
-                        await sleep( 2000 )
-
-                        chatFunctions.botSpeak( "Hey Hey Hey...", data );
-                        await sleep( 2000 )
-
-                        chatFunctions.botSpeak( "Goodbye @Bukkake", data );
-                        await sleep( 5000 )
-
-                        const bootMessage = "Sorry @bukkake, you got booted by @" + this.getUsername( bootingUserID );
-                        this.bootThisUser( this.bbUserID(), bootMessage )
-                        await sleep( 100 )
-
-                        this.updateBBBootedTimestamp();
-                        await sleep( 100 )
-                    }
-                    performInOrder();
-
-                    this.updateBBBootedTimestamp();
+                    const bootMessage = "Sorry " + this.getUsername( bootingUserID ) + ", you lose. BB was booted within the last 24Hrs. @Bukkake wins 1 RoboPoint!";
+                    this.bbBootSomeone( data, bootingUserID, bootingUserID, bootMessage, chatFunctions );
                 }
+
             } else {
                 chatFunctions.botSpeak( 'Sorry @' + this.getUsername( bootingUserID ) + ", but I can't boot BB if they're not here!", data );
             }
 
         },
 
-        getBBBootedTimestamp: function () {
-            if ( this.userExists( this.bbUserID() ) ) {
-                return theUsersList[ this.getPositionOnUsersList( this.bbUserID() ) ][ 'BBBootTimestamp' ];
+        getBBBootedTimestamp: function ( userID ) {
+            if ( this.userExists( userID ) ) {
+                return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'BBBootTimestamp' ];
             }
         },
 
-        updateBBBootedTimestamp: function () {
-            this.storeUserData( this.bbUserID(), "BBBootTimestamp", Date.now() );
+        updateBBBootedTimestamp: function ( userID ) {
+            this.storeUserData( userID, "BBBootTimestamp", Date.now() );
+        },
+
+        isBBHere: function () {
+            if ( this.isUserHere( this.bbUserID() ) ) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+
+        canBBBeBooted: function () {
+            return this.bbBootedMoreThan24Hrs( this.bbUserID() );
+        },
+
+        bbBootedMoreThan24Hrs: function ( userID ) {
+            const msSinceLastBoot = Date.now() - this.getBBBootedTimestamp( userID );
+
+            if ( msSinceLastBoot < 86400000 ) {
+                return false;
+            } else {
+                return true;
+            }
+        },
+
+        bbBootSomeone: function ( data, bootedUserID, bootingUserID, bootMessage, chatFunctions ) {
+            const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
+
+            const performInOrder = async () => {
+                chatFunctions.botSpeak( "Nah Nah Nah Nah...", data );
+                await sleep( 2000 )
+
+                chatFunctions.botSpeak( "Nah Nah Nah Nah...", data );
+                await sleep( 2000 )
+
+                chatFunctions.botSpeak( "Hey Hey Hey...", data );
+                await sleep( 2000 )
+
+                chatFunctions.botSpeak( "Goodbye @" + this.getUsername( bootingUserID ), data );
+                await sleep( 5000 )
+
+                // this.bootThisUser( this.bbUserID(), bootMessage )
+                await sleep( 100 )
+
+                this.updateBBBootedTimestamp( bootedUserID );
+                await sleep( 100 )
+            }
+            performInOrder();
+
+            if ( bootedUserID === this.bbUserID() ) {
+                this.updateRoboPoints( bootingUserID, this.getRoboPoints( bootingUserID ) + 5 )
+            } else {
+                this.updateRoboPoints( this.bbUserID(), this.getRoboPoints( this.bbUserID() ) + 1 )
+            }
         },
 
         // ========================================================
+
+        // ========================================================
+        // Points Functions
+        // ========================================================
+
+        getRoboPoints: function ( userID ) {
+            if ( this.userExists( userID ) ) {
+                let thePoints = theUsersList[ this.getPositionOnUsersList( userID ) ][ 'RoboPoints' ];
+                if ( thePoints === undefined ) {
+                    thePoints = 0;
+                }
+
+                return thePoints;
+            }
+        },
+
+        updateRoboPoints: function ( userID, points ) {
+            this.storeUserData( userID, "RoboPoints", points );
+        }
 
     }
 }
