@@ -81,8 +81,8 @@ const commandFunctions = ( bot ) => {
     generalCommands.bbboot = ( { data, userFunctions, chatFunctions } ) => { userFunctions.bbBoot( data, chatFunctions ); }
     generalCommands.bbboot.help = "BBBoot @Bukkake. If it's been more thatn 24hrs since the last boot, BB gets booted. If it's been less, you do! ;-)";
 
-    generalCommands.roboPoints = ( { data, userFunctions, chatFunctions } ) => { userFunctions.readMyRoboPoints( data, chatFunctions ); }
-    generalCommands.roboPoints.help = "How many Robo points do you have?";
+    generalCommands.robocoin = ( { data, userFunctions, chatFunctions } ) => { userFunctions.readMyRoboCoin( data, chatFunctions ); }
+    generalCommands.robocoin.help = "How many Robo points do you have?";
 
     // #############################################
     // General user Queue commands

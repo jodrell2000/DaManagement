@@ -2102,10 +2102,10 @@ const userFunctions = ( bot ) => {
             this.storeUserData( userID, "RoboPoints", points );
         },
 
-        readMyRoboPoints: function ( data, chatFunctions ) {
+        readMyRoboCoin: function ( data, chatFunctions ) {
             const userID = this.whoSentTheCommand( data );
             const thePoints = this.getRoboPoints( userID );
-            chatFunctions.botSpeak( '@' + this.getUsername( userID ) + " you currently have " + thePoints + " Robo Points", data );
+            chatFunctions.botSpeak( '@' + this.getUsername( userID ) + " you currently have " + thePoints + " Robo Coins", data );
 
         },
 
