@@ -1999,7 +1999,7 @@ const userFunctions = ( bot ) => {
             return "604154083f4bfc001c3a42ed";
         },
 
-        bbboot: function ( data, chatFunctions ) {
+        bbBoot: function ( data, chatFunctions ) {
             const bootingUserID = this.whoSentTheCommand( data );
 
             if ( this.isBBHere() ) {
