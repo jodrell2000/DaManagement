@@ -2066,6 +2066,7 @@ const userFunctions = ( bot ) => {
                 await sleep( 5000 )
 
                 // this.bootThisUser( this.bbUserID(), bootMessage )
+                chatFunctions.botSpeak( bootMessage, data );
                 await sleep( 100 )
 
                 this.updateBBBootedTimestamp( bootedUserID );
@@ -2099,7 +2100,14 @@ const userFunctions = ( bot ) => {
 
         updateRoboPoints: function ( userID, points ) {
             this.storeUserData( userID, "RoboPoints", points );
-        }
+        },
+
+        readMyRoboPoints: function ( data, chatFunctions ) {
+            const userID = this.whoSentTheCommand( data );
+            const thePoints = this.getRoboPoints( userID );
+            chatFunctions.botSpeak( '@' + this.getUsername( userID ) + " you currently have " + thePoints + " Robo Points", data );
+
+        },
 
     }
 }
