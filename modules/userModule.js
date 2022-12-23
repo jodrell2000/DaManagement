@@ -2004,6 +2004,9 @@ const userFunctions = ( bot ) => {
 
             if ( bootingUserID === this.bbUserID() ) {
                 chatFunctions.botSpeak( "You can't boot yourself @Bukkake, you ain't that flexible!", data );
+            } else if ( bootingUserID === authModule.USERID ) {
+                // you can't use the bot to speak the boot command
+                chatFunctions.botSpeak( "Yeah, nope...", data );
             } else {
                 if ( this.isBBHere() ) {
                     if ( this.canBBBoot( bootingUserID ) ) {
