@@ -21,6 +21,7 @@ let songModule = require( './modules/songModule.js' );
 let commandModule = require( './modules/commandModule.js' );
 let videoModule = require( './modules/videoModule.js' );
 let documentationModule = require( './modules/documentationModule.js' );
+let databaseModule = require( './modules/databaseModule.js' );
 
 const express = require( 'express' )
 const app = express();
@@ -49,6 +50,7 @@ const roomFunctions = roomModule( bot );
 const commandFunctions = commandModule( bot );
 const videoFunctions = videoModule( bot );
 const documentationFunctions = documentationModule();
+const databaseFunctions = databaseModule();
 
 // do something when the bot disconnects?
 // eslint-disable-next-line no-unused-vars
@@ -326,7 +328,7 @@ bot.on( 'speak', function ( data ) {
     userFunctions.updateUserLastSpoke( theUserID ); //update the afk position of the speaker
 
     if ( commandFunctions.wasThisACommand( data ) ) {
-        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions );
+        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions );
     }
 
     //checks to see if someone is trying to speak to an afk person or not.
@@ -343,7 +345,7 @@ bot.on( 'speak', function ( data ) {
 //checks when the bot recieves a pm
 bot.on( 'pmmed', function ( data ) {
     if ( commandFunctions.wasThisACommand( data ) ) {
-        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions );
+        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions );
     }
 } );
 

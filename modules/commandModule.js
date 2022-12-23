@@ -520,7 +520,7 @@ const commandFunctions = ( bot ) => {
             }
         },
 
-        parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions ) {
+        parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions ) {
             let senderID;
 
             if ( data.command === "pmmed" ) {
@@ -544,7 +544,8 @@ const commandFunctions = ( bot ) => {
                     songFunctions,
                     chatFunctions,
                     videoFunctions,
-                    documentationFunctions
+                    documentationFunctions,
+                    databaseFunctions
                 } );
             } else {
                 chatFunctions.botSpeak( "Sorry, that's not a command I recognise. Try " + chatDefaults.commandIdentifier + "list to find out more.", data );
