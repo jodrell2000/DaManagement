@@ -2002,21 +2002,25 @@ const userFunctions = ( bot ) => {
         bbBoot: function ( data, chatFunctions ) {
             const bootingUserID = this.whoSentTheCommand( data );
 
-            if ( this.isBBHere() ) {
-                if ( this.canBBBoot( bootingUserID ) ) {
-                    if ( this.canBBBeBooted() ) {
-                        const bootMessage = "Sorry @Bukkake, you got booted by @" + this.getUsername( bootingUserID ) + ". They win 5 RoboPoints!!!";
-                        this.bbBootSomeone( data, this.bbUserID(), bootingUserID, bootMessage, chatFunctions );
+            if ( bootingUserID === this.bbUserID() ) {
+                chatFunctions.botSpeak( "You can't boot yourself @Bukkake, you ain't that flexible!", data );
+                if ( this.isBBHere() ) {
+                    if ( this.canBBBoot( bootingUserID ) ) {
+                        if ( this.canBBBeBooted() ) {
+                            const bootMessage = "Sorry @Bukkake, you got booted by @" + this.getUsername( bootingUserID ) + ". They win 5 RoboPoints!!!";
+                            this.bbBootSomeone( data, this.bbUserID(), bootingUserID, bootMessage, chatFunctions );
+                        } else {
+                            const bootMessage = "Sorry " + this.getUsername( bootingUserID ) + ", you lose. BB was booted within the last 24Hrs. @Bukkake wins 1 RoboPoint!";
+                            this.bbBootSomeone( data, bootingUserID, bootingUserID, bootMessage, chatFunctions );
+                        }
                     } else {
-                        const bootMessage = "Sorry " + this.getUsername( bootingUserID ) + ", you lose. BB was booted within the last 24Hrs. @Bukkake wins 1 RoboPoint!";
-                        this.bbBootSomeone( data, bootingUserID, bootingUserID, bootMessage, chatFunctions );
+                        const msSinceLastBoot = Date.now() - this.getBBBootedTimestamp( bootingUserID );
+                        const formatttedLastBBBooted = formatRelativeTime( msSinceLastBoot / 1000 );
+                        chatFunctions.botSpeak( 'Sorry @' + this.getUsername( bootingUserID ) + ", you can only play BBBoot once every 24Hrs. You last played " + formatttedLastBBBooted + " ago", data );
                     }
                 } else {
-                    const formatttedLastBBBooted = formatRelativeTime( Date.now() - this.getBBBootedTimestamp( bootingUserID ) / 1000 );
-                    chatFunctions.botSpeak( 'Sorry @' + this.getUsername( bootingUserID ) + ", you can only play BBBoot once every 24Hrs. You last played " + formatttedLastBBBooted + " ago", data );
+                    chatFunctions.botSpeak( 'Sorry @' + this.getUsername( bootingUserID ) + ", but I can't boot BB if they're not here!", data );
                 }
-            } else {
-                chatFunctions.botSpeak( 'Sorry @' + this.getUsername( bootingUserID ) + ", but I can't boot BB if they're not here!", data );
             }
 
         },
