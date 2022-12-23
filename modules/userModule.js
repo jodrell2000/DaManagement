@@ -366,6 +366,17 @@ const userFunctions = ( bot ) => {
             theUsersList.push( userInfo );
         },
 
+        writeUserDataToDatabase: function () {
+
+        },
+
+        // ========================================================
+
+        // ========================================================
+        // Database Functions
+        // ========================================================
+
+
         // ========================================================
 
         readSingleUserStatus: function ( data, chatFunctions ) {
