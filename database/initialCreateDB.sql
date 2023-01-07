@@ -1,7 +1,18 @@
+CREATE DATABASE IF NOT EXISTS robotoDB;
+
 USE robotoDB;
 
+DROP TABLE IF EXISTS versions;
+CREATE TABLE versions (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  versionNo INT UNSIGNED NOT NULL
+);
+INSERT INTO versions (versionNo) VALUES (1);
+
+DROP TABLE IF EXISTS users;
 CREATE TABLE users (
   id CHAR(24) NOT NULL PRIMARY KEY,
+  userInfo JSON NOT NULL,
   username CHAR(100) NOT NULL,
   moderator CHAR(5) NOT NULL,
   joinTime BIGINT,
@@ -19,9 +30,6 @@ CREATE TABLE users (
   BBBootTimestamp BIGINT,
   noiceCount INT,
   propsCount INT,
-  RoboPoints INT,
   RoboCoins INT,
   here CHAR(5) NOT NULL
 );
-
-604154083f4bfc001c3a42ed

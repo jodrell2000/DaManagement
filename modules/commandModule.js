@@ -40,16 +40,16 @@ const commandFunctions = ( bot ) => {
     generalCommands.djplays = ( { data, userFunctions, chatFunctions } ) => { userFunctions.djPlaysCommand( data, chatFunctions ); }
     generalCommands.djplays.help = "How many track has each DJ played = current(total if different)";
 
-    generalCommands.escortme = ( { data, userFunctions, chatFunctions } ) => { userFunctions.enableEscortMe( data, chatFunctions ); }
+    generalCommands.escortme = ( { data, userFunctions, chatFunctions, databaseFunctions } ) => { userFunctions.enableEscortMe( data, chatFunctions, databaseFunctions ); }
     generalCommands.escortme.help = "Have yourself removed from the decks after your track finishes playing";
 
-    generalCommands.stopescortme = ( { data, userFunctions, chatFunctions } ) => { userFunctions.disableEscortMe( data, chatFunctions ); }
+    generalCommands.stopescortme = ( { data, userFunctions, chatFunctions, databaseFunctions } ) => { userFunctions.disableEscortMe( data, chatFunctions, databaseFunctions ); }
     generalCommands.stopescortme.help = "Stop yourself from being removed from the decks after your track finishes playing";
 
     generalCommands.whatsplaylimit = ( { data, userFunctions, chatFunctions } ) => { userFunctions.whatsPlayLimit( data, chatFunctions ); }
     generalCommands.whatsplaylimit.help = "Is the DJ Play Limit enabled, and if so what it's set to";
 
-    generalCommands.refresh = ( { data, botFunctions, userFunctions, chatFunctions } ) => { userFunctions.refreshCommand( data, chatFunctions, botFunctions ); }
+    generalCommands.refresh = ( { data, botFunctions, userFunctions, chatFunctions, databaseFunctions } ) => { userFunctions.refreshCommand( data, chatFunctions, botFunctions, databaseFunctions ); }
     generalCommands.refresh.help = "Hold your spot on stage for one minute if you need to refresh your browser";
 
     generalCommands.regionalerts = ( { data, botFunctions, videoFunctions, chatFunctions } ) => { botFunctions.reportRegionCheckStatus( data, videoFunctions, chatFunctions ); }
@@ -67,18 +67,18 @@ const commandFunctions = ( bot ) => {
     generalCommands.theme = ( { data, roomFunctions, chatFunctions } ) => { roomFunctions.readTheme( data, chatFunctions ); }
     generalCommands.theme.help = "Tells you what the current teme is, if there is one";
 
-    generalCommands.myregion = ( { data, args, userFunctions, chatFunctions, videoFunctions } ) => { userFunctions.checkAndStoreUserRegion( data, args, chatFunctions, videoFunctions ); }
+    generalCommands.myregion = ( { data, args, userFunctions, chatFunctions, videoFunctions, databaseFunctions } ) => { userFunctions.checkAndStoreUserRegion( data, args, chatFunctions, videoFunctions, databaseFunctions ); }
     generalCommands.myregion.argumentCount = 1;
     generalCommands.myregion.help = "Set the region you're in so that video regions can be checked automatically";
     generalCommands.myregion.sampleArguments = [ "GB" ];
 
-    generalCommands.noregion = ( { data, userFunctions, chatFunctions, videoFunctions } ) => { userFunctions.storeNoRegion( data, chatFunctions, videoFunctions ); }
+    generalCommands.noregion = ( { data, userFunctions, chatFunctions, videoFunctions, databaseFunctions } ) => { userFunctions.storeNoRegion( data, chatFunctions, videoFunctions, databaseFunctions ); }
     generalCommands.noregion.help = "Your regions will be removed and you won't be asked again to set one";
 
     generalCommands.deletetrack = ( { data, botFunctions, userFunctions, chatFunctions, songFunctions } ) => { botFunctions.deleteCurrentTrackFromBotPlaylist( data, userFunctions, chatFunctions, songFunctions ); }
     generalCommands.deletetrack.help = "Delete whatever track Robo is currently playing";
 
-    generalCommands.bbboot = ( { data, userFunctions, chatFunctions } ) => { userFunctions.bbBoot( data, chatFunctions ); }
+    generalCommands.bbboot = ( { data, userFunctions, chatFunctions, databaseFunctions } ) => { userFunctions.bbBoot( data, chatFunctions, databaseFunctions ); }
     generalCommands.bbboot.help = "BBBoot @Bukkake. If it's been more than 24hrs since the last boot, BB gets booted. If it's been less, you do! ;-)";
 
     generalCommands.robocoin = ( { data, userFunctions, chatFunctions } ) => { userFunctions.readMyRoboCoin( data, chatFunctions ); }
@@ -311,7 +311,7 @@ const commandFunctions = ( bot ) => {
     moderatorQueueCommands.queueoff = ( { data, userFunctions, chatFunctions } ) => { userFunctions.disableQueue( data, chatFunctions ) }
     moderatorQueueCommands.queueoff.help = "Disables the queue";
 
-    moderatorQueueCommands.setdjplaycount = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.setDJCurrentPlaycountCommand( data, args[ 0 ], reassembleArgs( args, 1 ), chatFunctions ) }
+    moderatorQueueCommands.setdjplaycount = ( { data, args, userFunctions, chatFunctions, databaseFunctions } ) => { userFunctions.setDJCurrentPlaycountCommand( data, args[ 0 ], reassembleArgs( args, 1 ), chatFunctions, databaseFunctions ) }
     moderatorQueueCommands.setdjplaycount.argumentCount = 2;
     moderatorQueueCommands.setdjplaycount.help = "Sets a DJs current playcount. This will let you give a DJ extra plays, or fewer, if the playLimit is set";
     moderatorQueueCommands.setdjplaycount.sampleArguments = [ 2, 'jodrell' ];
@@ -533,7 +533,7 @@ const commandFunctions = ( bot ) => {
             if ( moderatorOnly && !userFunctions.isUserModerator( senderID ) ) {
                 chatFunctions.botSpeak( "Sorry, that function is only available to moderators", data );
             } else if ( args === 'dynamicChat' ) {
-                chatFunctions.dynamicChatCommand( data, userFunctions, command );
+                chatFunctions.dynamicChatCommand( data, userFunctions, command, databaseFunctions );
             } else if ( command ) {
                 command.call( null, {
                     data,

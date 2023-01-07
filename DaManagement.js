@@ -68,7 +68,7 @@ setInterval( function () {
     // only check for idle DJs if the bot has been up for more than a minute
     if ( botFunctions.getUptime() > 60000 ) {
         if ( userFunctions.removeIdleDJs() === true ) {
-            userFunctions.idledOutDJCheck( roomDefaults, chatFunctions );
+            userFunctions.idledOutDJCheck( roomDefaults, chatFunctions, databaseFunctions );
         }
     }
 }, 10 * 1000 );
@@ -131,7 +131,7 @@ bot.on( 'registered', function ( data ) {
     const userID = data.user[ 0 ].userid;
     const username = data.user[ 0 ].name;
 
-    userFunctions.userJoinsRoom( userID, username );
+    userFunctions.userJoinsRoom( userID, username, databaseFunctions );
 
     const bootThisUser = userFunctions.bootNewUserCheck( userID, username );
     const bootUser = bootThisUser[ 0 ];
@@ -140,7 +140,7 @@ bot.on( 'registered', function ( data ) {
     if ( bootUser !== false ) {
         userFunctions.bootThisUser( userID, bootUserMessage );
     } else {
-        chatFunctions.userGreeting( data, userID, username, roomFunctions, userFunctions )
+        chatFunctions.userGreeting( data, userID, username, roomFunctions, userFunctions, databaseFunctions )
     }
 
     userFunctions.askUserToSetRegion( userID, chatFunctions );
@@ -150,7 +150,7 @@ bot.on( 'registered', function ( data ) {
 //starts up when a user leaves the room
 bot.on( 'deregistered', function ( data ) {
     let theUserID = data.user[ 0 ].userid;
-    userFunctions.deregisterUser( theUserID );
+    userFunctions.deregisterUser( theUserID, databaseFunctions );
     userFunctions.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
 } )
 
@@ -160,10 +160,10 @@ bot.on( 'roomChanged', function ( data ) {
         userFunctions.resetUsersList();
 
         // load in and user data on disk first
-        userFunctions.readAllUserDataFromDisk();
+        userFunctions.initialUserDataLoad( databaseFunctions );
 
         //reset arrays in case this was triggered by the bot restarting
-        userFunctions.resetAllWarnMe( data );
+        userFunctions.resetAllWarnMe( data, databaseFunctions );
 
         //get & set information
         roomFunctions.setRoomDefaults( data );
@@ -171,12 +171,12 @@ bot.on( 'roomChanged', function ( data ) {
         // build in the users in the room, skip any already loaded from disk
         userFunctions.rebuildUserList( data );
 
-        userFunctions.resetModerators( data );
-        userFunctions.startAllUserTimers();
+        userFunctions.resetModerators( data, databaseFunctions );
+        userFunctions.startAllUserTimers( databaseFunctions );
         userFunctions.resetDJs( data );
 
         // set user as current DJ
-        userFunctions.setCurrentDJ( data.room.metadata.current_dj );
+        userFunctions.setCurrentDJ( data.room.metadata.current_dj, databaseFunctions );
 
         // ask users for their regions if we don't have them
         userFunctions.checkUsersHaveRegions( data, chatFunctions );
@@ -208,7 +208,7 @@ bot.on( 'newsong', function ( data ) {
 
     // set user as current DJ
     let djID = data.room.metadata.current_dj;
-    userFunctions.setCurrentDJ( djID );
+    userFunctions.setCurrentDJ( djID, databaseFunctions );
 
     if ( songFunctions.ytid() !== undefined ) {
         videoFunctions.checkVideoRegionAlert( data, songFunctions.ytid(), userFunctions, chatFunctions, botFunctions );
@@ -325,7 +325,7 @@ bot.on( 'speak', function ( data ) {
     userFunctions.name = data.name; //name of latest person to say something
     botFunctions.recordActivity();
 
-    userFunctions.updateUserLastSpoke( theUserID ); //update the afk position of the speaker
+    userFunctions.updateUserLastSpoke( theUserID, databaseFunctions ); //update the afk position of the speaker
 
     if ( commandFunctions.wasThisACommand( data ) ) {
         commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions );
@@ -353,7 +353,7 @@ bot.on( 'pmmed', function ( data ) {
 bot.on( 'update_votes', function ( data ) {
     songFunctions.recordUpVotes( data );
     songFunctions.recordDownVotes( data );
-    userFunctions.updateUserLastVoted( data.room.metadata.votelog[ 0 ][ 0 ] ); //update the afk position of people who vote for a song
+    userFunctions.updateUserLastVoted( data.room.metadata.votelog[ 0 ][ 0 ], databaseFunctions ); //update the afk position of people who vote for a song
 
     //this is for /autosnag, automatically adds songs that get over the awesome threshold
     if ( botDefaults.autoSnag === true && songFunctions.snagSong() === false && songFunctions.upVotes() >= botDefaults.howManyVotes && songFunctions.ALLREADYCALLED() === false ) {
@@ -365,7 +365,7 @@ bot.on( 'update_votes', function ( data ) {
 //checks who added a song and updates their position on the afk list.
 bot.on( 'snagged', function ( data ) {
     songFunctions.incrementSnagCount();
-    userFunctions.updateUserLastSnagged( data.userid ); //update the afk position of people who add a song to their queue
+    userFunctions.updateUserLastSnagged( data.userid, databaseFunctions ); //update the afk position of people who add a song to their queue
 } )
 
 //this activates when a user joins the stage.
@@ -379,23 +379,23 @@ bot.on( 'add_dj', function ( data ) {
 
     if ( !OKToDJ ) {
         userFunctions.removeDJ( theUserID, 'User is not allowed to DJ so was removed' );
-        userFunctions.incrementSpamCounter( theUserID );
+        userFunctions.incrementSpamCounter( theUserID, databaseFunctions );
         chatFunctions.botSpeak( theMessage, data );
     }
 
     //sets dj's current songcount to zero when they enter the stage.
     //unless they used the refresh command, in which case its set to
     //what it was before they left the room
-    userFunctions.setDJCurrentPlayCount( theUserID, userFunctions.getUsersRefreshCurrentPlayCount[ theUserID ] );
+    userFunctions.setDJCurrentPlayCount( theUserID, userFunctions.getUsersRefreshCurrentPlayCount[ theUserID ], databaseFunctions );
 
     //keep the total playcount as it is, unless they've refreshed
     if ( totalPlayCount !== undefined ) {
-        userFunctions.setDJTotalPlayCount( theUserID, totalPlayCount );
+        userFunctions.setDJTotalPlayCount( theUserID, totalPlayCount, databaseFunctions );
     } else {
-        userFunctions.setDJTotalPlayCount( theUserID, userFunctions.getUsersRefreshTotalPlayCount[ theUserID ] );
+        userFunctions.setDJTotalPlayCount( theUserID, userFunctions.getUsersRefreshTotalPlayCount[ theUserID ], databaseFunctions );
     }
     //updates the afk position of the person who joins the stage.
-    userFunctions.updateUserJoinedStage( theUserID );
+    userFunctions.updateUserJoinedStage( theUserID, databaseFunctions );
 
     //adds a user to the Djs list when they join the stage.
     userFunctions.addDJToList( theUserID );
@@ -406,7 +406,7 @@ bot.on( 'add_dj', function ( data ) {
     }
 
     if ( userFunctions.isUserInRefreshList( theUserID ) ) {
-        userFunctions.removeRefreshFromUser( theUserID );
+        userFunctions.removeRefreshFromUser( theUserID, databaseFunctions );
     }
 
     //check to see if conditions are met for bot's autodjing feature
@@ -417,7 +417,7 @@ bot.on( 'add_dj', function ( data ) {
 bot.on( 'rem_dj', function ( data ) {
     let theUserID = data.user[ 0 ].userid;
     //removes user from the dj list when they leave the stage
-    userFunctions.resetDJFlags( theUserID );
+    userFunctions.resetDJFlags( theUserID, databaseFunctions );
 
     //gives them one chance to get off stage, then after that they're play limit is treated as normal
     if ( typeof userFunctions.getUsersRefreshCurrentPlayCount[ theUserID ] == 'number' && userFunctions.isUserInRefreshList( theUserID ) === false ) {
@@ -449,19 +449,19 @@ bot.on( 'rem_dj', function ( data ) {
 } );
 
 bot.on( 'update_user', function ( data ) {
-    userFunctions.updateUser( data );
+    userFunctions.updateUser( data, databaseFunctions );
 } )
 
 //updates the moderator list when a moderator is added.
 bot.on( 'new_moderator', function ( data ) {
     const theUserID = data.userid;
-    userFunctions.addModerator( theUserID )
+    userFunctions.addModerator( theUserID, databaseFunctions )
 } )
 
 //updates the moderator list when a moderator is removed.
 bot.on( 'rem_moderator', function ( data ) {
     const theUserID = data.userid;
-    userFunctions.removeModerator( theUserID )
+    userFunctions.removeModerator( theUserID, databaseFunctions )
 } )
 
 //activates at the end of a song.
@@ -472,7 +472,7 @@ bot.on( 'endsong', function ( data ) {
     //bot says song stats for each song
     chatFunctions.readSongStats( data, songFunctions, botFunctions )
 
-    userFunctions.incrementDJPlayCount( djID );
+    userFunctions.incrementDJPlayCount( djID, databaseFunctions );
 
     // check the playlimit and remove the current DJ if they've reached it
     userFunctions.removeDJsOverPlaylimit( data, chatFunctions, djID );

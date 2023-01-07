@@ -85,7 +85,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
             }
         },
 
-        dynamicChatCommand: function ( data, userFunctions, theCommand ) {
+        dynamicChatCommand: function ( data, userFunctions, theCommand, databaseFunctions ) {
             if ( this.isThereADJ( userFunctions, data ) ) {
                 const receiverID = userFunctions.getCurrentDJID();
                 const senderID = userFunctions.whoSentTheCommand( data );
@@ -99,7 +99,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
                 }
 
                 if ( this.commandsToCount().indexOf( theCommand ) !== -1 && receiverID !== senderID ) {
-                    userFunctions.updateCommandCount( receiverID, theCommand );
+                    userFunctions.updateCommandCount( receiverID, theCommand, databaseFunctions );
                 }
             }
         },
@@ -240,7 +240,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
 
         // ========================================================
 
-        userGreeting: function ( data, userID, theUsername, roomFunctions, userFunctions ) {
+        userGreeting: function ( data, userID, theUsername, roomFunctions, userFunctions, databaseFunctions ) {
             const customGreeting = userMessages.userGreetings.find( ( { id } ) => id === userID );
             let theMessage;
 
@@ -258,7 +258,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
             theMessage = theMessage.replace( "@roomName", roomFunctions.roomName() );
 
             if ( !userFunctions.isUsersWelcomeTimerActive( userID ) ) {
-                userFunctions.activateUsersWelcomeTimer( userID );
+                userFunctions.activateUsersWelcomeTimer( userID, databaseFunctions );
 
                 const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
                 const readInOrder = async () => {
