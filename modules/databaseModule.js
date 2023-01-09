@@ -12,6 +12,7 @@ const databaseFunctions = () => {
         // ========================================================
 
         runQuery: function ( query ) {
+            console.group( "runQuery" );
             return new Promise( ( resolve, reject ) => {
                 mysql.pool.getConnection( ( ex, connection ) => {
                     if ( ex ) {
@@ -25,6 +26,7 @@ const databaseFunctions = () => {
                                 console.log( "Query: " + query );
                                 console.log( "Rows: " + JSON.stringify( rows ) );
                                 console.log( "Fields: " + JSON.stringify( fields ) );
+                                console.groupEnd();
                                 return rows;
                             }
                         } );
@@ -149,19 +151,21 @@ const databaseFunctions = () => {
         // Song Data Functions
         // ========================================================
 
-        saveTrackData: function ( djID, songData ) {
-            console.group( "saveTrackData" );
-            console.log( "songData.artist:" + songData.metadata.artist )
-            console.log( "songData.song:" + songData.metadata.song )
-            const artistID = this.getArtistID( songData.metadata.artist );
-            const trackID = this.getTrackID( songData.metadata.song );
+        // saveTrackData: function ( djID, songData ) {
+        //     console.group( "saveTrackData" );
+        //     console.log( "songData.artist:" + songData.metadata.artist )
+        //     console.log( "songData.song:" + songData.metadata.song )
+        //     const trackID = this.getTrackID( songData.metadata.song );
 
-            console.log( "artistID:" + artistID );
-            console.log( "trackID:" + trackID );
-            let theQuery = `INSERT INTO tracksPlayed (artistID, trackID, djID) VALUES ("` + artistID + `", "` + trackID + `", "` + djID + `");`
-            this.runQuery( theQuery );
-            console.groupEnd();
-        },
+        //     this.getArtistID( songData.metadata.artist )
+        //         .then( ( row ) => { console.log( "row: " + row ) } );
+
+        //     console.log( "artistID:" + artistID );
+        //     console.log( "trackID:" + trackID );
+        //     let theQuery = `INSERT INTO tracksPlayed (artistID, trackID, djID) VALUES ("` + artistID + `", "` + trackID + `", "` + djID + `");`
+        //     this.runQuery( theQuery );
+        //     console.groupEnd();
+        // },
 
         // getArtistID: function ( artistName ) {
         //     console.group( "getArtistID" );
@@ -182,57 +186,66 @@ const databaseFunctions = () => {
         //     }
         // },
 
+        saveTrackData: function ( djID, songData ) {
+            console.group( "saveTrackData" );
+            this.getArtistID( songData.metadata.artist )
+                .then( ( artistID ) => {
+                    console.log( "artistID:" + artistID );
+                    this.getTrackID( songData.metadata.song )
+                        .then( ( trackID ) => {
+                            console.log( "trackID:" + trackID );
+                            let theQuery = `INSERT INTO tracksPlayed (artistID, trackID, djID) VALUES ("` + artistID + `", "` + trackID + `", "` + djID + `");`
+                            return this.runQuery( theQuery );
+                        } )
+                        .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
+                } )
+                .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
+            console.groupEnd();
+        },
+
         getArtistID: function ( artistName ) {
             console.group( "getArtistID" );
             const selectQuery = `SELECT id FROM artists WHERE artistName = "` + artistName + `";`;
             return this.runQuery( selectQuery )
                 .then( ( result ) => {
-                    if ( result != undefined ) {
+                    if ( result.length !== 0 ) {
+                        console.log( "result" + JSON.stringify( result ) );
                         return result
                     } else {
+                        console.log( "erm" );
                         const insertQuery = `INSERT INTO artists (artistName) VALUES ("` + artistName + `");`;
                         return this.runQuery( insertQuery )
                             .then( ( result ) => {
                                 return this.runQuery( selectQuery );
-
                             } );
                     }
+                } )
+                .then( ( row ) => {
+                    console.log( "row:" + JSON.stringify( row ) );
+                    return row[ 0 ][ 'id' ];
                 } )
                 .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
         },
 
-        addArtist: function ( artistName ) {
-            console.group( "addArtist" );
-            const insertQuery = `INSERT INTO artists (artistName) VALUES ("` + artistName + `");`;
-            console.log( "insertQuery:" + insertQuery );
-            this.runQuery( insertQuery );
-
-            const selectQuery = `SELECT id FROM artists WHERE artistName = "` + artistName + `";`;
-            console.log( "selectQuery:" + selectQuery );
-            let selectResult = this.runQuery( selectQuery );
-            console.log( "2nd artist select  result:" + selectResult );
-            console.groupEnd();
-        },
-
         getTrackID: function ( trackName ) {
             console.group( "getTrackID" );
-            const theQuery = `SELECT id FROM tracks WHERE trackName = "` + trackName + `";`;
-            let result = this.runQuery( theQuery );
-            console.log( "result:" + result );
-            if ( result !== undefined ) {
-                console.groupEnd();
-                return result;
-            } else {
-                console.groupEnd();
-                return this.addTrack( trackName );
-            }
-        },
-
-        addTrack: function ( trackName ) {
-            const insertQuery = `INSERT INTO tracks (trackName) VALUES ("` + trackName + `");`;
-            this.runQuery( insertQuery );
             const selectQuery = `SELECT id FROM tracks WHERE trackName = "` + trackName + `";`;
-            return this.runQuery( selectQuery );
+            return this.runQuery( selectQuery )
+                .then( ( result ) => {
+                    if ( result.length !== 0 ) {
+                        return result
+                    } else {
+                        const insertQuery = `INSERT INTO tracks (trackName) VALUES ("` + trackName + `");`;
+                        return this.runQuery( insertQuery )
+                            .then( ( result ) => {
+                                return this.runQuery( selectQuery );
+                            } );
+                    }
+                } )
+                .then( ( row ) => {
+                    return row[ 0 ][ 'id' ];
+                } )
+                .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
         },
 
         // ========================================================
