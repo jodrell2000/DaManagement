@@ -125,7 +125,7 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        deleteUserData: function ( databaseFunctions, theUsersList, userID, key ) {
+        deleteUserData: function ( databaseFunctions, userID, key ) {
             if ( this.userExists( userID ) ) {
                 delete theUsersList[ this.getPositionOnUsersList( userID ) ][ key ];
                 databaseFunctions.storeUserData( theUsersList[ this.getPositionOnUsersList( userID ) ] );
@@ -1938,7 +1938,7 @@ const userFunctions = ( bot ) => {
 
         removeEscortMeFromUser: function ( userID, databaseFunctions ) {
             if ( this.isUserInUsersList( userID ) ) {
-                this.deleteUserData( userID, "EscortMe" );
+                this.deleteUserData( databaseFunctions, userID, "EscortMe" );
             }
         },
 

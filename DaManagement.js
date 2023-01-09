@@ -445,7 +445,7 @@ bot.on( 'rem_dj', function ( data ) {
     botFunctions.checkAutoDJing( userFunctions );
 
     //takes a user off the escort list if they leave the stage.
-    userFunctions.removeEscortMeFromUser( theUserID );
+    userFunctions.removeEscortMeFromUser( theUserID, databaseFunctions );
 } );
 
 bot.on( 'update_user', function ( data ) {
