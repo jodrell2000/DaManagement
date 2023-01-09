@@ -304,7 +304,7 @@ bot.on( 'newsong', function ( data ) {
         roomFunctions.announceNewRandomThene( data, chatFunctions );
     }
 
-    databaseFunctions.saveTrackData( databaseFunctions, djID, data.room.metadata.current_song );
+    databaseFunctions.saveTrackData( djID, data.room.metadata.current_song );
 } );
 
 //bot gets on stage and starts djing if no song is playing.
