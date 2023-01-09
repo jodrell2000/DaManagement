@@ -154,41 +154,55 @@ const databaseFunctions = () => {
         // ========================================================
 
         saveTrackData: function ( databaseFunctions, djID, songData ) {
+            console.group( "saveTrackData" );
             const theTrack = songData.song;
             const theArtist = songData.artist;
+            let artistID;
+            let trackID;
 
-            let artistID = this.doesArtistExist( theArtist );
-            if ( !artistID ) {
+            artistID = this.doesArtistExist( theArtist );
+            console.log( "artistID:" + artistID );
+            if ( artistID === false ) {
                 let artistID = this.addArtist( theArtist );
             }
 
-            let trackID = this.doesTrackExist( theTrack );
+            trackID = this.doesTrackExist( theTrack );
+            console.log( "trackID:" + trackID );
             if ( !trackID ) {
                 let trackID = this.addTrack( theTrack );
             }
 
+            console.log( "artistID:" + artistID );
+            console.log( "trackID:" + trackID );
             let theQuery = `INSERT INTO tracksPlayed (artistID, trackID, djID) VALUES ("` + artistID + `", "` + trackID + `", ` + djID + `);`
             this.runQuery( theQuery );
+            console.groupEnd();
         },
 
         doesArtistExist: function ( artistName ) {
+            console.group( "doesArtistExist" );
             const theQuery = `SELECT id FROM artists WHERE artistName = "` + artistName + `";`;
             let result = this.runQuery( theQuery );
             console.log( "result:" + result );
             if ( result !== undefined ) {
+                console.groupEnd();
                 return result;
             } else {
+                console.groupEnd();
                 return false;
             }
         },
 
         doesTrackExist: function ( trackName ) {
+            console.group( "doesTrackExist" );
             const theQuery = `SELECT id FROM tracks WHERE trackName = "` + trackName + `";`;
             let result = this.runQuery( theQuery );
             console.log( "result:" + result );
             if ( result !== undefined ) {
+                console.groupEnd();
                 return result;
             } else {
+                console.groupEnd();
                 return false;
             }
         },
