@@ -126,11 +126,6 @@ const userFunctions = ( bot ) => {
         },
 
         deleteUserData: function ( databaseFunctions, userID, key ) {
-            console.group( "userModule.deleteUserData" );
-            console.log( "databaseFunctions:" + JSON.stringify( databaseFunctions ) );
-            console.log( "userID:" + userID );
-            console.log( "key:" + key );
-            console.log( "user:" + JSON.stringify( theUsersList[ this.getPositionOnUsersList( userID ) ] ) );
             if ( this.userExists( userID ) ) {
                 delete theUsersList[ this.getPositionOnUsersList( userID ) ][ key ];
                 databaseFunctions.storeUserData( theUsersList[ this.getPositionOnUsersList( userID ) ] );

@@ -477,7 +477,7 @@ bot.on( 'endsong', function ( data ) {
     // check the playlimit and remove the current DJ if they've reached it
     userFunctions.removeDJsOverPlaylimit( data, chatFunctions, djID );
 
-    roomFunctions.escortDJsDown( data, djID, botFunctions, userFunctions, chatFunctions );
+    roomFunctions.escortDJsDown( data, djID, botFunctions, userFunctions, chatFunctions, databaseFunctions );
 } );
 
 
