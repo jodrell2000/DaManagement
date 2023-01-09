@@ -12,23 +12,25 @@ const databaseFunctions = () => {
         // ========================================================
 
         runQuery: function ( query ) {
-            mysql.pool.getConnection( ( ex, connection ) => {
-                if ( ex ) {
-                    console.log( "Error: " + ex + query );
-                } else {
-                    connection.query( query, function ( ex, rows, fields ) {
-                        connection.release();
-                        if ( ex ) {
-                            console.log( "Error:" + ex + "\n" + query );
-                        } else {
-                            console.log( "Query: " + query );
-                            console.log( "Rows: " + JSON.stringify( rows ) );
-                            console.log( "Fields: " + JSON.stringify( fields ) );
-                            return rows;
-                        }
-                    } );
-                }
-            } );
+            return new Promise( ( resolve, reject ) => {
+                mysql.pool.getConnection( ( ex, connection ) => {
+                    if ( ex ) {
+                        console.log( "Error: " + ex + query );
+                    } else {
+                        connection.query( query, function ( ex, rows, fields ) {
+                            connection.release();
+                            if ( ex ) {
+                                console.log( "Error:" + ex + "\n" + query );
+                            } else {
+                                console.log( "Query: " + query );
+                                console.log( "Rows: " + JSON.stringify( rows ) );
+                                console.log( "Fields: " + JSON.stringify( fields ) );
+                                return rows;
+                            }
+                        } );
+                    }
+                } );
+            } )
         },
 
         buildSaveUserQuery: function ( userObject ) {
@@ -161,18 +163,42 @@ const databaseFunctions = () => {
             console.groupEnd();
         },
 
+        // getArtistID: function ( artistName ) {
+        //     console.group( "getArtistID" );
+        //     let artistID;
+
+        //     const theQuery = `SELECT id FROM artists WHERE artistName = "` + artistName + `";`;
+        //     this.runQuery( theQuery )
+        //         .then( ( row ) => { artistID = row[ "id" ] } )
+        //         .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
+        //     console.log( "first get artist ID result: " + artistID );
+
+        //     if ( artistID !== undefined ) {
+        //         console.groupEnd();
+        //         return artistID;
+        //     } else {
+        //         console.groupEnd();
+        //         return this.addArtist( artistName )
+        //     }
+        // },
+
         getArtistID: function ( artistName ) {
             console.group( "getArtistID" );
-            const theQuery = `SELECT id FROM artists WHERE artistName = "Squeeze";`;
-            let result = this.runQuery( theQuery );
-            console.log( "first get artist ID result: " + result );
-            if ( result !== undefined ) {
-                console.groupEnd();
-                return result;
-            } else {
-                console.groupEnd();
-                return this.addArtist( artistName )
-            }
+            const selectQuery = `SELECT id FROM artists WHERE artistName = "` + artistName + `";`;
+            return this.runQuery( selectQuery )
+                .then( ( result ) => {
+                    if ( result != undefined ) {
+                        return result
+                    } else {
+                        const insertQuery = `INSERT INTO artists (artistName) VALUES ("` + artistName + `");`;
+                        return this.runQuery( insertQuery )
+                            .then( ( result ) => {
+                                return this.runQuery( selectQuery );
+
+                            } );
+                    }
+                } )
+                .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
         },
 
         addArtist: function ( artistName ) {
