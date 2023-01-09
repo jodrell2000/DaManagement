@@ -71,8 +71,6 @@ const videoFunctions = () => {
                 id: videoID,
             } )
             .then( ( { data } ) => {
-                console.log( "data:" + JSON.stringify( data ) );
-                console.log( "contentDetails:" + JSON.stringify( data.items[ 0 ].contentDetails ) );
                 return data.items[ 0 ].contentDetails;
             } )
             .catch( err => console.error( `Error occurred in videoFunctions.queryVideoDetails() : ${ err }` ) );
