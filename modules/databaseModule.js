@@ -86,6 +86,11 @@ const databaseFunctions = () => {
             this.runQuery( query );
         },
 
+        getLastInsertID: function () {
+            const query = "select LAST_INSERT_ID();";
+            return this.runQuery( query );
+        },
+
         // ========================================================
         // File Functions
         // ========================================================
@@ -149,24 +154,55 @@ const databaseFunctions = () => {
         // ========================================================
 
         saveTrackData: function ( databaseFunctions, djID, songData ) {
-            const theSong = songData.song;
+            const theTrack = songData.song;
             const theArtist = songData.artist;
-            this.doesArtistExist( theArtist );
-            // if ( this.doesArtistExist( theArtist ) ) {
 
-            // } else {
+            let artistID = this.doesArtistExist( theArtist );
+            if ( !artistID ) {
+                let artistID = this.addArtist( theArtist );
+            }
 
-            // }
+            let trackID = this.doesTrackExist( theTrack );
+            if ( !trackID ) {
+                let trackID = this.addTrack( theTrack );
+            }
+
+            let theQuery = `INSERT INTO tracks (artistID, trackID, djID) VALUES ("` + artistID + `", "` + trackID + `", ` + djID + `);`
+            this.runQuery( theQuery );
         },
 
-        doesArtistExist: function ( artist ) {
-            const theQuery = `SELECT id FROM artists WHERE artistName = "` + artist + `";`;
+        doesArtistExist: function ( artistName ) {
+            const theQuery = `SELECT id FROM artists WHERE artistName = "` + artistName + `";`;
             let result = this.runQuery( theQuery );
             console.log( "result:" + result );
+            if ( result !== undefined ) {
+                return result;
+            } else {
+                return false;
+            }
         },
 
-        doesTrackExist: function () {
+        doesTrackExist: function ( trackName ) {
+            const theQuery = `SELECT id FROM tracks WHERE trackName = "` + trackName + `";`;
+            let result = this.runQuery( theQuery );
+            console.log( "result:" + result );
+            if ( result !== undefined ) {
+                return result;
+            } else {
+                return false;
+            }
+        },
 
+        addArtist: function ( artistName ) {
+            const theQuery = `INSERT INTO artists WHERE artistName = "` + artistName + `";`;
+            this.runQuery( theQuery );
+            return this.getLastInsertID();
+        },
+
+        addTrack: function ( trackName ) {
+            const theQuery = `INSERT INTO tracks WHERE artistName = "` + trackName + `";`;
+            this.runQuery( theQuery );
+            return this.getLastInsertID();
         },
 
         getArtistID: function () {
@@ -183,7 +219,7 @@ const databaseFunctions = () => {
 
         getTrackName: function () {
 
-        }
+        },
 
         // ========================================================
 
