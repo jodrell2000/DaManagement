@@ -62,7 +62,6 @@ const videoFunctions = () => {
     }
 
     async function queryVideoDetails ( auth, videoID ) {
-        console.group( "queryVideoDetails" );
         let service = google.youtube( "v3" );
         return service.videos
             .list( {
