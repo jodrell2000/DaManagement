@@ -167,7 +167,7 @@ const databaseFunctions = () => {
                 let trackID = this.addTrack( theTrack );
             }
 
-            let theQuery = `INSERT INTO tracks (artistID, trackID, djID) VALUES ("` + artistID + `", "` + trackID + `", ` + djID + `);`
+            let theQuery = `INSERT INTO tracksPlayed (artistID, trackID, djID) VALUES ("` + artistID + `", "` + trackID + `", ` + djID + `);`
             this.runQuery( theQuery );
         },
 
