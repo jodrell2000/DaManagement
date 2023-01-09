@@ -12,7 +12,6 @@ const databaseFunctions = () => {
         // ========================================================
 
         runQuery: function ( query ) {
-            console.group( "runQuery" );
             return new Promise( ( resolve, reject ) => {
                 mysql.pool.getConnection( ( ex, connection ) => {
                     if ( ex ) {
@@ -22,12 +21,9 @@ const databaseFunctions = () => {
                             connection.release();
                             if ( ex ) {
                                 console.log( "Error:" + ex + "\n" + query );
+                                reject( ex );
                             } else {
-                                console.log( "Query: " + query );
-                                console.log( "Rows: " + JSON.stringify( rows ) );
-                                console.log( "Fields: " + JSON.stringify( fields ) );
-                                console.groupEnd();
-                                return rows;
+                                resolve( rows );
                             }
                         } );
                     }
@@ -187,32 +183,25 @@ const databaseFunctions = () => {
         // },
 
         saveTrackData: function ( djID, songData ) {
-            console.group( "saveTrackData" );
             this.getArtistID( songData.metadata.artist )
                 .then( ( artistID ) => {
-                    console.log( "artistID:" + artistID );
                     this.getTrackID( songData.metadata.song )
                         .then( ( trackID ) => {
-                            console.log( "trackID:" + trackID );
                             let theQuery = `INSERT INTO tracksPlayed (artistID, trackID, djID) VALUES ("` + artistID + `", "` + trackID + `", "` + djID + `");`
                             return this.runQuery( theQuery );
                         } )
                         .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
                 } )
                 .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
-            console.groupEnd();
         },
 
         getArtistID: function ( artistName ) {
-            console.group( "getArtistID" );
             const selectQuery = `SELECT id FROM artists WHERE artistName = "` + artistName + `";`;
             return this.runQuery( selectQuery )
                 .then( ( result ) => {
                     if ( result.length !== 0 ) {
-                        console.log( "result" + JSON.stringify( result ) );
                         return result
                     } else {
-                        console.log( "erm" );
                         const insertQuery = `INSERT INTO artists (artistName) VALUES ("` + artistName + `");`;
                         return this.runQuery( insertQuery )
                             .then( ( result ) => {
@@ -221,14 +210,12 @@ const databaseFunctions = () => {
                     }
                 } )
                 .then( ( row ) => {
-                    console.log( "row:" + JSON.stringify( row ) );
                     return row[ 0 ][ 'id' ];
                 } )
                 .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
         },
 
         getTrackID: function ( trackName ) {
-            console.group( "getTrackID" );
             const selectQuery = `SELECT id FROM tracks WHERE trackName = "` + trackName + `";`;
             return this.runQuery( selectQuery )
                 .then( ( result ) => {
