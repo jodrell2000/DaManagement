@@ -1,7 +1,7 @@
 // load the googleAPI
 let { google } = require( "googleapis" );
 let authorize = require( "./oauth2lib" );
-const request = require('request');
+const request = require( 'request' );
 
 
 let { setIntersection, setDifference } = require( "../modules/setlib" );
@@ -62,6 +62,7 @@ const videoFunctions = () => {
     }
 
     async function queryVideoDetails ( auth, videoID ) {
+        console.group( "queryVideoDetails" );
         let service = google.youtube( "v3" );
         return service.videos
             .list( {
@@ -70,9 +71,11 @@ const videoFunctions = () => {
                 id: videoID,
             } )
             .then( ( { data } ) => {
+                console.log( "data:" + JSON.stringify( data ) );
+                console.log( "contentDetails:" + JSON.stringify( data.items[ 0 ].contentDetails ) );
                 return data.items[ 0 ].contentDetails;
             } )
-            .catch( err => console.error(`Error occurred in videoFunctions.queryVideoDetails() : ${err}`) );
+            .catch( err => console.error( `Error occurred in videoFunctions.queryVideoDetails() : ${ err }` ) );
     }
 
     async function getRegionRestrictions ( auth, videoID ) {
@@ -88,26 +91,26 @@ const videoFunctions = () => {
             chatFunctions.botSpeak( regionReport, data );
         },
 
-        checkVideoStatus: function (videoIDs) {
-            return new Promise( (resolve, reject) => {
-                let youtubeURL = `https://www.googleapis.com/youtube/v3/videos?id=${videoIDs}&part=status&key=${process.env.YOUTUBE_API_KEY}`
-                request(youtubeURL, {json: true}, (error, res, body) => {
-        
-                    if (error) {
-                        reject(`Something went wrong. Try again later.`);
+        checkVideoStatus: function ( videoIDs ) {
+            return new Promise( ( resolve, reject ) => {
+                let youtubeURL = `https://www.googleapis.com/youtube/v3/videos?id=${ videoIDs }&part=status&key=${ process.env.YOUTUBE_API_KEY }`
+                request( youtubeURL, { json: true }, ( error, res, body ) => {
+
+                    if ( error ) {
+                        reject( `Something went wrong. Try again later.` );
                     }
-        
-                    if (!body.hasOwnProperty('items')) {
-                        reject(`No data returned`);
+
+                    if ( !body.hasOwnProperty( 'items' ) ) {
+                        reject( `No data returned` );
                     }
-        
-                    if (!Array.isArray(body.items) || !body.items.length) {
-                        reject(`No data returned`);
+
+                    if ( !Array.isArray( body.items ) || !body.items.length ) {
+                        reject( `No data returned` );
                     }
-        
-                    resolve(body.items);
-                });
-            });
+
+                    resolve( body.items );
+                } );
+            } );
         },
 
         addAlertRegion: function ( data, region, chatFunctions, announce = true ) {
@@ -158,7 +161,7 @@ const videoFunctions = () => {
                             return;
                         }
 
-                        if ( restrictions.hasOwnProperty(`allowed`) ) {
+                        if ( restrictions.hasOwnProperty( `allowed` ) ) {
                             if ( restrictions.allowed ) {
                                 alertIfRegionsNotAllowed( restrictions, userFunctions, ( msg ) =>
                                     chatFunctions.botSpeak( msg, data )
@@ -167,7 +170,7 @@ const videoFunctions = () => {
                             return;
                         }
 
-                        if ( restrictions.hasOwnProperty(`blocked`) ) {
+                        if ( restrictions.hasOwnProperty( `blocked` ) ) {
                             if ( restrictions.blocked ) {
                                 alertIfRegionsBlocked( restrictions, userFunctions, ( msg ) =>
                                     chatFunctions.botSpeak( msg, data )
@@ -176,7 +179,7 @@ const videoFunctions = () => {
                         }
 
                     } )
-                    .catch( err => console.error(`Error occurred in videoFunctions.checkVideoRegionAlert() : ${err}`) );
+                    .catch( err => console.error( `Error occurred in videoFunctions.checkVideoRegionAlert() : ${ err }` ) );
             }
         },
 
