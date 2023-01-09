@@ -170,6 +170,7 @@ const songFunctions = ( bot ) => {
             console.log( "_id:" + getSong );
             console.log( "djName:" + dj );
             console.log( "ytid:" + ytid );
+            console.log( "current_song:" + JSON.stringify( current_song.metadata ) );
             console.groupEnd();
         },
 
