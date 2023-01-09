@@ -144,6 +144,49 @@ const databaseFunctions = () => {
 
         // ========================================================
 
+        // ========================================================
+        // Song Data Functions
+        // ========================================================
+
+        saveTrackData: function ( databaseFunctions, djID, songData ) {
+            const theSong = songData.song;
+            const theArtist = songData.artist;
+            this.doesArtistExist( theArtist );
+            // if ( this.doesArtistExist( theArtist ) ) {
+
+            // } else {
+
+            // }
+        },
+
+        doesArtistExist: function ( artist ) {
+            const theQuery = `SELECT id FROM artists WHERE artistName = "` + artist + `";`;
+            let result = this.runQuery( theQuery );
+            console.log( "result:" + result );
+        },
+
+        doesTrackExist: function () {
+
+        },
+
+        getArtistID: function () {
+
+        },
+
+        getTrackID: function () {
+
+        },
+
+        getArtistName: function () {
+
+        },
+
+        getTrackName: function () {
+
+        }
+
+        // ========================================================
+
 
     }
 

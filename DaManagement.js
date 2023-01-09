@@ -189,10 +189,6 @@ bot.on( 'roomChanged', function ( data ) {
 
 //checks at the beggining of the song
 bot.on( 'newsong', function ( data ) {
-    console.log( "data.room.metadata.current_song._id:" + data.room.metadata.current_song._id );
-    console.log( "data.room.metadata.current_song.metadata.song:" + data.room.metadata.current_song.metadata.song );
-    console.log( "data.room.metadata.current_song.metadata.artist:" + data.room.metadata.current_song.metadata.artist );
-
     //resets counters and array for vote skipping
     songFunctions.resetCheckVotes();
     songFunctions.resetVoteCountSkip();
@@ -307,6 +303,8 @@ bot.on( 'newsong', function ( data ) {
     if ( roomFunctions.themeRandomizerEnabled() === true && userFunctions.lastDJPlaying() ) {
         roomFunctions.announceNewRandomThene( data, chatFunctions );
     }
+
+    databaseFunctions.saveTrackData( databaseFunctions, djID, data.room.metadata.current_song );
 } );
 
 //bot gets on stage and starts djing if no song is playing.
