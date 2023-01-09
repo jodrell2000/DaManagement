@@ -155,7 +155,6 @@ const songFunctions = ( bot ) => {
         // ========================================================
 
         getSongTags: function ( current_song ) {
-            console.group( "getSongTags" );
             song = current_song.metadata.song;
             album = current_song.metadata.album;
             genre = current_song.metadata.genre;
@@ -163,15 +162,6 @@ const songFunctions = ( bot ) => {
             getSong = current_song._id;
             dj = current_song.djname;
             ytid = current_song.metadata.ytid;
-            console.log( "song:" + song );
-            console.log( "artist:" + artist );
-            console.log( "album:" + album );
-            console.log( "genre:" + genre );
-            console.log( "_id:" + getSong );
-            console.log( "djName:" + dj );
-            console.log( "ytid:" + ytid );
-            console.log( "current_song:" + JSON.stringify( current_song.metadata ) );
-            console.groupEnd();
         },
 
         recordUpVotes: function ( data ) {
