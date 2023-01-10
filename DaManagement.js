@@ -120,6 +120,9 @@ setInterval( function () {
 // },  roomDefaults.howOftenToRepeatMessage * 60 * 1000)
 
 bot.on( 'ready', function () {
+    // set the Bots Avatar (check the URL of the avatar images to get the ID)
+    bot.setAvatar( 23 );
+
     userFunctions.botStartReset( botFunctions, songFunctions );
 
     //format the musicDefaults.bannedArtists list at runtime
