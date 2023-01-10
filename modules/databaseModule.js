@@ -11,19 +11,19 @@ const databaseFunctions = () => {
         // Database Functions
         // ========================================================
 
-        runQuery: function ( query ) {
+        runQuery: function ( query, values ) {
             return new Promise( ( resolve, reject ) => {
                 mysql.pool.getConnection( ( ex, connection ) => {
                     if ( ex ) {
-                        console.log( "Error: " + ex + query );
+                        console.log( "Error: " + ex + query, values );
                     } else {
-                        connection.query( query, function ( ex, rows, fields ) {
+                        connection.query( query, values, function ( ex, results, fields ) {
                             connection.release();
                             if ( ex ) {
                                 console.log( "Error:" + ex + "\n" + query );
                                 reject( ex );
                             } else {
-                                resolve( rows );
+                                resolve( results );
                             }
                         } );
                     }
@@ -195,42 +195,46 @@ const databaseFunctions = () => {
                 .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
         },
 
-        getArtistID: function ( artistName ) {
-            const selectQuery = `SELECT id FROM artists WHERE artistName = "` + artistName + `";`;
-            return this.runQuery( selectQuery )
+        getArtistID: function ( theName ) {
+            const selectQuery = `SELECT id FROM artists WHERE artistName = "?";`;
+            const values = [ theName ];
+            return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
                     if ( result.length !== 0 ) {
-                        return result
+                        return result[ 0 ][ 'id' ];
                     } else {
-                        const insertQuery = `INSERT INTO artists (artistName) VALUES ("` + artistName + `");`;
-                        return this.runQuery( insertQuery )
+                        const insertQuery = `INSERT INTO artists SET ?;`;
+                        const values = { artistName: theName }
+                        return this.runQuery( insertQuery, values )
                             .then( ( result ) => {
-                                return this.runQuery( selectQuery );
+                                return result.insertId;
                             } );
                     }
                 } )
-                .then( ( row ) => {
-                    return row[ 0 ][ 'id' ];
+                .then( ( id ) => {
+                    return id;
                 } )
                 .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
         },
 
-        getTrackID: function ( trackName ) {
-            const selectQuery = `SELECT id FROM tracks WHERE trackName = "` + trackName + `";`;
-            return this.runQuery( selectQuery )
+        getTrackID: function ( theName ) {
+            const selectQuery = `SELECT id FROM tracks WHERE trackName = "?";`;
+            const values = [ theName ];
+            return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
                     if ( result.length !== 0 ) {
-                        return result
+                        return result[ 0 ][ 'id' ];
                     } else {
-                        const insertQuery = `INSERT INTO tracks (trackName) VALUES ("` + trackName + `");`;
-                        return this.runQuery( insertQuery )
+                        const insertQuery = `INSERT INTO tracks SET ?;`;
+                        const values = { trackName: theName }
+                        return this.runQuery( insertQuery, values )
                             .then( ( result ) => {
-                                return this.runQuery( selectQuery );
+                                return result.insertId;
                             } );
                     }
                 } )
-                .then( ( row ) => {
-                    return row[ 0 ][ 'id' ];
+                .then( ( id ) => {
+                    return id;
                 } )
                 .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
         },
