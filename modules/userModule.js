@@ -541,7 +541,7 @@ const userFunctions = ( bot ) => {
                 }
 
                 theUsersList[ this.getPositionOnUsersList( userID ) ][ 'spamTimer' ] = setTimeout( function ( userID ) {
-                    this.resetUsersSpamCount( userID );
+                    this.resetUsersSpamCount( userID, databaseFunctions );
                 }.bind( this ), 10 * 1000 );
             }
         },
