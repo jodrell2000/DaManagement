@@ -211,9 +211,6 @@ const databaseFunctions = () => {
                             } );
                     }
                 } )
-                .then( ( id ) => {
-                    return id;
-                } )
                 .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
         },
 
@@ -232,9 +229,6 @@ const databaseFunctions = () => {
                                 return result.insertId;
                             } );
                     }
-                } )
-                .then( ( id ) => {
-                    return id;
                 } )
                 .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
         },
