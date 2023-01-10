@@ -586,7 +586,7 @@ const userFunctions = ( bot ) => {
                             this.storeUserData( userID, 'RefreshTotalPlayCount', this.getDJTotalPlayCount( userID ), databaseFunctions );
 
                             theUsersList[ listPosition ][ 'RefreshTimer' ] = setTimeout( function () {
-                                this.removeRefreshFromUser( userID );
+                                this.removeRefreshFromUser( userID, databaseFunctions );
                             }.bind( this ), roomDefaults.amountOfTimeToRefresh * 1000 );
 
                             let message = '@' + this.getUsername( userID ) + ' I\'ll hold your spot on stage for the next ' + roomDefaults.amountOfTimeToRefresh / 60 + ' minutes';
