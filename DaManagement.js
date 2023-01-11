@@ -475,7 +475,8 @@ bot.on( 'endsong', function ( data ) {
     const djID = data.room.metadata.current_dj;
 
     //bot says song stats for each song
-    chatFunctions.readSongStats( data, songFunctions, botFunctions )
+    chatFunctions.readSongStats( data, songFunctions, botFunctions );
+    databaseFunctions.saveSongStats( songFunctions );
 
     userFunctions.incrementDJPlayCount( djID, databaseFunctions );
 

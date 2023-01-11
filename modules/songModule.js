@@ -145,6 +145,8 @@ const songFunctions = ( bot ) => {
         previousUpVotes: () => previousSongStats[ 'upvotes' ],
         previousDownVotes: () => previousSongStats[ 'downvotes' ],
         previousSnags: () => previousSongStats[ 'snags' ],
+        previousArtist: () => artist,
+        previousTrack: () => song,
 
         grabSongStats: function () {
             previousSongStats[ 'upvotes' ] = upVotes;
