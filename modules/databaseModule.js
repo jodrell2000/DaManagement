@@ -244,7 +244,7 @@ const databaseFunctions = () => {
         },
 
         getLastSongID: function ( theArtist, theTrack ) {
-            const selectQuery = "SELECT MAX(tp.id) AS theID FROM tracksPlayed tp JOIN tracks t ON tp.trackID=t.id JOIN artists a ON tp.artistID=a.id WHERE t.trackname=? AND a.artistName=? AND tp.whenPlayed > DATE_SUB(NOW(), INTERVAL 1 MINUTE);";
+            const selectQuery = "SELECT MAX(tp.id) AS theID FROM tracksPlayed tp JOIN tracks t ON tp.trackID=t.id JOIN artists a ON tp.artistID=a.id WHERE t.trackname=? AND a.artistName=?;";
             const values = [ theTrack, theArtist ];
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
@@ -254,7 +254,6 @@ const databaseFunctions = () => {
                         console.log( "We couldn't find the last track in the DB?!?" );
                         console.log( "Track: " + theTrack + " by: " + theArtist );
                     }
-
                 } )
         },
 
