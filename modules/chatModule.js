@@ -98,15 +98,18 @@ const chatFunctions = ( bot, roomDefaults ) => {
                     this.pictureMessageTheDJ( senderID, receiverID, theMessages, thePictures, data, userFunctions )
                 }
 
-                if ( this.commandsToCount().indexOf( theCommand ) !== -1 && receiverID !== senderID ) {
+                if ( this.countThisCommand( databaseFunctions, theCommand ) !== -1 && receiverID !== senderID ) {
                     userFunctions.updateCommandCount( receiverID, theCommand, databaseFunctions );
                 }
             }
         },
 
-        commandsToCount: function () {
-            const countTheseCommands = [ "props", "noice", "epic" ];
-            return countTheseCommands;
+        countThisCommand: function ( databaseFunctions, theCommand ) {
+            return databaseFunctions.commandsToCount()
+                .then( ( commands ) => {
+                    return commands.indexOf( theCommand );
+                    }
+                )
         },
 
         getDynamicChatMessages: function ( theCommand ) {

@@ -147,41 +147,6 @@ const databaseFunctions = () => {
         // Song Data Functions
         // ========================================================
 
-        // saveTrackData: function ( djID, songData ) {
-        //     console.group( "saveTrackData" );
-        //     console.log( "songData.artist:" + songData.metadata.artist )
-        //     console.log( "songData.song:" + songData.metadata.song )
-        //     const trackID = this.getTrackID( songData.metadata.song );
-
-        //     this.getArtistID( songData.metadata.artist )
-        //         .then( ( row ) => { console.log( "row: " + row ) } );
-
-        //     console.log( "artistID:" + artistID );
-        //     console.log( "trackID:" + trackID );
-        //     let theQuery = `INSERT INTO tracksPlayed (artistID, trackID, djID) VALUES ("` + artistID + `", "` + trackID + `", "` + djID + `");`
-        //     this.runQuery( theQuery );
-        //     console.groupEnd();
-        // },
-
-        // getArtistID: function ( artistName ) {
-        //     console.group( "getArtistID" );
-        //     let artistID;
-
-        //     const theQuery = `SELECT id FROM artists WHERE artistName = "` + artistName + `";`;
-        //     this.runQuery( theQuery )
-        //         .then( ( row ) => { artistID = row[ "id" ] } )
-        //         .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
-        //     console.log( "first get artist ID result: " + artistID );
-
-        //     if ( artistID !== undefined ) {
-        //         console.groupEnd();
-        //         return artistID;
-        //     } else {
-        //         console.groupEnd();
-        //         return this.addArtist( artistName )
-        //     }
-        // },
-
         saveTrackData: function ( djID, songData ) {
             this.getArtistID( songData.metadata.artist )
                 .then( ( artistID ) => {
@@ -259,6 +224,38 @@ const databaseFunctions = () => {
 
         // ========================================================
 
+        // ========================================================
+        // Config Functions
+        // ========================================================
+
+        commandsToCount: function () {
+            const selectQuery = "SELECT command FROM commandsToCount;";
+            const values = [ ];
+            return this.runQuery( selectQuery, values )
+                .then( ( results ) => {
+                        return this.convertToArray( results, "command" );
+                    }
+                )
+        },
+
+        // ========================================================
+
+        // ========================================================
+        // Helper Functions
+        // ========================================================
+
+        convertToArray: function ( results, column ) {
+            let theArray = [];
+
+            for (let i = 0; i < results.length; i++) {
+                let currentRow = results[i];
+                let thisCommand = currentRow[column];
+                theArray.push(thisCommand);
+            }
+            return theArray;
+        }
+
+        // ========================================================
 
     }
 
