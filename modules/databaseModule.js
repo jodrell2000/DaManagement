@@ -234,7 +234,6 @@ const databaseFunctions = () => {
         saveSongStats: function ( songFunctions ) {
             this.getLastSongID( songFunctions.previousArtist(), songFunctions.previousTrack() )
                 .then( ( theID ) => {
-                    console.log( 'UPDATE tracksPlayed tp SET upvotes=' + songFunctions.previousUpVotes() + ', downvotes=' + songFunctions.previousDownVotes() + ', snags=' + songFunctions.previousSnags() + ' WHERE tp.id=' + theID + ';' );
                     const query = "UPDATE tracksPlayed tp SET upvotes=?, downvotes=?, snags=? WHERE tp.id=?";
                     const values = [ songFunctions.previousUpVotes(), songFunctions.previousDownVotes(), songFunctions.previousSnags(), theID ];
 
@@ -250,7 +249,6 @@ const databaseFunctions = () => {
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
                     if ( result.length !== 0 ) {
-                        console.log( "result:" + result[ 0 ][ 'theID' ] );
                         return result[ 0 ][ 'theID' ];
                     } else {
                         console.log( "We couldn't find the last track in the DB?!?" );
