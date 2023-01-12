@@ -108,6 +108,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
         countThisCommand: function ( databaseFunctions, theCommand ) {
             return databaseFunctions.commandsToCount()
                 .then( ( commands ) => {
+                    console.log( "theCommand: " + theCommand );
                     console.log( "commands: " + commands );
                     console.log( "indexOf: " + commands.indexOf( theCommand ) );
                     return commands.indexOf( theCommand );
