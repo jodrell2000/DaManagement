@@ -497,6 +497,9 @@ const userFunctions = ( bot ) => {
         },
 
         updateCommandCount: function ( receiverID, theCommand, databaseFunctions ) {
+            console.group( "updateCommandCount" );
+            console.log( "receiverID: " + receiverID );
+            console.log( "theCommand: " + theCommand );
             let commandCount = this.getCommandCount( receiverID, theCommand );
             if ( commandCount === undefined ) { commandCount = 0 }
             this.storeUserData( receiverID, theCommand + 'Count', commandCount + 1, databaseFunctions );
