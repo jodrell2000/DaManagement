@@ -99,11 +99,13 @@ const chatFunctions = ( bot, roomDefaults ) => {
                     this.pictureMessageTheDJ( senderID, receiverID, theMessages, thePictures, data, userFunctions )
                 }
 
-                const commandToCount = this.countThisCommand( databaseFunctions, theCommand );
-                console.log( "commandToCount: " + commandToCount );
-                if ( commandToCount !== -1 && receiverID !== senderID ) {
-                    userFunctions.updateCommandCount( receiverID, theCommand, databaseFunctions );
-                }
+                this.countThisCommand( databaseFunctions, theCommand )
+                    .then( ( commandToCount ) => {
+                        console.log( "commandToCount: " + commandToCount );
+                        if ( commandToCount !== -1 && receiverID !== senderID ) {
+                            userFunctions.updateCommandCount( receiverID, theCommand, databaseFunctions );
+                        }
+                    } )
             }
             console.groupEnd();
         },
