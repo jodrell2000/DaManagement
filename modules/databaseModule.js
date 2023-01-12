@@ -240,9 +240,13 @@ const databaseFunctions = () => {
         // ========================================================
 
         incrementCommandCountForCurrentTrack: function ( theCommand ) {
+            console.group( "incrementCommandCountForCurrentTrack" );
             const trackID = this.getCurrentSongID();
+            console.log( "trackID: " + trackID );
             const commandID = this.getCommandID( theCommand );
+            console.log( "commandID: " + commandID );
             const commandCount = this.getCurrentCommandCount( commandID, trackID ) + 1;
+            console.log( "commandCount: " + commandCount );
 
             const query = "REPLACE INTO extendedTrackStats (count, commandsToCount_id, tracksPlayed_id) VALUES (?, ?, ?)";
             const values = [ commandCount, commandID, trackID ];
