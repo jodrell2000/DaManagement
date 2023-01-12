@@ -240,49 +240,45 @@ const databaseFunctions = () => {
         // ========================================================
 
         incrementCommandCountForCurrentTrack: function ( theCommand ) {
-            console.group( "incrementCommandCountForCurrentTrack" );
-            const trackID = this.getCurrentSongID();
-            console.log( "trackID: " + trackID );
-            const commandID = this.getCommandID( theCommand );
-            console.log( "commandID: " + commandID );
-            const commandCount = this.getCurrentCommandCount( commandID, trackID ) + 1;
-            console.log( "commandCount: " + commandCount );
-
-            const query = "REPLACE INTO extendedTrackStats (count, commandsToCount_id, tracksPlayed_id) VALUES (?, ?, ?)";
-            const values = [ commandCount, commandID, trackID ];
-            this.runQuery( query, values )
-                .then( ( result ) => {
-                    if ( result.length !== 0 ) {
-                        return result[ 0 ][ 'id' ];
-                    }
+            this.getCurrentSongID()
+                .then( ( trackID ) => {
+                    this.getCommandID( theCommand )
+                        .then( ( commandID ) => {
+                            this.getCurrentCommandCount( commandID, trackID )
+                                .then( ( commandCount ) => {
+                                    const query = "REPLACE INTO extendedTrackStats (count, commandsToCount_id, tracksPlayed_id) VALUES (?, ?, ?)";
+                                    const values = [ commandCount + 1, commandID, trackID ];
+                                    this.runQuery( query, values )
+                                } )
+                                .catch( ( ex ) => { console.log( "Something went wrong saving the extended stats: " + ex ); } );
+                        } )
+                        .catch( ( ex ) => { console.log( "Something went wrong finding the CommandID: " + ex ); } );
                 } )
-                .catch( ( ex ) => { console.log( "Something went wrong saving the song stats: " + ex ); } );
+                .catch( ( ex ) => { console.log( "Something went wrong getting the current Command count: " + ex ); } );
         },
 
         getCommandID: function ( theCommand ) {
-            const selectQuery = "SELECT id FROM commandsToCount WHERE command = ?;";
+            const selectQuery = "SELECT id as theID FROM commandsToCount WHERE command = ?;";
             const values = [ theCommand ];
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
                     if ( result.length !== 0 ) {
-                        return result[ 0 ][ 'id' ];
+                        return result[ 0 ][ 'theID' ];
                     }
                 } )
-                .catch( ( ex ) => { console.log( "Something went wrong saving the song stats: " + ex ); } );
         },
 
         getCurrentCommandCount: function ( commandID, trackID ) {
-            const selectQuery = "SELECT count FROM extendedTrackStats WHERE commandsToCount_id = ? AND tracksPlayed_id = ?;";
+            const selectQuery = "SELECT count as theCount FROM extendedTrackStats WHERE commandsToCount_id = ? AND tracksPlayed_id = ?;";
             const values = [ commandID, trackID ];
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
                     if ( result.length !== 0 ) {
-                        return result[ 0 ][ 'count' ];
+                        return result[ 0 ][ 'theCount' ];
                     } else {
                         return 0;
                     }
                 } )
-                .catch( ( ex ) => { console.log( "Something went wrong saving the song stats: " + ex ); } );
         },
 
         // ========================================================
