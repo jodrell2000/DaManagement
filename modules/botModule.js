@@ -67,7 +67,7 @@ const botFunctions = ( bot ) => {
         },
 
         changeAvatar: function ( data, avatarID, chatFunctions ) {
-            if ( avatarID === isNaN ) {
+            if ( isNaN( avatarID ) ) {
                 chatFunctions.botSpeak( "That's not a valid AvatarID...it needs to be a number", data );
             } else {
                 chatFunctions.botSpeak( "Changing...", data );
