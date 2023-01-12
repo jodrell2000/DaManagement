@@ -66,6 +66,15 @@ const botFunctions = ( bot ) => {
             shutMeDown();
         },
 
+        changeAvatar: function ( data, avatarID, chatFunctions ) {
+            if ( avatarID === isNaN ) {
+                chatFunctions.botSpeak( "That's not a valid AvatarID...it needs to be a number", data );
+            } else {
+                chatFunctions.botSpeak( "Changing...", data );
+                bot.setAvatar( avatarID );
+            }
+        },
+
         getUptime: function () {
             this.setUptimeTime( Date.now() );
             return this.uptimeTime() - this.botStartTime();
