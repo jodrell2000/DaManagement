@@ -256,6 +256,7 @@ const databaseFunctions = () => {
                         return result[ 0 ][ 'id' ];
                     }
                 } )
+                .catch( ( ex ) => { console.log( "Something went wrong saving the song stats: " + ex ); } );
         },
 
         getCommandID: function ( theCommand ) {
@@ -267,6 +268,7 @@ const databaseFunctions = () => {
                         return result[ 0 ][ 'id' ];
                     }
                 } )
+                .catch( ( ex ) => { console.log( "Something went wrong saving the song stats: " + ex ); } );
         },
 
         getCurrentCommandCount: function ( commandID, trackID ) {
@@ -280,6 +282,7 @@ const databaseFunctions = () => {
                         return 0;
                     }
                 } )
+                .catch( ( ex ) => { console.log( "Something went wrong saving the song stats: " + ex ); } );
         },
 
         // ========================================================
