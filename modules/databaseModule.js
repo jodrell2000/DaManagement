@@ -244,7 +244,7 @@ const databaseFunctions = () => {
             const commandID = this.getCommandID( theCommand );
             const commandCount = this.getCurrentCommandCount( commandID, trackID ) + 1;
 
-            const query = "REPLACE INTO extendedTrackStats SET count = ? WHERE commandsToCount_id = ? AND tracksPlayed_id = ?;";
+            const query = "REPLACE INTO extendedTrackStats (count, commandsToCount_id, tracksPlayed_id) VALUES (?, ?, ?)";
             const values = [ commandCount, commandID, trackID ];
             this.runQuery( query, values )
                 .then( ( result ) => {
