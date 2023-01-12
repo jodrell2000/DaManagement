@@ -500,6 +500,7 @@ const userFunctions = ( bot ) => {
             let commandCount = this.getCommandCount( receiverID, theCommand );
             if ( commandCount === undefined ) { commandCount = 0 }
             this.storeUserData( receiverID, theCommand + 'Count', commandCount + 1, databaseFunctions );
+            databaseFunctions.incrementCommandCountForCurrentTrack( theCommand );
         },
 
 

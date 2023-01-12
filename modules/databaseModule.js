@@ -222,6 +222,62 @@ const databaseFunctions = () => {
                 } )
         },
 
+        getCurrentSongID: function () {
+            const selectQuery = "SELECT MAX(tp.id) AS theID FROM tracksPlayed tp;";
+            const values = [];
+            return this.runQuery( selectQuery, values )
+                .then( ( result ) => {
+                    if ( result.length !== 0 ) {
+                        return result[ 0 ][ 'theID' ];
+                    }
+                } )
+        },
+
+        // ========================================================
+
+        // ========================================================
+        // Command Functions
+        // ========================================================
+
+        incrementCommandCountForCurrentTrack: function ( theCommand ) {
+            const trackID = this.getCurrentSongID();
+            const commandID = this.getCommandID( theCommand );
+            const commandCount = this.getCurrentCommandCount( commandID, trackID ) + 1;
+
+            const query = "REPLACE INTO extendedTrackStats SET count = ? WHERE commandsToCount_id = ? AND tracksPlayed_id = ?;";
+            const values = [ commandCount, commandID, trackID ];
+            this.runQuery( query, values )
+                .then( ( result ) => {
+                    if ( result.length !== 0 ) {
+                        return result[ 0 ][ 'id' ];
+                    }
+                } )
+        },
+
+        getCommandID: function ( theCommand ) {
+            const selectQuery = "SELECT id FROM commandsToCount WHERE command = ?;";
+            const values = [ theCommand ];
+            return this.runQuery( selectQuery, values )
+                .then( ( result ) => {
+                    if ( result.length !== 0 ) {
+                        return result[ 0 ][ 'id' ];
+                    }
+                } )
+        },
+
+        getCurrentCommandCount: function ( commandID, trackID ) {
+            const selectQuery = "SELECT count FROM extendedTrackStats WHERE commandsToCount_id = ? AND tracksPlayed_id = ?;";
+            const values = [ commandID, trackID ];
+            return this.runQuery( selectQuery, values )
+                .then( ( result ) => {
+                    if ( result.length !== 0 ) {
+                        return result[ 0 ][ 'count' ];
+                    } else {
+                        return 0;
+                    }
+                } )
+        },
+
         // ========================================================
 
         // ========================================================
@@ -230,11 +286,11 @@ const databaseFunctions = () => {
 
         commandsToCount: function () {
             const selectQuery = "SELECT command FROM commandsToCount;";
-            const values = [ ];
+            const values = [];
             return this.runQuery( selectQuery, values )
                 .then( ( results ) => {
-                        return this.convertToArray( results, "command" );
-                    }
+                    return this.convertToArray( results, "command" );
+                }
                 )
         },
 
@@ -247,10 +303,10 @@ const databaseFunctions = () => {
         convertToArray: function ( results, column ) {
             let theArray = [];
 
-            for (let i = 0; i < results.length; i++) {
-                let currentRow = results[i];
-                let thisCommand = currentRow[column];
-                theArray.push(thisCommand);
+            for ( let i = 0; i < results.length; i++ ) {
+                let currentRow = results[ i ];
+                let thisCommand = currentRow[ column ];
+                theArray.push( thisCommand );
             }
             return theArray;
         }
