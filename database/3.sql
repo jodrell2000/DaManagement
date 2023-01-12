@@ -11,3 +11,5 @@ CREATE TABLE extendedTrackStats (
     count INT UNSIGNED NOT NULL,
     PRIMARY KEY (tracksPlayed_id, commandsToCount_id)
 );
+
+INSERT INTO commandsToCount (command) VALUES ("props"), ("noice"), ("spin"), ("tune");

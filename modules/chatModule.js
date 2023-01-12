@@ -99,6 +99,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
                 }
 
                 if ( this.countThisCommand( databaseFunctions, theCommand ) !== -1 && receiverID !== senderID ) {
+                    console.log( "Counting: " + theCommand );
                     userFunctions.updateCommandCount( receiverID, theCommand, databaseFunctions );
                 }
             }
@@ -108,7 +109,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
             return databaseFunctions.commandsToCount()
                 .then( ( commands ) => {
                     return commands.indexOf( theCommand );
-                    }
+                }
                 )
         },
 
