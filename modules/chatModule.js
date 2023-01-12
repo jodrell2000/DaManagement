@@ -105,11 +105,12 @@ const chatFunctions = ( bot, roomDefaults ) => {
         },
 
         countThisCommand: function ( databaseFunctions, theCommand ) {
+            console.group( "countThisCommand" );
             return databaseFunctions.commandsToCount()
                 .then( ( commands ) => {
+                    console.log( "commands.indexOf( theCommand ): " + commands.indexOf( theCommand ) );
                     return commands.indexOf( theCommand );
-                }
-                )
+                } )
         },
 
         getDynamicChatMessages: function ( theCommand ) {
