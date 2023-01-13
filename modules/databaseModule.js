@@ -204,12 +204,10 @@ const databaseFunctions = () => {
                         .then( ( trackLength ) => {
                             const query = "UPDATE tracksPlayed tp SET upvotes=?, downvotes=?, snags=?, length=? WHERE tp.id=?";
                             const values = [ songFunctions.previousUpVotes(), songFunctions.previousDownVotes(), songFunctions.previousSnags(), trackLength, theID ];
-
                             return this.runQuery( query, values )
                         } )
                 } )
                 .catch( ( ex ) => { console.log( "Something went wrong saving the song stats: " + ex ); } );
-
         },
 
         getLastSongID: function ( theArtist, theTrack ) {
@@ -238,6 +236,8 @@ const databaseFunctions = () => {
         },
 
         calcTrackLength: function ( trackID ) {
+            console.group( "calcTrackLength" );
+            console.log( "trackID: " + trackID );
             this.getTrackPlayedTime( trackID )
                 .then( ( thisTrackPlayed ) => {
                     this.getTrackPlayedTime( trackID - 1 )
@@ -245,6 +245,7 @@ const databaseFunctions = () => {
                             console.log( "previousTrackPlayed: " + previousTrackPlayed );
                             console.log( "thisTrackPlayed: " + thisTrackPlayed );
                             console.log( "thisTrackPlayed - previousTrackPlayed: " + ( thisTrackPlayed - previousTrackPlayed ) );
+                            console.groupEnd();
                             return thisTrackPlayed - previousTrackPlayed;
                         } )
                 } )
@@ -252,6 +253,7 @@ const databaseFunctions = () => {
         },
 
         getTrackPlayedTime: function ( trackID ) {
+            console.group( "getTrackPlayedTime" );
             console.log( "trackID: " + trackID );
             const selectQuery = "SELECT UNIX_TIMESTAMP(whenPlayed) AS timestampPlayed FROM tracksPlayed tp WHERE tp.id = ?;";
             console.log( "query: " + selectQuery );
@@ -259,6 +261,7 @@ const databaseFunctions = () => {
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
                     if ( result.length !== 0 ) {
+                        console.groupEnd();
                         return result[ 0 ][ 'timestampPlayed' ];
                     }
                 } )
