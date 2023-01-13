@@ -252,7 +252,8 @@ const databaseFunctions = () => {
                             console.log( "thisTrackPlayed: " + thisTrackPlayed );
                             console.log( "thisTrackPlayed - previousTrackPlayed: " + ( thisTrackPlayed - previousTrackPlayed ) );
                             console.groupEnd();
-                            return thisTrackPlayed - previousTrackPlayed;
+                            const theLength = thisTrackPlayed - previousTrackPlayed;
+                            return theLength;
                         } )
                 } )
                 .catch( ( ex ) => { console.log( "Something went wrong calculating the track length: " + ex ); } );
