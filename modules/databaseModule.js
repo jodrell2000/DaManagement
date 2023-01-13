@@ -148,7 +148,7 @@ const databaseFunctions = () => {
         // ========================================================
 
         saveTrackData: function ( djID, songData ) {
-            this.getArtistID( songData.metadata.artist )
+            return this.getArtistID( songData.metadata.artist )
                 .then( ( artistID ) => {
                     this.getTrackID( songData.metadata.song )
                         .then( ( trackID ) => {
@@ -198,9 +198,9 @@ const databaseFunctions = () => {
         },
 
         saveSongStats: function ( songFunctions ) {
-            this.getLastSongID( songFunctions.previousArtist(), songFunctions.previousTrack() )
+            return this.getLastSongID( songFunctions.previousArtist(), songFunctions.previousTrack() )
                 .then( ( theID ) => {
-                    this.calcTrackLength( theID )
+                    return this.calcTrackLength( theID )
                         .then( ( trackLength ) => {
                             const query = "UPDATE tracksPlayed tp SET upvotes=?, downvotes=?, snags=?, length=? WHERE tp.id=?";
                             const values = [ songFunctions.previousUpVotes(), songFunctions.previousDownVotes(), songFunctions.previousSnags(), trackLength, theID ];
@@ -237,16 +237,10 @@ const databaseFunctions = () => {
         },
 
         calcTrackLength: function ( trackID ) {
-            console.group( "calcTrackLength" );
-            console.log( "trackID: " + trackID );
             return this.getTrackPlayedTime( trackID )
                 .then( ( thisTrackPlayed ) => {
                     return this.getTrackPlayedTime( trackID - 1 )
                         .then( ( previousTrackPlayed ) => {
-                            console.log( "previousTrackPlayed: " + previousTrackPlayed );
-                            console.log( "thisTrackPlayed: " + thisTrackPlayed );
-                            console.log( "thisTrackPlayed - previousTrackPlayed: " + ( thisTrackPlayed - previousTrackPlayed ) );
-                            console.groupEnd();
                             const theLength = thisTrackPlayed - previousTrackPlayed;
                             return theLength;
                         } )
