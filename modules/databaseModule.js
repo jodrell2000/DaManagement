@@ -212,8 +212,9 @@ const databaseFunctions = () => {
                             console.groupEnd();
                             return this.runQuery( query, values )
                         } )
+                        .catch( ( ex ) => { console.log( "Something went wrong saving the song stats: .then( ( trackLength ) " + ex ); } );
                 } )
-                .catch( ( ex ) => { console.log( "Something went wrong saving the song stats: " + ex ); } );
+                .catch( ( ex ) => { console.log( "Something went wrong saving the song stats: .then( ( theID ) " + ex ); } );
         },
 
         getLastSongID: function ( theArtist, theTrack ) {
