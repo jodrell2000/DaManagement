@@ -209,6 +209,7 @@ const databaseFunctions = () => {
                             console.log( "query: " + query );
                             const values = [ songFunctions.previousUpVotes(), songFunctions.previousDownVotes(), songFunctions.previousSnags(), trackLength, theID ];
                             console.log( "values: " + JSON.stringify( values ) );
+                            console.groupEnd();
                             return this.runQuery( query, values )
                         } )
                 } )
@@ -253,9 +254,8 @@ const databaseFunctions = () => {
                             console.groupEnd();
                             return thisTrackPlayed - previousTrackPlayed;
                         } )
-                        .catch( ( ex ) => { console.log( "Something went wrong calculating the track length: " + ex ); } );
                 } )
-
+                .catch( ( ex ) => { console.log( "Something went wrong calculating the track length: " + ex ); } );
         },
 
         getTrackPlayedTime: function ( trackID ) {
