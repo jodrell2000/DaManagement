@@ -245,7 +245,7 @@ const databaseFunctions = () => {
         calcTrackLength: function ( trackID ) {
             console.group( "calcTrackLength" );
             console.log( "trackID: " + trackID );
-            this.getTrackPlayedTime( trackID )
+            return this.getTrackPlayedTime( trackID )
                 .then( ( thisTrackPlayed ) => {
                     this.getTrackPlayedTime( trackID - 1 )
                         .then( ( previousTrackPlayed ) => {
