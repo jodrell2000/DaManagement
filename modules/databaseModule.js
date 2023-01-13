@@ -198,8 +198,10 @@ const databaseFunctions = () => {
         },
 
         saveSongStats: function ( songFunctions ) {
+            console.group( "saveSongStats" );
             this.getLastSongID( songFunctions.previousArtist(), songFunctions.previousTrack() )
                 .then( ( theID ) => {
+                    console.log( "theID: " + theID );
                     this.calcTrackLength( theID )
                         .then( ( trackLength ) => {
                             const query = "UPDATE tracksPlayed tp SET upvotes=?, downvotes=?, snags=?, length=? WHERE tp.id=?";
