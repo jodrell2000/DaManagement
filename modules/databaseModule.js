@@ -242,6 +242,9 @@ const databaseFunctions = () => {
                 .then( ( thisTrackPlayed ) => {
                     this.getTrackPlayedTime( trackID - 1 )
                         .then( ( previousTrackPlayed ) => {
+                            console.log( "previousTrackPlayed: " + previousTrackPlayed );
+                            console.log( "thisTrackPlayed: " + thisTrackPlayed );
+                            console.log( "thisTrackPlayed - previousTrackPlayed: " + ( thisTrackPlayed - previousTrackPlayed ) );
                             return thisTrackPlayed - previousTrackPlayed;
                         } )
                 } )
