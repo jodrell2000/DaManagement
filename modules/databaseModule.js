@@ -152,8 +152,9 @@ const databaseFunctions = () => {
                 .then( ( artistID ) => {
                     this.getTrackID( songData.metadata.song )
                         .then( ( trackID ) => {
-                            let theQuery = `INSERT INTO tracksPlayed (artistID, trackID, djID) VALUES ("` + artistID + `", "` + trackID + `", "` + djID + `");`
-                            return this.runQuery( theQuery );
+                            let theQuery = "INSERT INTO tracksPlayed (artistID, trackID, djID) VALUES (?, ?, ?);"
+                            let values = [ artistID, trackID, djID ];
+                            return this.runQuery( theQuery, values );
                         } )
                         .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
                 } )
@@ -199,10 +200,13 @@ const databaseFunctions = () => {
         saveSongStats: function ( songFunctions ) {
             this.getLastSongID( songFunctions.previousArtist(), songFunctions.previousTrack() )
                 .then( ( theID ) => {
-                    const query = "UPDATE tracksPlayed tp SET upvotes=?, downvotes=?, snags=? WHERE tp.id=?";
-                    const values = [ songFunctions.previousUpVotes(), songFunctions.previousDownVotes(), songFunctions.previousSnags(), theID ];
+                    this.calcTrackLength( theID )
+                        .then * ( ( trackLength ) => {
+                            const query = "UPDATE tracksPlayed tp SET upvotes=?, downvotes=?, snags=?, length WHERE tp.id=?";
+                            const values = [ songFunctions.previousUpVotes(), songFunctions.previousDownVotes(), songFunctions.previousSnags(), trackLength, theID ];
 
-                    return this.runQuery( query, values )
+                            return this.runQuery( query, values )
+                        } )
                 } )
                 .catch( ( ex ) => { console.log( "Something went wrong saving the song stats: " + ex ); } );
 
@@ -229,6 +233,28 @@ const databaseFunctions = () => {
                 .then( ( result ) => {
                     if ( result.length !== 0 ) {
                         return result[ 0 ][ 'theID' ];
+                    }
+                } )
+        },
+
+        calcTrackLength: function ( trackID ) {
+            this.getTrackPlayedTime( trackID )
+                .then( ( thisTrackPlayed ) => {
+                    this.getTrackPlayedTime( trackID - 1 )
+                        .then( ( previousTrackPlayed ) => {
+                            return thisTrackPlayed - previousTrackPlayed;
+                        } )
+                } )
+
+        },
+
+        getTrackPlayedTime: function ( trackID ) {
+            const selectQuery = "SELECT UNIX_TIMESTAMP(whenPlayed) AS timestampPlayed FROM tracksPlayed tp WHERE tp.id = ?;";
+            const values = [ trackID ];
+            return this.runQuery( selectQuery, values )
+                .then( ( result ) => {
+                    if ( result.length !== 0 ) {
+                        return result[ 0 ][ 'timestampPlayed' ];
                     }
                 } )
         },

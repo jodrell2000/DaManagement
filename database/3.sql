@@ -13,3 +13,6 @@ CREATE TABLE extendedTrackStats (
 );
 
 INSERT INTO commandsToCount (command) VALUES ("props"), ("noice"), ("spin"), ("tune");
+
+ALTER TABLE tracksPlayed
+ADD COLUMN length INT UNSIGNED NOT NULL DEFAULT 0;
