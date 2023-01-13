@@ -206,7 +206,9 @@ const databaseFunctions = () => {
                     this.calcTrackLength( theID )
                         .then( ( trackLength ) => {
                             const query = "UPDATE tracksPlayed tp SET upvotes=?, downvotes=?, snags=?, length=? WHERE tp.id=?";
+                            console.log( "query: " + query );
                             const values = [ songFunctions.previousUpVotes(), songFunctions.previousDownVotes(), songFunctions.previousSnags(), trackLength, theID ];
+                            console.log( "values: " + JSON.stringify( values ) );
                             return this.runQuery( query, values )
                         } )
                 } )
