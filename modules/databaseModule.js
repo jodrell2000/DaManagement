@@ -199,6 +199,7 @@ const databaseFunctions = () => {
 
         saveSongStats: function ( songFunctions ) {
             console.group( "saveSongStats" );
+            console.log( "artist & track: " + songFunctions.previousArtist() + " " + songFunctions.previousTrack() );
             this.getLastSongID( songFunctions.previousArtist(), songFunctions.previousTrack() )
                 .then( ( theID ) => {
                     console.log( "theID: " + theID );
