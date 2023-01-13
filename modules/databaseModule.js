@@ -252,7 +252,9 @@ const databaseFunctions = () => {
         },
 
         getTrackPlayedTime: function ( trackID ) {
+            console.log( "trackID: " + trackID );
             const selectQuery = "SELECT UNIX_TIMESTAMP(whenPlayed) AS timestampPlayed FROM tracksPlayed tp WHERE tp.id = ?;";
+            console.log( "query: " + selectQuery );
             const values = [ trackID ];
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
