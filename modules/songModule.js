@@ -157,6 +157,7 @@ const songFunctions = ( bot ) => {
         // ========================================================
 
         getSongTags: function ( current_song ) {
+            console.log( JSON.stringify( current_song ) );
             song = current_song.metadata.song;
             album = current_song.metadata.album;
             genre = current_song.metadata.genre;
