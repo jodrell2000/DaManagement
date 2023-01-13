@@ -121,7 +121,7 @@ const databaseFunctions = () => {
         storeUserData: function ( userObject ) {
             const userToSave = this.removeUnsavableDataFromUser( userObject );
             this.writeUserDataToDisk( userToSave );
-            //this.writeUserDataToDatabase( userToSave );
+            this.writeUserDataToDatabase( userToSave );
         },
 
         removeUnsavableDataFromUser: function ( userObject ) {
