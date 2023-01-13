@@ -177,6 +177,7 @@ bot.on( 'roomChanged', function ( data ) {
 
         // set user as current DJ
         userFunctions.setCurrentDJ( data.room.metadata.current_dj, databaseFunctions );
+        songFunctions.getSongTags( data.room.metadata.current_song )
 
         // ask users for their regions if we don't have them
         userFunctions.checkUsersHaveRegions( data, chatFunctions );
