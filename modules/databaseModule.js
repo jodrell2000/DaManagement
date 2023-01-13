@@ -251,6 +251,7 @@ const databaseFunctions = () => {
                             console.groupEnd();
                             return thisTrackPlayed - previousTrackPlayed;
                         } )
+                        .catch( ( ex ) => { console.log( "Something went wrong calculating the track length: " + ex ); } );
                 } )
 
         },
@@ -268,6 +269,7 @@ const databaseFunctions = () => {
                         return result[ 0 ][ 'timestampPlayed' ];
                     }
                 } )
+                .catch( ( ex ) => { console.log( "Something went wrong getting the track played time: " + ex ); } );
         },
 
         // ========================================================
