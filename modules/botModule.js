@@ -72,7 +72,7 @@ const botFunctions = ( bot ) => {
         changeAvatar: function ( data, theID, chatFunctions ) {
             console.group( "changeAvatar" );
             console.log( "theID: " + theID );
-            console.log( "theID.typeOf: " + theID.typeOf );
+            console.log( "typeof(theID): " + typeof ( theID ) );
             if ( isNaN( theID ) ) {
                 chatFunctions.botSpeak( "That's not a valid AvatarID...it needs to be a number", data );
             } else {
