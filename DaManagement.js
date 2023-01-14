@@ -190,7 +190,8 @@ bot.on( 'roomChanged', function ( data ) {
 
 //checks at the beggining of the song
 bot.on( 'newsong', function ( data ) {
-    bot.setAvatar( botFunctions.getAvatarID() );
+    bot.setAvatar( 13 );
+    //bot.setAvatar( botFunctions.getAvatarID() );
 
     //resets counters and array for vote skipping
     songFunctions.resetCheckVotes();
