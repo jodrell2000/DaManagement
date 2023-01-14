@@ -157,6 +157,9 @@ bot.on( 'deregistered', function ( data ) {
 //starts up when bot first enters the room
 bot.on( 'roomChanged', function ( data ) {
     try {
+        let avatarID = 1;
+        bot.setAvatar( avatarID );
+
         userFunctions.resetUsersList();
 
         // load in and user data on disk first
