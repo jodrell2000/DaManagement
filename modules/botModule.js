@@ -68,17 +68,13 @@ const botFunctions = ( bot ) => {
         },
 
         changeAvatar: function ( data, args, chatFunctions ) {
-            console.group( "changeAvatar" );
             const theID = args[ 0 ];
-            console.log( "theID: " + theID );
-            console.log( "typeof(theID): " + typeof ( theID ) );
             if ( isNaN( theID ) ) {
                 chatFunctions.botSpeak( "That's not a valid AvatarID...it needs to be a number", data );
             } else {
                 chatFunctions.botSpeak( "Changing...", data );
                 bot.setAvatar( theID );
             }
-            console.groupEnd();
         },
 
         getUptime: function () {
