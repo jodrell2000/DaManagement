@@ -22,6 +22,8 @@ let whenToGetOnStage = botDefaults.whenToGetOnStage; //when this many or less pe
 let whenToGetOffStage = botDefaults.whenToGetOffStage;
 let checkVideoRegions = musicDefaults.alertIfRegionBlocked;
 let refreshingEnabled = roomDefaults.refreshingEnabled;
+let avatarID = process.env.AVATARID;
+
 
 const botFunctions = ( bot ) => {
 
@@ -47,6 +49,7 @@ const botFunctions = ( bot ) => {
 
         uptimeTime: () => uptimeTime,
         setUptimeTime: function ( value ) { uptimeTime = value; },
+        avatarID: () => avatarID,
 
         // ========================================================
         // Bot Command Functions
@@ -66,12 +69,12 @@ const botFunctions = ( bot ) => {
             shutMeDown();
         },
 
-        changeAvatar: function ( data, avatarID, chatFunctions ) {
+        changeAvatar: function ( data, theID, chatFunctions ) {
             if ( isNaN( avatarID ) ) {
                 chatFunctions.botSpeak( "That's not a valid AvatarID...it needs to be a number", data );
             } else {
-                chatFunctions.botSpeak( "Changing...", data );
-                bot.setAvatar( avatarID );
+                chatFunctions.botSpeak( "Preparing to change outfits...", data );
+                this.avatarID = theID;
             }
         },
 

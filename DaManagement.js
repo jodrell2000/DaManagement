@@ -157,9 +157,6 @@ bot.on( 'deregistered', function ( data ) {
 //starts up when bot first enters the room
 bot.on( 'roomChanged', function ( data ) {
     try {
-        let avatarID = 1;
-        bot.setAvatar( avatarID );
-
         userFunctions.resetUsersList();
 
         // load in and user data on disk first
@@ -193,6 +190,8 @@ bot.on( 'roomChanged', function ( data ) {
 
 //checks at the beggining of the song
 bot.on( 'newsong', function ( data ) {
+    bot.setAvatar( botFunctions.avatarID() );
+
     //resets counters and array for vote skipping
     songFunctions.resetCheckVotes();
     songFunctions.resetVoteCountSkip();
