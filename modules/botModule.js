@@ -22,7 +22,6 @@ let whenToGetOnStage = botDefaults.whenToGetOnStage; //when this many or less pe
 let whenToGetOffStage = botDefaults.whenToGetOffStage;
 let checkVideoRegions = musicDefaults.alertIfRegionBlocked;
 let refreshingEnabled = roomDefaults.refreshingEnabled;
-let avatarID = process.env.AVATARID;
 
 
 const botFunctions = ( bot ) => {
@@ -49,7 +48,6 @@ const botFunctions = ( bot ) => {
 
         uptimeTime: () => uptimeTime,
         setUptimeTime: function ( value ) { uptimeTime = value; },
-        getAvatarID: () => avatarID,
 
         // ========================================================
         // Bot Command Functions
