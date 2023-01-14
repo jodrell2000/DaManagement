@@ -69,8 +69,9 @@ const botFunctions = ( bot ) => {
             shutMeDown();
         },
 
-        changeAvatar: function ( data, theID, chatFunctions ) {
+        changeAvatar: function ( data, args, chatFunctions ) {
             console.group( "changeAvatar" );
+            const theID = args[ 0 ];
             console.log( "theID: " + theID );
             console.log( "typeof(theID): " + typeof ( theID ) );
             if ( isNaN( theID ) ) {
