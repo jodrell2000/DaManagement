@@ -1980,7 +1980,7 @@ const userFunctions = ( bot ) => {
                     } else {
                         const msSinceLastBoot = Date.now() - this.getBBBootedTimestamp( bootingUserID );
                         const formatttedLastBBBooted = formatRelativeTime( msSinceLastBoot / 1000 );
-                        chatFunctions.botSpeak( 'Sorry @' + this.getUsername( bootingUserID ) + ", you can only play BBBoot once every 24Hrs. You last played " + formatttedLastBBBooted + " ago", data );
+                        chatFunctions.botSpeak( 'Sorry @' + this.getUsername( bootingUserID ) + ", you can't play BBBoot again yet. You last played " + formatttedLastBBBooted + " ago", data );
                     }
                 } else {
                     chatFunctions.botSpeak( 'Sorry @' + this.getUsername( bootingUserID ) + ", but I can't boot BB if they're not here!", data );
@@ -2008,17 +2008,20 @@ const userFunctions = ( bot ) => {
         },
 
         canBBBeBooted: function () {
-            return this.bbBootedMoreThan24Hrs( this.bbUserID() );
+            return this.withinBBBootTime( this.bbUserID(), 24 );
         },
 
         canBBBoot: function ( userID ) {
-            return this.bbBootedMoreThan24Hrs( userID );
+            const hours = 24 + ( Math.floor( Math.random() * 12 ) );
+            return this.withinBBBootTime( userID, hours );
         },
 
-        bbBootedMoreThan24Hrs: function ( userID ) {
+        withinBBBootTime: function ( userID, hours ) {
+            console.log( "hours: " + hours );
             const msSinceLastBoot = Date.now() - this.getBBBootedTimestamp( userID );
+            const bootTheshold = 3600000 * hours;
 
-            if ( msSinceLastBoot < 86400000 ) {
+            if ( msSinceLastBoot < bootTheshold ) {
                 return false;
             } else {
                 return true;
@@ -2041,8 +2044,8 @@ const userFunctions = ( bot ) => {
                 chatFunctions.botSpeak( "Goodbye @" + this.getUsername( bootedUserID ), data );
                 await sleep( 5000 )
 
-                this.bootThisUser( bootedUserID, bootMessage )
-                //chatFunctions.botSpeak( bootMessage, data );
+                //this.bootThisUser( bootedUserID, bootMessage )
+                chatFunctions.botSpeak( bootMessage, data );
                 await sleep( 100 )
 
                 this.updateBBBootedTimestamp( bootedUserID, databaseFunctions );
