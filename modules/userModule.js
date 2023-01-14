@@ -49,9 +49,19 @@ const userFunctions = ( bot ) => {
     }
 
     function formatDays ( seconds ) {
-        const theDays = Math.floor( seconds / ( 60 * 60 * 24 ) );
-        const theHours = Math.floor( ( seconds / ( 60 * 60 ) ) - theDays * 24 );
-        const theMinutes = Math.floor( ( ( seconds / ( 60 * 60 ) ) - theHours ) * 60 );
+        const oneDaySeconds = 60 * 60 * 24;
+        const oneHourSeconds = 60 * 60;
+        const oneMinuteSeconds = 60;
+        let remaining = 0;
+
+        const theDays = Math.floor( seconds / oneDaySeconds );
+        remaining = seconds - ( theDays * oneDaySeconds );
+
+        const theHours = Math.floor( ( remaining / oneHourSeconds ) );
+        remaining = remaining - ( theHours * oneHourSeconds );
+
+        const theMinutes = Math.floor( remaining / oneMinuteSeconds );
+
         return ( theDays ).toString() + ' days, ' + ( theHours ).toString() + ' hours ' + ( theMinutes ).toString() + ' and minutes';
     }
 
@@ -2017,7 +2027,6 @@ const userFunctions = ( bot ) => {
         },
 
         withinBBBootTime: function ( userID, hours ) {
-            console.log( "hours: " + hours );
             const msSinceLastBoot = Date.now() - this.getBBBootedTimestamp( userID );
             const bootTheshold = 3600000 * hours;
 
