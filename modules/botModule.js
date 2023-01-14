@@ -49,7 +49,7 @@ const botFunctions = ( bot ) => {
 
         uptimeTime: () => uptimeTime,
         setUptimeTime: function ( value ) { uptimeTime = value; },
-        avatarID: () => avatarID,
+        getAvatarID: () => avatarID,
 
         // ========================================================
         // Bot Command Functions

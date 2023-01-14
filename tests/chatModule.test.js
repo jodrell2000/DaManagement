@@ -1,6 +1,8 @@
 const chatModule = require( '../modules/chatModule' );
+const databaseModule = require( '../modules/databaseModule' );
 
 let chatFunctions;
+let databaseFunctions;
 let mockBot;
 
 beforeAll( () => {
@@ -15,6 +17,7 @@ beforeAll( () => {
     };
 
     chatFunctions = chatModule( mockBot );
+    databaseFunctions = databaseModule( mockBot );
 } );
 
 beforeEach( () => {
@@ -324,7 +327,7 @@ describe( `Test chat function`, () => {
                 getUsername: () => `DJ`
             }
 
-            chatFunctions.dynamicChatCommand( data, userFunctions, theCommand );
+            chatFunctions.dynamicChatCommand( data, userFunctions, theCommand, databaseFunctions );
 
             expect( botSpeak ).toHaveBeenCalled();
             expect( botSpeakReturn ).toBe( `@DJ ${ testMessage }${ pictureArray[ 0 ] }` );
@@ -353,7 +356,7 @@ describe( `Test chat function`, () => {
                 getUsername: ( sender ) => sender
             }
 
-            chatFunctions.dynamicChatCommand( data, userFunctions, theCommand );
+            chatFunctions.dynamicChatCommand( data, userFunctions, theCommand, databaseFunctions );
 
             expect( botSpeak ).toHaveBeenCalled();
             expect( botSpeakReturn ).toBe( "@Sender you can't send the DJ a message if there's no DJ?!?" );
