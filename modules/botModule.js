@@ -74,7 +74,7 @@ const botFunctions = ( bot ) => {
                 chatFunctions.botSpeak( "That's not a valid AvatarID...it needs to be a number", data );
             } else {
                 chatFunctions.botSpeak( "Preparing to change outfits...", data );
-                this.avatarID = theID;
+                bot.setAvatar( 1 );
             }
         },
 
