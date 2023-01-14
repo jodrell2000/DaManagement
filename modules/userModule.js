@@ -62,7 +62,7 @@ const userFunctions = ( bot ) => {
 
         const theMinutes = Math.floor( remaining / oneMinuteSeconds );
 
-        return ( theDays ).toString() + ' days, ' + ( theHours ).toString() + ' hours ' + ( theMinutes ).toString() + ' and minutes';
+        return ( theDays ).toString() + ' days, ' + ( theHours ).toString() + ' hours and ' + ( theMinutes ).toString() + ' minutes';
     }
 
     function formatRelativeTime ( seconds ) {
@@ -2053,8 +2053,8 @@ const userFunctions = ( bot ) => {
                 chatFunctions.botSpeak( "Goodbye @" + this.getUsername( bootedUserID ), data );
                 await sleep( 5000 )
 
-                //this.bootThisUser( bootedUserID, bootMessage )
-                chatFunctions.botSpeak( bootMessage, data );
+                this.bootThisUser( bootedUserID, bootMessage )
+                //chatFunctions.botSpeak( bootMessage, data );
                 await sleep( 100 )
 
                 this.updateBBBootedTimestamp( bootedUserID, databaseFunctions );
