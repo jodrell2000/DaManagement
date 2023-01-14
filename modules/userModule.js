@@ -50,7 +50,7 @@ const userFunctions = ( bot ) => {
 
     function formatDays ( seconds ) {
         const theDays = Math.floor( seconds / ( 60 * 60 * 24 ) );
-        const theHours = Math.floor( seconds / ( 60 * 60 ) );
+        const theHours = Math.floor( ( seconds / ( 60 * 60 ) ) - theDays * 24 );
         const theMinutes = Math.floor( ( ( seconds / ( 60 * 60 ) ) - theHours ) * 60 );
         return ( theDays ).toString() + ' days, ' + ( theHours ).toString() + ' hours ' + ( theMinutes ).toString() + ' and minutes';
     }
