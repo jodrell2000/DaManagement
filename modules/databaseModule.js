@@ -198,7 +198,12 @@ const databaseFunctions = () => {
         },
 
         saveSongStats: function ( songFunctions ) {
-            return this.getLastSongID( songFunctions.previousArtist(), songFunctions.previousTrack() )
+            let trackData = { theArtist: songFunctions.previousArtist(), theTrack: songFunctions.previousTrack() }
+            if ( trackData[ "theArtist" ] === undefined || trackData[ "theTrack" ] === undefined ) {
+                trackData = this.getLastTrackData();
+            }
+
+            return this.getLastSongID( trackData[ "theArtist" ], trackData[ "theTrack" ] )
                 .then( ( theID ) => {
                     return this.calcTrackLength( theID )
                         .then( ( trackLength ) => {
@@ -209,6 +214,16 @@ const databaseFunctions = () => {
                         .catch( ( ex ) => { console.log( "Something went wrong saving the song stats: .then( ( trackLength ) " + ex ); } );
                 } )
                 .catch( ( ex ) => { console.log( "Something went wrong saving the song stats: .then( ( theID ) " + ex ); } );
+        },
+
+        getLastTrackData: function () {
+            const idQuery = "SELECT a.artistName AS theArtist, t.trackName AS theTrack FROM tracksPlayed tp JOIN artists a on a.id=tp.artistID JOIN tracks t ON t.id=tp.trackID WHERE tp.id=(SELECT MAX(id) FROM tracksPlayed);";
+            const idValues = [];
+            return this.runQuery( idQuery, idValues )
+                .then( ( result ) => {
+                    let returnMe = { theArtist: result[ 0 ][ "theArtist" ], theTrack: result[ 0 ][ "theTrack" ] };
+                    return returnMe;
+                } )
         },
 
         getLastSongID: function ( theArtist, theTrack ) {
