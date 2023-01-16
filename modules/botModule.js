@@ -72,6 +72,8 @@ const botFunctions = ( bot ) => {
             if ( isNaN( theID ) ) {
                 chatFunctions.botSpeak( "That's not a valid AvatarID...it needs to be a number", data );
             } else {
+                console.log( "--" + theID + "--" );
+                console.log( typeof ( theID ) );
                 if ( theID === 8 || theID === 4 ) {
                     chatFunctions.botSpeak( "NOPE! No Gingers here...", data );
                 } else {
