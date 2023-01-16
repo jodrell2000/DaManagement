@@ -198,10 +198,14 @@ const databaseFunctions = () => {
         },
 
         saveSongStats: function ( songFunctions ) {
+            console.group( "saveSongStats" );
             let trackData = { theArtist: songFunctions.previousArtist(), theTrack: songFunctions.previousTrack() }
+            console.log( "trackData:" + JSON.stringify( trackData ) );
             if ( trackData[ "theArtist" ] === undefined || trackData[ "theTrack" ] === undefined ) {
-                trackData = this.getLastTrackData();
+                this.getLastTrackData()
+                    .then( ( trackData ) )
             }
+            console.log( "trackData again:" + JSON.stringify( trackData ) );
 
             return this.getLastSongID( trackData[ "theArtist" ], trackData[ "theTrack" ] )
                 .then( ( theID ) => {
@@ -209,6 +213,7 @@ const databaseFunctions = () => {
                         .then( ( trackLength ) => {
                             const query = "UPDATE tracksPlayed tp SET upvotes=?, downvotes=?, snags=?, length=? WHERE tp.id=?";
                             const values = [ songFunctions.previousUpVotes(), songFunctions.previousDownVotes(), songFunctions.previousSnags(), trackLength, theID ];
+                            console.groupEnd();
                             return this.runQuery( query, values )
                         } )
                         .catch( ( ex ) => { console.log( "Something went wrong saving the song stats: .then( ( trackLength ) " + ex ); } );
@@ -217,12 +222,19 @@ const databaseFunctions = () => {
         },
 
         getLastTrackData: function () {
+            console.group( "getLastTrackData" );
             const idQuery = "SELECT a.artistName AS theArtist, t.trackName AS theTrack FROM tracksPlayed tp JOIN artists a on a.id=tp.artistID JOIN tracks t ON t.id=tp.trackID WHERE tp.id=(SELECT MAX(id) FROM tracksPlayed);";
             const idValues = [];
             return this.runQuery( idQuery, idValues )
                 .then( ( result ) => {
-                    let returnMe = { theArtist: result[ 0 ][ "theArtist" ], theTrack: result[ 0 ][ "theTrack" ] };
-                    return returnMe;
+                    if ( result.length !== 0 ) {
+                        console.log( ":" + JSON.stringify( result ) );
+                        let returnMe = { theArtist: result[ 0 ][ "theArtist" ], theTrack: result[ 0 ][ "theTrack" ] };
+                        console.groupEnd();
+                        return returnMe;
+                    } else {
+                        console.log( "We couldn't find the last track in the DB?!?" );
+                    }
                 } )
         },
 
