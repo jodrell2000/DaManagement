@@ -3,9 +3,11 @@ let botDefaults = require( '../defaultSettings/botDefaults.js' );
 let musicDefaults = require( '../defaultSettings/musicDefaults.js' );
 
 let song = null; // info for the currently playing song, so default to null
+let previousSong = null; // info for the currently playing song, so default to null
 let album = null; // info for the currently playing song, so default to null
 let genre = null; // info for the currently playing song, so default to null
 let artist = null; // info for the currently playing song, so default to null
+let previousArtist = null; // info for the currently playing song, so default to null
 let getSong = null; // info for the currently playing song, so default to null
 let dj = null; // info for the currently playing song, so default to null
 let ytid = null; // youTube ID of the video, used to check the regions
@@ -145,8 +147,8 @@ const songFunctions = ( bot ) => {
         previousUpVotes: () => previousSongStats[ 'upvotes' ],
         previousDownVotes: () => previousSongStats[ 'downvotes' ],
         previousSnags: () => previousSongStats[ 'snags' ],
-        previousArtist: () => artist,
-        previousTrack: () => song,
+        previousArtist: () => previousArtist,
+        previousTrack: () => previousSong,
 
         grabSongStats: function () {
             previousSongStats[ 'upvotes' ] = upVotes;
@@ -157,6 +159,9 @@ const songFunctions = ( bot ) => {
         // ========================================================
 
         getSongTags: function ( current_song ) {
+            previousArtist = artist;
+            previousSong = song;
+
             song = current_song.metadata.song;
             album = current_song.metadata.album;
             genre = current_song.metadata.genre;
