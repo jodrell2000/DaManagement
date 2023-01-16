@@ -133,10 +133,10 @@ const commandFunctions = ( bot ) => {
     botCommands.playlist = ( { data, chatFunctions } ) => { chatFunctions.readPlaylistStats( data ); }
     botCommands.playlist.help = "Tells you how many songs are in the Bot playlist";
 
-    botCommands.avatar = ( { data, args, botFunctions, chatFunctions } ) => { botFunctions.changeAvatar( data, args, chatFunctions ) }
-    botCommands.avatar.argumentCount = 1;
-    botCommands.avatar.help = "Change Robo's avatar";
-    botCommands.avatar.sampleArguments = [ "13" ];
+    moderatorCommands.avatar = ( { data, args, botFunctions, chatFunctions } ) => { botFunctions.changeAvatar( data, args, chatFunctions ) }
+    moderatorCommands.avatar.argumentCount = 1;
+    moderatorCommands.avatar.help = "Change Robo's avatar";
+    moderatorCommands.avatar.sampleArguments = [ "13" ];
 
     // #############################################
     // User commands
