@@ -239,9 +239,9 @@ const databaseFunctions = () => {
         calcTrackLength: function ( trackID ) {
             return this.getTrackPlayedTime( trackID )
                 .then( ( thisTrackPlayed ) => {
-                    return this.getTrackPlayedTime( trackID - 1 )
-                        .then( ( previousTrackPlayed ) => {
-                            const theLength = thisTrackPlayed - previousTrackPlayed;
+                    return this.getTrackPlayedTime( trackID + 1 )
+                        .then( ( nextTrackPlayed ) => {
+                            const theLength = nextTrackPlayed - thisTrackPlayed;
                             return theLength;
                         } )
                 } )
