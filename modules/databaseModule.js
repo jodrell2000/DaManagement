@@ -156,7 +156,7 @@ const databaseFunctions = () => {
                             let values = [ artistID, trackID, djID ];
                             return this.runQuery( theQuery, values )
                                 .then( () => {
-                                    return this.setTrackLength( trackID );
+                                    return this.setTrackLength( trackID - 1 );
                                 } )
                         } )
                         .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
@@ -164,16 +164,14 @@ const databaseFunctions = () => {
                 .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
         },
 
-        setTrackLength: function ( currentTrackID ) {
-            const previousTrackID = currentTrackID - 1;
-            console.group( "setTrackLength" );
-            console.log( "currentTrackID: " + currentTrackID );
-            console.log( "previousTrackID: " + previousTrackID );
+        setTrackLength: function ( trackID ) {
+            console.log( "currentTrackID: " + trackID + 1 );
+            console.log( "previousTrackID: " + trackID );
             console.groupEnd();
-            return this.calcTrackLength( previousTrackID )
+            return this.calcTrackLength( trackID )
                 .then( ( length ) => {
                     let theQuery = "UPDATE tracksPlayed SET length = ? WHERE id = ?;"
-                    let values = [ length, previousTrackID ];
+                    let values = [ length, trackID ];
                     return this.runQuery( theQuery, values );
                 } )
         },
