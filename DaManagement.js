@@ -156,6 +156,7 @@ bot.on( 'deregistered', function ( data ) {
 
 //starts up when bot first enters the room
 bot.on( 'roomChanged', function ( data ) {
+    console.log( JSON.stringify( data ) );
     try {
         userFunctions.resetUsersList();
 
