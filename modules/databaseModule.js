@@ -165,9 +165,6 @@ const databaseFunctions = () => {
         },
 
         setTrackLength: function ( trackID ) {
-            console.log( "currentTrackID: " + trackID + 1 );
-            console.log( "previousTrackID: " + trackID );
-            console.groupEnd();
             return this.calcTrackLength( trackID )
                 .then( ( length ) => {
                     let theQuery = "UPDATE tracksPlayed SET length = ? WHERE id = ?;"
