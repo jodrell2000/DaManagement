@@ -164,15 +164,16 @@ const databaseFunctions = () => {
                 .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
         },
 
-        setTrackLength: function ( trackID ) {
+        setTrackLength: function ( currentTrackID ) {
+            const previousTrackID = currentTrackID - 1;
             console.group( "setTrackLength" );
-            console.log( "trackID: " + trackID );
-            console.log( "trackID-1: " + ( trackID - 1 ) );
+            console.log( "currentTrackID: " + currentTrackID );
+            console.log( "previousTrackID: " + previousTrackID );
             console.groupEnd();
-            return this.calcTrackLength( trackID )
+            return this.calcTrackLength( previousTrackID )
                 .then( ( length ) => {
                     let theQuery = "UPDATE tracksPlayed SET length = ? WHERE id = ?;"
-                    let values = [ length, trackID ];
+                    let values = [ length, previousTrackID ];
                     return this.runQuery( theQuery, values );
                 } )
         },
