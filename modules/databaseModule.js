@@ -154,11 +154,27 @@ const databaseFunctions = () => {
                         .then( ( trackID ) => {
                             let theQuery = "INSERT INTO tracksPlayed (artistID, trackID, djID) VALUES (?, ?, ?);"
                             let values = [ artistID, trackID, djID ];
-                            return this.runQuery( theQuery, values );
+                            return this.runQuery( theQuery, values )
+                                .then( () => {
+                                    return this.setTrackLength( trackID );
+                                } )
                         } )
                         .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
                 } )
                 .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
+        },
+
+        setTrackLength: function ( trackID ) {
+            console.group( "setTrackLength" );
+            console.log( "trackID: " + trackID );
+            console.log( "trackID-1: " + ( trackID - 1 ) );
+            console.groupEnd();
+            return this.calcTrackLength( trackID )
+                .then( ( length ) => {
+                    let theQuery = "UPDATE tracksPlayed SET length = ? WHERE id = ?;"
+                    let values = [ length, trackID ];
+                    return this.runQuery( theQuery, values );
+                } )
         },
 
         getArtistID: function ( theName ) {
@@ -198,44 +214,14 @@ const databaseFunctions = () => {
         },
 
         saveSongStats: function ( songFunctions ) {
-            console.group( "saveSongStats" );
-            let trackData = { theArtist: songFunctions.previousArtist(), theTrack: songFunctions.previousTrack() }
-            console.log( "trackData:" + JSON.stringify( trackData ) );
-            if ( trackData[ "theArtist" ] === undefined || trackData[ "theTrack" ] === undefined ) {
-                this.getLastTrackData()
-                    .then( ( trackData ) )
-            }
-            console.log( "trackData again:" + JSON.stringify( trackData ) );
-
-            return this.getLastSongID( trackData[ "theArtist" ], trackData[ "theTrack" ] )
+            return this.getLastSongID( songFunctions.previousArtist(), songFunctions.previousTrack() )
                 .then( ( theID ) => {
-                    return this.calcTrackLength( theID )
-                        .then( ( trackLength ) => {
-                            const query = "UPDATE tracksPlayed tp SET upvotes=?, downvotes=?, snags=?, length=? WHERE tp.id=?";
-                            const values = [ songFunctions.previousUpVotes(), songFunctions.previousDownVotes(), songFunctions.previousSnags(), trackLength, theID ];
-                            console.groupEnd();
-                            return this.runQuery( query, values )
-                        } )
-                        .catch( ( ex ) => { console.log( "Something went wrong saving the song stats: .then( ( trackLength ) " + ex ); } );
+                    const query = "UPDATE tracksPlayed tp SET upvotes=?, downvotes=?, snags=? WHERE tp.id=?";
+                    const values = [ songFunctions.previousUpVotes(), songFunctions.previousDownVotes(), songFunctions.previousSnags(), theID ];
+                    console.groupEnd();
+                    return this.runQuery( query, values )
                 } )
                 .catch( ( ex ) => { console.log( "Something went wrong saving the song stats: .then( ( theID ) " + ex ); } );
-        },
-
-        getLastTrackData: function () {
-            console.group( "getLastTrackData" );
-            const idQuery = "SELECT a.artistName AS theArtist, t.trackName AS theTrack FROM tracksPlayed tp JOIN artists a on a.id=tp.artistID JOIN tracks t ON t.id=tp.trackID WHERE tp.id=(SELECT MAX(id) FROM tracksPlayed);";
-            const idValues = [];
-            return this.runQuery( idQuery, idValues )
-                .then( ( result ) => {
-                    if ( result.length !== 0 ) {
-                        console.log( ":" + JSON.stringify( result ) );
-                        let returnMe = { theArtist: result[ 0 ][ "theArtist" ], theTrack: result[ 0 ][ "theTrack" ] };
-                        console.groupEnd();
-                        return returnMe;
-                    } else {
-                        console.log( "We couldn't find the last track in the DB?!?" );
-                    }
-                } )
         },
 
         getLastSongID: function ( theArtist, theTrack ) {
@@ -265,10 +251,10 @@ const databaseFunctions = () => {
 
         calcTrackLength: function ( trackID ) {
             return this.getTrackPlayedTime( trackID )
-                .then( ( thisTrackPlayed ) => {
+                .then( ( thisTrackPlayedTime ) => {
                     return this.getTrackPlayedTime( trackID + 1 )
-                        .then( ( nextTrackPlayed ) => {
-                            const theLength = nextTrackPlayed - thisTrackPlayed;
+                        .then( ( nextTrackPlayedTime ) => {
+                            const theLength = nextTrackPlayedTime - thisTrackPlayedTime;
                             return theLength;
                         } )
                 } )
