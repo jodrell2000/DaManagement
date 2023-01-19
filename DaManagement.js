@@ -202,6 +202,7 @@ bot.on( 'newsong', function ( data ) {
     //procedure for getting song tags
     //console.info( "data.room.metadata.current_song:" + JSON.stringify( data.room.metadata.current_song ) );
     songFunctions.getSongTags( data.room.metadata.current_song )
+    databaseFunctions.saveLastSongStats( songFunctions );
 
     //set information
     roomFunctions.setDJCount( data.room.metadata.djs.length ); //the number of dj's on stage
@@ -474,7 +475,6 @@ bot.on( 'endsong', function ( data ) {
 
     //bot says song stats for each song
     chatFunctions.readSongStats( data, songFunctions, botFunctions );
-    databaseFunctions.saveSongStats( songFunctions );
 
     userFunctions.incrementDJPlayCount( djID, databaseFunctions );
 
