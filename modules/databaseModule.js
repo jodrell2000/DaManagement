@@ -209,7 +209,7 @@ const databaseFunctions = () => {
                 } )
         },
 
-        saveSongStats: function ( songFunctions ) {
+        saveLastSongStats: function ( songFunctions ) {
             return this.getLastSongID( songFunctions.previousArtist(), songFunctions.previousTrack() )
                 .then( ( theID ) => {
                     const query = "UPDATE tracksPlayed tp SET upvotes=?, downvotes=?, snags=? WHERE tp.id=?";
