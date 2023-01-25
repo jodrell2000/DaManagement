@@ -72,7 +72,7 @@ const botFunctions = ( bot ) => {
             if ( isNaN( theID ) ) {
                 chatFunctions.botSpeak( "That's not a valid AvatarID...it needs to be a number", data );
             } else {
-                if ( theID === "8" || theID === "4" ) {
+                if ( theID === "8" || theID === "4" || theID === "227" || theID === "2022" ) {
                     chatFunctions.botSpeak( "NOPE! No Gingers here...", data );
                 } else {
                     chatFunctions.botSpeak( "Changing...", data );
