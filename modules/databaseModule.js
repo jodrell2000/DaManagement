@@ -174,7 +174,7 @@ const databaseFunctions = () => {
         },
 
         getArtistID: function ( theName ) {
-            const selectQuery = `SELECT id FROM artists WHERE artistName = "?";`;
+            const selectQuery = `SELECT id FROM artists WHERE artistName = ?;`;
             const values = [ theName ];
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
@@ -192,7 +192,7 @@ const databaseFunctions = () => {
         },
 
         getTrackID: function ( theName ) {
-            const selectQuery = `SELECT id FROM tracks WHERE trackName = "?";`;
+            const selectQuery = `SELECT id FROM tracks WHERE trackName = ?;`;
             const values = [ theName ];
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
