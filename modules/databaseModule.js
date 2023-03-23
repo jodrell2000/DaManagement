@@ -155,8 +155,8 @@ const databaseFunctions = () => {
                             let theQuery = "INSERT INTO tracksPlayed (artistID, trackID, djID) VALUES (?, ?, ?);"
                             let values = [ artistID, trackID, djID ];
                             return this.runQuery( theQuery, values )
-                                .then( () => {
-                                    return this.setTrackLength( trackID - 1 );
+                                .then( ( result ) => {
+                                    return this.setTrackLength( result.insertId - 1 );
                                 } )
                         } )
                         .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
