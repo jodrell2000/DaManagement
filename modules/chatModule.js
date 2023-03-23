@@ -246,42 +246,44 @@ const chatFunctions = ( bot, roomDefaults ) => {
         // ========================================================
 
         userGreeting: function ( data, userID, theUsername, roomFunctions, userFunctions, databaseFunctions ) {
-            const customGreeting = userMessages.userGreetings.find( ( { id } ) => id === userID );
-            let theMessage;
+            if ( theUsername !== "Guest" ) {
+                const customGreeting = userMessages.userGreetings.find( ( { id } ) => id === userID );
+                let theMessage;
 
-            if ( customGreeting !== undefined ) {
-                theMessage = customGreeting.message;
-            } else {
-                theMessage = roomFunctions.roomJoinMessage();
-            }
-
-            if ( roomFunctions.theme() !== false ) {
-                theMessage += '; The theme is currently set to ' + roomFunctions.theme();
-            }
-
-            theMessage = theMessage.replace( "@username", "@" + theUsername );
-            theMessage = theMessage.replace( "@roomName", roomFunctions.roomName() );
-
-            if ( !userFunctions.isUsersWelcomeTimerActive( userID ) ) {
-                userFunctions.activateUsersWelcomeTimer( userID, databaseFunctions );
-
-                const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
-                const readInOrder = async () => {
-                    await sleep( 1000 )
-                    this.botSpeak( theMessage, null, roomFunctions.greetInPublic(), userID );
-                    await sleep( 10 )
-                    if ( roomDefaults.queueActive === true && userFunctions.howManyDJs() === 5 ) {
-                        this.botSpeak( 'The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.', data, roomFunctions.greetInPublic() );
-                    }
-
-                    await sleep( 10 )
-                    if ( !roomFunctions.isRulesTimerRunning() && roomFunctions.rulesMessageOn() ) {
-                        this.botSpeak( roomFunctions.additionalJoinMessage(), data, roomFunctions.greetInPublic() );
-                        roomFunctions.startRulesTimer();
-                    }
-
+                if ( customGreeting !== undefined ) {
+                    theMessage = customGreeting.message;
+                } else {
+                    theMessage = roomFunctions.roomJoinMessage();
                 }
-                readInOrder();
+
+                if ( roomFunctions.theme() !== false ) {
+                    theMessage += '; The theme is currently set to ' + roomFunctions.theme();
+                }
+
+                theMessage = theMessage.replace( "@username", "@" + theUsername );
+                theMessage = theMessage.replace( "@roomName", roomFunctions.roomName() );
+
+                if ( !userFunctions.isUsersWelcomeTimerActive( userID ) ) {
+                    userFunctions.activateUsersWelcomeTimer( userID, databaseFunctions );
+
+                    const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
+                    const readInOrder = async () => {
+                        await sleep( 1000 )
+                        this.botSpeak( theMessage, null, roomFunctions.greetInPublic(), userID );
+                        await sleep( 10 )
+                        if ( roomDefaults.queueActive === true && userFunctions.howManyDJs() === 5 ) {
+                            this.botSpeak( 'The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.', data, roomFunctions.greetInPublic() );
+                        }
+
+                        await sleep( 10 )
+                        if ( !roomFunctions.isRulesTimerRunning() && roomFunctions.rulesMessageOn() ) {
+                            this.botSpeak( roomFunctions.additionalJoinMessage(), data, roomFunctions.greetInPublic() );
+                            roomFunctions.startRulesTimer();
+                        }
+
+                    }
+                    readInOrder();
+                }
             }
         },
 
