@@ -78,8 +78,8 @@ const commandFunctions = ( bot ) => {
     generalCommands.deletetrack = ( { data, botFunctions, userFunctions, chatFunctions, songFunctions } ) => { botFunctions.deleteCurrentTrackFromBotPlaylist( data, userFunctions, chatFunctions, songFunctions ); }
     generalCommands.deletetrack.help = "Delete whatever track Robo is currently playing";
 
-    generalCommands.bbboot = ( { data, userFunctions, chatFunctions, databaseFunctions } ) => { userFunctions.bbBoot( data, chatFunctions, databaseFunctions ); }
-    generalCommands.bbboot.help = "BBBoot @Bukkake. If it's been more than 24hrs since the last boot, BB gets booted. If it's been less, you do! ;-)";
+    // generalCommands.bbboot = ( { data, userFunctions, chatFunctions, databaseFunctions } ) => { userFunctions.bbBoot( data, chatFunctions, databaseFunctions ); }
+    // generalCommands.bbboot.help = "BBBoot @Bukkake. If it's been more than 24hrs since the last boot, BB gets booted. If it's been less, you do! ;-)";
 
     generalCommands.robocoin = ( { data, userFunctions, chatFunctions } ) => { userFunctions.readMyRoboCoin( data, chatFunctions ); }
     generalCommands.robocoin.help = "How many Robo points do you have?";
