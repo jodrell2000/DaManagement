@@ -470,6 +470,7 @@ bot.on( 'rem_moderator', function ( data ) {
 
 //activates at the end of a song.
 bot.on( 'endsong', function ( data ) {
+    console.log( JSON.stringify( data ) );
     songFunctions.grabSongStats();
     const djID = data.room.metadata.current_dj;
 
