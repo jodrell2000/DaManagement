@@ -254,20 +254,14 @@ const botFunctions = ( bot ) => {
         },
 
         favouriteArtist: function ( databaseFunctions ) {
-            return new Promise( ( resolve, _ ) => {
-                if ( favouriteArtist === null ) {
-                    databaseFunctions.getRandomVerifiedArtist()
-                        .then( ( displayName ) => {
-                            this.setFavouriteArtist( displayName )
-                                .then( ( favouriteArtist ) => {
-                                    resolve( favouriteArtist );
-                                } )
+            if ( favouriteArtist !== null ) {
+                return Promise.resolve( favouriteArtist );
+            }
 
-                        } )
-                } else {
-                    resolve( favouriteArtist );
-                }
-            } )
+            return databaseFunctions.getRandomVerifiedArtist()
+                .then( ( displayName ) => {
+                    return this.setFavouriteArtist( displayName );
+                } );
         },
 
         setFavouriteArtist: function ( value ) {
