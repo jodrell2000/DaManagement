@@ -295,7 +295,7 @@ const databaseFunctions = () => {
 
             return this.runQuery( selectQuery, values )
                 .then( result => {
-                    console.log( "queryResults:" + result );
+                    console.log( "queryResults:" + JSON.stringify( result ) );
                     console.groupEnd();
                     return result;
                 } );

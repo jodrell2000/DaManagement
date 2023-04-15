@@ -283,7 +283,7 @@ const botFunctions = ( bot ) => {
             console.group( "botModule:isFavouriteArtist" );
 
             const artistList = await databaseFunctions.getVerifiedArtistsFromName( theArtist );
-            console.log( "artistList:" + artistList );
+            console.log( "artistList:" + JSON.stringify( artistList ) );
 
             console.groupEnd();
         },
