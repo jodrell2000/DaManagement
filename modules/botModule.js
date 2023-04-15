@@ -4,6 +4,7 @@ let musicDefaults = require( '../defaultSettings/musicDefaults.js' );
 let chatDefaults = require( '../defaultSettings/chatDefaults.js' );
 
 let authModule = require( '../auth.js' );
+const { weekdays } = require( 'moment' );
 
 let checkActivity = Date.now();
 let skipOn = null; //if true causes the bot to skip every song it plays, toggled on and off by commands
@@ -243,6 +244,11 @@ const botFunctions = ( bot ) => {
 
         lameCommand: function () {
             bot.vote( 'down' );
+        },
+
+        choosefavourite ( data, chatFunctions, databaseFunctions ) {
+            const theFavourite = databaseFunctions.getRandomVerifiedArtist();
+            chatFunctions.botSpeak( "This week, I haz been mostly listening to " + theFavourite, data );
         },
 
         // ========================================================

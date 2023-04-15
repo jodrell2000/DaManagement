@@ -271,6 +271,23 @@ const databaseFunctions = () => {
         // ========================================================
 
         // ========================================================
+        // Misc Functions
+        // ========================================================
+
+        getRandomVerifiedArtist: function () {
+            const selectQuery = "select DISTINCT(displayName) from artists WHERE displayName IS NOT NULL ORDER BY RAND() LIMIT 1;";
+            const values = [];
+            return this.runQuery( selectQuery, values )
+                .then( ( result ) => {
+                    if ( result.length !== 0 ) {
+                        return result[ 0 ][ 'displayName' ];
+                    }
+                } )
+        },
+
+        // ========================================================
+
+        // ========================================================
         // Command Functions
         // ========================================================
 
