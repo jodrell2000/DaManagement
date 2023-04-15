@@ -252,7 +252,7 @@ bot.on( 'newsong', function ( data ) {
         } )
         .then( () => {
             chatFunctions.botSpeak( "Have 10 RoboCoin as a thank you", data );
-            userFunctions.updateRoboCoins( djID, this.getRoboCoins( djID ) + 5, databaseFunctions )
+            userFunctions.updateRoboCoins( djID, userFunctions.getRoboCoins( djID ) + 5, databaseFunctions )
         } )
         .then( () => {
             botFunctions.chooseNewFavourite( databaseFunctions );
