@@ -247,17 +247,20 @@ const botFunctions = ( bot ) => {
             bot.vote( 'down' );
         },
 
+        // ========================================================
+
         async readFavouriteArtist ( data, chatFunctions, databaseFunctions ) {
+            await this.getFavouriteArtist( databaseFunctions )
+                .then( () => {
+                    chatFunctions.botSpeak( "This week, I has been mostly listening to " + favouriteArtist, data );
+                } )
+        },
+
+        async getFavouriteArtist ( databaseFunctions ) {
             await this.hasFavouriteArtist()
                 .then( ( theReturn ) => {
                     if ( !theReturn ) {
                         this.chooseNewFavourite( databaseFunctions )
-                            .then( () => {
-                                chatFunctions.botSpeak( "This week, I has been mostly listening to " + favouriteArtist, data );
-                            } )
-
-                    } else {
-                        chatFunctions.botSpeak( "This week, I has been mostly listening to " + favouriteArtist, data );
                     }
                 } )
         },
