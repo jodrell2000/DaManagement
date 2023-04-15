@@ -279,6 +279,13 @@ const botFunctions = ( bot ) => {
                 } )
         },
 
+        async isFavouriteArtist ( databaseFunctions, theArtist ) {
+            console.group( "botModule:isFavouriteArtist" );
+            const artistList = await databaseFunctions.getVerifiedArtistsFromName( theArtist );
+            console.log( "aartistList:" + artistList );
+            console.groupEnd();
+        },
+
         // ========================================================
 
         getFormattedDate: function () {

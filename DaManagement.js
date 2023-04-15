@@ -243,6 +243,8 @@ bot.on( 'newsong', function ( data ) {
     //this is for /warnme
     userFunctions.warnMeCall( roomFunctions );
 
+    botFunctions.isFavouriteArtist( data.room.metadata.current_song.metadata.artist );
+
     //removes current dj from stage if they play a banned song or artist.
     if ( musicDefaults.bannedArtists.length !== 0 && typeof songFunctions.artist() !== 'undefined' && typeof songFunctions.song() !== 'undefined' ) {
         const djCheck = userFunctions.getCurrentDJID();
