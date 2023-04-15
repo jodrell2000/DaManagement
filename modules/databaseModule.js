@@ -290,17 +290,15 @@ const databaseFunctions = () => {
 
         getVerifiedArtistsFromName ( theArtist ) {
             console.group( "databaseModule:getVerifiedArtistsFromName" );
-            return new Promise( ( resolve, _ ) => {
-                const selectQuery = "SELECT displayName FROM artists WHERE artistName = ?;";
-                const values = [ theArtist ];
+            const selectQuery = "SELECT displayName FROM artists WHERE artistName = ?;";
+            const values = [ theArtist ];
 
-                this.runQuery( selectQuery, values )
-                    .then( ( result ) => {
-                        console.log( "queryResults:" + result );
-                        console.groupEnd();
-                        resolve( result );
-                    } )
-            } )
+            return this.runQuery( selectQuery, values )
+                .then( result => {
+                    console.log( "queryResults:" + result );
+                    console.groupEnd();
+                    return result;
+                } );
         },
 
         // ========================================================
