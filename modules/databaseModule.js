@@ -274,15 +274,18 @@ const databaseFunctions = () => {
         // Misc Functions
         // ========================================================
 
-        async getRandomVerifiedArtist () {
-            const selectQuery = "select DISTINCT(displayName) from artists WHERE displayName IS NOT NULL ORDER BY RAND() LIMIT 1;";
-            const values = [];
-            await this.runQuery( selectQuery, values )
-                .then( ( result ) => {
-                    if ( result.length !== 0 ) {
-                        return result[ 0 ][ 'displayName' ];
-                    }
-                } )
+        getRandomVerifiedArtist () {
+            return new Promise( ( resolve, reject ) => {
+                const selectQuery = "select DISTINCT(displayName) from artists WHERE displayName IS NOT NULL ORDER BY RAND() LIMIT 1;";
+                const values = [];
+
+                this.runQuery( selectQuery, values )
+                    .then( ( result ) => {
+                        if ( result.length !== 0 ) {
+                            resolve( result[ 0 ][ 'displayName' ] );
+                        }
+                    } )
+            }
         },
 
         // ========================================================
