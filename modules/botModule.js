@@ -23,6 +23,7 @@ let whenToGetOnStage = botDefaults.whenToGetOnStage; //when this many or less pe
 let whenToGetOffStage = botDefaults.whenToGetOffStage;
 let checkVideoRegions = musicDefaults.alertIfRegionBlocked;
 let refreshingEnabled = roomDefaults.refreshingEnabled;
+let favouriteArtist = null; // what's Robos current favouurite Artist (requires verified info in the DB)
 
 
 const botFunctions = ( bot ) => {
@@ -246,10 +247,36 @@ const botFunctions = ( bot ) => {
             bot.vote( 'down' );
         },
 
+        readFavouriteArtist ( data, chatFunctions, databaseFunctions ) {
+            this.hasFavouriteArtist()
+                .then( ( theReturn ) => {
+                    if ( !theReturn ) {
+                        this.choosefavourite( data, chatFunctions, databaseFunctions );
+                    }
+                } )
+                .then( () => {
+                    chatFunctions.botSpeak( "This week, I haz been mostly listening to " + favouriteArtist, data );
+                } )
+
+        },
+
+        hasFavouriteArtist () {
+            let theReturn;
+            return new Promise( ( resolve, _ ) => {
+                if ( !favouriteArtist ) {
+                    theReturn = false;
+                } else {
+                    theReturn = true;
+                }
+                resolve( theReturn );
+            } )
+        },
+
         choosefavourite ( data, chatFunctions, databaseFunctions ) {
             databaseFunctions.getRandomVerifiedArtist()
                 .then( ( displayName ) => {
-                    chatFunctions.botSpeak( "This week, I haz been mostly listening to " + displayName, data );
+                    favouriteArtist = displayName;
+                    console.log( favouriteArtist );
                 } )
         },
 
