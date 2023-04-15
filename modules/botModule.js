@@ -256,6 +256,8 @@ const botFunctions = ( bot ) => {
                                 chatFunctions.botSpeak( "This week, I has been mostly listening to " + favouriteArtist, data );
                             } )
 
+                    } else {
+                        chatFunctions.botSpeak( "This week, I has been mostly listening to " + favouriteArtist, data );
                     }
                 } )
         },
