@@ -250,27 +250,22 @@ const botFunctions = ( bot ) => {
         // ========================================================
 
         async readFavouriteArtist ( data, chatFunctions, databaseFunctions ) {
-            await this.getFavouriteArtist( databaseFunctions )
-                .then( () => {
-                    chatFunctions.botSpeak( "This week, I has been mostly listening to " + favouriteArtist, data );
-                } )
+            chatFunctions.botSpeak( "This week, I has been mostly listening to " + this.favouriteArtist( databaseFunctions ), data );
         },
 
-        async getFavouriteArtist ( databaseFunctions ) {
-            await this.hasFavouriteArtist()
-                .then( ( theReturn ) => {
-                    if ( !theReturn ) {
-                        this.chooseNewFavourite( databaseFunctions )
-                    }
-                } )
-        },
-
-        async hasFavouriteArtist () {
+        favouriteArtist: function ( databaseFunctions ) {
             return new Promise( ( resolve, _ ) => {
                 if ( favouriteArtist === null ) {
-                    resolve( false );
+                    databaseFunctions.getRandomVerifiedArtist()
+                        .then( ( displayName ) => {
+                            favouriteArtist = displayName
+                                .then( () => {
+                                    resolve( favouriteArtist );
+                                } )
+
+                        } )
                 } else {
-                    resolve( true );
+                    resolve( favouriteArtist );
                 }
             } )
         },
