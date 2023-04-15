@@ -260,15 +260,13 @@ const botFunctions = ( bot ) => {
 
         },
 
-        hasFavouriteArtist () {
-            let theReturn;
+        async hasFavouriteArtist () {
             return new Promise( ( resolve, _ ) => {
-                if ( !favouriteArtist ) {
-                    theReturn = false;
+                if ( favouriteArtist === null ) {
+                    resolve( false );
                 } else {
-                    theReturn = true;
+                    resolve( true );
                 }
-                resolve( theReturn );
             } )
         },
 
