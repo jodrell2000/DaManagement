@@ -275,7 +275,7 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.randomthemeremove.help = "Remove a theme from the randomizer";
     moderatorCommands.randomthemeremove.sampleArguments = [ "The Weather" ];
 
-    moderatorCommands.readFavouriteArtist = ( { data, chatFunctions, botFunctions, databaseFunctions } ) => { botFunctions.readFavouriteArtist( data, chatFunctions, databaseFunctions ); }
+    moderatorCommands.readfavouriteartist = ( { data, chatFunctions, botFunctions, databaseFunctions } ) => { botFunctions.readFavouriteArtist( data, chatFunctions, databaseFunctions ); }
     moderatorCommands.readFavouriteArtist.help = "Pick and announce a favourite artist";
 
     // #############################################
