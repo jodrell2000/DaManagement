@@ -291,7 +291,6 @@ const botFunctions = ( bot ) => {
                                 return;
                             }
                         }
-                        reject();
                     } )
                     .catch( ( error ) => {
                         reject( error );
