@@ -258,8 +258,8 @@ const botFunctions = ( bot ) => {
                 if ( favouriteArtist === null ) {
                     databaseFunctions.getRandomVerifiedArtist()
                         .then( ( displayName ) => {
-                            favouriteArtist = displayName
-                                .then( () => {
+                            this.setFavouriteArtist( displayName )
+                                .then( ( favouriteArtist ) => {
                                     resolve( favouriteArtist );
                                 } )
 
@@ -267,6 +267,13 @@ const botFunctions = ( bot ) => {
                 } else {
                     resolve( favouriteArtist );
                 }
+            } )
+        },
+
+        setFavouriteArtist: function ( value ) {
+            return new Promise( ( resolve, _ ) => {
+                favouriteArtist = value;
+                resolve( value );
             } )
         },
 
