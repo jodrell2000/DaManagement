@@ -251,7 +251,7 @@ const botFunctions = ( bot ) => {
             this.hasFavouriteArtist()
                 .then( ( theReturn ) => {
                     if ( !theReturn ) {
-                        this.choosefavourite( data, chatFunctions, databaseFunctions );
+                        this.chooseNewFavourite( databaseFunctions );
                     }
                 } )
                 .then( () => {
@@ -272,11 +272,10 @@ const botFunctions = ( bot ) => {
             } )
         },
 
-        choosefavourite ( data, chatFunctions, databaseFunctions ) {
+        chooseNewFavourite ( databaseFunctions ) {
             databaseFunctions.getRandomVerifiedArtist()
                 .then( ( displayName ) => {
                     favouriteArtist = displayName;
-                    console.log( favouriteArtist );
                 } )
         },
 

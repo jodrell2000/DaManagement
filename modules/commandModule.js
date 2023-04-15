@@ -276,7 +276,10 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.randomthemeremove.sampleArguments = [ "The Weather" ];
 
     moderatorCommands.readfavouriteartist = ( { data, chatFunctions, botFunctions, databaseFunctions } ) => { botFunctions.readFavouriteArtist( data, chatFunctions, databaseFunctions ); }
-    moderatorCommands.readfavouriteartist.help = "Pick and announce a favourite artist";
+    moderatorCommands.readfavouriteartist.help = "Read Robos favourite artist";
+
+    moderatorCommands.choosenewfavourite = ( { botFunctions, databaseFunctions } ) => { botFunctions.chooseNewFavourite( databaseFunctions ); }
+    moderatorCommands.choosenewfavourite.help = "Pick a new favourite artist";
 
     // #############################################
     // Moderator Greeting commands
