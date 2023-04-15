@@ -285,7 +285,7 @@ const databaseFunctions = () => {
                             resolve( result[ 0 ][ 'displayName' ] );
                         }
                     } )
-            }
+            } )
         },
 
         // ========================================================
