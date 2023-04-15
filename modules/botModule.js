@@ -251,13 +251,13 @@ const botFunctions = ( bot ) => {
             await this.hasFavouriteArtist()
                 .then( ( theReturn ) => {
                     if ( !theReturn ) {
-                        this.chooseNewFavourite( databaseFunctions );
+                        this.chooseNewFavourite( databaseFunctions )
+                            .then( () => {
+                                chatFunctions.botSpeak( "This week, I has been mostly listening to " + favouriteArtist, data );
+                            } )
+
                     }
                 } )
-                .then( () => {
-                    chatFunctions.botSpeak( "This week, I has been mostly listening to " + favouriteArtist, data );
-                } )
-
         },
 
         async hasFavouriteArtist () {
