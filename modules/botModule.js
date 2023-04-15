@@ -4,6 +4,7 @@ let musicDefaults = require( '../defaultSettings/musicDefaults.js' );
 let chatDefaults = require( '../defaultSettings/chatDefaults.js' );
 
 let authModule = require( '../auth.js' );
+const { weekdays } = require( 'moment' );
 
 let checkActivity = Date.now();
 let skipOn = null; //if true causes the bot to skip every song it plays, toggled on and off by commands
@@ -22,6 +23,7 @@ let whenToGetOnStage = botDefaults.whenToGetOnStage; //when this many or less pe
 let whenToGetOffStage = botDefaults.whenToGetOffStage;
 let checkVideoRegions = musicDefaults.alertIfRegionBlocked;
 let refreshingEnabled = roomDefaults.refreshingEnabled;
+let favouriteArtist = null; // what's Robos current favouurite Artist (requires verified info in the DB)
 
 
 const botFunctions = ( bot ) => {
@@ -243,6 +245,38 @@ const botFunctions = ( bot ) => {
 
         lameCommand: function () {
             bot.vote( 'down' );
+        },
+
+        // ========================================================
+
+        async readFavouriteArtist ( data, chatFunctions, databaseFunctions ) {
+            const favouriteArtist = await this.favouriteArtist( databaseFunctions );
+            chatFunctions.botSpeak( "This week, I have been mostly listening to " + favouriteArtist, data );
+        },
+
+        favouriteArtist: function ( databaseFunctions ) {
+            if ( favouriteArtist !== null ) {
+                return Promise.resolve( favouriteArtist );
+            }
+
+            return databaseFunctions.getRandomVerifiedArtist()
+                .then( ( displayName ) => {
+                    return this.setFavouriteArtist( displayName );
+                } );
+        },
+
+        setFavouriteArtist: function ( value ) {
+            return new Promise( ( resolve, _ ) => {
+                favouriteArtist = value;
+                resolve( value );
+            } )
+        },
+
+        async chooseNewFavourite ( databaseFunctions ) {
+            await databaseFunctions.getRandomVerifiedArtist()
+                .then( ( displayName ) => {
+                    favouriteArtist = displayName;
+                } )
         },
 
         // ========================================================

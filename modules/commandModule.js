@@ -2,6 +2,7 @@ let chatDefaults = require( '../defaultSettings/chatDefaults.js' );
 let chatCommandItems = require( '../defaultSettings/chatCommandItems.js' );
 const Storage = require( 'node-storage' );
 const { dirname } = require( 'path' );
+const databaseFunctions = require( './databaseModule.js' );
 
 const generalCommands = {};
 const userCommands = {};
@@ -273,6 +274,12 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.randomthemeremove.argumentCount = 1;
     moderatorCommands.randomthemeremove.help = "Remove a theme from the randomizer";
     moderatorCommands.randomthemeremove.sampleArguments = [ "The Weather" ];
+
+    moderatorCommands.readfavouriteartist = ( { data, chatFunctions, botFunctions, databaseFunctions } ) => { botFunctions.readFavouriteArtist( data, chatFunctions, databaseFunctions ); }
+    moderatorCommands.readfavouriteartist.help = "Read Robos favourite artist";
+
+    moderatorCommands.choosenewfavourite = ( { botFunctions, databaseFunctions } ) => { botFunctions.chooseNewFavourite( databaseFunctions ); }
+    moderatorCommands.choosenewfavourite.help = "Pick a new favourite artist";
 
     // #############################################
     // Moderator Greeting commands
