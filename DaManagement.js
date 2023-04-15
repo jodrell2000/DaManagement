@@ -248,6 +248,9 @@ bot.on( 'newsong', function ( data ) {
             if ( result !== false ) {
                 chatFunctions.botSpeak( "Awesome play..." + result + " is my current favourite!", data );
             }
+        } )
+        .catch( ( error ) => {
+            console.error( error );
         } );
 
 
