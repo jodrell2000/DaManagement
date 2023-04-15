@@ -275,9 +275,11 @@ const botFunctions = ( bot ) => {
         async chooseNewFavourite ( databaseFunctions ) {
             await databaseFunctions.getRandomVerifiedArtist()
                 .then( ( displayName ) => {
-                    favouriteArtist = displayName;
+                    this.setFavouriteArtist( displayName );
                 } )
         },
+
+        async setFavouriteArtist ( value ) { favouriteArtist = value; }
 
         // ========================================================
 
