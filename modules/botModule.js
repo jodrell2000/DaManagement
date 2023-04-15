@@ -281,13 +281,24 @@ const botFunctions = ( bot ) => {
 
         async isFavouriteArtist ( databaseFunctions, theArtist ) {
             console.group( "botModule:isFavouriteArtist" );
+            const currentFavourite = await this.favouriteArtist( databaseFunctions );
 
-            const artistList = await databaseFunctions.getVerifiedArtistsFromName( theArtist );
-            console.log( "artistList:" + JSON.stringify( artistList ) );
-
-            console.groupEnd();
+            return new Promise( ( resolve, reject ) => {
+                databaseFunctions.getVerifiedArtistsFromName( theArtist )
+                    .then( ( array ) => {
+                        for ( let i = 0; i < array.length; i++ ) {
+                            if ( array[ i ].displayName === currentFavourite ) {
+                                resolve( currentFavourite );
+                                return;
+                            }
+                        }
+                        reject( false );
+                    } )
+                    .catch( ( error ) => {
+                        reject( error );
+                    } );
+            } );
         },
-
 
         // ========================================================
 

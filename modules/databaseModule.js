@@ -295,7 +295,7 @@ const databaseFunctions = () => {
             const values = [ theArtist ];
 
             return this.runQuery( selectQuery, values )
-                .then( result => {
+                .then( ( result ) => {
                     console.log( "queryResults:" + JSON.stringify( result ) );
                     console.groupEnd();
                     return result;
