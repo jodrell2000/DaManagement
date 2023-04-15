@@ -250,7 +250,7 @@ const botFunctions = ( bot ) => {
         // ========================================================
 
         async readFavouriteArtist ( data, chatFunctions, databaseFunctions ) {
-            chatFunctions.botSpeak( "This week, I has been mostly listening to " + this.favouriteArtist( databaseFunctions ), data );
+            chatFunctions.botSpeak( "This week, I has been mostly listening to " + this.favouriteArtist( databaseFunctions ).then( result => { result } ), data );
         },
 
         favouriteArtist: function ( databaseFunctions ) {
