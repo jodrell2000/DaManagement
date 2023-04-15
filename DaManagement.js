@@ -246,8 +246,16 @@ bot.on( 'newsong', function ( data ) {
     botFunctions.isFavouriteArtist( databaseFunctions, data.room.metadata.current_song.metadata.artist )
         .then( ( result ) => {
             if ( result !== false ) {
-                chatFunctions.botSpeak( "Awesome play..." + result + " is my current favourite!", data );
+                chatFunctions.botSpeak( "/props", data );
+                chatFunctions.botSpeak( "Awesome play..." + result + " is my favourite!", data );
             }
+        } )
+        .then( () => {
+            chatFunctions.botSpeak( "Have 10 RoboCoin as a thank you", data );
+            userFunctions.updateRoboCoins( djID, this.getRoboCoins( djID ) + 5, databaseFunctions )
+        } )
+        .then( () => {
+            botFunctions.chooseNewFavourite( databaseFunctions );
         } )
         .catch( ( error ) => {
             console.error( error );
