@@ -289,15 +289,11 @@ const databaseFunctions = () => {
         },
 
         getVerifiedArtistsFromName ( theArtist ) {
-            console.group( "databaseModule:getVerifiedArtistsFromName" );
-            console.log( "theArtist:" + theArtist );
             const selectQuery = "SELECT displayName FROM artists WHERE artistName = ?;";
             const values = [ theArtist ];
 
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
-                    console.log( "queryResults:" + JSON.stringify( result ) );
-                    console.groupEnd();
                     return result;
                 } );
         },

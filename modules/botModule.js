@@ -280,7 +280,6 @@ const botFunctions = ( bot ) => {
         },
 
         async isFavouriteArtist ( databaseFunctions, theArtist ) {
-            console.group( "botModule:isFavouriteArtist" );
             const currentFavourite = await this.favouriteArtist( databaseFunctions );
 
             return new Promise( ( resolve, reject ) => {
