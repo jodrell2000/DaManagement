@@ -275,7 +275,7 @@ const databaseFunctions = () => {
         // ========================================================
 
         getRandomVerifiedArtist () {
-            return new Promise( ( resolve, reject ) => {
+            return new Promise( ( resolve, _ ) => {
                 const selectQuery = "select DISTINCT(displayName) from artists WHERE displayName IS NOT NULL ORDER BY RAND() LIMIT 1;";
                 const values = [];
 
