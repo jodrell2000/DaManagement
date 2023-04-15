@@ -279,7 +279,12 @@ const botFunctions = ( bot ) => {
                 } )
         },
 
-        async setFavouriteArtist ( value ) { favouriteArtist = value; },
+        async setFavouriteArtist ( value ) {
+            return new Promise( ( resolve, _ ) => {
+                favouriteArtist = value;
+                resolve();
+            } )
+        },
 
         // ========================================================
 
