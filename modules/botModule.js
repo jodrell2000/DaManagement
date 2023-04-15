@@ -247,11 +247,10 @@ const botFunctions = ( bot ) => {
         },
 
         choosefavourite ( data, chatFunctions, databaseFunctions ) {
-            async function getRandomVerifiedArtist () {
-                return await databaseFunctions.getRandomVerifiedArtist();
-            }
-            console.log( JSON.stringify( getRandomVerifiedArtist() ) );
-            chatFunctions.botSpeak( "This week, I haz been mostly listening to " + getRandomVerifiedArtist(), data );
+            databaseFunctions.getRandomVerifiedArtist()
+                .then( ( displayName ) => {
+                    chatFunctions.botSpeak( "This week, I haz been mostly listening to " + displayName, data );
+                } )
         },
 
         // ========================================================
