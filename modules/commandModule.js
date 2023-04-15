@@ -276,7 +276,7 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.randomthemeremove.sampleArguments = [ "The Weather" ];
 
     moderatorCommands.readfavouriteartist = ( { data, chatFunctions, botFunctions, databaseFunctions } ) => { botFunctions.readFavouriteArtist( data, chatFunctions, databaseFunctions ); }
-    moderatorCommands.readFavouriteArtist.help = "Pick and announce a favourite artist";
+    moderatorCommands.readfavouriteartist.help = "Pick and announce a favourite artist";
 
     // #############################################
     // Moderator Greeting commands
