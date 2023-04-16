@@ -46,7 +46,7 @@ html(lang="en")
                     | #{song.artistDisplayName}
                 else
                     form(action='/updateArtistDisplayName' method='POST')
-                        input(type='text' name='artistDisplayName')
+                        input(type='text' name='artistDisplayName', value=song.artistName)
                         input(type='hidden' name='artistID' value=song.artistID)
                         button(type='submit') Update
             td= song.trackID
@@ -56,7 +56,7 @@ html(lang="en")
                     | #{song.trackDisplayName}
                 else
                     form(action='/updateTrackDisplayName' method='POST')
-                        input(type='text' name='trackDisplayName')
+                        input(type='text' name='trackDisplayName', value=song.trackName)
                         input(type='hidden' name='trackID' value=song.trackID)
                         button(type='submit') Update
             td= song.length
