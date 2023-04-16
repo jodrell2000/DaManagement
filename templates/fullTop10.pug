@@ -27,9 +27,9 @@ html(lang="en")
 
     form(action='/fulltop10' method='GET')
         label(for='startDate') Start Date:
-        input#startDate(type='date' name='startDate' value=startDate)
+        input#startDate(type='date' name='startDate' value=formStartDate)
         label(for='endDate') End Date:
-        input#endDate(type='date' name='endDate' value=endDate)
+        input#endDate(type='date' name='endDate' value=formEndDate)
         input(type='submit' value='Update')
 
     table#songqueue
