@@ -511,7 +511,8 @@ bot.on( 'endsong', function ( data ) {
 app.get( '/listunverified', async ( req, res ) => {
     try {
         const songList = await databaseFunctions.getUnverifiedSongList();
-        res.send( songList );
+        let html = pug.renderFile( './templates/search.pug', { songList } );
+        res.send( html );
     } catch ( error ) {
         console.error( error );
         res.sendStatus( 500 );
