@@ -24,6 +24,11 @@ html(lang="en")
 
   body
     h1 Full Top 10
+    
+    form(action='/updateArtistDisplayName' method='POST')
+        input(type='text' name='artistDisplayName', value=song.artistName)
+        input(type='hidden' name='artistID' value=song.artistID)
+        button(type='submit') UpdateDB
 
     table#songqueue
         thead

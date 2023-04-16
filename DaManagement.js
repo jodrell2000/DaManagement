@@ -28,6 +28,8 @@ const express = require( 'express' )
 const app = express();
 const pug = require( 'pug' );
 const bodyParser = require( 'body-parser' );
+const dayjs = require( 'dayjs' );
+const utc = require( 'dayjs/plugin/utc' );
 
 // client authentication
 app.use( authentication )
@@ -550,7 +552,19 @@ app.post( '/updateTrackDisplayName', ( req, res ) => {
 
 app.get( '/fulltop10', async ( req, res ) => {
     try {
-        const songList = await databaseFunctions.fullTop10Results( "2023-04-12 12:00:00", "2023-04-19 12:00:00" );
+        let startDate;
+        let endDate;
+
+        // If dates are posted in the request, override the default dates
+        if ( req.query.startDate && req.query.endDate ) {
+            startDate = dayjs.utc( req.query.startDate ).hour( 12 );
+            endDate = dayjs.utc( req.query.endDate ).hour( 12 );
+        } else {
+            startDate = dayjs().utc().endOf( 'week' ).add( 2, 'day' ).hour( 12 ); // last Wednesday at 12
+            endDate = dayjs().utc().startOf( 'week' ).add( 2, 'day' ).hour( 12 ); // next Wednesday at 12
+        }
+
+        const songList = await databaseFunctions.fullTop10Results( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
         let html = pug.renderFile( './templates/fullTop10.pug', { songList } );
         res.send( html );
     } catch ( error ) {
@@ -558,7 +572,6 @@ app.get( '/fulltop10', async ( req, res ) => {
         res.sendStatus( 500 );
     }
 } );
-
 // ########################################################################
 // Bot Plaaylist Editor
 // ########################################################################
