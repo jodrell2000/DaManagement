@@ -271,7 +271,7 @@ const databaseFunctions = () => {
         // ========================================================
 
         // ========================================================
-        // Misc Functions
+        // Artist Editing Functions
         // ========================================================
 
         getRandomVerifiedArtist () {
@@ -301,6 +301,16 @@ const databaseFunctions = () => {
         getUnverifiedSongList () {
             const selectQuery = "SELECT a.id AS artistID, a.artistName, a.displayName AS artistDisplayName, t.id AS trackID, t.trackName, t.displayName AS trackDisplayName, ROUND(AVG(tp.length)) AS length FROM tracksPlayed tp JOIN artists a ON a.id=tp.artistID JOIN tracks t ON t.id=tp.trackID WHERE (a.displayName IS NULL) OR (t.displayName IS NULL) GROUP BY a.id, a.artistName, a.displayName, t.id, t.trackName, t.displayName ORDER BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname);";
             const values = [];
+
+            return this.runQuery( selectQuery, values )
+                .then( ( result ) => {
+                    return result;
+                } );
+        },
+
+        updateArtistDisplayName ( artistID, artistDisplayName ) {
+            const selectQuery = "UPDATE artists SET displayName=? WHERE id=?;";
+            const values = [ artistID, artistDisplayName ];
 
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {

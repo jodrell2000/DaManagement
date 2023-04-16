@@ -528,10 +528,10 @@ app.post( '/updateArtistDisplayName', ( req, res ) => {
     const artistDisplayName = req.body.artistDisplayName;
 
     // call a function with the artistID and artistDisplayName values
-    databaseFunctions.updateArtistDisplayName( artistID, artistDisplayName );
-
-    // send a response back to the client
-    res.send( 'Artist display name updated' );
+    databaseFunctions.updateArtistDisplayName( artistID, artistDisplayName )
+        .then( () => {
+            res.send( 'Artist display name updated' );
+        } )
 } );
 
 
