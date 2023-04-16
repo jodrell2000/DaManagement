@@ -276,7 +276,7 @@ const databaseFunctions = () => {
 
         getRandomVerifiedArtist () {
             return new Promise( ( resolve, _ ) => {
-                const selectQuery = "select DISTINCT(displayName) from artists WHERE displayName IS NOT NULL ORDER BY RAND() LIMIT 1;";
+                const selectQuery = "SELECT DISTINCT(displayName) FROM artists WHERE displayName IS NOT NULL ORDER BY RAND() LIMIT 1;";
                 const values = [];
 
                 this.runQuery( selectQuery, values )
@@ -286,6 +286,16 @@ const databaseFunctions = () => {
                         }
                     } )
             } )
+        },
+
+        getVerifiedArtistsFromName ( theArtist ) {
+            const selectQuery = "SELECT displayName FROM artists WHERE artistName = ?;";
+            const values = [ theArtist ];
+
+            return this.runQuery( selectQuery, values )
+                .then( ( result ) => {
+                    return result;
+                } );
         },
 
         // ========================================================

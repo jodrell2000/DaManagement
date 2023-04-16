@@ -279,6 +279,25 @@ const botFunctions = ( bot ) => {
                 } )
         },
 
+        async isFavouriteArtist ( databaseFunctions, theArtist ) {
+            const currentFavourite = await this.favouriteArtist( databaseFunctions );
+
+            return new Promise( ( resolve, reject ) => {
+                databaseFunctions.getVerifiedArtistsFromName( theArtist )
+                    .then( ( array ) => {
+                        for ( let i = 0; i < array.length; i++ ) {
+                            if ( array[ i ].displayName === currentFavourite ) {
+                                resolve( currentFavourite );
+                                return;
+                            }
+                        }
+                    } )
+                    .catch( ( error ) => {
+                        reject( error );
+                    } );
+            } );
+        },
+
         // ========================================================
 
         getFormattedDate: function () {

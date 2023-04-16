@@ -243,6 +243,25 @@ bot.on( 'newsong', function ( data ) {
     //this is for /warnme
     userFunctions.warnMeCall( roomFunctions );
 
+    botFunctions.isFavouriteArtist( databaseFunctions, data.room.metadata.current_song.metadata.artist )
+        .then( ( result ) => {
+            if ( result !== false ) {
+                chatFunctions.botSpeak( "/props", data );
+                chatFunctions.botSpeak( "Awesome play..." + result + " is my favourite!", data );
+            }
+        } )
+        .then( () => {
+            chatFunctions.botSpeak( "Have 10 RoboCoin as a thank you", data );
+            userFunctions.updateRoboCoins( djID, userFunctions.getRoboCoins( djID ) + 10, databaseFunctions )
+        } )
+        .then( () => {
+            botFunctions.chooseNewFavourite( databaseFunctions );
+        } )
+        .catch( ( error ) => {
+            console.error( error );
+        } );
+
+
     //removes current dj from stage if they play a banned song or artist.
     if ( musicDefaults.bannedArtists.length !== 0 && typeof songFunctions.artist() !== 'undefined' && typeof songFunctions.song() !== 'undefined' ) {
         const djCheck = userFunctions.getCurrentDJID();

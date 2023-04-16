@@ -10,3 +10,5 @@ client_secret.json
 /data/chatDoc.html
 /data/users/*
 /html/chatDoc.html
+package-lock.json
+package.json
