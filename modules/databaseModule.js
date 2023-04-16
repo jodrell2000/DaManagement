@@ -310,7 +310,7 @@ const databaseFunctions = () => {
 
         updateArtistDisplayName ( artistID, artistDisplayName ) {
             const selectQuery = "UPDATE artists SET displayName=? WHERE id=?;";
-            const values = [ artistID, artistDisplayName ];
+            const values = [ artistDisplayName, artistID ];
 
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
