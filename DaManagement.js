@@ -511,7 +511,7 @@ bot.on( 'endsong', function ( data ) {
 app.get( '/listunverified', async ( req, res ) => {
     try {
         const songList = await databaseFunctions.getUnverifiedSongList();
-        res.render( 'songfest', { songList } );
+        res.send( songList );
     } catch ( error ) {
         console.error( error );
         res.sendStatus( 500 );
