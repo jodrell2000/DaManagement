@@ -1,7 +1,7 @@
 doctype html
 html(lang="en")
   head
-    title List of unverified songs from Robos DB
+    title List of unverified songs from Robo's DB
     link(href='/styles/app.css' rel='stylesheet' type='text/css')
     link(href='/modules/dragula/dist/dragula.css' rel='stylesheet' type='text/css')
     link(href="/modules/@fortawesome/fontawesome-free/css/fontawesome.css" rel="stylesheet")
@@ -23,17 +23,32 @@ html(lang="en")
       }
 
   body
-    h1 Current list of unverified songs from Robos DB
+    h1 Current list of unverified songs from Robo's DB
 
     table#songqueue
         thead
             tr
                 th artistID
                 th artistName
-                th artistDisplayName
+                td
+                    if song.artistDisplayName
+                        | #{song.artistDisplayName}
+                    else
+                        form(action='/updateArtistDisplayName' method='POST')
+                            input(type='text' name='artistDisplayName')
+                            input(type='hidden' name='artistID' value=song.artistID)
+                            button(type='submit') Update
                 th trackID
                 th trackName
                 th trackDisplayName
+                td
+                    if song.trackDisplayName
+                        | #{song.trackDisplayName}
+                    else
+                        form(action='/updateTrackDisplayName' method='POST')
+                            input(type='text' name='trackDisplayName')
+                            input(type='hidden' name='trackID' value=song.trackID)
+                            button(type='submit') Update
                 th Length
         tbody
         each song in songList
