@@ -271,7 +271,7 @@ const databaseFunctions = () => {
         // ========================================================
 
         // ========================================================
-        // Artist Editing Functions
+        // DB Track Editing Functions
         // ========================================================
 
         getRandomVerifiedArtist () {
@@ -311,6 +311,16 @@ const databaseFunctions = () => {
         updateArtistDisplayName ( artistID, artistDisplayName ) {
             const selectQuery = "UPDATE artists SET displayName=? WHERE id=?;";
             const values = [ artistDisplayName, artistID ];
+
+            return this.runQuery( selectQuery, values )
+                .then( ( result ) => {
+                    return result;
+                } );
+        },
+
+        updateTrackDisplayName ( trackID, trackDisplayName ) {
+            const selectQuery = "UPDATE tracks SET displayName=? WHERE id=?;";
+            const values = [ trackDisplayName, trackID ];
 
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {

@@ -523,18 +523,26 @@ app.get( '/listunverified', async ( req, res ) => {
 } );
 
 app.post( '/updateArtistDisplayName', ( req, res ) => {
-    // extract the artistID and artistDisplayName values from the form data
     const artistID = req.body.artistID;
     const artistDisplayName = req.body.artistDisplayName;
 
     // call a function with the artistID and artistDisplayName values
     databaseFunctions.updateArtistDisplayName( artistID, artistDisplayName )
         .then( () => {
-            res.send( 'Artist display name updated' );
+            res.redirect( '/listunverified' );
         } )
 } );
 
+app.post( '/updateTrackDisplayName', ( req, res ) => {
+    const trackID = req.body.trackID;
+    const trackDisplayName = req.body.trackDisplayName;
 
+    // call a function with the artistID and artistDisplayName values
+    databaseFunctions.updateTrackDisplayName( trackID, trackDisplayName )
+        .then( () => {
+            res.redirect( '/listunverified' );
+        } )
+} );
 
 // ########################################################################
 // Bot Plaaylist Editor
