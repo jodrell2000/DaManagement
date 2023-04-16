@@ -299,7 +299,7 @@ const databaseFunctions = () => {
         },
 
         getUnverifiedSongList () {
-            const selectQuery = "SELECT a.id AS artistID, a.artistName, a.displayName AS artistDisplayName, t.id AS trackID, t.trackName, t.displayName AS trackDisplayName, ROUND(AVG(tp.length)) AS length FROM tracksPlayed tp JOIN artists a ON a.id=tp.artistID JOIN tracks t ON t.id=tp.trackID WHERE (a.displayName IS NULL) OR (t.displayName IS NULL) GROUP BY a.id, a.artistName, a.displayName, t.id, t.trackName, t.displayName ORDER BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname);";
+            const selectQuery = "SELECT a.id AS artistID, a.artistName, a.displayName AS artistDisplayName, t.id AS trackID, t.trackName, t.displayName AS trackDisplayName, ROUND(AVG(tp.length)) AS length FROM tracksPlayed tp JOIN artists a ON a.id=tp.artistID JOIN tracks t ON t.id=tp.trackID WHERE (a.displayName IS NULL) OR (t.displayName IS NULL) GROUP BY a.id, a.artistName, a.displayName, t.id, t.trackName, t.displayName ORDER BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname) LIMIT 50;";
             const values = [];
 
             return this.runQuery( selectQuery, values )
