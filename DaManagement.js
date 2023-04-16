@@ -30,6 +30,7 @@ const pug = require( 'pug' );
 const bodyParser = require( 'body-parser' );
 const dayjs = require( 'dayjs' );
 const utc = require( 'dayjs/plugin/utc' );
+dayjs.extend( utc )
 
 // client authentication
 app.use( authentication )
