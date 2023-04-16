@@ -30,33 +30,33 @@ html(lang="en")
             tr
                 th artistID
                 th artistName
-                td
-                    if song.artistDisplayName
-                        | #{song.artistDisplayName}
-                    else
-                        form(action='/updateArtistDisplayName' method='POST')
-                            input(type='text' name='artistDisplayName')
-                            input(type='hidden' name='artistID' value=song.artistID)
-                            button(type='submit') Update
+                td artistDisplayName
                 th trackID
                 th trackName
                 th trackDisplayName
-                td
-                    if song.trackDisplayName
-                        | #{song.trackDisplayName}
-                    else
-                        form(action='/updateTrackDisplayName' method='POST')
-                            input(type='text' name='trackDisplayName')
-                            input(type='hidden' name='trackID' value=song.trackID)
-                            button(type='submit') Update
-                th Length
+                td trackDisplayName
+                th length
         tbody
         each song in songList
             tr
             td= song.artistID
             td= song.artistName
-            td= song.artistDisplayName
+            td
+                if song.artistDisplayName
+                    | #{song.artistDisplayName}
+                else
+                    form(action='/updateArtistDisplayName' method='POST')
+                        input(type='text' name='artistDisplayName')
+                        input(type='hidden' name='artistID' value=song.artistID)
+                        button(type='submit') Update
             td= song.trackID
             td= song.trackName
-            td= song.trackDisplayName
+            td
+                if song.trackDisplayName
+                    | #{song.trackDisplayName}
+                else
+                    form(action='/updateTrackDisplayName' method='POST')
+                        input(type='text' name='trackDisplayName')
+                        input(type='hidden' name='trackID' value=song.trackID)
+                        button(type='submit') Update
             td= song.length
