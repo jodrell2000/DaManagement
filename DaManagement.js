@@ -27,6 +27,7 @@ let databaseModule = require( './modules/databaseModule.js' );
 const express = require( 'express' )
 const app = express();
 const pug = require( 'pug' );
+const bodyParser = require( 'body-parser' );
 
 // client authentication
 app.use( authentication )
@@ -37,6 +38,8 @@ app.use( `/scripts`, express.static( './scripts' ) );
 app.use( `/modules`, express.static( './node_modules' ) );
 app.use( `/styles`, express.static( './styles' ) );
 app.use( express.json() );
+app.use( bodyParser.urlencoded( { extended: false } ) );
+
 /************************************EndSetUp**********************************************************************/
 
 let bot = new Bot( authModule.AUTH, authModule.USERID, authModule.ROOMID ); //initializes the bot
@@ -518,6 +521,20 @@ app.get( '/listunverified', async ( req, res ) => {
         res.sendStatus( 500 );
     }
 } );
+
+app.post( '/updateArtistDisplayName', ( req, res ) => {
+    // extract the artistID and artistDisplayName values from the form data
+    const artistID = req.body.artistID;
+    const artistDisplayName = req.body.artistDisplayName;
+
+    // call a function with the artistID and artistDisplayName values
+    databaseFunctions.updateArtistDisplayName( artistID, artistDisplayName );
+
+    // send a response back to the client
+    res.send( 'Artist display name updated' );
+} );
+
+
 
 // ########################################################################
 // Bot Plaaylist Editor
