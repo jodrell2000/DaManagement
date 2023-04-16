@@ -415,8 +415,6 @@ const databaseFunctions = () => {
         // ========================================================
 
         fullTop10Results: function ( startDate, endDate ) {
-            console.log( "startDate: " + startDate );
-            console.log( "endDate: " + endDate );
             const selectQuery = `SELECT COALESCE(a.displayName, a.artistName) AS "artist", COALESCE(t.displayName, t.trackname) AS "track", 
 (SUM(tp.upvotes-tp.downvotes) + SUM(tp.snags*6) + 
 SUM(IF(c.command='props', e.count, 0))*5 +
