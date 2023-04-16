@@ -566,7 +566,9 @@ app.get( '/fulltop10', async ( req, res ) => {
         }
 
         const songList = await databaseFunctions.fullTop10Results( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
-        let html = pug.renderFile( './templates/fullTop10.pug', { songList, startDate, endDate } );
+        const formStartDate = startDate.format( 'DD/MM/YYYY' );
+        const formEndDate = endDate.format( 'DD/MM/YYYY' );
+        let html = pug.renderFile( './templates/fullTop10.pug', { songList, formStartDate, formEndDate } );
         res.send( html );
     } catch ( error ) {
         console.error( error );
