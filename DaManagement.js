@@ -558,8 +558,8 @@ app.get( '/fulltop10', async ( req, res ) => {
 
         // If dates are posted in the request, override the default dates
         if ( req.query.startDate && req.query.endDate ) {
-            startDate = dayjs.utc( req.query.startDate ).hour( 12 );
-            endDate = dayjs.utc( req.query.endDate ).hour( 12 );
+            startDate = dayjs.utc( req.query.startDate ).hour( 12 ).minute( 0 ).second( 0 );
+            endDate = dayjs.utc( req.query.endDate ).hour( 12 ).minute( 0 ).second( 0 );
         } else {
             startDate = dayjs().utc().day( 3 ).subtract( 1, 'week' ).hour( 12 ); // last Wednesday at 12
             endDate = dayjs().utc().day( 3 ).hour( 12 ); // next Wednesday at 12
