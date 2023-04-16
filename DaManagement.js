@@ -561,8 +561,8 @@ app.get( '/fulltop10', async ( req, res ) => {
             startDate = dayjs.utc( req.query.startDate ).hour( 12 );
             endDate = dayjs.utc( req.query.endDate ).hour( 12 );
         } else {
-            startDate = dayjs().utc().startOf( 'week' ).add( 2, 'day' ).hour( 12 ); // last Wednesday at 12
-            endDate = dayjs().utc().endOf( 'week' ).add( 2, 'day' ).hour( 12 ); // next Wednesday at 12
+            startDate = dayjs().utc().day( 3 ).hour( 12 ); // last Wednesday at 12
+            endDate = dayjs().utc().day( 3 ).add( 1, 'week' ).hour( 12 ); // next Wednesday at 12
         }
 
         const songList = await databaseFunctions.fullTop10Results( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
