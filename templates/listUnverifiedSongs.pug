@@ -1,0 +1,30 @@
+html(lang="en")
+  head
+    title List of unverified songs from Robos DB
+    link(href='/styles/app.css' rel='stylesheet' type='text/css')
+    link(href='/modules/dragula/dist/dragula.css' rel='stylesheet' type='text/css')
+    link(href="/modules/@fortawesome/fontawesome-free/css/fontawesome.css" rel="stylesheet")
+    link(href="/modules/@fortawesome/fontawesome-free/css/solid.css" rel="stylesheet")
+  body
+    h1 Current list of unverified songs from Robos DB
+
+    table#songqueue
+        thead
+            tr
+                th artistID
+                th artistName
+                th artistDisplayName
+                th trackID
+                th trackName
+                th trackDisplayName
+                th Length
+        tbody
+        each song in songList
+            tr
+            td= song.artistID
+            td= song.artistName
+            td= song.artistDisplayName
+            td= song.trackID
+            td= song.trackName
+            td= song.trackDisplayName
+            td= song.Length
