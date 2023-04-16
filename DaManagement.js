@@ -545,6 +545,21 @@ app.post( '/updateTrackDisplayName', ( req, res ) => {
 } );
 
 // ########################################################################
+// Top 10 Countddown Data
+// ########################################################################
+
+app.get( '/fulltop10', async ( req, res ) => {
+    try {
+        const songList = await databaseFunctions.fullTop10Results( "2023-04-12 12:00:00", "2023-04-19 12:00:00" );
+        let html = pug.renderFile( './templates/fullTop10.pug', { songList } );
+        res.send( html );
+    } catch ( error ) {
+        console.error( error );
+        res.sendStatus( 500 );
+    }
+} );
+
+// ########################################################################
 // Bot Plaaylist Editor
 // ########################################################################
 

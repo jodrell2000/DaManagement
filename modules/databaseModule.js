@@ -388,8 +388,7 @@ const databaseFunctions = () => {
             return this.runQuery( selectQuery, values )
                 .then( ( results ) => {
                     return this.convertToArray( results, "command" );
-                }
-                )
+                } )
         },
 
         // ========================================================
@@ -407,7 +406,41 @@ const databaseFunctions = () => {
                 theArray.push( thisCommand );
             }
             return theArray;
-        }
+        },
+
+        // ========================================================
+
+        // ========================================================
+        // Top 10 Functions
+        // ========================================================
+
+        fullTop10Results: function ( startDate, endDate ) {
+            const selectQuery = `SELECT COALESCE(a.displayName, a.artistName) AS "1", COALESCE(t.displayName, t.trackname) AS "2", 
+(SUM(tp.upvotes-tp.downvotes) + SUM(tp.snags*6) + 
+SUM(IF(c.command='props', e.count, 0))*5 +
+SUM(IF(c.command='noice', e.count, 0))*5 +
+SUM(IF(c.command='spin', e.count, 0))*5 +
+SUM(IF(c.command='tune', e.count, 0))*5) * count(tp.id) AS "3",
+count(tp.id) AS "4"
+FROM users u 
+JOIN tracksPlayed tp ON tp.djID=u.id 
+JOIN tracks t ON tp.trackID=t.id 
+JOIN artists a ON tp.artistID=a.id
+LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id 
+LEFT JOIN commandsToCount c ON c.id=e.commandsToCount_id
+WHERE tp.whenPlayed BETWEEN ? AND ? AND 
+tp.length>60 AND
+u.username != "Mr. Roboto"
+GROUP BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname)
+ORDER BY 3 DESC, 4 DESC
+limit 20;`;
+            const values = [ startDate, endDate ];
+
+            return this.runQuery( selectQuery, values )
+                .then( ( result ) => {
+                    return result;
+                } );
+        },
 
         // ========================================================
 
