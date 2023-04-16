@@ -2,6 +2,7 @@
     Adam Reynolds 2021-2022
     version 0.1 (forked from chillybot)
     version 0.2 (forked from Mr. Roboto by Jake Smith)
+    version 0.3 (bears very little resemblance to the original now)
 */
 
 /*******************************BeginSetUp*****************************************************************************/
@@ -503,6 +504,23 @@ bot.on( 'endsong', function ( data ) {
     roomFunctions.escortDJsDown( data, djID, botFunctions, userFunctions, chatFunctions, databaseFunctions );
 } );
 
+// ########################################################################
+// DB Song Editor
+// ########################################################################
+
+app.get( '/listunverified', async ( req, res ) => {
+    try {
+        const songList = await databaseFunctions.getUnverifiedSongList();
+        res.render( 'songfest', { songList } );
+    } catch ( error ) {
+        console.error( error );
+        res.sendStatus( 500 );
+    }
+} );
+
+// ########################################################################
+// Bot Plaaylist Editor
+// ########################################################################
 
 app.get( '/', function ( req, res ) {
     bot.playlistAll( ( playlistData ) => {
@@ -537,6 +555,10 @@ app.get( '/deletesong', ( req, res ) => {
     bot.playlistRemove( Number.parseInt( req.query.songindex ) );
     res.json( `refresh` );
 } );
+
+// ########################################################################
+// General functions
+// ########################################################################
 
 function authentication ( req, res, next ) {
     let authheader = req.headers.authorization;

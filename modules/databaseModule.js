@@ -298,6 +298,16 @@ const databaseFunctions = () => {
                 } );
         },
 
+        getUnverifiedSongList () {
+            const selectQuery = "SELECT DISTINCT a.id AS artistID, a.artistName, a.displayName AS artistDisplayName, t.id AS trackID, t.trackName, t.displayName AS trackDisplayName, tp.length FROM tracksPlayed tp JOIN artists a ON a.id=tp.artistID JOIN tracks t ON t.id=tp.trackID WHERE (a.displayName IS NULL) OR (t.displayName IS NULL) ORDER BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname);";
+            const values = [];
+
+            return this.runQuery( selectQuery, values )
+                .then( ( result ) => {
+                    return result;
+                } );
+        },
+
         // ========================================================
 
         // ========================================================
