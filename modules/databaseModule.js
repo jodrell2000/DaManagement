@@ -415,13 +415,13 @@ const databaseFunctions = () => {
         // ========================================================
 
         fullTop10Results: function ( startDate, endDate ) {
-            const selectQuery = `SELECT COALESCE(a.displayName, a.artistName) AS "1", COALESCE(t.displayName, t.trackname) AS "2", 
+            const selectQuery = `SELECT COALESCE(a.displayName, a.artistName) AS "artist", COALESCE(t.displayName, t.trackname) AS "track", 
 (SUM(tp.upvotes-tp.downvotes) + SUM(tp.snags*6) + 
 SUM(IF(c.command='props', e.count, 0))*5 +
 SUM(IF(c.command='noice', e.count, 0))*5 +
 SUM(IF(c.command='spin', e.count, 0))*5 +
-SUM(IF(c.command='tune', e.count, 0))*5) * count(tp.id) AS "3",
-count(tp.id) AS "4"
+SUM(IF(c.command='tune', e.count, 0))*5) * count(tp.id) AS "points",
+count(tp.id) AS "plays"
 FROM users u 
 JOIN tracksPlayed tp ON tp.djID=u.id 
 JOIN tracks t ON tp.trackID=t.id 
