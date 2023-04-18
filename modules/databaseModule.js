@@ -460,7 +460,7 @@ JOIN tracks t ON tp.trackID = t.id
 JOIN artists a ON tp.artistID = a.id
 LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id 
 LEFT JOIN commandsToCount c ON c.id = e.commandsToCount_id
-WHERE tp.whenPlayed BETWEEN @theStartDate AND @theEndDate AND
+WHERE tp.whenPlayed BETWEEN ? AND ? AND 
             tp.length > 60 AND
             u.username != "Mr. Roboto"
 `;
