@@ -586,7 +586,7 @@ app.get( '/fulltop10', async ( req, res ) => {
 } );
 
 app.get( '/likesTop10', async ( req, res ) => {
-    await getTop10( req, res, "likesTop10Results", "likesTop10" );
+    await getTop10( req, res, "top10ByLikesResults", "likesTop10" );
 } );
 
 /* 

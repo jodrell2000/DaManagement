@@ -451,6 +451,38 @@ u.username != "Mr. Roboto"
             }
         },
 
+        async top10ByLikesResults ( startDate, endDate, includeWednesdays = true ) {
+            const baseSelectQuery = `SELECT COALESCE( a.displayName, a.artistName ) AS "artist", COALESCE( t.displayName, t.trackname ) AS "track", SUM( tp.upvotes ) as upvotes, SUM( tp.downvotes ) as 'downvotes',
+                count( tp.id ) AS "played"
+FROM users u 
+JOIN tracksPlayed tp ON tp.djID = u.id 
+JOIN tracks t ON tp.trackID = t.id 
+JOIN artists a ON tp.artistID = a.id
+LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id 
+LEFT JOIN commandsToCount c ON c.id = e.commandsToCount_id
+WHERE tp.whenPlayed BETWEEN @theStartDate AND @theEndDate AND
+            tp.length > 60 AND
+            u.username != "Mr. Roboto"
+`;
+
+            const queryEnd = `
+    GROUP BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname)
+    ORDER BY 3 DESC, 4 ASC, 5 DESC
+    limit 20;
+    `;
+
+            const selectQuery = baseSelectQuery + `${ includeWednesdays ? "" : "AND DAYOFWEEK(tp.whenPlayed)!=4 " }` + queryEnd;
+            const values = [ startDate, endDate ];
+
+            try {
+                const result = await this.runQuery( selectQuery, values );
+                return result;
+            } catch ( error ) {
+                console.error( error );
+                throw error;
+            }
+        }
+
         // ========================================================
 
     }
