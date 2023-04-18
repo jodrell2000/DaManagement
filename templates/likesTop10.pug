@@ -37,7 +37,7 @@ html(lang="en")
     li
         a(href=`http://141.147.86.68:8585/summary?startDate=${linkStartDate}&endDate=${linkEndDate}`) Room Summary & Top DJs
 
-    form(action='/fulltop10' method='GET')
+    form(action='/likesTop10' method='GET')
         label(for='startDate') Start Date:
         input#startDate(type='date' name='startDate' value=formStartDate)
         label(for='endDate') End Date:
