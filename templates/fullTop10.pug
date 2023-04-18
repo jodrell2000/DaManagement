@@ -27,15 +27,15 @@ html(lang="en")
 
     ul
         li
-            a(href=`http://141.147.86.68:8585/fullTop10?startDate=${encodeURIComponent(formStartDate)}&endDate=${encodeURIComponent(formEndDate)}`) Full Top 10 Lists
+            a(href=`http://141.147.86.68:8585/fullTop10?startDate=${encodeURIComponent(formStartDate.toISOString().substring(0, 10))}&endDate=${encodeURIComponent(formEndDate.toISOString().substring(0, 10))}`) Full Top 10 Lists
         li
-            a(href=`http://141.147.86.68:8585/likesTop10?startDate=${encodeURIComponent(formStartDate)}&endDate=${encodeURIComponent(formEndDate)}`) Top 10 (Likes Only)
+            a(href=`http://141.147.86.68:8585/likesTop10?startDate=${encodeURIComponent(formStartDate.toISOString().substring(0, 10))}&endDate=${encodeURIComponent(formEndDate.toISOString().substring(0, 10))}`) Top 10 (Likes Only)
         li
-            a(href=`http://141.147.86.68:8585/mostplayedartists?startDate=${encodeURIComponent(formStartDate)}&endDate=${encodeURIComponent(formEndDate)}`) Most Played Artists
+            a(href=`http://141.147.86.68:8585/mostplayedartists?startDate=${encodeURIComponent(formStartDate.toISOString().substring(0, 10))}&endDate=${encodeURIComponent(formEndDate.toISOString().substring(0, 10))}`) Most Played Artists
         li
-            a(href=`http://141.147.86.68:8585/mostplayedtracks?startDate=${encodeURIComponent(formStartDate)}&endDate=${encodeURIComponent(formEndDate)}`) Most Played Tracks
+            a(href=`http://141.147.86.68:8585/mostplayedtracks?startDate=${encodeURIComponent(formStartDate.toISOString().substring(0, 10))}&endDate=${encodeURIComponent(formEndDate.toISOString().substring(0, 10))}`) Most Played Tracks
         li
-            a(href=`http://141.147.86.68:8585/summary?startDate=${encodeURIComponent(formStartDate)}&endDate=${encodeURIComponent(formEndDate)}`) Room Summary & Top DJs
+            a(href=`http://141.147.86.68:8585/summary?startDate=${encodeURIComponent(formStartDate.toISOString().substring(0, 10))}&endDate=${encodeURIComponent(formEndDate.toISOString().substring(0, 10))}`) Room Summary & Top DJs
 
     form(action='/fulltop10' method='GET')
         label(for='startDate') Start Date:
