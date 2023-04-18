@@ -27,15 +27,15 @@ html(lang="en")
 
     ul
         li
-            a(href='http://141.147.86.68:8585/fullTop10?startDate=#{startDate}&endDate=#{endDate}') Full Top 10 Lists
+            a(href=`http://141.147.86.68:8585/fullTop10?startDate=${startDate}&endDate=${endDate}`) Full Top 10 Lists
         li
-            a(href='http://141.147.86.68:8585/likesTop10?startDate=#{startDate}&endDate=#{endDate}') Top 10 (Likes Only)
+            a(href='http://141.147.86.68:8585/likesTop10?startDate=${startDate}&endDate=${endDate}') Top 10 (Likes Only)
         li
-            a(href='http://141.147.86.68:8585/mostplayedartists?startDate=#{startDate}&endDate=#{endDate}') Most Played Artists
+            a(href='http://141.147.86.68:8585/mostplayedartists?startDate=${startDate}&endDate=${endDate}') Most Played Artists
         li
-            a(href='http://141.147.86.68:8585/mostplayedtracks?startDate=#{startDate}&endDate=#{endDate}') Most Played Tracks
+            a(href='http://141.147.86.68:8585/mostplayedtracks?startDate=${startDate}&endDate=${endDate}') Most Played Tracks
         li
-            a(href='http://141.147.86.68:8585/summary?startDate=#{startDate}&endDate=#{endDate}') Room Summary & Top DJs
+            a(href='http://141.147.86.68:8585/summary?startDate=${startDate}&endDate=${endDate}') Room Summary & Top DJs
 
     form(action='/fulltop10' method='GET')
         label(for='startDate') Start Date:
