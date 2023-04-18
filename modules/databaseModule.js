@@ -492,7 +492,7 @@ LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id
 LEFT JOIN commandsToCount c ON c.id=e.commandsToCount_id
 WHERE tp.whenPlayed BETWEEN ? AND ? AND 
 tp.length>60 AND
-u.username != "Mr. Roboto" AND
+u.username != "Mr. Roboto"
 `;
 
             const queryEnd = `GROUP BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname)
