@@ -589,46 +589,14 @@ app.get( '/likesTop10', async ( req, res ) => {
     await getTop10( req, res, "top10ByLikesResults", "likesTop10" );
 } );
 
-/* 
-app.get( '/mostplayedartists', async ( req, res ) => {
-    try {
-        const top10SongList = await databaseFunctions.fullTop10Results( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
-        const top10NotWednesdaySongList = await databaseFunctions.fullTop10NotWednesdayResults( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
-
-        let html = pug.renderFile( './templates/likesTop10.pug', { top10SongList, top10NotWednesdaySongList, formStartDate, formEndDate, linkStartDate, linkEndDate } );
-        res.send( html );
-    } catch ( error ) {
-        console.error( error );
-        res.sendStatus( 500 );
-    }
-} );
-
 app.get( '/mostplayedtracks', async ( req, res ) => {
-    try {
-        const top10SongList = await databaseFunctions.fullTop10Results( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
-        const top10NotWednesdaySongList = await databaseFunctions.fullTop10NotWednesdayResults( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
-
-        let html = pug.renderFile( './templates/likesTop10.pug', { top10SongList, top10NotWednesdaySongList, formStartDate, formEndDate, linkStartDate, linkEndDate } );
-        res.send( html );
-    } catch ( error ) {
-        console.error( error );
-        res.sendStatus( 500 );
-    }
+    await getTop10( req, res, "mostPlayedTracksResults", "mostplayedtracks" );
 } );
 
-app.get( '/summary', async ( req, res ) => {
-    try {
-        const top10SongList = await databaseFunctions.fullTop10Results( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
-        const top10NotWednesdaySongList = await databaseFunctions.fullTop10NotWednesdayResults( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
-
-        let html = pug.renderFile( './templates/likesTop10.pug', { top10SongList, top10NotWednesdaySongList, formStartDate, formEndDate, linkStartDate, linkEndDate } );
-        res.send( html );
-    } catch ( error ) {
-        console.error( error );
-        res.sendStatus( 500 );
-    }
+app.get( '/mostplayedartists', async ( req, res ) => {
+    await getTop10( req, res, "mostPlayedArtistsResults", "mostplayedartists" );
 } );
-*/
+
 
 // ########################################################################
 // Bot Plaaylist Editor
