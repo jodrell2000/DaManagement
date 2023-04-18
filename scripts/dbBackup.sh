@@ -10,7 +10,7 @@ source ../.env
 db_name="robotoDB"
 
 # Set the current date
-current_date=$(date +%Y-%m-%d)
+current_datetime=$(date +%Y-%m-%d-%H-%M-%S)
 
 # Set the date one month ago
 one_month_ago=$(date -d "1 month ago" +%Y-%m-%d)
