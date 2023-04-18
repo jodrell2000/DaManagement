@@ -19,29 +19,28 @@ const dateFunctions = () => {
         },
 
         formStartDate: function ( dayjs, theDate ) {
-            return this.formStartDate( dayjs, theDate ).format( 'DD/MM/YYYY' );
+            return this.startDate( dayjs, theDate ).format( 'DD/MM/YYYY' );
         },
 
         formEndDate: function ( dayjs, theDate ) {
-            return this.formEndDate( dayjs, theDate ).format( 'DD/MM/YYYY' );
+            return this.endDate( dayjs, theDate ).format( 'DD/MM/YYYY' );
         },
 
         linkStartDate: function ( dayjs, theDate ) {
-            return this.formStartDate( dayjs, theDate ).format( 'YYYY-MM-DD' );
+            return this.startDate( dayjs, theDate ).format( 'YYYY-MM-DD' );
         },
 
         linkEndDate: function ( dayjs, theDate ) {
-            return this.formEndDate( dayjs, theDate ).format( 'YYYY-MM-DD' );
+            return this.endDate( dayjs, theDate ).format( 'YYYY-MM-DD' );
         },
 
         dbStartDate: function ( dayjs, theDate ) {
-            return this.formStartDate( dayjs, theDate ).format( 'YYYY-MM-DD HH:mm:ss' );
+            return this.startDate( dayjs, theDate ).format( 'YYYY-MM-DD HH:mm:ss' );
         },
 
         dbEndDate: function ( dayjs, theDate ) {
-            return this.formEndDate( dayjs, theDate ).format( 'YYYY-MM-DD HH:mm:ss' );
+            return this.endDate( dayjs, theDate ).format( 'YYYY-MM-DD HH:mm:ss' );
         },
-
 
     }
 }
