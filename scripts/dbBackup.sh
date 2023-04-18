@@ -10,10 +10,7 @@ source /home/opc/git/DaManagement/.env
 db_name="robotoDB"
 
 # Set the current date
-current_datetime=$(date +%Y-%m-%d-%H-%M-%S)
-
-# Set the date one month ago
-one_month_ago=$(date -d "1 month ago" +%Y-%m-%d)
+current_datetime=date +%Y-%m-%d-%H-%M-%S
 
 # Run mysqldump to backup the database
 mysqldump -u $BACKUPDBUSERNAME -p$DBPASSWORD $db_name > $backup_dir/$db_name-$current_date.sql
