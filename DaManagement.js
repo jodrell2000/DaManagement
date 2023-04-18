@@ -556,10 +556,10 @@ app.post( '/updateTrackDisplayName', ( req, res ) => {
 app.get( '/fulltop10', async ( req, res ) => {
     try {
         const { startDate, endDate } = req.query;
-        const [ formStartDate, formEndDate, linkStartDate, linkEndDate ] = [ dateFunctions.formStartDate( dayjs, startDate ), dateFunctions.formEndDate( endDate ), dateFunctions.linkStartDate( startDate ), dateFunctions.linkEndDate( endDate ), ];
+        const [ formStartDate, formEndDate, linkStartDate, linkEndDate ] = [ dateFunctions.formStartDate( dayjs, startDate ), dateFunctions.formEndDate( dayjs, endDate ), dateFunctions.linkStartDate( dayjs, startDate ), dateFunctions.linkEndDate( dayjs, endDate ), ];
         const [ top10SongList, top10NotWednesdaySongList ] = await Promise.all( [
-            databaseFunctions.fullTop10Results( dateFunctions.dbStartDate( startDate ), dateFunctions.dbEndDate( endDate ) ),
-            databaseFunctions.fullTop10NotWednesdayResults( dateFunctions.dbStartDate( startDate ), dateFunctions.dbEndDate( endDate ) ),
+            databaseFunctions.fullTop10Results( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ) ),
+            databaseFunctions.fullTop10NotWednesdayResults( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ) ),
         ] );
         const html = pug.renderFile( './templates/fullTop10.pug', {
             top10SongList,
