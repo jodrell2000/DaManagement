@@ -10,7 +10,7 @@ source /home/opc/git/DaManagement/.env
 db_name="robotoDB"
 
 # Set the current date
-current_datetime=date +%Y-%m-%d-%H-%M-%S
+current_datetime=$(date +%Y-%m-%d-%H-%M-%S)
 
 # Run mysqldump to backup the database
 mysqldump -u $BACKUPDBUSERNAME -p$DBPASSWORD $db_name > $backup_dir/$db_name-$current_date.sql
