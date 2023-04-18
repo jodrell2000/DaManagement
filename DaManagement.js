@@ -565,10 +565,13 @@ app.get( '/fulltop10', async ( req, res ) => {
             endDate = dayjs().utc().day( 3 ).hour( 12 ).minute( 0 ).second( 0 ); // next Wednesday at 12
         }
 
-        const songList = await databaseFunctions.fullTop10Results( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
         const formStartDate = startDate.format( 'DD/MM/YYYY' );
         const formEndDate = endDate.format( 'DD/MM/YYYY' );
-        let html = pug.renderFile( './templates/fullTop10.pug', { songList, formStartDate, formEndDate } );
+
+        const top10SongList = await databaseFunctions.fullTop10Results( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
+        const top10NotWednesdaySongList = await databaseFunctions.fullTop10NotWednesdayResults( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
+
+        let html = pug.renderFile( './templates/fullTop10.pug', { top10SongList, top10NotWednesdaySongList, formStartDate, formEndDate } );
         res.send( html );
     } catch ( error ) {
         console.error( error );

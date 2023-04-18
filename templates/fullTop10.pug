@@ -40,7 +40,24 @@ html(lang="en")
                 td Total Points
                 th Play Count
         tbody
-        each song in songList
+        each song in top10SongList
+            tr
+            td= song.artist
+            td= song.track
+            td= song.points
+            td= song.plays
+
+    h2 Not including Wednesdays (less 90s)
+
+    table#songqueue
+        thead
+            tr
+                th Artist
+                th Track
+                td Total Points
+                th Play Count
+        tbody
+        each song in top10NotWednesdaySongList
             tr
             td= song.artist
             td= song.track

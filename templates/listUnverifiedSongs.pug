@@ -35,6 +35,7 @@ html(lang="en")
                 th trackName
                 th trackDisplayName
                 th length
+                th search
         tbody
         each song in songList
             tr
@@ -48,6 +49,10 @@ html(lang="en")
                         input(type='text' name='artistDisplayName', value=song.artistName)
                         input(type='hidden' name='artistID' value=song.artistID)
                         button(type='submit') UpdateDB
+                    form(action='/updateArtistDisplayName' method='POST')
+                        input(type='hidden' name='reset' value=true)
+                        input(type='hidden' name='artistID' value=song.artistID)
+                        button(type='submit') Reset
             td= song.trackID
             td= song.trackName
             td
@@ -58,4 +63,9 @@ html(lang="en")
                         input(type='text' name='trackDisplayName', value=song.trackName)
                         input(type='hidden' name='trackID' value=song.trackID)
                         button(type='submit') UpdateDB
+                    form(action='/updateTrackDisplayName' method='POST')
+                        input(type='hidden' name='reset' value=true)
+                        input(type='hidden' name='trackID' value=song.trackID)
+                        button(type='submit') Reset
             td= song.length
+            td= a(href=`https://www.google.com/search?q=${encodeURIComponent(song.artistName)}%20${encodeURIComponent(song.trackName)}` target="_blank") Search
