@@ -23,7 +23,7 @@ let commandModule = require( './modules/commandModule.js' );
 let videoModule = require( './modules/videoModule.js' );
 let documentationModule = require( './modules/documentationModule.js' );
 let databaseModule = require( './modules/databaseModule.js' );
-let dateModule = require( '.modules/dateModule.js' );
+let dateModule = require( './modules/dateModule.js' );
 
 const express = require( 'express' )
 const app = express();
@@ -575,6 +575,60 @@ app.get( '/fulltop10', async ( req, res ) => {
         res.sendStatus( 500 );
     }
 } );
+
+/* 
+app.get( '/likesTop10', async ( req, res ) => {
+    try {
+        const top10SongList = await databaseFunctions.fullTop10Results( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
+        const top10NotWednesdaySongList = await databaseFunctions.fullTop10NotWednesdayResults( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
+
+        let html = pug.renderFile( './templates/likesTop10.pug', { top10SongList, top10NotWednesdaySongList, formStartDate, formEndDate, linkStartDate, linkEndDate } );
+        res.send( html );
+    } catch ( error ) {
+        console.error( error );
+        res.sendStatus( 500 );
+    }
+} );
+
+app.get( '/mostplayedartists', async ( req, res ) => {
+    try {
+        const top10SongList = await databaseFunctions.fullTop10Results( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
+        const top10NotWednesdaySongList = await databaseFunctions.fullTop10NotWednesdayResults( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
+
+        let html = pug.renderFile( './templates/likesTop10.pug', { top10SongList, top10NotWednesdaySongList, formStartDate, formEndDate, linkStartDate, linkEndDate } );
+        res.send( html );
+    } catch ( error ) {
+        console.error( error );
+        res.sendStatus( 500 );
+    }
+} );
+
+app.get( '/mostplayedtracks', async ( req, res ) => {
+    try {
+        const top10SongList = await databaseFunctions.fullTop10Results( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
+        const top10NotWednesdaySongList = await databaseFunctions.fullTop10NotWednesdayResults( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
+
+        let html = pug.renderFile( './templates/likesTop10.pug', { top10SongList, top10NotWednesdaySongList, formStartDate, formEndDate, linkStartDate, linkEndDate } );
+        res.send( html );
+    } catch ( error ) {
+        console.error( error );
+        res.sendStatus( 500 );
+    }
+} );
+
+app.get( '/summary', async ( req, res ) => {
+    try {
+        const top10SongList = await databaseFunctions.fullTop10Results( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
+        const top10NotWednesdaySongList = await databaseFunctions.fullTop10NotWednesdayResults( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
+
+        let html = pug.renderFile( './templates/likesTop10.pug', { top10SongList, top10NotWednesdaySongList, formStartDate, formEndDate, linkStartDate, linkEndDate } );
+        res.send( html );
+    } catch ( error ) {
+        console.error( error );
+        res.sendStatus( 500 );
+    }
+} );
+*/
 
 // ########################################################################
 // Bot Plaaylist Editor
