@@ -567,11 +567,13 @@ app.get( '/fulltop10', async ( req, res ) => {
 
         const formStartDate = startDate.format( 'DD/MM/YYYY' );
         const formEndDate = endDate.format( 'DD/MM/YYYY' );
+        const linkStartDate = startDate.format( 'YYYY-MM-DD' );
+        const linkEndDate = endDate.format( 'YYYY-MM-DD' );
 
         const top10SongList = await databaseFunctions.fullTop10Results( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
         const top10NotWednesdaySongList = await databaseFunctions.fullTop10NotWednesdayResults( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
 
-        let html = pug.renderFile( './templates/fullTop10.pug', { top10SongList, top10NotWednesdaySongList, formStartDate, formEndDate } );
+        let html = pug.renderFile( './templates/fullTop10.pug', { top10SongList, top10NotWednesdaySongList, formStartDate, formEndDate, linkStartDate, linkEndDate } );
         res.send( html );
     } catch ( error ) {
         console.error( error );

@@ -1,5 +1,3 @@
-script(src='https://cdn.jsdelivr.net/npm/dayjs@1.11.7/dayjs.min.js')
-
 doctype html
 html(lang="en")
   head
@@ -29,15 +27,15 @@ html(lang="en")
 
     ul
     li
-        a(href=`http://141.147.86.68:8585/fullTop10?startDate=${dayjs(formStartDate, 'DD/MM/YYYY').format('YYYY-MM-DD')}&endDate=${dayjs(formEndDate, 'DD/MM/YYYY').format('YYYY-MM-DD')}`) Full Top 10 Lists
+        a(href=`http://141.147.86.68:8585/fullTop10?startDate=${linkStartDate}&endDate=${linkEndDate}`) Full Top 10 Lists
     li
-        a(href=`http://141.147.86.68:8585/likesTop10?startDate=${dayjs(formStartDate, 'DD/MM/YYYY').format('YYYY-MM-DD')}&endDate=${dayjs(formEndDate, 'DD/MM/YYYY').format('YYYY-MM-DD')}`) Top 10 (Likes Only)
+        a(href=`http://141.147.86.68:8585/likesTop10?startDate=${linkStartDate}}&endDate=${linkEndDate}`) Top 10 (Likes Only)
     li
-        a(href=`http://141.147.86.68:8585/mostplayedartists?startDate=${dayjs(formStartDate, 'DD/MM/YYYY').format('YYYY-MM-DD')}&endDate=${dayjs(formEndDate, 'DD/MM/YYYY').format('YYYY-MM-DD')}`) Most Played Artists
+        a(href=`http://141.147.86.68:8585/mostplayedartists?startDate=${linkStartDate}}&endDate=${linkEndDate}`) Most Played Artists
     li
-        a(href=`http://141.147.86.68:8585/mostplayedtracks?startDate=${dayjs(formStartDate, 'DD/MM/YYYY').format('YYYY-MM-DD')}&endDate=${dayjs(formEndDate, 'DD/MM/YYYY').format('YYYY-MM-DD')}`) Most Played Tracks
+        a(href=`http://141.147.86.68:8585/mostplayedtracks?startDate=${linkStartDate}}&endDate=${linkEndDate}`) Most Played Tracks
     li
-        a(href=`http://141.147.86.68:8585/summary?startDate=${dayjs(formStartDate, 'DD/MM/YYYY').format('YYYY-MM-DD')}&endDate=${dayjs(formEndDate, 'DD/MM/YYYY').format('YYYY-MM-DD')}`) Room Summary & Top DJs
+        a(href=`http://141.147.86.68:8585/summary?startDate=${linkStartDate}}&endDate=${linkEndDate}`) Room Summary & Top DJs
 
     form(action='/fulltop10' method='GET')
         label(for='startDate') Start Date:
@@ -77,5 +75,3 @@ html(lang="en")
             td= song.track
             td= song.points
             td= song.plays
-
-    script(src='https://cdn.jsdelivr.net/npm/dayjs@1.11.7/dayjs.min.js')
