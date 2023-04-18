@@ -26,16 +26,16 @@ html(lang="en")
     h1 Full Top 10 for #{formStartDate} to #{formEndDate}
 
     ul
-        li
-            a(href=`http://141.147.86.68:8585/fullTop10?startDate=${formStartDate}&endDate=${formEndDate}`) Full Top 10 Lists
-        li
-            a(href=`http://141.147.86.68:8585/likesTop10?startDate=${formStartDate}&endDate=${formEndDate}`) Top 10 (Likes Only)
-        li
-            a(href=`http://141.147.86.68:8585/mostplayedartists?startDate=${formStartDate}&endDate=${formEndDate}`) Most Played Artists
-        li
-            a(href=`http://141.147.86.68:8585/mostplayedtracks?startDate=${formStartDate}&endDate=${formEndDate}`) Most Played Tracks
-        li
-            a(href=`http://141.147.86.68:8585/summary?startDate=${formStartDate}&endDate=${formEndDate}`) Room Summary & Top DJs
+    li
+        a(href=`http://141.147.86.68:8585/fullTop10?startDate=${dayjs(formStartDate, 'DD/MM/YYYY').format('YYYY-MM-DD')}&endDate=${dayjs(formEndDate, 'DD/MM/YYYY').format('YYYY-MM-DD')}`) Full Top 10 Lists
+    li
+        a(href=`http://141.147.86.68:8585/likesTop10?startDate=${dayjs(formStartDate, 'DD/MM/YYYY').format('YYYY-MM-DD')}&endDate=${dayjs(formEndDate, 'DD/MM/YYYY').format('YYYY-MM-DD')}`) Top 10 (Likes Only)
+    li
+        a(href=`http://141.147.86.68:8585/mostplayedartists?startDate=${dayjs(formStartDate, 'DD/MM/YYYY').format('YYYY-MM-DD')}&endDate=${dayjs(formEndDate, 'DD/MM/YYYY').format('YYYY-MM-DD')}`) Most Played Artists
+    li
+        a(href=`http://141.147.86.68:8585/mostplayedtracks?startDate=${dayjs(formStartDate, 'DD/MM/YYYY').format('YYYY-MM-DD')}&endDate=${dayjs(formEndDate, 'DD/MM/YYYY').format('YYYY-MM-DD')}`) Most Played Tracks
+    li
+        a(href=`http://141.147.86.68:8585/summary?startDate=${dayjs(formStartDate, 'DD/MM/YYYY').format('YYYY-MM-DD')}&endDate=${dayjs(formEndDate, 'DD/MM/YYYY').format('YYYY-MM-DD')}`) Room Summary & Top DJs
 
     form(action='/fulltop10' method='GET')
         label(for='startDate') Start Date:
