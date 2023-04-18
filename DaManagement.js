@@ -23,6 +23,7 @@ let commandModule = require( './modules/commandModule.js' );
 let videoModule = require( './modules/videoModule.js' );
 let documentationModule = require( './modules/documentationModule.js' );
 let databaseModule = require( './modules/databaseModule.js' );
+let dateModule = require( '.modules/dateModule.js' );
 
 const express = require( 'express' )
 const app = express();
@@ -58,6 +59,7 @@ const commandFunctions = commandModule( bot );
 const videoFunctions = videoModule( bot );
 const documentationFunctions = documentationModule();
 const databaseFunctions = databaseModule();
+const dateFunctions = dateModule();
 
 // do something when the bot disconnects?
 // eslint-disable-next-line no-unused-vars
@@ -553,33 +555,27 @@ app.post( '/updateTrackDisplayName', ( req, res ) => {
 
 app.get( '/fulltop10', async ( req, res ) => {
     try {
-        let startDate;
-        let endDate;
-
-        // If dates are posted in the request, override the default dates
-        if ( req.query.startDate && req.query.endDate ) {
-            startDate = dayjs.utc( req.query.startDate ).hour( 12 ).minute( 0 ).second( 0 );
-            endDate = dayjs.utc( req.query.endDate ).hour( 12 ).minute( 0 ).second( 0 );
-        } else {
-            startDate = dayjs().utc().day( 3 ).subtract( 1, 'week' ).hour( 12 ).minute( 0 ).second( 0 ); // last Wednesday at 12
-            endDate = dayjs().utc().day( 3 ).hour( 12 ).minute( 0 ).second( 0 ); // next Wednesday at 12
-        }
-
-        const formStartDate = startDate.format( 'DD/MM/YYYY' );
-        const formEndDate = endDate.format( 'DD/MM/YYYY' );
-        const linkStartDate = startDate.format( 'YYYY-MM-DD' );
-        const linkEndDate = endDate.format( 'YYYY-MM-DD' );
-
-        const top10SongList = await databaseFunctions.fullTop10Results( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
-        const top10NotWednesdaySongList = await databaseFunctions.fullTop10NotWednesdayResults( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
-
-        let html = pug.renderFile( './templates/fullTop10.pug', { top10SongList, top10NotWednesdaySongList, formStartDate, formEndDate, linkStartDate, linkEndDate } );
+        const { startDate, endDate } = req.query;
+        const [ formStartDate, formEndDate, linkStartDate, linkEndDate ] = [ dateFunctions.formStartDate( dayjs, startDate ), dateFunctions.formEndDate( endDate ), dateFunctions.linkStartDate( startDate ), dateFunctions.linkEndDate( endDate ), ];
+        const [ top10SongList, top10NotWednesdaySongList ] = await Promise.all( [
+            databaseFunctions.fullTop10Results( dateFunctions.dbStartDate( startDate ), dateFunctions.dbEndDate( endDate ) ),
+            databaseFunctions.fullTop10NotWednesdayResults( dateFunctions.dbStartDate( startDate ), dateFunctions.dbEndDate( endDate ) ),
+        ] );
+        const html = pug.renderFile( './templates/fullTop10.pug', {
+            top10SongList,
+            top10NotWednesdaySongList,
+            formStartDate,
+            formEndDate,
+            linkStartDate,
+            linkEndDate,
+        } );
         res.send( html );
     } catch ( error ) {
         console.error( error );
         res.sendStatus( 500 );
     }
 } );
+
 // ########################################################################
 // Bot Plaaylist Editor
 // ########################################################################
