@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Set the backup directory path
-backup_dir="../dbBackups"
+backup_dir="/home/opc/git/DaManagement/dbBackups"
 
 # Load the database credentials from the .env file
-source ../.env
+source /home/opc/git/DaManagement/.env
 
 # Set the database name
 db_name="robotoDB"
