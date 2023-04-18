@@ -68,4 +68,4 @@ html(lang="en")
                         input(type='hidden' name='trackID' value=song.trackID)
                         button(type='submit') Reset
             td= song.length
-            td= a(href=`https://www.google.com/search?q=${encodeURIComponent(song.artistName)}%20${encodeURIComponent(song.trackName)}` target="_blank") Search
+            td= a(href=`https://www.google.com/search?q=${encodeURIComponent(song.artistName)}%20${encodeURIComponent(song.trackName)}`, target="_blank") Search
