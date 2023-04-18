@@ -453,7 +453,7 @@ u.username != "Mr. Roboto"
 
         async top10ByLikesResults ( startDate, endDate, includeWednesdays = true ) {
             const baseSelectQuery = `SELECT COALESCE( a.displayName, a.artistName ) AS "artist", COALESCE( t.displayName, t.trackname ) AS "track", SUM( tp.upvotes ) as upvotes, SUM( tp.downvotes ) as 'downvotes',
-                count( tp.id ) AS "played"
+                count( tp.id ) AS "plays"
 FROM users u 
 JOIN tracksPlayed tp ON tp.djID = u.id 
 JOIN tracks t ON tp.trackID = t.id 
