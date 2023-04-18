@@ -550,6 +550,54 @@ limit 10;
             }
         },
 
+        async roomSummaryResults ( startDate, endDate ) {
+            const selectQuery = `SELECT COUNT(tp.id) AS "plays", COUNT(DISTINCT(u.id)) AS "djs", SUM(tp.upvotes) "upvotes",  SUM(tp.downvotes) as "downvotes"
+FROM tracksPlayed tp 
+JOIN users u ON tp.djID=u.id 
+WHERE tp.whenPlayed BETWEEN ? AND ? AND 
+u.username != "Mr. Roboto";`;
+            const values = [ startDate, endDate ];
+
+            try {
+                const result = await this.runQuery( selectQuery, values );
+                return result;
+            } catch ( error ) {
+                console.error( error );
+                throw error;
+            }
+        },
+
+        async top10DJResults ( startDate, endDate ) {
+            const selectQuery = `SELECT dj, SUM(points) as "points" FROM (
+SELECT u.username as "dj", SUM(tp.upvotes)-SUM(tp.downvotes)+SUM(tp.snags*6)+
+(SUM(IF(c.command='props', e.count, 0))*5)+
+(SUM(IF(c.command='noice', e.count, 0))*5)+
+(SUM(IF(c.command='spin', e.count, 0))*5)+
+(SUM(IF(c.command='tune', e.count, 0))*5) AS points
+FROM users u 
+JOIN tracksPlayed tp ON tp.djID=u.id 
+JOIN tracks t ON tp.trackID=t.id 
+JOIN artists a ON tp.artistID=a.id
+LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id 
+LEFT JOIN commandsToCount c ON c.id=e.commandsToCount_id
+WHERE tp.whenPlayed BETWEEN ? AND ? AND 
+tp.length>60
+GROUP BY tp.id, u.username
+) trackPoints
+GROUP BY username
+ORDER BY 2 DESC
+LIMIT 11;`;
+            const values = [ startDate, endDate ];
+
+            try {
+                const result = await this.runQuery( selectQuery, values );
+                return result;
+            } catch ( error ) {
+                console.error( error );
+                throw error;
+            }
+        },
+
         // ========================================================
 
     }

@@ -1,7 +1,7 @@
 doctype html
 html(lang="en")
   head
-    title Full Top 10
+    title Room Summary
     link(href='/styles/app.css' rel='stylesheet' type='text/css')
     link(href='/modules/dragula/dist/dragula.css' rel='stylesheet' type='text/css')
     link(href="/modules/@fortawesome/fontawesome-free/css/fontawesome.css" rel="stylesheet")
@@ -23,7 +23,7 @@ html(lang="en")
       }
 
   body
-    h1 Full Top 10 for #{formStartDate} to #{formEndDate}
+    h1 Room Summary for #{formStartDate} to #{formEndDate}
 
     ul
     li
@@ -37,7 +37,7 @@ html(lang="en")
     li
         a(href=`http://141.147.86.68:8585/summary?startDate=${linkStartDate}&endDate=${linkEndDate}`) Room Summary & Top DJs
 
-    form(action='/fulltop10' method='GET')
+    form(action='/summary' method='GET')
         label(for='startDate') Start Date:
         input#startDate(type='date' name='startDate' value=formStartDate)
         label(for='endDate') End Date:
@@ -47,31 +47,27 @@ html(lang="en")
     table#songqueue
         thead
             tr
-                th Artist
-                th Track
-                td Total Points
-                th Play Count
+                th Total Plays
+                th No. DJs
+                td Total Upvotes
+                th Total Downvotes
         tbody
-        each song in top10SongList
+        each row in summary
             tr
-            td= song.artist
-            td= song.track
-            td= song.points
-            td= song.plays
+            td= row.plays
+            td= row.djs
+            td= row.upvotes
+            td= row.downvotes
 
     h2 Not including Wednesdays (less 90s)
 
     table#songqueue
         thead
             tr
-                th Artist
-                th Track
+                th DJ
                 td Total Points
-                th Play Count
         tbody
-        each song in top10NotWednesdaySongList
+        each dj in top10DJs
             tr
-            td= song.artist
-            td= song.track
-            td= song.points
-            td= song.plays
+            td= dj.dj
+            td= dj.points
