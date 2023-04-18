@@ -13,7 +13,7 @@ db_name="robotoDB"
 current_datetime=$(date +%Y-%m-%d-%H-%M-%S)
 
 # Run mysqldump to backup the database
-mysqldump -u $BACKUPDBUSERNAME -p$DBPASSWORD $db_name > $backup_dir/$db_name-$current_date.sql
+mysqldump -u $BACKUPDBUSERNAME -p$DBPASSWORD $db_name > $backup_dir/$db_name-$current_datetime.sql
 
 # Delete backups that are older than one month
 find $backup_dir -name "$db_name-*.sql" -type f -mtime +30 -exec rm {} \;
