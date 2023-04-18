@@ -474,6 +474,7 @@ WHERE tp.whenPlayed BETWEEN @theStartDate AND @theEndDate AND
             const selectQuery = baseSelectQuery + `${ includeWednesdays ? "" : "AND DAYOFWEEK(tp.whenPlayed)!=4 " }` + queryEnd;
             const values = [ startDate, endDate ];
 
+            console.log( selectQuery );
             try {
                 const result = await this.runQuery( selectQuery, values );
                 return result;
