@@ -414,8 +414,8 @@ const databaseFunctions = () => {
         // Top 10 Functions
         // ========================================================
 
-        fullTop10Results: function ( startDate, endDate ) {
-            const selectQuery = `SELECT COALESCE(a.displayName, a.artistName) AS "artist", COALESCE(t.displayName, t.trackname) AS "track", 
+        async fullTop10Results ( startDate, endDate, includeWednesdays = true ) {
+            const baseSelectQuery = `SELECT COALESCE(a.displayName, a.artistName) AS "artist", COALESCE(t.displayName, t.trackname) AS "track", 
 (SUM(tp.upvotes-tp.downvotes) + SUM(tp.snags*6) + 
 SUM(IF(c.command='props', e.count, 0))*5 +
 SUM(IF(c.command='noice', e.count, 0))*5 +
@@ -431,49 +431,32 @@ LEFT JOIN commandsToCount c ON c.id=e.commandsToCount_id
 WHERE tp.whenPlayed BETWEEN ? AND ? AND 
 tp.length>60 AND
 u.username != "Mr. Roboto"
-GROUP BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname)
-ORDER BY 3 DESC, 4 DESC
-limit 20;`;
+`;
+
+            const queryEnd = `
+    GROUP BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname)
+    ORDER BY 3 DESC, 4 DESC
+    limit 20;
+    `;
+
+            const selectQuery = baseSelectQuery + `${ includeWednesdays ? "" : "AND DAYOFWEEK(tp.whenPlayed)!=4 " }` + queryEnd;
             const values = [ startDate, endDate ];
 
-            return this.runQuery( selectQuery, values )
-                .then( ( result ) => {
-                    return result;
-                } );
-        },
-
-        fullTop10NotWednesdayResults: function ( startDate, endDate ) {
-            const selectQuery = `SELECT COALESCE(a.displayName, a.artistName) AS "artist", COALESCE(t.displayName, t.trackname) AS "track", 
-(SUM(tp.upvotes-tp.downvotes) + SUM(tp.snags*6) + 
-SUM(IF(c.command='props', e.count, 0))*5 +
-SUM(IF(c.command='noice', e.count, 0))*5 +
-SUM(IF(c.command='spin', e.count, 0))*5 +
-SUM(IF(c.command='tune', e.count, 0))*5) * count(tp.id) AS "points",
-count(tp.id) AS "plays"
-FROM users u 
-JOIN tracksPlayed tp ON tp.djID=u.id 
-JOIN tracks t ON tp.trackID=t.id 
-JOIN artists a ON tp.artistID=a.id
-LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id 
-LEFT JOIN commandsToCount c ON c.id=e.commandsToCount_id
-WHERE tp.whenPlayed BETWEEN ? AND ? AND 
-tp.length>60 AND
-u.username != "Mr. Roboto" AND
-DAYOFWEEK(tp.whenPlayed)!=4
-GROUP BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname)
-ORDER BY 3 DESC, 4 DESC
-limit 20;`;
-            const values = [ startDate, endDate ];
-
-            return this.runQuery( selectQuery, values )
-                .then( ( result ) => {
-                    return result;
-                } );
+            try {
+                const result = await this.runQuery( selectQuery, values );
+                return result;
+            } catch ( error ) {
+                console.error( error );
+                throw error;
+            }
         },
 
         // ========================================================
 
     }
+
+
+
 
 }
 

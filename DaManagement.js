@@ -553,15 +553,20 @@ app.post( '/updateTrackDisplayName', ( req, res ) => {
 // Top 10 Countddown Data
 // ########################################################################
 
-app.get( '/fulltop10', async ( req, res ) => {
+async function getTop10 ( req, res, functionName, templateFile ) {
     try {
         const { startDate, endDate } = req.query;
-        const [ formStartDate, formEndDate, linkStartDate, linkEndDate ] = [ dateFunctions.formStartDate( dayjs, startDate ), dateFunctions.formEndDate( dayjs, endDate ), dateFunctions.linkStartDate( dayjs, startDate ), dateFunctions.linkEndDate( dayjs, endDate ), ];
+        const [ formStartDate, formEndDate, linkStartDate, linkEndDate ] = [
+            dateFunctions.formStartDate( dayjs, startDate ),
+            dateFunctions.formEndDate( dayjs, endDate ),
+            dateFunctions.linkStartDate( dayjs, startDate ),
+            dateFunctions.linkEndDate( dayjs, endDate ),
+        ];
         const [ top10SongList, top10NotWednesdaySongList ] = await Promise.all( [
-            databaseFunctions.fullTop10Results( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ) ),
-            databaseFunctions.fullTop10NotWednesdayResults( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ) ),
+            databaseFunctions[ functionName ]( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ) ),
+            databaseFunctions[ functionName ]( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ), false ),
         ] );
-        const html = pug.renderFile( './templates/fullTop10.pug', {
+        const html = pug.renderFile( `./templates/${ templateFile }.pug`, {
             top10SongList,
             top10NotWednesdaySongList,
             formStartDate,
@@ -574,22 +579,17 @@ app.get( '/fulltop10', async ( req, res ) => {
         console.error( error );
         res.sendStatus( 500 );
     }
+}
+
+app.get( '/fulltop10', async ( req, res ) => {
+    await getTop10( req, res, "fullTop10Results", "fullTop10" );
+} );
+
+app.get( '/likesTop10', async ( req, res ) => {
+    await getTop10( req, res, "likesTop10Results", "likesTop10" );
 } );
 
 /* 
-app.get( '/likesTop10', async ( req, res ) => {
-    try {
-        const top10SongList = await databaseFunctions.fullTop10Results( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
-        const top10NotWednesdaySongList = await databaseFunctions.fullTop10NotWednesdayResults( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
-
-        let html = pug.renderFile( './templates/likesTop10.pug', { top10SongList, top10NotWednesdaySongList, formStartDate, formEndDate, linkStartDate, linkEndDate } );
-        res.send( html );
-    } catch ( error ) {
-        console.error( error );
-        res.sendStatus( 500 );
-    }
-} );
-
 app.get( '/mostplayedartists', async ( req, res ) => {
     try {
         const top10SongList = await databaseFunctions.fullTop10Results( startDate.format( 'YYYY-MM-DD HH:mm:ss' ), endDate.format( 'YYYY-MM-DD HH:mm:ss' ) );
