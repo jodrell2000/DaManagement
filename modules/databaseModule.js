@@ -584,7 +584,7 @@ WHERE tp.whenPlayed BETWEEN ? AND ? AND
 tp.length>60
 GROUP BY tp.id, u.username
 ) trackPoints
-GROUP BY username
+GROUP BY dj
 ORDER BY 2 DESC
 LIMIT 11;`;
             const values = [ startDate, endDate ];
