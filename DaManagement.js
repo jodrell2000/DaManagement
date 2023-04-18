@@ -579,7 +579,35 @@ async function getTop10 ( req, res, functionName, templateFile ) {
         console.error( error );
         res.sendStatus( 500 );
     }
-}
+};
+
+async function getSummary ( req, res, templateFile ) {
+    try {
+        const { startDate, endDate } = req.query;
+        const [ formStartDate, formEndDate, linkStartDate, linkEndDate ] = [
+            dateFunctions.formStartDate( dayjs, startDate ),
+            dateFunctions.formEndDate( dayjs, endDate ),
+            dateFunctions.linkStartDate( dayjs, startDate ),
+            dateFunctions.linkEndDate( dayjs, endDate ),
+        ];
+        const [ summary, top10DJs ] = await Promise.all( [
+            databaseFunctions.roomSummaryResults( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ) ),
+            databaseFunctions.top10DJResults( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ) ),
+        ] );
+        const html = pug.renderFile( `./templates/${ templateFile }.pug`, {
+            summary,
+            top10DJs,
+            formStartDate,
+            formEndDate,
+            linkStartDate,
+            linkEndDate,
+        } );
+        res.send( html );
+    } catch ( error ) {
+        console.error( error );
+        res.sendStatus( 500 );
+    }
+};
 
 app.get( '/fulltop10', async ( req, res ) => {
     await getTop10( req, res, "fullTop10Results", "fullTop10" );
@@ -595,6 +623,10 @@ app.get( '/mostplayedtracks', async ( req, res ) => {
 
 app.get( '/mostplayedartists', async ( req, res ) => {
     await getTop10( req, res, "mostPlayedArtistsResults", "mostplayedartists" );
+} );
+
+app.get( '/summary', async ( req, res ) => {
+    await getSummary( req, res, "summary" );
 } );
 
 
