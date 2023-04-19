@@ -101,7 +101,8 @@ const roomFunctions = ( bot ) => {
         theme: () => theme,
         setTheme: function ( value ) {
             theme = value;
-            bot.roomModify( { theme: value } );
+            // this function doesn't exist in the api yet
+            // bot.roomModify( { theme: value } );
         },
         clearTheme: function () {
             theme = false;
