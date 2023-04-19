@@ -1,0 +1,75 @@
+doctype html
+html(lang="en")
+  head
+    title Room Summary
+    link(href='/styles/app.css' rel='stylesheet' type='text/css')
+    link(href='/modules/dragula/dist/dragula.css' rel='stylesheet' type='text/css')
+    link(href="/modules/@fortawesome/fontawesome-free/css/fontawesome.css" rel="stylesheet")
+    link(href="/modules/@fortawesome/fontawesome-free/css/solid.css" rel="stylesheet")
+    style.
+      #songqueue {
+        border-collapse: collapse;
+        border: 1px solid #ddd;
+        width: 100%;
+      }
+      #songqueue td, #songqueue th {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      #songqueue th {
+        background-color: #f2f2f2;
+        color: black;
+      }
+
+  body
+    h1 Room Summary for #{formStartDate} to #{formEndDate}
+
+    ul
+    li
+        a(href=`http://141.147.86.68:8585/fullTop10?startDate=${linkStartDate}&endDate=${linkEndDate}`) Full Top 10 Lists
+    li
+        a(href=`http://141.147.86.68:8585/likesTop10?startDate=${linkStartDate}&endDate=${linkEndDate}`) Top 10 (Likes Only)
+    li
+        a(href=`http://141.147.86.68:8585/mostplayedartists?startDate=${linkStartDate}&endDate=${linkEndDate}`) Most Played Artists
+    li
+        a(href=`http://141.147.86.68:8585/mostplayedtracks?startDate=${linkStartDate}&endDate=${linkEndDate}`) Most Played Tracks
+    li
+        a(href=`http://141.147.86.68:8585/summary?startDate=${linkStartDate}&endDate=${linkEndDate}`) Room Summary & Top DJs
+
+    form(action='/summary' method='GET')
+        label(for='startDate') Start Date:
+        input#startDate(type='date' name='startDate' value=formStartDate)
+        label(for='endDate') End Date:
+        input#endDate(type='date' name='endDate' value=formEndDate)
+        input(type='submit' value='Update')
+
+    h2 Summary
+
+    table#songqueue
+        thead
+            tr
+                th Total Plays
+                th No. DJs
+                td Total Upvotes
+                th Total Downvotes
+        tbody
+        each row in summary
+            tr
+            td= row.plays
+            td= row.djs
+            td= row.upvotes
+            td= row.downvotes
+
+    h2 Top DJs
+
+    table#songqueue
+        thead
+            tr
+                th DJ
+                td Total Points
+        tbody
+        each dj in top10DJs
+            tr
+            td= dj.dj
+            td= dj.points

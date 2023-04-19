@@ -85,7 +85,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
             }
         },
 
-        dynamicChatCommand: function ( data, userFunctions, theCommand ) {
+        dynamicChatCommand: function ( data, userFunctions, theCommand, databaseFunctions ) {
             if ( this.isThereADJ( userFunctions, data ) ) {
                 const receiverID = userFunctions.getCurrentDJID();
                 const senderID = userFunctions.whoSentTheCommand( data );
@@ -98,15 +98,20 @@ const chatFunctions = ( bot, roomDefaults ) => {
                     this.pictureMessageTheDJ( senderID, receiverID, theMessages, thePictures, data, userFunctions )
                 }
 
-                if ( this.commandsToCount().indexOf( theCommand ) !== -1 && receiverID !== senderID ) {
-                    userFunctions.updateCommandCount( receiverID, theCommand );
-                }
+                this.countThisCommand( databaseFunctions, theCommand )
+                    .then( ( countThisCommand ) => {
+                        if ( countThisCommand !== -1 && receiverID !== senderID ) {
+                            userFunctions.updateCommandCount( receiverID, theCommand, databaseFunctions );
+                        }
+                    } )
             }
         },
 
-        commandsToCount: function () {
-            const countTheseCommands = [ "props", "noice", "epic" ];
-            return countTheseCommands;
+        countThisCommand: function ( databaseFunctions, theCommand ) {
+            return databaseFunctions.commandsToCount()
+                .then( ( commands ) => {
+                    return commands.indexOf( theCommand );
+                } )
         },
 
         getDynamicChatMessages: function ( theCommand ) {
@@ -240,43 +245,45 @@ const chatFunctions = ( bot, roomDefaults ) => {
 
         // ========================================================
 
-        userGreeting: function ( data, userID, theUsername, roomFunctions, userFunctions ) {
-            const customGreeting = userMessages.userGreetings.find( ( { id } ) => id === userID );
-            let theMessage;
+        userGreeting: function ( data, userID, theUsername, roomFunctions, userFunctions, databaseFunctions ) {
+            if ( theUsername !== "Guest" ) {
+                const customGreeting = userMessages.userGreetings.find( ( { id } ) => id === userID );
+                let theMessage;
 
-            if ( customGreeting !== undefined ) {
-                theMessage = customGreeting.message;
-            } else {
-                theMessage = roomFunctions.roomJoinMessage();
-            }
-
-            if ( roomFunctions.theme() !== false ) {
-                theMessage += '; The theme is currently set to ' + roomFunctions.theme();
-            }
-
-            theMessage = theMessage.replace( "@username", "@" + theUsername );
-            theMessage = theMessage.replace( "@roomName", roomFunctions.roomName() );
-
-            if ( !userFunctions.isUsersWelcomeTimerActive( userID ) ) {
-                userFunctions.activateUsersWelcomeTimer( userID );
-
-                const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
-                const readInOrder = async () => {
-                    await sleep( 1000 )
-                    this.botSpeak( theMessage, null, roomFunctions.greetInPublic(), userID );
-                    await sleep( 10 )
-                    if ( roomDefaults.queueActive === true && userFunctions.howManyDJs() === 5 ) {
-                        this.botSpeak( 'The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.', data, roomFunctions.greetInPublic() );
-                    }
-
-                    await sleep( 10 )
-                    if ( !roomFunctions.isRulesTimerRunning() && roomFunctions.rulesMessageOn() ) {
-                        this.botSpeak( roomFunctions.additionalJoinMessage(), data, roomFunctions.greetInPublic() );
-                        roomFunctions.startRulesTimer();
-                    }
-
+                if ( customGreeting !== undefined ) {
+                    theMessage = customGreeting.message;
+                } else {
+                    theMessage = roomFunctions.roomJoinMessage();
                 }
-                readInOrder();
+
+                if ( roomFunctions.theme() !== false ) {
+                    theMessage += '; The theme is currently set to ' + roomFunctions.theme();
+                }
+
+                theMessage = theMessage.replace( "@username", "@" + theUsername );
+                theMessage = theMessage.replace( "@roomName", roomFunctions.roomName() );
+
+                if ( !userFunctions.isUsersWelcomeTimerActive( userID ) ) {
+                    userFunctions.activateUsersWelcomeTimer( userID, databaseFunctions );
+
+                    const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
+                    const readInOrder = async () => {
+                        await sleep( 1000 )
+                        this.botSpeak( theMessage, null, roomFunctions.greetInPublic(), userID );
+                        await sleep( 10 )
+                        if ( roomDefaults.queueActive === true && userFunctions.howManyDJs() === 5 ) {
+                            this.botSpeak( 'The queue is currently active. To add yourself to the queue type /addme. To remove yourself from the queue type /removeme.', data, roomFunctions.greetInPublic() );
+                        }
+
+                        await sleep( 10 )
+                        if ( !roomFunctions.isRulesTimerRunning() && roomFunctions.rulesMessageOn() ) {
+                            this.botSpeak( roomFunctions.additionalJoinMessage(), data, roomFunctions.greetInPublic() );
+                            roomFunctions.startRulesTimer();
+                        }
+
+                    }
+                    readInOrder();
+                }
             }
         },
 

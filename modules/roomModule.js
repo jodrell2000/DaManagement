@@ -351,12 +351,12 @@ const roomFunctions = ( bot ) => {
             }
         },
 
-        escortDJsDown: function ( data, currentDJ, botFunctions, userFunctions, chatFunctions ) {
+        escortDJsDown: function ( data, currentDJ, botFunctions, userFunctions, chatFunctions, databaseFunctions ) {
             //iterates through the escort list and escorts all djs on the list off the stage.
 
             if ( userFunctions.escortMeIsEnabled( currentDJ ) === true ) {
                 userFunctions.removeDJ( currentDJ, 'DJ had enabled escortme' );
-                userFunctions.removeEscortMeFromUser( currentDJ );
+                userFunctions.removeEscortMeFromUser( currentDJ, databaseFunctions );
 
                 const theMessage = '@' + userFunctions.getUsername( currentDJ ) + ' had enabled escortme';
                 chatFunctions.botSpeak( theMessage, data );

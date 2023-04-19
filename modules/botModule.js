@@ -22,6 +22,8 @@ let whenToGetOnStage = botDefaults.whenToGetOnStage; //when this many or less pe
 let whenToGetOffStage = botDefaults.whenToGetOffStage;
 let checkVideoRegions = musicDefaults.alertIfRegionBlocked;
 let refreshingEnabled = roomDefaults.refreshingEnabled;
+let favouriteArtist = null; // what's Robos current favouurite Artist (requires verified info in the DB)
+
 
 const botFunctions = ( bot ) => {
 
@@ -64,6 +66,20 @@ const botFunctions = ( bot ) => {
                 process.exit( 1 );
             }
             shutMeDown();
+        },
+
+        changeAvatar: function ( data, args, chatFunctions ) {
+            const theID = args[ 0 ];
+            if ( isNaN( theID ) ) {
+                chatFunctions.botSpeak( "That's not a valid AvatarID...it needs to be a number", data );
+            } else {
+                if ( theID === "8" || theID === "4" || theID === "227" || theID === "2022" ) {
+                    chatFunctions.botSpeak( "NOPE! No Gingers here...", data );
+                } else {
+                    chatFunctions.botSpeak( "Changing...", data );
+                    bot.setAvatar( theID );
+                }
+            }
         },
 
         getUptime: function () {
@@ -228,6 +244,57 @@ const botFunctions = ( bot ) => {
 
         lameCommand: function () {
             bot.vote( 'down' );
+        },
+
+        // ========================================================
+
+        async readFavouriteArtist ( data, chatFunctions, databaseFunctions ) {
+            const favouriteArtist = await this.favouriteArtist( databaseFunctions );
+            chatFunctions.botSpeak( "This week, I have been mostly listening to " + favouriteArtist, data );
+        },
+
+        favouriteArtist: function ( databaseFunctions ) {
+            if ( favouriteArtist !== null ) {
+                return Promise.resolve( favouriteArtist );
+            }
+
+            return databaseFunctions.getRandomVerifiedArtist()
+                .then( ( displayName ) => {
+                    return this.setFavouriteArtist( displayName );
+                } );
+        },
+
+        setFavouriteArtist: function ( value ) {
+            return new Promise( ( resolve, _ ) => {
+                favouriteArtist = value;
+                resolve( value );
+            } )
+        },
+
+        async chooseNewFavourite ( databaseFunctions ) {
+            await databaseFunctions.getRandomVerifiedArtist()
+                .then( ( displayName ) => {
+                    favouriteArtist = displayName;
+                } )
+        },
+
+        async isFavouriteArtist ( databaseFunctions, theArtist ) {
+            const currentFavourite = await this.favouriteArtist( databaseFunctions );
+
+            return new Promise( ( resolve, reject ) => {
+                databaseFunctions.getVerifiedArtistsFromName( theArtist )
+                    .then( ( array ) => {
+                        for ( let i = 0; i < array.length; i++ ) {
+                            if ( array[ i ].displayName === currentFavourite ) {
+                                resolve( currentFavourite );
+                                return;
+                            }
+                        }
+                    } )
+                    .catch( ( error ) => {
+                        reject( error );
+                    } );
+            } );
         },
 
         // ========================================================
