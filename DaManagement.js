@@ -2,6 +2,7 @@
     Adam Reynolds 2021-2022
     version 0.1 (forked from chillybot)
     version 0.2 (forked from Mr. Roboto by Jake Smith)
+    version 0.3 (bears very little resemblance to the original now)
 */
 
 /*******************************BeginSetUp*****************************************************************************/
@@ -22,10 +23,15 @@ let commandModule = require( './modules/commandModule.js' );
 let videoModule = require( './modules/videoModule.js' );
 let documentationModule = require( './modules/documentationModule.js' );
 let databaseModule = require( './modules/databaseModule.js' );
+let dateModule = require( './modules/dateModule.js' );
 
 const express = require( 'express' )
 const app = express();
 const pug = require( 'pug' );
+const bodyParser = require( 'body-parser' );
+const dayjs = require( 'dayjs' );
+const utc = require( 'dayjs/plugin/utc' );
+dayjs.extend( utc )
 
 // client authentication
 app.use( authentication )
@@ -36,6 +42,8 @@ app.use( `/scripts`, express.static( './scripts' ) );
 app.use( `/modules`, express.static( './node_modules' ) );
 app.use( `/styles`, express.static( './styles' ) );
 app.use( express.json() );
+app.use( bodyParser.urlencoded( { extended: false } ) );
+
 /************************************EndSetUp**********************************************************************/
 
 let bot = new Bot( authModule.AUTH, authModule.USERID, authModule.ROOMID ); //initializes the bot
@@ -51,6 +59,7 @@ const commandFunctions = commandModule( bot );
 const videoFunctions = videoModule( bot );
 const documentationFunctions = documentationModule();
 const databaseFunctions = databaseModule();
+const dateFunctions = dateModule();
 
 // do something when the bot disconnects?
 // eslint-disable-next-line no-unused-vars
@@ -503,6 +512,127 @@ bot.on( 'endsong', function ( data ) {
     roomFunctions.escortDJsDown( data, djID, botFunctions, userFunctions, chatFunctions, databaseFunctions );
 } );
 
+// ########################################################################
+// DB Song Editor
+// ########################################################################
+
+app.get( '/listunverified', async ( req, res ) => {
+    try {
+        const songList = await databaseFunctions.getUnverifiedSongList();
+        let html = pug.renderFile( './templates/listUnverifiedSongs.pug', { songList } );
+        res.send( html );
+    } catch ( error ) {
+        console.error( error );
+        res.sendStatus( 500 );
+    }
+} );
+
+app.post( '/updateArtistDisplayName', ( req, res ) => {
+    const artistID = req.body.artistID;
+    const artistDisplayName = req.body.artistDisplayName;
+
+    // call a function with the artistID and artistDisplayName values
+    databaseFunctions.updateArtistDisplayName( artistID, artistDisplayName )
+        .then( () => {
+            res.redirect( '/listunverified' );
+        } )
+} );
+
+app.post( '/updateTrackDisplayName', ( req, res ) => {
+    const trackID = req.body.trackID;
+    const trackDisplayName = req.body.trackDisplayName;
+
+    // call a function with the artistID and artistDisplayName values
+    databaseFunctions.updateTrackDisplayName( trackID, trackDisplayName )
+        .then( () => {
+            res.redirect( '/listunverified' );
+        } )
+} );
+
+// ########################################################################
+// Top 10 Countddown Data
+// ########################################################################
+
+async function getTop10 ( req, res, functionName, templateFile ) {
+    try {
+        const { startDate, endDate } = req.query;
+        const [ formStartDate, formEndDate, linkStartDate, linkEndDate ] = [
+            dateFunctions.formStartDate( dayjs, startDate ),
+            dateFunctions.formEndDate( dayjs, endDate ),
+            dateFunctions.linkStartDate( dayjs, startDate ),
+            dateFunctions.linkEndDate( dayjs, endDate ),
+        ];
+        const [ top10SongList, top10NotWednesdaySongList ] = await Promise.all( [
+            databaseFunctions[ functionName ]( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ) ),
+            databaseFunctions[ functionName ]( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ), false ),
+        ] );
+        const html = pug.renderFile( `./templates/${ templateFile }.pug`, {
+            top10SongList,
+            top10NotWednesdaySongList,
+            formStartDate,
+            formEndDate,
+            linkStartDate,
+            linkEndDate,
+        } );
+        res.send( html );
+    } catch ( error ) {
+        console.error( error );
+        res.sendStatus( 500 );
+    }
+};
+
+async function getSummary ( req, res, templateFile ) {
+    try {
+        const { startDate, endDate } = req.query;
+        const [ formStartDate, formEndDate, linkStartDate, linkEndDate ] = [
+            dateFunctions.formStartDate( dayjs, startDate ),
+            dateFunctions.formEndDate( dayjs, endDate ),
+            dateFunctions.linkStartDate( dayjs, startDate ),
+            dateFunctions.linkEndDate( dayjs, endDate ),
+        ];
+        const [ summary, top10DJs ] = await Promise.all( [
+            databaseFunctions.roomSummaryResults( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ) ),
+            databaseFunctions.top10DJResults( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ) ),
+        ] );
+        const html = pug.renderFile( `./templates/${ templateFile }.pug`, {
+            summary,
+            top10DJs,
+            formStartDate,
+            formEndDate,
+            linkStartDate,
+            linkEndDate,
+        } );
+        res.send( html );
+    } catch ( error ) {
+        console.error( error );
+        res.sendStatus( 500 );
+    }
+};
+
+app.get( '/fulltop10', async ( req, res ) => {
+    await getTop10( req, res, "fullTop10Results", "fullTop10" );
+} );
+
+app.get( '/likesTop10', async ( req, res ) => {
+    await getTop10( req, res, "top10ByLikesResults", "likesTop10" );
+} );
+
+app.get( '/mostplayedtracks', async ( req, res ) => {
+    await getTop10( req, res, "mostPlayedTracksResults", "mostplayedtracks" );
+} );
+
+app.get( '/mostplayedartists', async ( req, res ) => {
+    await getTop10( req, res, "mostPlayedArtistsResults", "mostplayedartists" );
+} );
+
+app.get( '/summary', async ( req, res ) => {
+    await getSummary( req, res, "summary" );
+} );
+
+
+// ########################################################################
+// Bot Plaaylist Editor
+// ########################################################################
 
 app.get( '/', function ( req, res ) {
     bot.playlistAll( ( playlistData ) => {
@@ -537,6 +667,10 @@ app.get( '/deletesong', ( req, res ) => {
     bot.playlistRemove( Number.parseInt( req.query.songindex ) );
     res.json( `refresh` );
 } );
+
+// ########################################################################
+// General functions
+// ########################################################################
 
 function authentication ( req, res, next ) {
     let authheader = req.headers.authorization;
