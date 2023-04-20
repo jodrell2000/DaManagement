@@ -19,20 +19,24 @@ const mlFunctions = () => {
                     theQuestion,
                 } ),
             };
-            console.groupEnd();
 
             try {
                 const response = await axios( request );
+                console.log( "response: " + JSON.stringify( response ) );
 
                 if ( !response.data ) {
                     throw new Error( `Empty response` );
                 }
 
+                console.groupEnd();
                 return response.data.result;
             } catch ( error ) {
                 console.error( error );
+                console.groupEnd();
+
                 throw new Error( "Failed to get response from Bard AI" );
             }
+
         },
 
     }
