@@ -38,6 +38,9 @@ const mlFunctions = () => {
             } catch ( error ) {
                 console.error( error );
                 console.groupEnd();
+                if ( error.message === "Timeout" ) {
+                    return "Oopsie";
+                }
 
                 throw new Error( "Failed to get response from Bard AI" );
             }
