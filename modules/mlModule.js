@@ -40,7 +40,7 @@ const mlFunctions = () => {
     }
 }
 
-module.exports = mlFunctions;
+export default ( mlFunctions );
 
 
 // 440 characters, max chat length for ttfm
