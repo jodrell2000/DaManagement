@@ -603,6 +603,16 @@ const botFunctions = ( bot ) => {
                 }
             }
         },
+
+        // ========================================================
+        // ML Chat Functions
+        // ========================================================
+
+        async chatCommand ( data, theQuestion, chatFunctions, mlFunctions ) {
+            const answer = await mlFunctions.askBard( theQuestion );
+            chatFunctions.botSpeak( answer, data );
+        },
+
     }
 }
 

@@ -281,6 +281,9 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.choosenewfavourite = ( { botFunctions, databaseFunctions } ) => { botFunctions.chooseNewFavourite( databaseFunctions ); }
     moderatorCommands.choosenewfavourite.help = "Pick a new favourite artist";
 
+    moderatorCommands.chat = ( { botFunctions, data, args, chatFunctions, mlFunctions } ) => { botFunctions.chatCommand( data, reassembleArgs( args ), chatFunctions, mlFunctions ); }
+    moderatorCommands.chat.help = "Talk to Robo via Bard";
+
     // #############################################
     // Moderator Greeting commands
     // #############################################
@@ -532,7 +535,7 @@ const commandFunctions = ( bot ) => {
             }
         },
 
-        parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions ) {
+        parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions ) {
             let senderID;
 
             if ( data.command === "pmmed" ) {
@@ -557,7 +560,9 @@ const commandFunctions = ( bot ) => {
                     chatFunctions,
                     videoFunctions,
                     documentationFunctions,
-                    databaseFunctions
+                    databaseFunctions,
+                    dateFunctions,
+                    mlFunctions
                 } );
             } else {
                 chatFunctions.botSpeak( "Sorry, that's not a command I recognise. Try " + chatDefaults.commandIdentifier + "list to find out more.", data );

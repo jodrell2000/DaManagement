@@ -24,6 +24,7 @@ let videoModule = require( './modules/videoModule.js' );
 let documentationModule = require( './modules/documentationModule.js' );
 let databaseModule = require( './modules/databaseModule.js' );
 let dateModule = require( './modules/dateModule.js' );
+let mlModule = require( './modules/mlModule.js' );
 
 const express = require( 'express' )
 const app = express();
@@ -60,6 +61,7 @@ const videoFunctions = videoModule( bot );
 const documentationFunctions = documentationModule();
 const databaseFunctions = databaseModule();
 const dateFunctions = dateModule();
+const mlFunctions = mlModule();
 
 // do something when the bot disconnects?
 // eslint-disable-next-line no-unused-vars
@@ -360,7 +362,7 @@ bot.on( 'speak', function ( data ) {
     userFunctions.updateUserLastSpoke( theUserID, databaseFunctions ); //update the afk position of the speaker
 
     if ( commandFunctions.wasThisACommand( data ) ) {
-        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions );
+        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions );
     }
 
     //checks to see if someone is trying to speak to an afk person or not.
