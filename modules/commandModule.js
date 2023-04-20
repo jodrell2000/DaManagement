@@ -281,8 +281,8 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.choosenewfavourite = ( { botFunctions, databaseFunctions } ) => { botFunctions.chooseNewFavourite( databaseFunctions ); }
     moderatorCommands.choosenewfavourite.help = "Pick a new favourite artist";
 
-    moderatorCommands.chat = ( { botFunctions, data, args, chatFunctions, mlFunctions } ) => { botFunctions.chatCommand( data, reassembleArgs( args ), chatFunctions, mlFunctions ); }
-    moderatorCommands.chat.help = "Talk to Robo via Bard";
+    moderatorCommands.askbard = ( { botFunctions, data, args, chatFunctions, mlFunctions } ) => { botFunctions.askBardCommand( data, reassembleArgs( args ), chatFunctions, mlFunctions ); }
+    moderatorCommands.askbard.help = "Talk to Robo via Bard";
 
     // #############################################
     // Moderator Greeting commands
