@@ -45,8 +45,8 @@ const mlFunctions = () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                data: JSON.stringify( {
-                    theQuestion,
+                body: JSON.stringify( {
+                    question: theQuestion,
                 } ),
             };
 
