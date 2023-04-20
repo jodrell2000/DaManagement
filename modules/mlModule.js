@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+const fetch = ( 'node-fetch' );
 
 const mlFunctions = () => {
 
