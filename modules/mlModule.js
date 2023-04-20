@@ -1,4 +1,4 @@
-const fetch = ( 'node-fetch' );
+const axios = require( 'axios' );
 
 const mlFunctions = () => {
 
@@ -15,22 +15,20 @@ const mlFunctions = () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify( {
+                data: JSON.stringify( {
                     theQuestion,
                 } ),
             };
             console.groupEnd();
 
             try {
-                const response = await fetch( request );
+                const response = await axios( request );
 
-                if ( !response.ok ) {
-                    throw new Error( `Request failed with status code ${ response.status }` );
+                if ( !response.data ) {
+                    throw new Error( `Empty response` );
                 }
 
-                const body = await response.json();
-
-                return body.result;
+                return response.data.result;
             } catch ( error ) {
                 console.error( error );
                 throw new Error( "Failed to get response from Bard AI" );
@@ -41,7 +39,6 @@ const mlFunctions = () => {
 }
 
 module.exports = mlFunctions;
-
 
 // 440 characters, max chat length for ttfm
 // 0123456789abcdefghijklmonpqrstuvwxyz0123456789abcdefghijklmonpqrstuvwxyz0123456789abcdefghijklmonpqrstuvwxyz0123456789abcdefghijklmonpqrstuvwxyz0123456789abcdefghijklmonpqrstuvwxyz0123456789abcdefghijklmonpqrstuvwxyz0123456789abcdefghijklmonpqrstuvwxyz0123456789abcdefghijklmonpqrstuvwxyz0123456789abcdefghijklmonpqrstuvwxyz0123456789abcdefghijklmonpqrstuvwxyz0123456789abcdefghijklmonpqrstuvwxyz0123456789abcdefghijklmonpqrstuvwxyz01234567
