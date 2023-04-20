@@ -1,3 +1,5 @@
+let fetch = require( 'node-fetch' );
+
 const mlFunctions = () => {
 
     return {
