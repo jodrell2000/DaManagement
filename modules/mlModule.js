@@ -3,7 +3,10 @@ const mlFunctions = () => {
     return {
 
         async askBard ( sentQuestion ) {
+            console.group( "askBard" );
             const theQuestion = "In no more than 440 characters " + sentQuestion;
+            console.log( "theQuestion: " + theQuestion );
+            console.log( "stringify theQuestion: " + JSON.stringify( theQuestion ) );
             const request = {
                 method: "POST",
                 url: "https://bard.ai/v1/query",
@@ -14,6 +17,7 @@ const mlFunctions = () => {
                     theQuestion,
                 } ),
             };
+            console.groupEnd();
 
             try {
                 const response = await fetch( request );
