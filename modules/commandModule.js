@@ -284,6 +284,9 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.askbard = ( { botFunctions, data, args, chatFunctions, mlFunctions } ) => { botFunctions.askBardCommand( data, reassembleArgs( args ), chatFunctions, mlFunctions ); }
     moderatorCommands.askbard.help = "Talk to Robo via Bard";
 
+    moderatorCommands.askchatgpt = ( { botFunctions, data, args, chatFunctions, mlFunctions } ) => { botFunctions.askChatGPTCommand( data, reassembleArgs( args ), chatFunctions, mlFunctions ); }
+    moderatorCommands.askchatgpt.help = "Talk to Robo via Bard";
+
     // #############################################
     // Moderator Greeting commands
     // #############################################

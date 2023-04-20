@@ -613,6 +613,11 @@ const botFunctions = ( bot ) => {
             chatFunctions.botSpeak( answer, data );
         },
 
+        async askChatGPTCommand ( data, theQuestion, chatFunctions, mlFunctions ) {
+            const answer = await mlFunctions.askChatGPT( theQuestion );
+            chatFunctions.botSpeak( answer, data );
+        },
+
     }
 }
 
