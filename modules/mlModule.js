@@ -1,9 +1,9 @@
 const axios = require( 'axios' );
 
+
 const mlFunctions = () => {
 
     return {
-
         async askBard ( sentQuestion ) {
             console.group( "askBard" );
             const theQuestion = "Answer in no more than 440 characters: " + sentQuestion;
@@ -23,7 +23,10 @@ const mlFunctions = () => {
             console.log( "request:" + JSON.stringify( request ) )
 
             try {
-                const response = await axios( request );
+                const response = await Promise.race( [
+                    axios( request ),
+                    new Promise( ( resolve, reject ) => setTimeout( () => reject( new Error( "Timeout" ) ), 10000 ) )
+                ] );
                 // console.log( "response: " + JSON.stringify( response ) );
 
                 if ( !response.data ) {
@@ -38,9 +41,7 @@ const mlFunctions = () => {
 
                 throw new Error( "Failed to get response from Bard AI" );
             }
-
         },
-
     }
 }
 
