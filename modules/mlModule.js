@@ -6,7 +6,7 @@ const mlFunctions = () => {
 
         async askBard ( sentQuestion ) {
             console.group( "askBard" );
-            const theQuestion = "In no more than 440 characters " + sentQuestion;
+            const theQuestion = "Answer in no more than 440 characters: " + sentQuestion;
             console.log( "theQuestion: " + theQuestion );
             console.log( "stringify theQuestion: " + JSON.stringify( theQuestion ) );
             const request = {
@@ -20,7 +20,7 @@ const mlFunctions = () => {
                 } ),
             };
 
-            console.log( "request:" + request )
+            console.log( "request:" + JSON.stringify( request ) )
 
             try {
                 const response = await axios( request );
