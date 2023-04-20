@@ -36,7 +36,7 @@ const mlFunctions = () => {
                 console.groupEnd();
                 return response.data.result;
             } catch ( error ) {
-                console.error( error );
+                console.error( "==" + error + "==" );
                 console.groupEnd();
                 if ( error.message === "Timeout" ) {
                     return "Oopsie";
