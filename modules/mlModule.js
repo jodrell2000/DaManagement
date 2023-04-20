@@ -20,9 +20,11 @@ const mlFunctions = () => {
                 } ),
             };
 
+            console.log( "request:" + request )
+
             try {
                 const response = await axios( request );
-                console.log( "response: " + JSON.stringify( response ) );
+                // console.log( "response: " + JSON.stringify( response ) );
 
                 if ( !response.data ) {
                     throw new Error( `Empty response` );
