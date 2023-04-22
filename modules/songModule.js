@@ -266,20 +266,33 @@ const songFunctions = ( bot ) => {
         // ========================================================
 
         songInfoCommand ( data, databaseFunctions, mlFunctions, chatFunctions ) {
-            console.log( "data:" + JSON.stringify( data ) );
-            console.log( "song:" + song );
-            console.log( "artist:" + artist );
+            let verifiedSong;
+            let verifiedArtist;
 
-            databaseFunctions.getVerifiedTracksFromName( song )
+            const getVerifiedTracks = databaseFunctions.getVerifiedTracksFromName( song )
                 .then( ( array ) => {
+                    verifiedSong = array[ 0 ].displayName;
                     console.log( "songs:" + array[ 0 ].displayName );
-                } )
+                } );
 
-            databaseFunctions.getVerifiedArtistsFromName( artist )
+            const getVerifiedArtists = databaseFunctions.getVerifiedArtistsFromName( artist )
                 .then( ( array ) => {
+                    verifiedArtist = array[ 0 ].displayName;
                     console.log( "artists:" + array[ 0 ].displayName );
-                } )
+                } );
 
+            Promise.all( [ getVerifiedTracks, getVerifiedArtists ] )
+                .then( () => {
+                    if ( verifiedSong && verifiedArtist ) {
+                        chatFunctions.botSpeak( 'Found something', data );
+                        console.log( mlFunctions.searchSong( verifiedSong, verifiedArtist ) );
+                    } else {
+                        console.log( "Could not find both verified song and artist" );
+                    }
+                } )
+                .catch( ( error ) => {
+                    console.log( "Error:", error );
+                } );
         },
 
         // ========================================================
