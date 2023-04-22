@@ -282,6 +282,7 @@ const songFunctions = ( bot ) => {
                     if ( verifiedSong && verifiedArtist ) {
                         mlFunctions.searchSong( verifiedSong, verifiedArtist )
                             .then( ( returned ) => {
+                                chatFunctions.botSpeak( "This is " + verifiedSong + " by " + verifiedArtist, data );
                                 chatFunctions.botSpeak( returned.thumbnail, data );
                                 chatFunctions.botSpeak( "Released in " + returned.releaseCountry + " in " + returned.releaseYear, data );
                                 chatFunctions.botSpeak( "More info can be found here: " + returned.discogsUrl, data );
