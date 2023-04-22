@@ -361,8 +361,6 @@ bot.on( 'speak', function ( data ) {
     userFunctions.updateUserLastSpoke( theUserID, databaseFunctions ); //update the afk position of the speaker
 
     if ( commandFunctions.wasThisACommand( data ) ) {
-        console.log( "======================" + JSON.stringify( mlFunctions ) );
-
         commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions );
     }
 
@@ -380,7 +378,7 @@ bot.on( 'speak', function ( data ) {
 //checks when the bot recieves a pm
 bot.on( 'pmmed', function ( data ) {
     if ( commandFunctions.wasThisACommand( data ) ) {
-        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions );
+        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions );
     }
 } );
 
