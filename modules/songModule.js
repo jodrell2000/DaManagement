@@ -292,7 +292,7 @@ const songFunctions = ( bot ) => {
                                 chatFunctions.botSpeak( "Sorry, I couuldn't find that", data );
                             } )
                     } else {
-                        chatFunctions.botSpeak( "Sorry, I couuldn't find this", data );
+                        chatFunctions.botSpeak( "Sorry, I couldn't find info on this track", data );
                     }
                 } )
                 .catch( ( error ) => {
