@@ -81,6 +81,7 @@ const mlFunctions = () => {
         },
 
         async searchSong ( songName, artistName ) {
+            console.group( "searchSong" );
             try {
                 const response = await axios.get( 'https://api.discogs.com/database/search', {
                     params: {
@@ -90,6 +91,8 @@ const mlFunctions = () => {
                         secret: discogsConsumerSecret
                     }
                 } );
+
+                console.log( JSON.stringify( response ) );
 
                 if ( response.data.results.length === 0 ) {
                     throw new Error( 'No results found.' );
@@ -115,6 +118,7 @@ const mlFunctions = () => {
                     throw new Error( `Artist "${ artistName }" not found on release.` );
                 }
 
+                console.groupEnd();
                 return {
                     songTitle: song.title,
                     artistName: artist.name,
