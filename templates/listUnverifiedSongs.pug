@@ -44,13 +44,15 @@ html(lang="en")
             td
                 if song.artistDisplayName
                     | #{song.artistDisplayName}
-                    form(action='/updateArtistDisplayName?byrecent=req.body.byrecent' method='POST')
+                    form(action='/updateArtistDisplayName' method='POST')
                         input(type='hidden' name='reset' value=true)
+                        input(type='hidden' name='byrecent' value=req.body.byrecent)
                         input(type='hidden' name='artistID' value=song.artistID)
                         button(type='submit') Reset
                 else
-                    form(action='/updateArtistDisplayName?byrecent=req.body.byrecent' method='POST')
+                    form(action='/updateArtistDisplayName' method='POST')
                         input(type='text' name='artistDisplayName', value=song.artistName)
+                        input(type='hidden' name='byrecent' value=req.body.byrecent)
                         input(type='hidden' name='artistID' value=song.artistID)
                         button(type='submit') UpdateDB
             td= song.trackID
@@ -58,13 +60,15 @@ html(lang="en")
             td
                 if song.trackDisplayName
                     | #{song.trackDisplayName}
-                    form(action='/updateTrackDisplayName?byrecent=req.body.byrecent' method='POST')
+                    form(action='/updateTrackDisplayName' method='POST')
                         input(type='hidden' name='reset' value=true)
+                        input(type='hidden' name='byrecent' value=req.body.byrecent)
                         input(type='hidden' name='trackID' value=song.trackID)
                         button(type='submit') Reset
                 else
-                    form(action='/updateTrackDisplayName?byrecent=req.body.byrecent' method='POST')
+                    form(action='/updateTrackDisplayName' method='POST')
                         input(type='text' name='trackDisplayName', value=song.trackName)
+                        input(type='hidden' name='byrecent' value=req.body.byrecent)
                         input(type='hidden' name='trackID' value=song.trackID)
                         button(type='submit') UpdateDB
             td= song.length
