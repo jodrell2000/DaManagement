@@ -324,7 +324,7 @@ const databaseFunctions = () => {
       JOIN tracks t ON t.id=tp.trackID 
     WHERE 
       a.displayName IS NULL OR t.displayName IS NULL 
-      ${ byRecent ? `GROUP BY tp.id ORDER BY tp.whenPlayed ` : `GROUP BY a.id,t.id 
+      ${ byRecent ? `GROUP BY tp.id ORDER BY tp.whenPlayed DESC ` : `GROUP BY a.id,t.id 
     ORDER BY COALESCE( a.displayName, a.artistName ), COALESCE( t.displayName, t.trackname ) ` } 
     LIMIT 50`;
 
