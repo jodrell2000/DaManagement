@@ -535,7 +535,7 @@ app.post( '/updateArtistDisplayName', ( req, res ) => {
     // call a function with the artistID and artistDisplayName values
     databaseFunctions.updateArtistDisplayName( artistID, artistDisplayName )
         .then( () => {
-            res.redirect( '/listunverified' );
+            res.redirect( '/listunverified?byrecent=' + req.body.byrecent );
         } )
 } );
 
@@ -546,7 +546,7 @@ app.post( '/updateTrackDisplayName', ( req, res ) => {
     // call a function with the artistID and artistDisplayName values
     databaseFunctions.updateTrackDisplayName( trackID, trackDisplayName )
         .then( () => {
-            res.redirect( '/listunverified' );
+            res.redirect( '/listunverified?byrecent=' + req.body.byrecent );
         } )
 } );
 
