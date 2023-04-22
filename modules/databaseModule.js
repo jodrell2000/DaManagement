@@ -298,9 +298,9 @@ const databaseFunctions = () => {
                 } );
         },
 
-        getVerifiedTracksFromName ( theArtist ) {
+        getVerifiedTracksFromName ( theSong ) {
             const selectQuery = "SELECT displayName FROM tracks WHERE trackName = ?;";
-            const values = [ theArtist ];
+            const values = [ theSong ];
 
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {

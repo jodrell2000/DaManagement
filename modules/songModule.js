@@ -270,8 +270,8 @@ const songFunctions = ( bot ) => {
             console.log( "song:" + song );
             console.log( "artist:" + artist );
 
-            const theTracks = databaseFunctions.getVerifiedTracksFromName();
-            const theArtists = databaseFunctions.getVerifiedArtistsFromName();
+            const theTracks = databaseFunctions.getVerifiedTracksFromName( song );
+            const theArtists = databaseFunctions.getVerifiedArtistsFromName( artist );
             console.log( "songs:" + JSON.stringify( theTracks ) );
             console.log( "artists:" + JSON.stringify( theArtists ) );
 
