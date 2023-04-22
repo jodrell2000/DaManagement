@@ -267,6 +267,8 @@ const songFunctions = ( bot ) => {
 
         songInfoCommand ( data, chatFunctions, mlFunctions ) {
             console.log( "data:" + JSON.stringify( data ) );
+            console.log( "song:" + song );
+            console.log( "artist:" + artist );
 
         },
 
