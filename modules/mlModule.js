@@ -100,7 +100,7 @@ const mlFunctions = () => {
 
                 const releaseId = response.data.results[ 0 ].id;
                 console.log( "releaseID:" + releaseId );
-                const release = await axios.get( `https://api.discogs.com/releases/${ releaseId }`, {
+                const release = await axios.get( `https://api.discogs.com/masters/${ releaseId }`, {
                     params: {
                         key: discogsConsumerKey,
                         secret: discogsConsumerSecret
