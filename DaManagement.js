@@ -88,7 +88,7 @@ setInterval( function () {
 setInterval( function () { userFunctions.roomIdleCheck( roomDefaults, chatFunctions ) }, 60 * 1000 )
 
 // every 5 seconds, check if the there's an empty DJ slot, and prompt the next in the queue to join the decks, remove them if they don't
-setInterval( function ( data ) {
+setInterval( function () {
     if ( roomDefaults.queueActive !== true && userFunctions.howManyDJs() === roomDefaults.maxDJs ) {
         roomDefaults.queueActive = true;
         chatFunctions.botSpeak( "The Queue is now active", null, true, null );
@@ -202,7 +202,6 @@ bot.on( 'roomChanged', function ( data ) {
 //checks at the beggining of the song
 bot.on( 'newsong', function ( data ) {
     //resets counters and array for vote skipping
-    songFunctions.resetCheckVotes();
     songFunctions.resetVoteCountSkip();
     songFunctions.resetVotesLeft( roomDefaults.HowManyVotesToSkip );
     songFunctions.resetUpVotes();
@@ -581,7 +580,7 @@ async function getTop10 ( req, res, functionName, templateFile ) {
         console.error( error );
         res.sendStatus( 500 );
     }
-};
+}
 
 async function getSummary ( req, res, templateFile ) {
     try {
@@ -609,7 +608,7 @@ async function getSummary ( req, res, templateFile ) {
         console.error( error );
         res.sendStatus( 500 );
     }
-};
+}
 
 app.get( '/fulltop10', async ( req, res ) => {
     await getTop10( req, res, "fullTop10Results", "fullTop10" );

@@ -187,10 +187,6 @@ const songFunctions = ( bot ) => {
             downVotes = 0;
         },
 
-        resetCheckVotes: function () {
-            checkVotes = [];
-        },
-
         resetVoteCountSkip: function () {
             voteCountSkip = 0;
         },
