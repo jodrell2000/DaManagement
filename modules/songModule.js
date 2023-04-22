@@ -270,10 +270,19 @@ const songFunctions = ( bot ) => {
             console.log( "song:" + song );
             console.log( "artist:" + artist );
 
-            const theTracks = databaseFunctions.getVerifiedTracksFromName( song );
-            const theArtists = databaseFunctions.getVerifiedArtistsFromName( artist );
-            console.log( "songs:" + JSON.stringify( theTracks ) );
-            console.log( "artists:" + JSON.stringify( theArtists ) );
+            databaseFunctions.getVerifiedTracksFromName( song )
+                .then( ( array ) => {
+                    for ( let i = 0; i < array.length; i++ ) {
+                        console.log( "songs:" + array[ i ].displayName );
+                    }
+                } )
+
+            databaseFunctions.getVerifiedArtistsFromName( artist )
+                .then( ( array ) => {
+                    for ( let i = 0; i < array.length; i++ ) {
+                        console.log( "artists:" + array[ i ].displayName );
+                    }
+                } )
 
         },
 
