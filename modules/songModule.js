@@ -286,11 +286,11 @@ const songFunctions = ( bot ) => {
                     if ( verifiedSong && verifiedArtist ) {
                         mlFunctions.searchSong( verifiedSong, verifiedArtist )
                             .then( ( returned ) => {
-                                console.log( "thumbnail:" + returned.thumbnail );
-                                console.log( "releaseCountry:" + returned.releaseCountry );
-                                console.log( "releaseYear:" + returned.releaseYear );
-                                console.log( "discogsUrl:" + returned.discogsUrl );
-                                console.log( "tracklist:" + returned.tracklist );
+                                chatFunctions.botSpeak( returned.thumbnail, data );
+                                chatFunctions.botSpeak( "Released in " + returned.releaseCountry + " in " + returned.releaseYear, data );
+                                chatFunctions.botSpeak( "More info can be found here: " + returned.discogsUrl, data );
+
+                                //console.log( "tracklist:" + returned.tracklist );
                             } )
                     } else {
                         chatFunctions.botSpeak( 'Nope', data );
