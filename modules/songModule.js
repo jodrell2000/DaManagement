@@ -290,12 +290,11 @@ const songFunctions = ( bot ) => {
 
                                 //console.log( "tracklist:" + returned.tracklist );
                             } )
-                            .catch( ( error ) => {
-                                console.log( "Error:", error );
+                            .catch( () => {
+                                chatFunctions.botSpeak( "Sorry, I couuldn't find that", data );
                             } )
                     } else {
-                        chatFunctions.botSpeak( 'Nope', data );
-                        console.log( "Sorry, I couldn't confirm the artist and track name" );
+                        chatFunctions.botSpeak( "Sorry, I couuldn't find that", data );
                     }
                 } )
                 .catch( ( error ) => {
