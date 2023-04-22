@@ -288,6 +288,7 @@ const songFunctions = ( bot ) => {
                         chatFunctions.botSpeak( 'Found something', data );
                         console.log( mlFunctions.searchSong( verifiedSong, verifiedArtist ) );
                     } else {
+                        chatFunctions.botSpeak( 'Nope', data );
                         console.log( "Could not find both verified song and artist" );
                     }
                 } )
