@@ -94,6 +94,10 @@ const mlFunctions = () => {
                     throw new Error( 'No results found.' );
                 }
 
+                const thumbnail = response.data.results[ 0 ].thumb;
+                const releaseCountry = response.data.results[ 0 ].country;
+
+
                 const releaseId = response.data.results[ 0 ].id;
                 const release = await axios.get( `https://api.discogs.com/releases/${ releaseId }`, {
                     params: {
@@ -102,28 +106,13 @@ const mlFunctions = () => {
                     }
                 } );
 
-                console.log( JSON.stringify( release.data.tracklist ) );
-
-                const song = release.data.tracklist.find( track => track.title.toLowerCase() === songName.toLowerCase() );
-
-                if ( !song ) {
-                    throw new Error( `Song "${ songName }" not found on release.` );
-                }
-
-                const artist = release.data.artists.find( artist => artist.name.toLowerCase() === artistName.toLowerCase() );
-
-                if ( !artist ) {
-                    throw new Error( `Artist "${ artistName }" not found on release.` );
-                }
-
                 console.groupEnd();
                 return {
-                    songTitle: song.title,
-                    artistName: artist.name,
-                    releaseTitle: release.data.title,
+                    thumbnail,
+                    releaseCountry,
                     releaseYear: release.data.year,
-                    releaseLabel: release.data.labels[ 0 ].name,
-                    discogsUrl: release.data.uri
+                    discogsUrl: release.data.uri,
+                    tracklist: release.data.tracklist
                 };
 
             } catch ( error ) {
