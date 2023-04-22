@@ -269,15 +269,13 @@ const songFunctions = ( bot ) => {
 
             const getVerifiedTracks = databaseFunctions.getVerifiedTracksFromName( song )
                 .then( ( array ) => {
-                    // verifiedSong = array[ 0 ].displayName;
-                    verifiedSong = "Dead Ringer for Love";
+                    verifiedSong = array[ 0 ].displayName;
                     console.log( "songs:" + array[ 0 ].displayName );
                 } );
 
             const getVerifiedArtists = databaseFunctions.getVerifiedArtistsFromName( artist )
                 .then( ( array ) => {
-                    // verifiedArtist = array[ 0 ].displayName;
-                    verifiedArtist = "Meat Loaf";
+                    verifiedArtist = array[ 0 ].displayName;
                     console.log( "artists:" + array[ 0 ].displayName );
                 } );
 
@@ -294,7 +292,7 @@ const songFunctions = ( bot ) => {
                             } )
                     } else {
                         chatFunctions.botSpeak( 'Nope', data );
-                        console.log( "Could not find both verified song and artist" );
+                        console.log( "Sorry, I couldn't confirm the artist and track name" );
                     }
                 } )
                 .catch( ( error ) => {
