@@ -9,8 +9,6 @@ const openai = new OpenAIApi( configuration );
 const discogsConsumerKey = process.env.DISCOGS_CONSUMER_KEY;
 const discogsConsumerSecret = process.env.DISCOGS_CONSUMER_SECRET;
 
-
-
 const mlFunctions = () => {
 
     return {
