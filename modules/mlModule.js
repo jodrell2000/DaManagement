@@ -90,8 +90,6 @@ const mlFunctions = () => {
                     }
                 } );
 
-                console.log( JSON.stringify( response.data.results[ 0 ] ) );
-
                 if ( response.data.results.length === 0 ) {
                     throw new Error( 'No results found.' );
                 }
@@ -103,6 +101,8 @@ const mlFunctions = () => {
                         secret: discogsConsumerSecret
                     }
                 } );
+
+                console.log( JSON.stringify( release.data ) );
 
                 const song = release.data.tracklist.find( track => track.title.toLowerCase() === songName.toLowerCase() );
 
