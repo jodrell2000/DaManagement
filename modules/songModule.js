@@ -268,13 +268,11 @@ const songFunctions = ( bot ) => {
             const getVerifiedTracks = databaseFunctions.getVerifiedTracksFromName( song )
                 .then( ( array ) => {
                     verifiedSong = array[ 0 ].displayName;
-                    console.log( "songs:" + array[ 0 ].displayName );
                 } );
 
             const getVerifiedArtists = databaseFunctions.getVerifiedArtistsFromName( artist )
                 .then( ( array ) => {
                     verifiedArtist = array[ 0 ].displayName;
-                    console.log( "artists:" + array[ 0 ].displayName );
                 } );
 
             Promise.all( [ getVerifiedTracks, getVerifiedArtists ] )
