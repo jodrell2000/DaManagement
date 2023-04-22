@@ -285,8 +285,10 @@ const songFunctions = ( bot ) => {
                 .then( () => {
                     if ( verifiedSong && verifiedArtist ) {
                         chatFunctions.botSpeak( 'Found something', data );
-                        let returned = mlFunctions.searchSong( verifiedSong, verifiedArtist );
-                        console.log( returned );
+                        mlFunctions.searchSong( verifiedSong, verifiedArtist )
+                            .then( ( returned ) => {
+                                console.log( returned );
+                            } )
                     } else {
                         chatFunctions.botSpeak( 'Nope', data );
                         console.log( "Could not find both verified song and artist" );
