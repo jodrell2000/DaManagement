@@ -74,7 +74,7 @@ const songFunctions = ( bot ) => {
         // ========================================================
 
         // ========================================================
-        // Playlist Functions
+        // Length Functions
         // ========================================================
 
         switchLengthLimit: function ( data, songLength, chatFunctions ) {
@@ -256,7 +256,21 @@ const songFunctions = ( bot ) => {
                     userFunctions.removeDJ( lastDJ, 'DJ removed because of a stuck song issue' ); // Remove Saved DJ from last newsong call
                 }, 20 * 1000 ); // Current DJ has 20 seconds to skip before they are removed
             }, ( length + 10 ) * 1000 ); //Timer expires 10 seconds after the end of the song, if not cleared by a newsong
-        }
+        },
+
+        // ========================================================
+
+
+        // ========================================================
+        // Song Info Functions
+        // ========================================================
+
+        songInfoCommand ( data, chatFunctions, mlFunctions ) {
+            console.log( "data:" + JSON.stringify( data ) );
+
+        },
+
+        // ========================================================
     }
 }
 

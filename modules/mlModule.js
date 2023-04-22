@@ -6,6 +6,10 @@ const configuration = new Configuration( {
 } );
 const openai = new OpenAIApi( configuration );
 
+const discogsConsumerKey = process.env.DISCOGS_CONSUMER_KEY;
+const discogsConsumerSecret = process.env.DISCOGS_CONSUMER_SECRET;
+
+
 
 const mlFunctions = () => {
 
@@ -73,6 +77,56 @@ const mlFunctions = () => {
                 }
 
                 throw new Error( "Failed to get response from Bard AI" );
+            }
+        },
+
+        async searchSong ( songName, artistName ) {
+            try {
+                const response = await axios.get( 'https://api.discogs.com/database/search', {
+                    params: {
+                        artist: `${ artistName }`,
+                        release_title: `${ songName }`,
+                        key: discogsConsumerKey,
+                        secret: discogsConsumerSecret
+                    }
+                } );
+
+                if ( response.data.results.length === 0 ) {
+                    throw new Error( 'No results found.' );
+                }
+
+                const releaseId = response.data.results[ 0 ].id;
+                const release = await axios.get( `https://api.discogs.com/releases/${ releaseId }`, {
+                    params: {
+                        key: discogsConsumerKey,
+                        secret: discogsConsumerSecret
+                    }
+                } );
+
+                const song = release.data.tracklist.find( track => track.title.toLowerCase() === songName.toLowerCase() );
+
+                if ( !song ) {
+                    throw new Error( `Song "${ songName }" not found on release.` );
+                }
+
+                const artist = release.data.artists.find( artist => artist.name.toLowerCase() === artistName.toLowerCase() );
+
+                if ( !artist ) {
+                    throw new Error( `Artist "${ artistName }" not found on release.` );
+                }
+
+                return {
+                    songTitle: song.title,
+                    artistName: artist.name,
+                    releaseTitle: release.data.title,
+                    releaseYear: release.data.year,
+                    releaseLabel: release.data.labels[ 0 ].name,
+                    discogsUrl: release.data.uri
+                };
+
+            } catch ( error ) {
+                console.error( error );
+                throw new Error( 'Failed to get information from Discogs API.' );
             }
         },
     }
