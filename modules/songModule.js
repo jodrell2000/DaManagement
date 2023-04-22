@@ -272,16 +272,12 @@ const songFunctions = ( bot ) => {
 
             databaseFunctions.getVerifiedTracksFromName( song )
                 .then( ( array ) => {
-                    for ( let i = 0; i < array.length; i++ ) {
-                        console.log( "songs:" + array[ i ].displayName );
-                    }
+                    console.log( "songs:" + array[ 0 ].displayName );
                 } )
 
             databaseFunctions.getVerifiedArtistsFromName( artist )
                 .then( ( array ) => {
-                    for ( let i = 0; i < array.length; i++ ) {
-                        console.log( "artists:" + array[ i ].displayName );
-                    }
+                    console.log( "artists:" + array[ 0 ].displayName );
                 } )
 
         },
