@@ -84,6 +84,9 @@ const commandFunctions = ( bot ) => {
     generalCommands.robocoin = ( { data, userFunctions, chatFunctions } ) => { userFunctions.readMyRoboCoin( data, chatFunctions ); }
     generalCommands.robocoin.help = "How many Robo points do you have?";
 
+    generalCommands.songinfo = ( { songFunctions, data, databaseFunctions, mlFunctions, chatFunctions } ) => { songFunctions.songInfoCommand( data, databaseFunctions, mlFunctions, chatFunctions ); }
+    generalCommands.songinfo.help = "Lookup song info from Discogs";
+
     // #############################################
     // General user Queue commands
     // #############################################
@@ -285,9 +288,6 @@ const commandFunctions = ( bot ) => {
 
     moderatorCommands.askchatgpt = ( { botFunctions, data, args, chatFunctions, mlFunctions } ) => { botFunctions.askChatGPTCommand( data, reassembleArgs( args ), chatFunctions, mlFunctions ); }
     moderatorCommands.askchatgpt.help = "Talk to Robo via Bard";
-
-    moderatorCommands.songinfo = ( { songFunctions, data, databaseFunctions, mlFunctions, chatFunctions } ) => { songFunctions.songInfoCommand( data, databaseFunctions, mlFunctions, chatFunctions ); }
-    moderatorCommands.songinfo.help = "Lookup song info from Discogs";
 
     // #############################################
     // Moderator Greeting commands
