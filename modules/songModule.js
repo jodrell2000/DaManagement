@@ -290,6 +290,9 @@ const songFunctions = ( bot ) => {
 
                                 //console.log( "tracklist:" + returned.tracklist );
                             } )
+                            .catch( ( error ) => {
+                                console.log( "Error:", error );
+                            } )
                     } else {
                         chatFunctions.botSpeak( 'Nope', data );
                         console.log( "Sorry, I couldn't confirm the artist and track name" );
