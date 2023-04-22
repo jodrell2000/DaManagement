@@ -269,14 +269,14 @@ const songFunctions = ( bot ) => {
 
             const getVerifiedTracks = databaseFunctions.getVerifiedTracksFromName( song )
                 .then( ( array ) => {
-                    verifiedSong = array[ 0 ].displayName;
+                    // verifiedSong = array[ 0 ].displayName;
                     verifiedSong = "Dead Ringer for Love";
                     console.log( "songs:" + array[ 0 ].displayName );
                 } );
 
             const getVerifiedArtists = databaseFunctions.getVerifiedArtistsFromName( artist )
                 .then( ( array ) => {
-                    verifiedArtist = array[ 0 ].displayName;
+                    // verifiedArtist = array[ 0 ].displayName;
                     verifiedArtist = "Meat Loaf";
                     console.log( "artists:" + array[ 0 ].displayName );
                 } );
@@ -284,7 +284,6 @@ const songFunctions = ( bot ) => {
             Promise.all( [ getVerifiedTracks, getVerifiedArtists ] )
                 .then( () => {
                     if ( verifiedSong && verifiedArtist ) {
-                        chatFunctions.botSpeak( 'Found something', data );
                         mlFunctions.searchSong( verifiedSong, verifiedArtist )
                             .then( ( returned ) => {
                                 console.log( returned );
