@@ -286,7 +286,11 @@ const songFunctions = ( bot ) => {
                     if ( verifiedSong && verifiedArtist ) {
                         mlFunctions.searchSong( verifiedSong, verifiedArtist )
                             .then( ( returned ) => {
-                                console.log( returned );
+                                console.log( "thumbnail:" + returned.thumbnail );
+                                console.log( "releaseCountry:" + returned.releaseCountry );
+                                console.log( "releaseYear:" + returned.releaseYear );
+                                console.log( "discogsUrl:" + returned.discogsUrl );
+                                console.log( "tracklist:" + returned.tracklist );
                             } )
                     } else {
                         chatFunctions.botSpeak( 'Nope', data );
