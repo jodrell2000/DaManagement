@@ -262,8 +262,6 @@ const songFunctions = ( bot ) => {
         // ========================================================
 
         songInfoCommand ( data, databaseFunctions, mlFunctions, chatFunctions ) {
-            console.group( "songInfoCommand" );
-            console.log( JSON.stringify( mlFunctions ) );
             let verifiedSong;
             let verifiedArtist;
 
@@ -300,7 +298,6 @@ const songFunctions = ( bot ) => {
                 .catch( ( error ) => {
                     console.log( "Error:", error );
                 } );
-            console.groupEnd();
         },
 
         // ========================================================

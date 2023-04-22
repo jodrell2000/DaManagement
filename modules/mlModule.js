@@ -79,7 +79,6 @@ const mlFunctions = () => {
         },
 
         async searchSong ( songName, artistName ) {
-            console.group( "searchSong" );
             try {
                 const response = await axios.get( 'https://api.discogs.com/database/search', {
                     params: {
@@ -99,7 +98,7 @@ const mlFunctions = () => {
 
 
                 const releaseId = response.data.results[ 0 ].id;
-                console.log( "releaseID:" + releaseId );
+
                 const release = await axios.get( `https://api.discogs.com/masters/${ releaseId }`, {
                     params: {
                         key: discogsConsumerKey,
@@ -107,7 +106,6 @@ const mlFunctions = () => {
                     }
                 } );
 
-                console.groupEnd();
                 return {
                     thumbnail,
                     releaseCountry,
