@@ -287,7 +287,7 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.askchatgpt.help = "Talk to Robo via Bard";
 
     moderatorCommands.songinfo = ( { songFunctions, data, databaseFunctions, mlFunctions, chatFunctions } ) => { songFunctions.songInfoCommand( data, databaseFunctions, mlFunctions, chatFunctions ); }
-    moderatorCommands.songinfo.help = "Talk to Robo via Bard";
+    moderatorCommands.songinfo.help = "Lookup song info from Discogs";
 
     // #############################################
     // Moderator Greeting commands
@@ -541,6 +541,7 @@ const commandFunctions = ( bot ) => {
         },
 
         parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions ) {
+            console.log( "======================" + JSON.stringify( mlFunctions ) );
             let senderID;
 
             if ( data.command === "pmmed" ) {
@@ -567,7 +568,7 @@ const commandFunctions = ( bot ) => {
                     documentationFunctions,
                     databaseFunctions,
                     dateFunctions,
-                    mlFunctions
+                    mlFunctions,
                 } );
             } else {
                 chatFunctions.botSpeak( "Sorry, that's not a command I recognise. Try " + chatDefaults.commandIdentifier + "list to find out more.", data );
