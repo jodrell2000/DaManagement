@@ -265,10 +265,15 @@ const songFunctions = ( bot ) => {
         // Song Info Functions
         // ========================================================
 
-        songInfoCommand ( data, chatFunctions, mlFunctions ) {
+        songInfoCommand ( data, databaseFunctions, mlFunctions, chatFunctions ) {
             console.log( "data:" + JSON.stringify( data ) );
             console.log( "song:" + song );
             console.log( "artist:" + artist );
+
+            const theTracks = databaseFunctions.getVerifiedTracksFromName();
+            const theArtists = databaseFunctions.getVerifiedArtistsFromName();
+            console.log( "songs:" + theTracks );
+            console.log( "artists:" + theArtists );
 
         },
 

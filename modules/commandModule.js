@@ -287,7 +287,7 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.askchatgpt = ( { botFunctions, data, args, chatFunctions, mlFunctions } ) => { botFunctions.askChatGPTCommand( data, reassembleArgs( args ), chatFunctions, mlFunctions ); }
     moderatorCommands.askchatgpt.help = "Talk to Robo via Bard";
 
-    moderatorCommands.songinfo = ( { songFunctions, data, chatFunctions, mlFunctions } ) => { songFunctions.songInfoCommand( data, chatFunctions, mlFunctions ); }
+    moderatorCommands.songinfo = ( { songFunctions, data, databaseFunctions, chatFunctions, mlFunctions } ) => { songFunctions.songInfoCommand( data, databaseFunctions, mlFunctions, chatFunctions ); }
     moderatorCommands.songinfo.help = "Talk to Robo via Bard";
 
     // #############################################
