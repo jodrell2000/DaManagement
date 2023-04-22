@@ -267,7 +267,7 @@ const songFunctions = ( bot ) => {
 
         songInfoCommand ( data, databaseFunctions, mlFunctions, chatFunctions ) {
             console.group( "songInfoCommand" );
-            console.log( JSON.striingify( mlFunctions ) );
+            console.log( JSON.stringify( mlFunctions ) );
             let verifiedSong;
             let verifiedArtist;
 
