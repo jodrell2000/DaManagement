@@ -90,7 +90,7 @@ const mlFunctions = () => {
                     }
                 } );
 
-                // console.log( JSON.stringify( response ) );
+                console.log( JSON.stringify( response.data.results ) );
 
                 if ( response.data.results.length === 0 ) {
                     throw new Error( 'No results found.' );
