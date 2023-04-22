@@ -102,7 +102,7 @@ const mlFunctions = () => {
                     }
                 } );
 
-                console.log( JSON.stringify( release.data ) );
+                console.log( JSON.stringify( release.data.tracklist ) );
 
                 const song = release.data.tracklist.find( track => track.title.toLowerCase() === songName.toLowerCase() );
 
