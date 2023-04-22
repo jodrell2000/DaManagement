@@ -541,7 +541,6 @@ const commandFunctions = ( bot ) => {
         },
 
         parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions ) {
-            console.log( "======================" + JSON.stringify( mlFunctions ) );
             let senderID;
 
             if ( data.command === "pmmed" ) {

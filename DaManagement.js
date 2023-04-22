@@ -361,6 +361,8 @@ bot.on( 'speak', function ( data ) {
     userFunctions.updateUserLastSpoke( theUserID, databaseFunctions ); //update the afk position of the speaker
 
     if ( commandFunctions.wasThisACommand( data ) ) {
+        console.log( "======================" + JSON.stringify( mlFunctions ) );
+
         commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions );
     }
 
