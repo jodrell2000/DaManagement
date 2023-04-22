@@ -267,31 +267,37 @@ const songFunctions = ( bot ) => {
 
         songInfoCommand ( data, databaseFunctions, mlFunctions, chatFunctions ) {
             console.group( "songInfoCommand" );
+            console.log( JSON.striingify( mlFunctions ) );
             let verifiedSong;
             let verifiedArtist;
 
-            databaseFunctions
-                .getVerifiedTracksFromName( song )
+            const getVerifiedTracks = databaseFunctions.getVerifiedTracksFromName( song )
                 .then( ( array ) => {
                     verifiedSong = array[ 0 ].displayName;
                     verifiedSong = "Dead Ringer for Love";
                     console.log( "songs:" + array[ 0 ].displayName );
-                } )
-                .then( () =>
-                    databaseFunctions.getVerifiedArtistsFromName( artist ).then( ( array ) => {
-                        verifiedArtist = array[ 0 ].displayName;
-                        verifiedArtist = "Meat Loaf";
-                        console.log( "artists:" + array[ 0 ].displayName );
-                    } )
-                )
+                } );
+
+            const getVerifiedArtists = databaseFunctions.getVerifiedArtistsFromName( artist )
+                .then( ( array ) => {
+                    verifiedArtist = array[ 0 ].displayName;
+                    verifiedArtist = "Meat Loaf";
+                    console.log( "artists:" + array[ 0 ].displayName );
+                } );
+
+            Promise.all( [ getVerifiedTracks, getVerifiedArtists ] )
                 .then( () => {
                     if ( verifiedSong && verifiedArtist ) {
-                        return mlFunctions.searchSong( verifiedSong, verifiedArtist );
+                        chatFunctions.botSpeak( 'Found something', data );
+                        let returned = mlFunctions.searchSong( verifiedSong, verifiedArtist );
+                        console.log( returned );
+                    } else {
+                        chatFunctions.botSpeak( 'Nope', data );
+                        console.log( "Could not find both verified song and artist" );
                     }
                 } )
                 .catch( ( error ) => {
-                    console.error( error );
-                    throw new Error( "Failed to get song info." );
+                    console.log( "Error:", error );
                 } );
             console.groupEnd();
         },
