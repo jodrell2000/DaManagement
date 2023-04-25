@@ -177,8 +177,9 @@ const mlFunctions = () => {
         async searchMusicBrainz ( songName, artistName ) {
             try {
                 const query = "artist:%22" + encodeURIComponent( artistName ) + "%22%20AND%20recording:%22" + encodeURIComponent( songName ) + "%22";
-                console.log( "query:" + query );
-                const response = await axios.get( `https://musicbrainz.org/ws/2/recording/?query=${ encodeURIComponent( query ) }&limit=10&fmt=json`, {
+                const queryToSend = `https://musicbrainz.org/ws/2/recording/?query=${ encodeURIComponent( query ) }&limit=10&fmt=json`;
+                console.log( "query:" + queryToSend );
+                const response = await axios.get( queryToSend, {
                     headers: {
                         'User-Agent': 'Mr. Roboto/1.0.0 ( https://turntable.fm/i_the_80s )'
                     }
