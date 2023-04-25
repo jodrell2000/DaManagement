@@ -137,11 +137,16 @@ const mlFunctions = () => {
 
             try {
                 // Obtain an access token using the client ID and client secret
-                const authResponse = await axios.post( authURL, {
-                    grant_type: 'client_credentials',
-                    client_id: SPOTIFY_CLIENT_ID,
-                    client_secret: SPOTIFY_CLIENT_SECRET,
-                } );
+                const authResponse = await axios.post( authURL,
+                    {
+                        grant_type: 'client_credentials',
+                        client_id: SPOTIFY_CLIENT_ID,
+                        client_secret: SPOTIFY_CLIENT_SECRET,
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                    }
+                );
 
                 const accessToken = authResponse.data.access_token;
                 console.log( "accessTiken:" + JSON.stringify( accessToken ) );
