@@ -88,7 +88,7 @@ const commandFunctions = ( bot ) => {
     generalCommands.songinfo.help = "Lookup song info from Discogs";
 
     generalCommands.searchspotify = ( { songFunctions, data, databaseFunctions, mlFunctions, chatFunctions } ) => { songFunctions.searchSpotifyCommand( data, databaseFunctions, mlFunctions, chatFunctions ); }
-    generalCommands.searchSpotify.help = "Lookup song info from Spotify";
+    generalCommands.searchspotify.help = "Lookup song info from Spotify";
 
     // #############################################
     // General user Queue commands
