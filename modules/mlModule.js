@@ -144,6 +144,7 @@ const mlFunctions = () => {
                 } );
 
                 const accessToken = authResponse.data.access_token;
+                console.log( "accessTiken:" + JSON.stringify( accessToken ) );
 
                 // Make a GET request to the Spotify API's search endpoint, passing in the access token as a header
                 const response = await axios.get( url, {
