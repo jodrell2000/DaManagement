@@ -278,7 +278,7 @@ const songFunctions = ( bot ) => {
             Promise.all( [ getVerifiedTracks, getVerifiedArtists ] )
                 .then( () => {
                     if ( verifiedSong && verifiedArtist ) {
-                        mlFunctions.searchSong( verifiedSong, verifiedArtist )
+                        mlFunctions.searchDiscogs( verifiedSong, verifiedArtist )
                             .then( ( returned ) => {
                                 chatFunctions.botSpeak( "This is " + verifiedSong + " by " + verifiedArtist, data );
                                 chatFunctions.botSpeak( returned.thumbnail, data );
