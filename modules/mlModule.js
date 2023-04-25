@@ -1,5 +1,6 @@
 const axios = require( 'axios' );
 require( 'dotenv' ).config();
+const request = require( 'request' ); // "Request" library
 const { Configuration, OpenAIApi } = require( "openai" );
 const configuration = new Configuration( {
     apiKey: process.env.OPENAI_API_KEY,
@@ -136,29 +137,59 @@ const mlFunctions = () => {
             const url = `${ baseURL }?q=${ query }&type=${ queryType }`;
 
             try {
-                // Obtain an access token using the client ID and client secret
-                const authResponse = await axios.post( authURL,
-                    {
-                        grant_type: 'client_credentials',
-                        client_id: SPOTIFY_CLIENT_ID,
-                        client_secret: SPOTIFY_CLIENT_SECRET,
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        }
-                    }
-                );
 
-                const accessToken = authResponse.data.access_token;
-                console.log( "accessTiken:" + JSON.stringify( accessToken ) );
-
-                // Make a GET request to the Spotify API's search endpoint, passing in the access token as a header
-                const response = await axios.get( url, {
+                var authOptions = {
+                    url: authURL,
                     headers: {
-                        Authorization: `Bearer ${ accessToken }`,
+                        'Authorization': 'Basic ' + ( new Buffer( SPOTIFY_CLIENT_ID + ':' + SPOTIFY_CLIENT_SECRET ).toString( 'base64' ) )
                     },
+                    form: {
+                        grant_type: 'client_credentials'
+                    },
+                    json: true
+                };
+
+                request.post( authOptions, function ( error, response, body ) {
+                    if ( !error && response.statusCode === 200 ) {
+
+                        // use the access token to access the Spotify Web API
+                        var token = body.access_token;
+                        var options = {
+                            url: 'https://api.spotify.com/v1/users/jodrell',
+                            headers: {
+                                'Authorization': 'Bearer ' + token
+                            },
+                            json: true
+                        };
+                        request.get( options, function ( error, response, body ) {
+                            console.log( body );
+                        } );
+                    }
                 } );
 
-                return response.data;
+                // Obtain an access token using the client ID and client secret
+                // const authResponse = await axios.post( authURL,
+                //     {
+                //         grant_type: 'client_credentials',
+                //         client_id: SPOTIFY_CLIENT_ID,
+                //         client_secret: SPOTIFY_CLIENT_SECRET,
+                //         headers: {
+                //             'Content-Type': 'application/x-www-form-urlencoded'
+                //         }
+                //     }
+                // );
+
+                // const accessToken = authResponse.data.access_token;
+                // console.log( "accessTiken:" + JSON.stringify( accessToken ) );
+
+                // // Make a GET request to the Spotify API's search endpoint, passing in the access token as a header
+                // const response = await axios.get( url, {
+                //     headers: {
+                //         Authorization: `Bearer ${ accessToken }`,
+                //     },
+                // } );
+
+                // return response.data;
             } catch ( error ) {
                 console.error( error );
             }
