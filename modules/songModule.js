@@ -288,10 +288,10 @@ const songFunctions = ( bot ) => {
                                 //console.log( "tracklist:" + returned.tracklist );
                             } )
                             .catch( () => {
-                                chatFunctions.botSpeak( "Sorry, I couuldn't find that", data );
+                                chatFunctions.botSpeak( "Sorry, I couldn't find that: " + verifiedSong + " by " + verifiedArtist, data );
                             } )
                     } else {
-                        chatFunctions.botSpeak( "Sorry, I couldn't find info on this track", data );
+                        chatFunctions.botSpeak( "Sorry, I couldn't find that in my Database", data );
                     }
                 } )
                 .catch( ( error ) => {
