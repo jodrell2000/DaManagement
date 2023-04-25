@@ -90,7 +90,7 @@ const mlFunctions = () => {
                 } );
 
                 if ( response.data.results.length === 0 ) {
-                    throw new Error( 'No results found.' );
+                    throw new Error( 'No response found.' );
                 }
 
                 const thumbnail = response.data.results[ 0 ].thumb;
@@ -105,6 +105,10 @@ const mlFunctions = () => {
                         secret: discogsConsumerSecret
                     }
                 } );
+
+                if ( release.data.results.length === 0 ) {
+                    throw new Error( 'No release found.' );
+                }
 
                 return {
                     thumbnail,

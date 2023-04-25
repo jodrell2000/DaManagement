@@ -288,7 +288,7 @@ const songFunctions = ( bot ) => {
                                 //console.log( "tracklist:" + returned.tracklist );
                             } )
                             .catch( () => {
-                                chatFunctions.botSpeak( "Sorry, I couldn't find that: " + verifiedSong + " by " + verifiedArtist, data );
+                                chatFunctions.botSpeak( "Sorry, I couldn't find that online: " + verifiedSong + " by " + verifiedArtist, data );
                             } )
                     } else {
                         chatFunctions.botSpeak( "Sorry, I couldn't find that in my Database", data );
