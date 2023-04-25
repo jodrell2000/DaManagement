@@ -176,7 +176,8 @@ const mlFunctions = () => {
 
         async searchMusicBrainz ( songName, artistName ) {
             try {
-                const query = "artist:%22" + encodeURIComponent( artistName ) + "%22%20AND%20recording:%22" + encodeURIComponent( songName ) + "%22";
+                // https://musicbrainz.org/ws/2/recording/?query=artist:%22INXS%22ANDrecording:%22New%20Sensation%22
+                const query = "artist:" + encodeURIComponent( '"' + artistName + '"' ) + "ANDrecording:" + encodeURIComponent( '"' + songName + '"' );
                 const queryToSend = `https://musicbrainz.org/ws/2/recording/?query=${ encodeURIComponent( query ) }&limit=10&fmt=json`;
                 console.log( "query:" + queryToSend );
                 const response = await axios.get( queryToSend, {
