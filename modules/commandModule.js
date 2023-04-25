@@ -90,6 +90,9 @@ const commandFunctions = ( bot ) => {
     generalCommands.searchspotify = ( { songFunctions, data, databaseFunctions, mlFunctions, chatFunctions } ) => { songFunctions.searchSpotifyCommand( data, databaseFunctions, mlFunctions, chatFunctions ); }
     generalCommands.searchspotify.help = "Lookup song info from Spotify";
 
+    generalCommands.searchmusicbrainz = ( { songFunctions, data, databaseFunctions, mlFunctions, chatFunctions } ) => { songFunctions.searchmusicbrainzCommand( data, databaseFunctions, mlFunctions, chatFunctions ); }
+    generalCommands.searchmusicbrainz.help = "Lookup song info from Music Brainz";
+
     // #############################################
     // General user Queue commands
     // #############################################
