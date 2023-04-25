@@ -106,7 +106,7 @@ const mlFunctions = () => {
                     }
                 } );
 
-                if ( release.data.results.length === 0 ) {
+                if ( release === undefined ) {
                     throw new Error( 'No release found.' );
                 }
 
