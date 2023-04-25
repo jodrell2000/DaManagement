@@ -134,7 +134,7 @@ const mlFunctions = () => {
             const query = encodeURIComponent( artistName + " " + songName );
             const queryType = "track"
 
-            const url = `${ baseURL }?q=${ query }&type=${ queryType }`;
+            const url = `${ baseURL }?q=${ query }&type=${ queryType }&limit=1`;
 
             try {
 
