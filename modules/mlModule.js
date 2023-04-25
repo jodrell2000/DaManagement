@@ -162,17 +162,11 @@ const mlFunctions = () => {
                             json: true
                         };
                         request.get( options, function ( error, response, body ) {
-                            console.log( body );
+                            console.log( "body:" + body );
+                            console.log( "items:" + JSON.stringify( body.tracks.items ) )
                         } );
                     }
                 } );
-
-                // // Make a GET request to the Spotify API's search endpoint, passing in the access token as a header
-                // const response = await axios.get( url, {
-                //     headers: {
-                //         Authorization: `Bearer ${ accessToken }`,
-                //     },
-                // } );
 
                 // return response.data;
             } catch ( error ) {
