@@ -318,7 +318,7 @@ const songFunctions = ( bot ) => {
                     if ( verifiedSong && verifiedArtist ) {
                         mlFunctions.searchSpotify( verifiedSong, verifiedArtist )
                             .then( ( returned ) => {
-                                console.log( returned );
+                                console.log( "Got this:" + returned );
                                 // chatFunctions.botSpeak( "This is " + verifiedSong + " by " + verifiedArtist, data );
                                 // chatFunctions.botSpeak( returned.thumbnail, data );
                                 // chatFunctions.botSpeak( "Released in " + returned.releaseCountry + " in " + returned.releaseYear, data );
