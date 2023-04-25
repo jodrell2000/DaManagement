@@ -176,7 +176,7 @@ const mlFunctions = () => {
 
         async searchMusicBrainz ( songName, artistName ) {
             try {
-                const query = "artist:" + encodeURIComponent( artistName ) + "%20AND%20recording:" + encodeURIComponent( songName );
+                const query = "artist:%22" + encodeURIComponent( artistName ) + "%22%20AND%20recording:%22" + encodeURIComponent( songName ) + "%22";
                 console.log( "query:" + query );
                 const response = await axios.get( `https://musicbrainz.org/ws/2/recording/?query=${ encodeURIComponent( query ) }&limit=10&fmt=json`, {
                     headers: {
