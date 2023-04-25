@@ -130,7 +130,7 @@ const mlFunctions = () => {
         async searchSpotify ( songName, artistName ) {
             const baseURL = 'https://api.spotify.com/v1/search';
             const authURL = 'https://accounts.spotify.com/api/token';
-            const query = artistName + " " + songName;
+            const query = encodeURIComponent( artistName + " " + songName );
             const queryType = "track"
 
             const url = `${ baseURL }?q=${ query }&type=${ queryType }`;
