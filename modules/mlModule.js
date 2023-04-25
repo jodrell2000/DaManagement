@@ -81,7 +81,7 @@ const mlFunctions = () => {
             }
         },
 
-        async searchSiscogs ( songName, artistName ) {
+        async searchDiscogs ( songName, artistName ) {
             try {
                 const response = await axios.get( 'https://api.discogs.com/database/search', {
                     params: {
