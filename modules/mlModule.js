@@ -176,9 +176,11 @@ const mlFunctions = () => {
 
         async searchMusicBrainz ( songName, artistName ) {
             try {
-                // https://musicbrainz.org/ws/2/recording/?query=artist:%22INXS%22ANDrecording:%22New%20Sensation%22
+                // https://musicbrainz.org/ws/2/recording/?query=artist:%22Huey%20Lewis%20And%20The%20News%22ANDrecording:%22Heart%20And%20Soul%22&limit=10&fmt=json
+                // https://musicbrainz.org/ws/2/recording/?query=artist%3A%2522Huey%2520Lewis%2520And%2520The%2520News%2522ANDrecording%3A%2522Heart%2520And%2520Soul%2522&limit=10&fmt=json
+
                 const query = "artist:" + encodeURIComponent( '"' + artistName + '"' ) + "ANDrecording:" + encodeURIComponent( '"' + songName + '"' );
-                const queryToSend = `https://musicbrainz.org/ws/2/recording/?query=${ encodeURIComponent( query ) }&limit=10&fmt=json`;
+                const queryToSend = `https://musicbrainz.org/ws/2/recording/?query=${ query }&limit=10&fmt=json`;
                 console.log( "query:" + queryToSend );
                 const response = await axios.get( queryToSend, {
                     headers: {
