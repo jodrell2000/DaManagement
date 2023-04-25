@@ -177,15 +177,20 @@ const mlFunctions = () => {
         async searchMusicBrainz ( songName, artistName ) {
             try {
                 const query = `${ artistName } ${ songName }`;
-                const response = await axios.get( `https://musicbrainz.org/ws/2/recording/?query=${ encodeURIComponent( query ) }&limit=1&fmt=json` );
+                const response = await axios.get( `https://musicbrainz.org/ws/2/recording/?query=${ encodeURIComponent( query ) }&limit=1&fmt=json`, {
+                    headers: {
+                        'User-Agent': 'Mr. Roboto/1.0.0 ( https://turntable.fm/i_the_80s )'
+                    }
+                } );
 
                 if ( response.data.recordings.length > 0 ) {
                     const recording = response.data.recordings[ 0 ];
-                    console.log( `Title: ${ recording.title }` );
-                    console.log( `Artist: ${ recording[ 'artist-credit' ][ 0 ].artist.name }` );
-                    console.log( `Length: ${ recording.length }ms` );
-                    console.log( `MBID: ${ recording.id }` );
-                    console.log( `URL: https://musicbrainz.org/recording/${ recording.id }` );
+                    console.log( JSON.stringify( recording ) );
+                    // console.log( `Title: ${ recording.title }` );
+                    // console.log( `Artist: ${ recording[ 'artist-credit' ][ 0 ].artist.name }` );
+                    // console.log( `Length: ${ recording.length }ms` );
+                    // console.log( `MBID: ${ recording.id }` );
+                    // console.log( `URL: https://musicbrainz.org/recording/${ recording.id }` );
                 } else {
                     console.log( `No recording found for "${ query }"` );
                 }
