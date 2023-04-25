@@ -9,6 +9,9 @@ const openai = new OpenAIApi( configuration );
 const discogsConsumerKey = process.env.DISCOGS_CONSUMER_KEY;
 const discogsConsumerSecret = process.env.DISCOGS_CONSUMER_SECRET;
 
+const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
+const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
+
 const mlFunctions = () => {
 
     return {
@@ -78,7 +81,7 @@ const mlFunctions = () => {
             }
         },
 
-        async searchSong ( songName, artistName ) {
+        async searchSiscogs ( songName, artistName ) {
             try {
                 const response = await axios.get( 'https://api.discogs.com/database/search', {
                     params: {
@@ -123,6 +126,38 @@ const mlFunctions = () => {
                 throw new Error( 'Failed to get information from Discogs API.' );
             }
         },
+
+        async searchSpotify ( songName, artistName ) {
+            const baseURL = 'https://api.spotify.com/v1/search';
+            const authURL = 'https://accounts.spotify.com/api/token';
+            const query = artistName + " " + songName;
+            const queryType = "track"
+
+            const url = `${ baseURL }?q=${ query }&type=${ queryType }`;
+
+            try {
+                // Obtain an access token using the client ID and client secret
+                const authResponse = await axios.post( authURL, {
+                    grant_type: 'client_credentials',
+                    client_id: SPOTIFY_CLIENT_ID,
+                    client_secret: SPOTIFY_CLIENT_SECRET,
+                } );
+
+                const accessToken = authResponse.data.access_token;
+
+                // Make a GET request to the Spotify API's search endpoint, passing in the access token as a header
+                const response = await axios.get( url, {
+                    headers: {
+                        Authorization: `Bearer ${ accessToken }`,
+                    },
+                } );
+
+                return response.data;
+            } catch ( error ) {
+                console.error( error );
+            }
+        },
+
     }
 }
 
