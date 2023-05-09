@@ -61,7 +61,7 @@ html(lang="en")
             td= song.downvotes
             td= song.plays
 
-    h2 Not including Wednesdays (less 90s)
+    h2 80s Only (excluding 90s and Covers day)
 
     table#songqueue
         thead
@@ -72,7 +72,7 @@ html(lang="en")
                 td Downvotes
                 th Play Count
         tbody
-        each song in top10NotWednesdaySongList
+        each song in top1080sSongList
             tr
             td= song.artist
             td= song.track
