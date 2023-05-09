@@ -569,7 +569,7 @@ async function getTop10 ( req, res, functionName, templateFile ) {
         ];
         const [ top10SongList, top1080sSongList, top10WednesdaySongList, top10FridaySongList ] = await Promise.all( [
             databaseFunctions[ functionName ]( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ) ),
-            databaseFunctions[ functionName ]( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate )[ 0, 1, 2, 3, 5 ] ),
+            databaseFunctions[ functionName ]( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ), [ 0, 1, 2, 3, 5 ] ),
             databaseFunctions[ functionName ]( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ), [ 4 ] ),
             databaseFunctions[ functionName ]( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ), [ 6 ] ),
         ] );
