@@ -59,7 +59,7 @@ html(lang="en")
             td= song.points
             td= song.plays
 
-    h2 Not including Wednesdays (less 90s)
+    h2 80s Only (No 90s or covers)
 
     table#songqueue
         thead
@@ -69,7 +69,43 @@ html(lang="en")
                 td Total Points
                 th Play Count
         tbody
-        each song in top10NotWednesdaySongList
+        each song in top1080sSongList
+            tr
+            td= song.artist
+            td= song.track
+            td= song.points
+            td= song.plays
+
+
+    h2 Only Wednesdays (90s Day)
+
+    table#songqueue
+        thead
+            tr
+                th Artist
+                th Track
+                td Total Points
+                th Play Count
+        tbody
+        each song in top10WednesdaySongList
+            tr
+            td= song.artist
+            td= song.track
+            td= song.points
+            td= song.plays
+
+
+    h2 Only Fridays (Covers day)
+
+    table#songqueue
+        thead
+            tr
+                th Artist
+                th Track
+                td Total Points
+                th Play Count
+        tbody
+        each song in top10WednesdaySongList
             tr
             td= song.artist
             td= song.track
