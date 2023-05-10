@@ -24,6 +24,7 @@ let videoModule = require( './modules/videoModule.js' );
 let documentationModule = require( './modules/documentationModule.js' );
 let databaseModule = require( './modules/databaseModule.js' );
 let dateModule = require( './modules/dateModule.js' );
+let mlModule = require( './modules/mlModule.js' );
 
 const express = require( 'express' )
 const app = express();
@@ -60,6 +61,7 @@ const videoFunctions = videoModule( bot );
 const documentationFunctions = documentationModule();
 const databaseFunctions = databaseModule();
 const dateFunctions = dateModule();
+const mlFunctions = mlModule();
 
 // do something when the bot disconnects?
 // eslint-disable-next-line no-unused-vars
@@ -86,7 +88,7 @@ setInterval( function () {
 setInterval( function () { userFunctions.roomIdleCheck( roomDefaults, chatFunctions ) }, 60 * 1000 )
 
 // every 5 seconds, check if the there's an empty DJ slot, and prompt the next in the queue to join the decks, remove them if they don't
-setInterval( function ( data ) {
+setInterval( function () {
     if ( roomDefaults.queueActive !== true && userFunctions.howManyDJs() === roomDefaults.maxDJs ) {
         roomDefaults.queueActive = true;
         chatFunctions.botSpeak( "The Queue is now active", null, true, null );
@@ -200,7 +202,6 @@ bot.on( 'roomChanged', function ( data ) {
 //checks at the beggining of the song
 bot.on( 'newsong', function ( data ) {
     //resets counters and array for vote skipping
-    songFunctions.resetCheckVotes();
     songFunctions.resetVoteCountSkip();
     songFunctions.resetVotesLeft( roomDefaults.HowManyVotesToSkip );
     songFunctions.resetUpVotes();
@@ -360,7 +361,7 @@ bot.on( 'speak', function ( data ) {
     userFunctions.updateUserLastSpoke( theUserID, databaseFunctions ); //update the afk position of the speaker
 
     if ( commandFunctions.wasThisACommand( data ) ) {
-        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions );
+        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions );
     }
 
     //checks to see if someone is trying to speak to an afk person or not.
@@ -377,7 +378,7 @@ bot.on( 'speak', function ( data ) {
 //checks when the bot recieves a pm
 bot.on( 'pmmed', function ( data ) {
     if ( commandFunctions.wasThisACommand( data ) ) {
-        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions );
+        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions );
     }
 } );
 
@@ -518,7 +519,7 @@ bot.on( 'endsong', function ( data ) {
 
 app.get( '/listunverified', async ( req, res ) => {
     try {
-        const songList = await databaseFunctions.getUnverifiedSongList();
+        const songList = await databaseFunctions.getUnverifiedSongList( req.query.byrecent );
         let html = pug.renderFile( './templates/listUnverifiedSongs.pug', { songList } );
         res.send( html );
     } catch ( error ) {
@@ -534,7 +535,9 @@ app.post( '/updateArtistDisplayName', ( req, res ) => {
     // call a function with the artistID and artistDisplayName values
     databaseFunctions.updateArtistDisplayName( artistID, artistDisplayName )
         .then( () => {
-            res.redirect( '/listunverified' );
+            const queryParams = new URLSearchParams( { byrecent: req.body.byrecent } );
+            const redirectUrl = '/listunverified?' + queryParams.toString();
+            res.redirect( redirectUrl );
         } )
 } );
 
@@ -545,7 +548,9 @@ app.post( '/updateTrackDisplayName', ( req, res ) => {
     // call a function with the artistID and artistDisplayName values
     databaseFunctions.updateTrackDisplayName( trackID, trackDisplayName )
         .then( () => {
-            res.redirect( '/listunverified' );
+            const queryParams = new URLSearchParams( { byrecent: req.body.byrecent } );
+            const redirectUrl = '/listunverified?' + queryParams.toString();
+            res.redirect( redirectUrl );
         } )
 } );
 
@@ -562,13 +567,17 @@ async function getTop10 ( req, res, functionName, templateFile ) {
             dateFunctions.linkStartDate( dayjs, startDate ),
             dateFunctions.linkEndDate( dayjs, endDate ),
         ];
-        const [ top10SongList, top10NotWednesdaySongList ] = await Promise.all( [
+        const [ top10SongList, top1080sSongList, top10WednesdaySongList, top10FridaySongList ] = await Promise.all( [
             databaseFunctions[ functionName ]( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ) ),
-            databaseFunctions[ functionName ]( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ), false ),
+            databaseFunctions[ functionName ]( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ), [ 0, 1, 2, 3, 5 ] ),
+            databaseFunctions[ functionName ]( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ), [ 4 ] ),
+            databaseFunctions[ functionName ]( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ), [ 6 ] ),
         ] );
         const html = pug.renderFile( `./templates/${ templateFile }.pug`, {
             top10SongList,
-            top10NotWednesdaySongList,
+            top1080sSongList,
+            top10WednesdaySongList,
+            top10FridaySongList,
             formStartDate,
             formEndDate,
             linkStartDate,
@@ -579,7 +588,7 @@ async function getTop10 ( req, res, functionName, templateFile ) {
         console.error( error );
         res.sendStatus( 500 );
     }
-};
+}
 
 async function getSummary ( req, res, templateFile ) {
     try {
@@ -607,7 +616,7 @@ async function getSummary ( req, res, templateFile ) {
         console.error( error );
         res.sendStatus( 500 );
     }
-};
+}
 
 app.get( '/fulltop10', async ( req, res ) => {
     await getTop10( req, res, "fullTop10Results", "fullTop10" );

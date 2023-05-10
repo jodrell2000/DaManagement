@@ -74,7 +74,7 @@ const songFunctions = ( bot ) => {
         // ========================================================
 
         // ========================================================
-        // Playlist Functions
+        // Length Functions
         // ========================================================
 
         switchLengthLimit: function ( data, songLength, chatFunctions ) {
@@ -187,10 +187,6 @@ const songFunctions = ( bot ) => {
             downVotes = 0;
         },
 
-        resetCheckVotes: function () {
-            checkVotes = [];
-        },
-
         resetVoteCountSkip: function () {
             voteCountSkip = 0;
         },
@@ -256,7 +252,134 @@ const songFunctions = ( bot ) => {
                     userFunctions.removeDJ( lastDJ, 'DJ removed because of a stuck song issue' ); // Remove Saved DJ from last newsong call
                 }, 20 * 1000 ); // Current DJ has 20 seconds to skip before they are removed
             }, ( length + 10 ) * 1000 ); //Timer expires 10 seconds after the end of the song, if not cleared by a newsong
-        }
+        },
+
+        // ========================================================
+
+
+        // ========================================================
+        // Song Info Functions
+        // ========================================================
+
+        songInfoCommand ( data, databaseFunctions, mlFunctions, chatFunctions ) {
+            let verifiedSong;
+            let verifiedArtist;
+
+            const getVerifiedTracks = databaseFunctions.getVerifiedTracksFromName( song )
+                .then( ( array ) => {
+                    verifiedSong = array[ 0 ].displayName;
+                } );
+
+            const getVerifiedArtists = databaseFunctions.getVerifiedArtistsFromName( artist )
+                .then( ( array ) => {
+                    verifiedArtist = array[ 0 ].displayName;
+                } );
+
+            Promise.all( [ getVerifiedTracks, getVerifiedArtists ] )
+                .then( () => {
+                    if ( verifiedSong && verifiedArtist ) {
+                        mlFunctions.searchDiscogs( verifiedSong, verifiedArtist )
+                            .then( ( returned ) => {
+                                chatFunctions.botSpeak( "This is " + verifiedSong + " by " + verifiedArtist, data );
+                                chatFunctions.botSpeak( returned.thumbnail, data );
+                                chatFunctions.botSpeak( "Released in " + returned.releaseCountry + " in " + returned.releaseYear, data );
+                                chatFunctions.botSpeak( "More info can be found here: " + returned.discogsUrl, data );
+
+                                //console.log( "tracklist:" + returned.tracklist );
+                            } )
+                            .catch( () => {
+                                chatFunctions.botSpeak( "Sorry, I couldn't find that online: " + verifiedSong + " by " + verifiedArtist, data );
+                            } )
+                    } else {
+                        chatFunctions.botSpeak( "Sorry, I couldn't find that in my Database", data );
+                    }
+                } )
+                .catch( ( error ) => {
+                    console.log( "Error:", error );
+                } );
+        },
+
+        searchSpotifyCommand ( data, databaseFunctions, mlFunctions, chatFunctions ) {
+            let verifiedSong;
+            let verifiedArtist;
+
+            const getVerifiedTracks = databaseFunctions.getVerifiedTracksFromName( song )
+                .then( ( array ) => {
+                    verifiedSong = array[ 0 ].displayName;
+                } );
+
+            const getVerifiedArtists = databaseFunctions.getVerifiedArtistsFromName( artist )
+                .then( ( array ) => {
+                    verifiedArtist = array[ 0 ].displayName;
+                } );
+
+            Promise.all( [ getVerifiedTracks, getVerifiedArtists ] )
+                .then( () => {
+                    if ( verifiedSong && verifiedArtist ) {
+                        mlFunctions.searchSpotify( verifiedSong, verifiedArtist )
+                            .then( ( returned ) => {
+                                console.log( "Got this:" + returned );
+                                // chatFunctions.botSpeak( "This is " + verifiedSong + " by " + verifiedArtist, data );
+                                // chatFunctions.botSpeak( returned.thumbnail, data );
+                                // chatFunctions.botSpeak( "Released in " + returned.releaseCountry + " in " + returned.releaseYear, data );
+                                // chatFunctions.botSpeak( "More info can be found here: " + returned.discogsUrl, data );
+
+                                //console.log( "tracklist:" + returned.tracklist );
+                            } )
+                            .catch( () => {
+                                chatFunctions.botSpeak( "Sorry, I couldn't find that online: " + verifiedSong + " by " + verifiedArtist, data );
+                            } )
+                    } else {
+                        chatFunctions.botSpeak( "Sorry, I couldn't find that in my Database", data );
+                    }
+                } )
+                .catch( ( error ) => {
+                    console.log( "Error:", error );
+                } );
+
+        },
+
+        searchMusicBrainzCommand ( data, databaseFunctions, mlFunctions, chatFunctions ) {
+            let verifiedSong;
+            let verifiedArtist;
+
+            const getVerifiedTracks = databaseFunctions.getVerifiedTracksFromName( song )
+                .then( ( array ) => {
+                    verifiedSong = array[ 0 ].displayName;
+                } );
+
+            const getVerifiedArtists = databaseFunctions.getVerifiedArtistsFromName( artist )
+                .then( ( array ) => {
+                    verifiedArtist = array[ 0 ].displayName;
+                } );
+
+            Promise.all( [ getVerifiedTracks, getVerifiedArtists ] )
+                .then( () => {
+                    if ( verifiedSong && verifiedArtist ) {
+                        mlFunctions.searchMusicBrainz( verifiedSong, verifiedArtist )
+                            .then( ( returned ) => {
+                                console.log( "Got this:" + returned );
+                                // chatFunctions.botSpeak( "This is " + verifiedSong + " by " + verifiedArtist, data );
+                                // chatFunctions.botSpeak( returned.thumbnail, data );
+                                // chatFunctions.botSpeak( "Released in " + returned.releaseCountry + " in " + returned.releaseYear, data );
+                                // chatFunctions.botSpeak( "More info can be found here: " + returned.discogsUrl, data );
+
+                                //console.log( "tracklist:" + returned.tracklist );
+                            } )
+                            .catch( () => {
+                                chatFunctions.botSpeak( "Sorry, I couldn't find that online: " + verifiedSong + " by " + verifiedArtist, data );
+                            } )
+                    } else {
+                        chatFunctions.botSpeak( "Sorry, I couldn't find that in my Database", data );
+                    }
+                } )
+                .catch( ( error ) => {
+                    console.log( "Error:", error );
+                } );
+
+        },
+
+        // ========================================================
     }
 }
 

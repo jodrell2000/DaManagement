@@ -298,8 +298,36 @@ const databaseFunctions = () => {
                 } );
         },
 
-        getUnverifiedSongList () {
-            const selectQuery = "SELECT a.id AS artistID, a.artistName, a.displayName AS artistDisplayName, t.id AS trackID, t.trackName, t.displayName AS trackDisplayName, ROUND(AVG(tp.length)) AS length FROM tracksPlayed tp JOIN artists a ON a.id=tp.artistID JOIN tracks t ON t.id=tp.trackID WHERE (a.displayName IS NULL) OR (t.displayName IS NULL) GROUP BY a.id, a.artistName, a.displayName, t.id, t.trackName, t.displayName ORDER BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname) LIMIT 50;";
+        getVerifiedTracksFromName ( theSong ) {
+            const selectQuery = "SELECT displayName FROM tracks WHERE trackName = ?;";
+            const values = [ theSong ];
+
+            return this.runQuery( selectQuery, values )
+                .then( ( result ) => {
+                    return result;
+                } );
+        },
+
+        getUnverifiedSongList ( byRecent ) {
+            const selectQuery = `
+    SELECT 
+      a.id AS artistID, 
+      a.artistName, 
+      a.displayName AS artistDisplayName, 
+      t.id AS trackID, 
+      t.trackName, 
+      t.displayName AS trackDisplayName, 
+      ROUND(AVG(tp.length)) AS length 
+    FROM 
+      tracksPlayed tp 
+      JOIN artists a ON a.id=tp.artistID 
+      JOIN tracks t ON t.id=tp.trackID 
+    WHERE 
+      a.displayName IS NULL OR t.displayName IS NULL 
+      ${ byRecent ? `GROUP BY tp.id ORDER BY tp.whenPlayed DESC ` : `GROUP BY a.id,t.id 
+    ORDER BY COALESCE( a.displayName, a.artistName ), COALESCE( t.displayName, t.trackname ) ` } 
+    LIMIT 50`;
+
             const values = [];
 
             return this.runQuery( selectQuery, values )
@@ -414,8 +442,44 @@ const databaseFunctions = () => {
         // Top 10 Functions
         // ========================================================
 
-        async fullTop10Results ( startDate, endDate, includeWednesdays = true ) {
-            const baseSelectQuery = `SELECT COALESCE(a.displayName, a.artistName) AS "artist", COALESCE(t.displayName, t.trackname) AS "track", 
+        //         async fullTop10Results ( startDate, endDate, includeWednesdays = true ) {
+        //             const baseSelectQuery = `SELECT COALESCE(a.displayName, a.artistName) AS "artist", COALESCE(t.displayName, t.trackname) AS "track", 
+        // (SUM(tp.upvotes-tp.downvotes) + SUM(tp.snags*6) + 
+        // SUM(IF(c.command='props', e.count, 0))*5 +
+        // SUM(IF(c.command='noice', e.count, 0))*5 +
+        // SUM(IF(c.command='spin', e.count, 0))*5 +
+        // SUM(IF(c.command='tune', e.count, 0))*5) * count(tp.id) AS "points",
+        // count(tp.id) AS "plays"
+        // FROM users u 
+        // JOIN tracksPlayed tp ON tp.djID=u.id 
+        // JOIN tracks t ON tp.trackID=t.id 
+        // JOIN artists a ON tp.artistID=a.id
+        // LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id 
+        // LEFT JOIN commandsToCount c ON c.id=e.commandsToCount_id
+        // WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND 
+        // tp.length>60 AND
+        // u.username != "Mr. Roboto"
+        // `;
+
+        //             const queryEnd = `GROUP BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname)
+        // ORDER BY 3 DESC, 4 DESC
+        // limit 20;
+        // `;
+
+        //             const selectQuery = baseSelectQuery + `${ includeWednesdays ? "" : 'AND DAYOFWEEK(CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central")) NOT IN (4, 6) ' }` + queryEnd;
+        //             const values = [ startDate, endDate ];
+
+        //             try {
+        //                 const result = await this.runQuery( selectQuery, values );
+        //                 return result;
+        //             } catch ( error ) {
+        //                 console.error( error );
+        //                 throw error;
+        //             }
+        //         },
+
+        async fullTop10Results ( startDate, endDate, includeDays = [ 0, 1, 2, 3, 4, 5, 6 ] ) {
+            const selectQuery = `SELECT COALESCE(a.displayName, a.artistName) AS "artist", COALESCE(t.displayName, t.trackname) AS "track", 
 (SUM(tp.upvotes-tp.downvotes) + SUM(tp.snags*6) + 
 SUM(IF(c.command='props', e.count, 0))*5 +
 SUM(IF(c.command='noice', e.count, 0))*5 +
@@ -428,17 +492,14 @@ JOIN tracks t ON tp.trackID=t.id
 JOIN artists a ON tp.artistID=a.id
 LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id 
 LEFT JOIN commandsToCount c ON c.id=e.commandsToCount_id
-WHERE tp.whenPlayed BETWEEN ? AND ? AND 
+WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND 
 tp.length>60 AND
-u.username != "Mr. Roboto"
-`;
-
-            const queryEnd = `GROUP BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname)
+u.username != "Mr. Roboto" AND 
+DAYOFWEEK(CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central")) IN (${ includeDays.join( ', ' ) }) 
+GROUP BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname)
 ORDER BY 3 DESC, 4 DESC
-limit 20;
-`;
+LIMIT 10;`;
 
-            const selectQuery = baseSelectQuery + `${ includeWednesdays ? "" : "AND DAYOFWEEK(tp.whenPlayed)!=4 " }` + queryEnd;
             const values = [ startDate, endDate ];
 
             try {
@@ -450,8 +511,8 @@ limit 20;
             }
         },
 
-        async top10ByLikesResults ( startDate, endDate, includeWednesdays = true ) {
-            const baseSelectQuery = `SELECT COALESCE( a.displayName, a.artistName ) AS "artist", COALESCE( t.displayName, t.trackname ) AS "track", SUM( tp.upvotes ) as upvotes, SUM( tp.downvotes ) as 'downvotes',
+        async top10ByLikesResults ( startDate, endDate, includeDays = [ 0, 1, 2, 3, 4, 5, 6 ] ) {
+            const selectQuery = `SELECT COALESCE( a.displayName, a.artistName ) AS "artist", COALESCE( t.displayName, t.trackname ) AS "track", SUM( tp.upvotes ) as upvotes, SUM( tp.downvotes ) as 'downvotes',
                 count( tp.id ) AS "plays"
 FROM users u 
 JOIN tracksPlayed tp ON tp.djID = u.id 
@@ -459,17 +520,14 @@ JOIN tracks t ON tp.trackID = t.id
 JOIN artists a ON tp.artistID = a.id
 LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id 
 LEFT JOIN commandsToCount c ON c.id = e.commandsToCount_id
-WHERE tp.whenPlayed BETWEEN ? AND ? AND 
-            tp.length > 60 AND
-            u.username != "Mr. Roboto"
-`;
-
-            const queryEnd = `GROUP BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname)
+WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND 
+tp.length > 60 AND
+u.username != "Mr. Roboto" AND 
+DAYOFWEEK(CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central")) IN (${ includeDays.join( ', ' ) }) 
+GROUP BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname)
 ORDER BY 3 DESC, 4 ASC, 5 DESC
-limit 20;
-`;
+limit 10;`;
 
-            const selectQuery = baseSelectQuery + `${ includeWednesdays ? "" : "AND DAYOFWEEK(tp.whenPlayed)!=4 " }` + queryEnd;
             const values = [ startDate, endDate ];
 
             try {
@@ -481,8 +539,8 @@ limit 20;
             }
         },
 
-        async mostPlayedTracksResults ( startDate, endDate, includeWednesdays = true ) {
-            const baseSelectQuery = `SELECT COALESCE(a.displayName, a.artistName) AS "artist", COALESCE(t.displayName, t.trackname) AS "track", SUM(tp.upvotes-tp.downvotes) as 'points',
+        async mostPlayedTracksResults ( startDate, endDate, includeDays = [ 0, 1, 2, 3, 4, 5, 6 ] ) {
+            const selectQuery = `SELECT COALESCE(a.displayName, a.artistName) AS "artist", COALESCE(t.displayName, t.trackname) AS "track", SUM(tp.upvotes-tp.downvotes) as 'points',
 count(tp.id) AS "plays"
 FROM users u 
 JOIN tracksPlayed tp ON tp.djID=u.id 
@@ -490,17 +548,14 @@ JOIN tracks t ON tp.trackID=t.id
 JOIN artists a ON tp.artistID=a.id
 LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id 
 LEFT JOIN commandsToCount c ON c.id=e.commandsToCount_id
-WHERE tp.whenPlayed BETWEEN ? AND ? AND 
+WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND 
 tp.length>60 AND
-u.username != "Mr. Roboto"
-`;
-
-            const queryEnd = `GROUP BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname)
+u.username != "Mr. Roboto" AND 
+DAYOFWEEK(CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central")) IN (${ includeDays.join( ', ' ) }) 
+GROUP BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname)
 ORDER BY 4 DESC, 3 DESC 
-limit 20;
-    `;
+limit 10;`;
 
-            const selectQuery = baseSelectQuery + `${ includeWednesdays ? "" : "AND DAYOFWEEK(tp.whenPlayed)!=4 " }` + queryEnd;
             const values = [ startDate, endDate ];
 
             try {
@@ -512,8 +567,8 @@ limit 20;
             }
         },
 
-        async mostPlayedArtistsResults ( startDate, endDate, includeWednesdays = true ) {
-            const baseSelectQuery = `SELECT artist, COUNT(*) as "plays", SUM(points) as "points" FROM (
+        async mostPlayedArtistsResults ( startDate, endDate, includeDays = [ 0, 1, 2, 3, 4, 5, 6 ] ) {
+            const selectQuery = `SELECT artist, COUNT(*) as "plays", SUM(points) as "points" FROM (
 SELECT COALESCE(a.displayName, a.artistName) as "artist", (tp.upvotes-tp.downvotes+(tp.snags*6)+ 
 SUM(IF(c.command='props', e.count, 0))*5+
 SUM(IF(c.command='noice', e.count, 0))*5+
@@ -525,20 +580,16 @@ JOIN tracks t ON tp.trackID=t.id
 JOIN artists a ON tp.artistID=a.id
 LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id 
 LEFT JOIN commandsToCount c ON c.id=e.commandsToCount_id
-WHERE tp.whenPlayed BETWEEN ? AND ? AND 
+WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND 
 tp.length>60 AND
-u.username != "Mr. Roboto"
-`;
-
-            const queryEnd = `GROUP BY tp.id, COALESCE(a.displayName, a.artistName)
+u.username != "Mr. Roboto" AND
+DAYOFWEEK(CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central")) IN (${ includeDays.join( ', ' ) }) 
+GROUP BY tp.id, COALESCE(a.displayName, a.artistName)
 ) trackPoints
 GROUP BY Artist
 ORDER BY 2 DESC, 3 DESC
-limit 10;
+limit 10;`;
 
-    `;
-
-            const selectQuery = baseSelectQuery + `${ includeWednesdays ? "" : "AND DAYOFWEEK(tp.whenPlayed)!=4 " }` + queryEnd;
             const values = [ startDate, endDate ];
 
             try {
@@ -554,7 +605,7 @@ limit 10;
             const selectQuery = `SELECT COUNT(tp.id) AS "plays", COUNT(DISTINCT(u.id)) AS "djs", SUM(tp.upvotes) "upvotes",  SUM(tp.downvotes) as "downvotes"
 FROM tracksPlayed tp 
 JOIN users u ON tp.djID=u.id 
-WHERE tp.whenPlayed BETWEEN ? AND ? AND 
+WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND 
 u.username != "Mr. Roboto";`;
             const values = [ startDate, endDate ];
 
@@ -580,7 +631,7 @@ JOIN tracks t ON tp.trackID=t.id
 JOIN artists a ON tp.artistID=a.id
 LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id 
 LEFT JOIN commandsToCount c ON c.id=e.commandsToCount_id
-WHERE tp.whenPlayed BETWEEN ? AND ? AND 
+WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND 
 tp.length>60
 GROUP BY tp.id, u.username
 ) trackPoints

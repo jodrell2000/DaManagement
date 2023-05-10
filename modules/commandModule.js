@@ -2,7 +2,6 @@ let chatDefaults = require( '../defaultSettings/chatDefaults.js' );
 let chatCommandItems = require( '../defaultSettings/chatCommandItems.js' );
 const Storage = require( 'node-storage' );
 const { dirname } = require( 'path' );
-const databaseFunctions = require( './databaseModule.js' );
 
 const generalCommands = {};
 const userCommands = {};
@@ -84,6 +83,15 @@ const commandFunctions = ( bot ) => {
 
     generalCommands.robocoin = ( { data, userFunctions, chatFunctions } ) => { userFunctions.readMyRoboCoin( data, chatFunctions ); }
     generalCommands.robocoin.help = "How many Robo points do you have?";
+
+    generalCommands.songinfo = ( { songFunctions, data, databaseFunctions, mlFunctions, chatFunctions } ) => { songFunctions.songInfoCommand( data, databaseFunctions, mlFunctions, chatFunctions ); }
+    generalCommands.songinfo.help = "Lookup song info from Discogs";
+
+    generalCommands.searchspotify = ( { songFunctions, data, databaseFunctions, mlFunctions, chatFunctions } ) => { songFunctions.searchSpotifyCommand( data, databaseFunctions, mlFunctions, chatFunctions ); }
+    generalCommands.searchspotify.help = "Lookup song info from Spotify";
+
+    generalCommands.searchmusicbrainz = ( { songFunctions, data, databaseFunctions, mlFunctions, chatFunctions } ) => { songFunctions.searchMusicBrainzCommand( data, databaseFunctions, mlFunctions, chatFunctions ); }
+    generalCommands.searchmusicbrainz.help = "Lookup song info from Music Brainz";
 
     // #############################################
     // General user Queue commands
@@ -280,6 +288,12 @@ const commandFunctions = ( bot ) => {
 
     moderatorCommands.choosenewfavourite = ( { botFunctions, databaseFunctions } ) => { botFunctions.chooseNewFavourite( databaseFunctions ); }
     moderatorCommands.choosenewfavourite.help = "Pick a new favourite artist";
+
+    moderatorCommands.askbard = ( { botFunctions, data, args, chatFunctions, mlFunctions } ) => { botFunctions.askBardCommand( data, reassembleArgs( args ), chatFunctions, mlFunctions ); }
+    moderatorCommands.askbard.help = "Talk to Robo via Bard";
+
+    moderatorCommands.askchatgpt = ( { botFunctions, data, args, chatFunctions, mlFunctions } ) => { botFunctions.askChatGPTCommand( data, reassembleArgs( args ), chatFunctions, mlFunctions ); }
+    moderatorCommands.askchatgpt.help = "Talk to Robo via Bard";
 
     // #############################################
     // Moderator Greeting commands
@@ -532,7 +546,7 @@ const commandFunctions = ( bot ) => {
             }
         },
 
-        parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions ) {
+        parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions ) {
             let senderID;
 
             if ( data.command === "pmmed" ) {
@@ -557,7 +571,9 @@ const commandFunctions = ( bot ) => {
                     chatFunctions,
                     videoFunctions,
                     documentationFunctions,
-                    databaseFunctions
+                    databaseFunctions,
+                    dateFunctions,
+                    mlFunctions,
                 } );
             } else {
                 chatFunctions.botSpeak( "Sorry, that's not a command I recognise. Try " + chatDefaults.commandIdentifier + "list to find out more.", data );
