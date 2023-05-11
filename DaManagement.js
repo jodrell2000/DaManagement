@@ -403,26 +403,28 @@ bot.on( 'snagged', function ( data ) {
 
 //this activates when a user joins the stage.
 bot.on( 'add_dj', function ( data ) {
-    let OKToDJ;
-    let theMessage = "";
     const theUserID = data.user[ 0 ].userid;
     const totalPlayCount = userFunctions.getDJTotalPlayCount( theUserID );
 
     userFunctions.isSuperDJ( theUserID )
         .then( ( result ) => {
             if ( result ) {
-                OKToDJ = true;
+                let OKToDJ = true;
             } else {
-                [ OKToDJ, theMessage ] = userFunctions.checkOKToDJ( theUserID, roomFunctions );
+                return userFunctions.checkOKToDJ( theUserID, roomFunctions );
             }
+        } )
+        .then( ( [ OKToDJ, theMessage ] ) => {
+            if ( !OKToDJ ) {
+                userFunctions.removeDJ( theUserID, 'User is not allowed to DJ so was removed' );
+                userFunctions.incrementSpamCounter( theUserID, databaseFunctions );
+                chatFunctions.botSpeak( theMessage, data );
+            }
+        } )
+        .catch( ( error ) => {
+            // Handle errors from any of the promises in the chain
+            console.error( error );
         } );
-    console.log( "OKToDJ: " + OKToDJ );
-
-    if ( !OKToDJ ) {
-        userFunctions.removeDJ( theUserID, 'User is not allowed to DJ so was removed' );
-        userFunctions.incrementSpamCounter( theUserID, databaseFunctions );
-        chatFunctions.botSpeak( theMessage, data );
-    }
 
     //sets dj's current songcount to zero when they enter the stage.
     //unless they used the refresh command, in which case its set to
