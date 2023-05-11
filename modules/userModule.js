@@ -1212,13 +1212,9 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        checkOKToDJ: async function ( theUserID, roomFunctions ) {
+        checkOKToDJ: function ( theUserID, roomFunctions ) {
             console.group( "checkOKToDJ" );
             if ( theUserID === authModule.USERID ) {
-                return [ true, '' ];
-            }
-
-            if ( await this.isSuperDJ( theUserID ) ) {
                 return [ true, '' ];
             }
 
