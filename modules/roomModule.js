@@ -102,10 +102,17 @@ const roomFunctions = ( bot ) => {
         maxDJs: () => maxDJs,
 
         setMaxDJs: function ( value, data, chatFunctions ) {
-            maxDJs = Number( value );
-            chatFunctions.botSpeak( 'The max No. of DJs is now ' + value, data );
-        },
+            const numValue = Number( value );
 
+            if ( isNaN( numValue ) ) {
+                chatFunctions.botSpeak( 'MaxDJs must be set to a number', data );
+            } else if ( numValue < 1 || numValue > 5 ) {
+                chatFunctions.botSpeak( "MaxDJs can't be bigger than 5 or less than 1", data );
+            } else {
+                maxDJs = numValue;
+                chatFunctions.botSpeak( 'The max No. of DJs is now ' + numValue, data );
+            }
+        },
         // ========================================================
 
         // ========================================================
