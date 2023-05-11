@@ -1292,7 +1292,7 @@ const userFunctions = ( bot ) => {
 
 
         removeDJsOverPlaylimit: async function ( data, chatFunctions, userID ) {
-            if ( this.DJPlaysLimited() === true && !( await this.isSuperDJ( userID ) ) ) {
+            if ( this.DJPlaysLimited() === true && !superDJs.includes( userID ) ) {
 
                 if ( userID !== authModule.USERID && this.isCurrentDJ( data, userID ) && this.getDJCurrentPlayCount( userID ) >= this.DJsPlayLimit() ) {
                     if ( this.userExists( userID ) ) {
