@@ -1238,7 +1238,7 @@ const userFunctions = ( bot ) => {
                 }
             }
 
-            if ( this.refreshDJCount() + this.djList().length >= 5 ) {
+            if ( this.refreshDJCount() + this.djList().length >= roomFunctions.maxDJs() ) {
                 return [ false, '@' + this.getUsername( theUserID ) + ', sorry, but I\'m holding that spot for someone in the refresh list' ];
             }
 
