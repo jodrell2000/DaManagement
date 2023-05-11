@@ -1217,54 +1217,49 @@ const userFunctions = ( bot ) => {
                 return [ true, '' ];
             }
 
-            // Check if user is a super DJ
-            return this.isSuperDJ( theUserID )
-                .then( ( result ) => {
-                    if ( result ) {
+            if ( superDJs.includes( theUserID ) ) {
+                return [ true, '' ];
+            }
+
+            if ( !this.isUserVIP( theUserID ) && roomDefaults.vipsOnly ) {
+                return [ false, "The VIP list is active...and you're not on the list. Sorry!" ];
+            }
+
+            if ( roomDefaults.queueActive ) {
+                if ( this.isUserInRefreshList( theUserID ) ) {
+                    return [ true, '' ];
+                }
+
+                if ( this.isUserIDInQueue( theUserID ) ) {
+                    if ( theUserID !== this.headOfQueue() ) {
+                        return [ false, '@' + this.getUsername( theUserID ) + ', sorry, but you are not first in queue. please wait your turn.' ];
+                    } else {
                         return [ true, '' ];
                     }
+                } else {
+                    return [ false, '@' + this.getUsername( theUserID ) + ', the queue is currently active. To add yourself to the queue type ' + chatDefaults.commandIdentifier + 'addme. To remove yourself from the queue type ' + chatDefaults.commandIdentifier + 'removeme.' ];
+                }
+            }
 
-                    // Rest of the checks
-                    if ( !this.isUserVIP( theUserID ) && roomDefaults.vipsOnly ) {
-                        return [ false, "The VIP list is active...and you're not on the list. Sorry!" ];
-                    }
+            if ( this.refreshDJCount() + this.djList().length >= roomFunctions.maxDJs() ) {
+                return [ false, '@' + this.getUsername( theUserID ) + ', sorry, but I\'m holding that spot for someone in the refresh list' ];
+            }
 
-                    if ( roomDefaults.queueActive ) {
-                        if ( this.isUserInRefreshList( theUserID ) ) {
-                            return [ true, '' ];
-                        }
+            for ( let banLoop = 0; banLoop < roomFunctions.tempBanList().length; banLoop++ ) {
+                if ( theUserID === roomFunctions.tempBanList()[ banLoop ] ) {
+                    return [ false, '@' + this.getUsername( theUserID ) + ', you are banned from djing. Please speak to a Mod to find out why' ];
+                }
+            }
 
-                        if ( this.isUserIDInQueue( theUserID ) ) {
-                            if ( theUserID !== this.headOfQueue() ) {
-                                return [ false, '@' + this.getUsername( theUserID ) + ', sorry, but you are not first in queue. please wait your turn.' ];
-                            } else {
-                                return [ true, '' ];
-                            }
-                        } else {
-                            return [ false, '@' + this.getUsername( theUserID ) + ', the queue is currently active. To add yourself to the queue type ' + chatDefaults.commandIdentifier + 'addme. To remove yourself from the queue type ' + chatDefaults.commandIdentifier + 'removeme.' ];
-                        }
-                    }
+            if ( this.isUserIDStageBanned( theUserID ) ) {
+                return [ false, '@' + this.getUsername( theUserID ) + ', you are banned from djing. Please speak to a Mod to find out why' ];
+            }
 
-                    if ( this.refreshDJCount() + this.djList().length >= roomFunctions.maxDJs() ) {
-                        return [ false, '@' + this.getUsername( theUserID ) + ', sorry, but I\'m holding that spot for someone in the refresh list' ];
-                    }
+            if ( this.getUserSpamCount( theUserID ) >= roomDefaults.spamLimit ) {
+                return [ false, '@' + this.getUsername( theUserID ) + ', you\'ve been SPAMming too much...please want a few minutes before trying again' ];
+            }
 
-                    for ( let banLoop = 0; banLoop < roomFunctions.tempBanList().length; banLoop++ ) {
-                        if ( theUserID === roomFunctions.tempBanList()[ banLoop ] ) {
-                            return [ false, '@' + this.getUsername( theUserID ) + ', you are banned from djing. Please speak to a Mod to find out why' ];
-                        }
-                    }
-
-                    if ( this.isUserIDStageBanned( theUserID ) ) {
-                        return [ false, '@' + this.getUsername( theUserID ) + ', you are banned from djing. Please speak to a Mod to find out why' ];
-                    }
-
-                    if ( this.getUserSpamCount( theUserID ) >= roomDefaults.spamLimit ) {
-                        return [ false, '@' + this.getUsername( theUserID ) + ', you\'ve been SPAMming too much...please wait a few minutes before trying again' ];
-                    }
-
-                    return [ true, '' ];
-                } );
+            return [ true, '' ];
         },
 
         resetDJFlags: function ( userID, databaseFunctions ) {
