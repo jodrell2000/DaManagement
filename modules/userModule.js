@@ -1213,7 +1213,6 @@ const userFunctions = ( bot ) => {
         },
 
         checkOKToDJ: function ( theUserID, roomFunctions ) {
-            console.group( "checkOKToDJ" );
             if ( theUserID === authModule.USERID ) {
                 return [ true, '' ];
             }
