@@ -1217,9 +1217,12 @@ const userFunctions = ( bot ) => {
                 return [ true, '' ];
             }
 
-            if ( this.isSuperDJ( theUserID ) ) {
-                return [ true, '' ];
-            }
+            this.isSuperDJ( theUserID )
+                .then( ( result ) => {
+                    if ( result ) {
+                        return [ true, '' ];
+                    }
+                } );
 
             if ( !this.isUserVIP( theUserID ) && roomDefaults.vipsOnly ) {
                 return [ false, "The VIP list is active...and you're not on the list. Sorry!" ];
@@ -1291,8 +1294,8 @@ const userFunctions = ( bot ) => {
         // ========================================================
 
 
-        removeDJsOverPlaylimit: function ( data, chatFunctions, userID ) {
-            if ( this.DJPlaysLimited() === true && !this.isSuperDJ( userID ) ) {
+        removeDJsOverPlaylimit: async function ( data, chatFunctions, userID ) {
+            if ( this.DJPlaysLimited() === true && !( await this.isSuperDJ( userID ) ) ) {
 
                 if ( userID !== authModule.USERID && this.isCurrentDJ( data, userID ) && this.getDJCurrentPlayCount( userID ) >= this.DJsPlayLimit() ) {
                     if ( this.userExists( userID ) ) {
