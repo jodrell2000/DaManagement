@@ -389,6 +389,14 @@ const userFunctions = ( bot ) => {
             superDJs = [];
         },
 
+        readSuperDJs: function ( data, chatFunctions ) {
+            if ( superDJs.length === 0 ) {
+                chatFunctions.botSpeak( "There are currently no SuperDJs", data );
+            } else {
+                chatFunctions.botSpeak( "The current SuperDJs are " + superDJs.join( ", " ), data );
+            }
+        },
+
         // ========================================================
 
         readSingleUserStatus: function ( data, chatFunctions ) {

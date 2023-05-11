@@ -357,6 +357,9 @@ const commandFunctions = ( bot ) => {
     moderatorQueueCommands.setmaxdjs.help = "Remove a DJ from the SuperDJs list";
     moderatorQueueCommands.setmaxdjs.sampleArguments = [ "Jodrell" ];
 
+    moderatorQueueCommands.removesuperdj = ( { data, chatFunctions, userFunctions } ) => { userFunctions.readSuperDJs( data, chatFunctions ) }
+    moderatorQueueCommands.setmaxdjs.help = "List the SuperDJs";
+
     // #############################################
     // Moderator Only Dynamic Chat commands
     // #############################################
