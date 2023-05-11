@@ -92,6 +92,7 @@ setInterval( function () {
     console.log( "roomDefaults.queueActive:" + roomDefaults.queueActive );
     console.log( "userFunctions.howManyDJs():" + userFunctions.howManyDJs() );
     console.log( "roomFunctions.maxDJs():" + roomFunctions.maxDJs() );
+    console.log( "true??:" + userFunctions.howManyDJs() === roomFunctions.maxDJs() );
 
     if ( roomDefaults.queueActive !== true && userFunctions.howManyDJs() === roomFunctions.maxDJs() ) {
         roomDefaults.queueActive = true;
