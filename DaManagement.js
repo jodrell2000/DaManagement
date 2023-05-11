@@ -408,7 +408,15 @@ bot.on( 'add_dj', function ( data ) {
     const theUserID = data.user[ 0 ].userid;
     const totalPlayCount = userFunctions.getDJTotalPlayCount( theUserID );
 
-    [ OKToDJ, theMessage ] = userFunctions.checkOKToDJ( theUserID, roomFunctions );
+    this.isSuperDJ( theUserID )
+        .then( ( result ) => {
+            if ( result ) {
+                OKToDJ = true;
+            } else {
+                [ OKToDJ, theMessage ] = userFunctions.checkOKToDJ( theUserID, roomFunctions );
+            }
+        } );
+    console.log( "OKToDJ: " + OKToDJ );
 
     if ( !OKToDJ ) {
         userFunctions.removeDJ( theUserID, 'User is not allowed to DJ so was removed' );
