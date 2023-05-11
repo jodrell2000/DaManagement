@@ -1218,7 +1218,7 @@ const userFunctions = ( bot ) => {
                 return [ true, '' ];
             }
 
-            if ( await userFunctions.isSuperDJ( theUserID ) ) {
+            if ( await this.isSuperDJ( theUserID ) ) {
                 return [ true, '' ];
             }
 
