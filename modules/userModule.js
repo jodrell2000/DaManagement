@@ -1213,12 +1213,15 @@ const userFunctions = ( bot ) => {
         },
 
         checkOKToDJ: function ( theUserID, roomFunctions ) {
+            console.group( "checkOKToDJ" );
             if ( theUserID === authModule.USERID ) {
                 return [ true, '' ];
             }
 
+            console.log( "theUserID: " + theUserID );
             this.isSuperDJ( theUserID )
                 .then( ( result ) => {
+                    console.log( "result: " + result );
                     if ( result ) {
                         return [ true, '' ];
                     }
