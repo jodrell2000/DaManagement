@@ -11,6 +11,7 @@ let afkPeople = []; //holds the userid of everyone who has used the /afk command
 let modPM = []; //holds the userid's of everyone in the /modpm feature
 let djList = []; //holds the userid of all the dj's who are on stage currently
 let notifyThisDJ = null; // holds the ID of the DJ being told they're next in the queue
+let superDJs = []; // list of users not removed by exceeding the playcount and who don't have to queue
 
 /* Previously banned users
  *
@@ -337,6 +338,55 @@ const userFunctions = ( bot ) => {
             }
             console.log( "Regions array:" + regionsArray.filter( ( v, i, a ) => a.indexOf( v ) === i ) );
             return regionsArray.filter( ( v, i, a ) => a.indexOf( v ) === i );
+        },
+
+
+        // ========================================================
+
+        // ========================================================
+        // Super User Functions
+        // ========================================================
+
+        superDJs: () => superDJs,
+
+        addSuperDJ: function ( username, data, chatFunctions ) {
+            const userID = this.getUserIDFromUsername( username );
+            this.isSuperDJ( userID )
+                .then( ( isSuperDJ ) => {
+                    if ( !isSuperDJ ) {
+                        superDJs.push( userID );
+                        chatFunctions.botSpeak( this.getUsername( userID ) + " is now a SuperDJ", data );
+                    } else {
+                        chatFunctions.botSpeak( this.getUsername( userID ) + " is already a SuperDJ", data );
+                    }
+                } );
+        },
+
+        removeSuperDJ: function ( username, data, chatFunctions ) {
+            const userID = this.getUserIDFromUsername( username );
+            this.isSuperDJ( userID )
+                .then( ( isSuperDJ ) => {
+                    if ( !isSuperDJ ) {
+                        chatFunctions.botSpeak( this.getUsername( userID ) + " is not a SuperDJ??", data );
+                    } else {
+                        superDJs.splice( superDJs.indexOf( userID ), 1 )
+                        chatFunctions.botSpeak( this.getUsername( userID ) + " is no longer a SuperDJ", data );
+                    }
+                } );
+        },
+
+        isSuperDJ: function ( userID ) {
+            return new Promise( ( resolve ) => {
+                if ( superDJs.includes( userID ) ) {
+                    resolve( true );
+                } else {
+                    resolve( false );
+                }
+            } );
+        },
+
+        clearsuperDJs: function () {
+            superDJs = [];
         },
 
         // ========================================================

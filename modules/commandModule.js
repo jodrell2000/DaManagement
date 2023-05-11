@@ -347,6 +347,16 @@ const commandFunctions = ( bot ) => {
     moderatorQueueCommands.setmaxdjs.help = "Sets the max number of DJs allowed on stage";
     moderatorQueueCommands.setmaxdjs.sampleArguments = [ 2 ];
 
+    moderatorQueueCommands.addsuperdj = ( { data, args, chatFunctions, userFunctions } ) => { userFunctions.addSuperDJ( args[ 0 ], data, chatFunctions ) }
+    moderatorQueueCommands.setmaxdjs.argumentCount = 1;
+    moderatorQueueCommands.setmaxdjs.help = "Add a DJ to the SuperDJs list";
+    moderatorQueueCommands.setmaxdjs.sampleArguments = [ "Jodrell" ];
+
+    moderatorQueueCommands.removesuperdj = ( { data, args, chatFunctions, userFunctions } ) => { userFunctions.removeSuperDJ( args[ 0 ], data, chatFunctions ) }
+    moderatorQueueCommands.setmaxdjs.argumentCount = 1;
+    moderatorQueueCommands.setmaxdjs.help = "Remove a DJ from the SuperDJs list";
+    moderatorQueueCommands.setmaxdjs.sampleArguments = [ "Jodrell" ];
+
     // #############################################
     // Moderator Only Dynamic Chat commands
     // #############################################
