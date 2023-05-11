@@ -409,7 +409,7 @@ bot.on( 'add_dj', function ( data ) {
     userFunctions.isSuperDJ( theUserID )
         .then( ( result ) => {
             if ( result ) {
-                let OKToDJ = true;
+                return [ true, "" ];
             } else {
                 return userFunctions.checkOKToDJ( theUserID, roomFunctions );
             }
