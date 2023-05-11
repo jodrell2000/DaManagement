@@ -385,8 +385,9 @@ const userFunctions = ( bot ) => {
             } );
         },
 
-        clearsuperDJs: function () {
+        clearSuperDJs: function ( data, chatFunctions ) {
             superDJs = [];
+            this.readSuperDJs( data, chatFunctions );
         },
 
         readSuperDJs: function ( data, chatFunctions ) {
