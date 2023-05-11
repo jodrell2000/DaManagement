@@ -360,6 +360,9 @@ const commandFunctions = ( bot ) => {
     moderatorQueueCommands.listsuperdjs = ( { data, chatFunctions, userFunctions } ) => { userFunctions.readSuperDJs( data, chatFunctions ) }
     moderatorQueueCommands.listsuperdjs.help = "List the SuperDJs";
 
+    moderatorQueueCommands.clearsuperdjs = ( { data, chatFunctions, userFunctions } ) => { userFunctions.clearSuperDJs( data, chatFunctions ) }
+    moderatorQueueCommands.clearsuperdjs.help = "Remove all SuperDJs";
+
     // #############################################
     // Moderator Only Dynamic Chat commands
     // #############################################
