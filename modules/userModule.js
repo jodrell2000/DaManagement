@@ -1218,15 +1218,6 @@ const userFunctions = ( bot ) => {
                 return [ true, '' ];
             }
 
-            console.log( "theUserID: " + theUserID );
-            this.isSuperDJ( theUserID )
-                .then( ( result ) => {
-                    if ( result ) {
-                        console.log( "result: " + result );
-                        return [ true, '' ];
-                    }
-                } );
-
             if ( !this.isUserVIP( theUserID ) && roomDefaults.vipsOnly ) {
                 return [ false, "The VIP list is active...and you're not on the list. Sorry!" ];
             }

@@ -408,7 +408,7 @@ bot.on( 'add_dj', function ( data ) {
     const theUserID = data.user[ 0 ].userid;
     const totalPlayCount = userFunctions.getDJTotalPlayCount( theUserID );
 
-    this.isSuperDJ( theUserID )
+    userFunctions.isSuperDJ( theUserID )
         .then( ( result ) => {
             if ( result ) {
                 OKToDJ = true;
