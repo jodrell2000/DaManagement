@@ -94,7 +94,7 @@ setInterval( function () {
     console.log( "roomFunctions.maxDJs():" + roomFunctions.maxDJs() );
     console.log( "true??:" + userFunctions.howManyDJs() === roomFunctions.maxDJs() );
 
-    if ( roomDefaults.queueActive !== true && userFunctions.howManyDJs() === roomFunctions.maxDJs() ) {
+    if ( roomDefaults.queueActive !== true && ( userFunctions.howManyDJs() === roomFunctions.maxDJs() ) ) {
         roomDefaults.queueActive = true;
         chatFunctions.botSpeak( "The Queue is now active", null, true, null );
     }
