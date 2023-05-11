@@ -393,7 +393,14 @@ const userFunctions = ( bot ) => {
             if ( superDJs.length === 0 ) {
                 chatFunctions.botSpeak( "There are currently no SuperDJs", data );
             } else {
-                chatFunctions.botSpeak( "The current SuperDJs are " + superDJs.join( ", " ), data );
+                let usernameArray = [];
+                for ( let i = 0; i < superDJs.length; i++ ) {
+                    let username = this.getUsername( superDJs[ i ] );
+                    usernameArray.push( username );
+                }
+                let usernameList = usernameArray.join( ', ' );
+
+                chatFunctions.botSpeak( "The current SuperDJs are " + usernameList, data );
             }
         },
 
