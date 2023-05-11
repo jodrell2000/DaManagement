@@ -102,7 +102,7 @@ const roomFunctions = ( bot ) => {
         maxDJs: () => maxDJs,
 
         setMaxDJs: function ( value, data, chatFunctions ) {
-            maxDJs = value;
+            maxDJs = Number( value );
             chatFunctions.botSpeak( 'The max No. of DJs is now ' + value, data );
         },
 
