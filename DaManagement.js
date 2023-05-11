@@ -401,7 +401,7 @@ bot.on( 'snagged', function ( data ) {
     userFunctions.updateUserLastSnagged( data.userid, databaseFunctions ); //update the afk position of people who add a song to their queue
 } )
 
-//this activates when a user joins the stage.
+//this activates when a user joins the stage
 bot.on( 'add_dj', async function ( data ) {
     let OKToDJ;
     let theMessage;
