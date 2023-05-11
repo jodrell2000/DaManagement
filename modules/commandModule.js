@@ -342,6 +342,11 @@ const commandFunctions = ( bot ) => {
     moderatorQueueCommands.setdjplaycount.help = "Sets a DJs current playcount. This will let you give a DJ extra plays, or fewer, if the playLimit is set";
     moderatorQueueCommands.setdjplaycount.sampleArguments = [ 2, 'jodrell' ];
 
+    moderatorQueueCommands.setmaxdjs = ( { data, args, chatFunctions, roomFunctions } ) => { roomFunctions.setMaxDJs( args[ 0 ], data, chatFunctions ) }
+    moderatorQueueCommands.setmaxdjs.argumentCount = 1;
+    moderatorQueueCommands.setmaxdjs.help = "Sets the max number of DJs allowed on stage";
+    moderatorQueueCommands.setmaxdjs.sampleArguments = [ 2 ];
+
     // #############################################
     // Moderator Only Dynamic Chat commands
     // #############################################
