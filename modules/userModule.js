@@ -1221,8 +1221,8 @@ const userFunctions = ( bot ) => {
             console.log( "theUserID: " + theUserID );
             this.isSuperDJ( theUserID )
                 .then( ( result ) => {
-                    console.log( "result: " + result );
                     if ( result ) {
+                        console.log( "result: " + result );
                         return [ true, '' ];
                     }
                 } );
