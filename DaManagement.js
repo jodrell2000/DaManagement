@@ -404,7 +404,7 @@ bot.on( 'snagged', function ( data ) {
 //this activates when a user joins the stage.
 bot.on( 'add_dj', function ( data ) {
     let OKToDJ;
-    let theMessage;
+    let theMessage = "";
     const theUserID = data.user[ 0 ].userid;
     const totalPlayCount = userFunctions.getDJTotalPlayCount( theUserID );
 
