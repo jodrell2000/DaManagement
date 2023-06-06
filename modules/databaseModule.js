@@ -448,7 +448,7 @@ const databaseFunctions = () => {
 SUM(IF(c.command='props', e.count, 0))*5 +
 SUM(IF(c.command='noice', e.count, 0))*5 +
 SUM(IF(c.command='spin', e.count, 0))*5 +
-SUM(IF(c.command='tune', e.count, 0))*5) * count(tp.id) AS "points",
+SUM(IF(c.command='tune', e.count, 0))*5) * COUNT(DISTINCT(u.id)) AS "points",
 count(tp.id) AS "plays"
 FROM users u 
 JOIN tracksPlayed tp ON tp.djID=u.id 
@@ -537,7 +537,7 @@ SELECT COALESCE(a.displayName, a.artistName) as "artist", (tp.upvotes-tp.downvot
 SUM(IF(c.command='props', e.count, 0))*5+
 SUM(IF(c.command='noice', e.count, 0))*5+
 SUM(IF(c.command='spin', e.count, 0))*5+
-SUM(IF(c.command='tune', e.count, 0))*5) * count(tp.id) AS points
+SUM(IF(c.command='tune', e.count, 0))*5) * COUNT(DISTINCT(u.id)) AS points
 FROM users u 
 JOIN tracksPlayed tp ON tp.djID=u.id 
 JOIN tracks t ON tp.trackID=t.id 
