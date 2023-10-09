@@ -18,7 +18,7 @@ let superDJs = []; // list of users not removed by exceeding the playcount and w
  */
 
 let bannedUsers = [ { id: "6040548a3f4bfc001be4c174", name: "bacon_cheeseburger" }, { id: "60d14bf5cd1ec800127fb964", name: "outlaw" }, { id: "625a5dd088b736001f4160c3", name: "MustardX" }, { id: "636e831117f5ac001d2331c7", name: "wub the fuzzizzle" }, { id: "6041125b3f4bfc001b27de48", name: "Eggman" }, { id: "617a2526d1a3d9001c8cd086", name: "Eggman" }, { id: "62b94b7388b736001dfd42da", name: "Eggman" }, { id: "61b457a8d1a3d9001ce3b8b0", name: "Eggman" }, { id: "604cfaa047c69b001b52cea5", name: "Eggman" }, { id: "61b460d8261cf0001dd4a8c6", name: "Eggman" }, { id: "61837c92caf438001c80d56a", name: "Eggman" } ]; //banned users list, put userids in string form here for permanent banning(put their name after their userid to tell who is banned).
-let permanentStageBan = [ { id: 636473737373 }, { id: 535253533353 } ]; //put userids in here to ban from djing permanently(put their name after their userid to tell who is banned)
+let permanentStageBan = [ { id: "60417796c2dbd9001be7573f" } ]; //put userids in here to ban from djing permanently(put their name after their userid to tell who is banned)
 let vipList = [];
 /* this is the vip list, it accepts userids as input, this is for when you have a special guest or guests in your room and you only
    want to hear them dj, leave this empty unless you want everyone other than the people whos userids are in the vip list to be automatically kicked from stage. */
