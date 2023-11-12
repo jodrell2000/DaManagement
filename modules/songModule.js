@@ -236,6 +236,9 @@ const songFunctions = ( bot ) => {
             const length = data.room.metadata.current_song.metadata.length;
             const lastDJ = roomFunctions.lastdj();
             const nextDJName = userFunctions.getUsername( userFunctions.getNextDJ() );
+            console.log( "length:" + length );
+            console.log( "lastDJ:" + lastDJ );
+            console.log( "nextDJName:" + nextDJName );
 
 
             // Set a new watchdog timer for the current song.
