@@ -289,11 +289,8 @@ const chatFunctions = ( bot, roomDefaults ) => {
 
         readSongStats: function ( data, songFunctions, botFunctions ) {
             if ( botFunctions.readSongStats() ) {
-                const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve, delay ) )
                 const readInOrder = async () => {
-                    this.botSpeak( 'Stats for ' + songFunctions.song() + ' by ' + songFunctions.artist() + ':', data );
-                    await sleep( 10 )
-                    this.botSpeak( ':thumbsup:' + songFunctions.previousUpVotes() + ':thumbsdown:' + songFunctions.previousDownVotes() + ':heart:' + songFunctions.previousSnags(), data );
+                    this.botSpeak( 'Stats for ' + songFunctions.song() + ' by ' + songFunctions.artist() + '\n:thumbsup:' + songFunctions.previousUpVotes() + ':thumbsdown:' + songFunctions.previousDownVotes() + ':heart:' + songFunctions.previousSnags(), data );
                 }
                 readInOrder();
             }
