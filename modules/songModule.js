@@ -240,19 +240,12 @@ const songFunctions = ( bot ) => {
             console.log( "warnedDJ:" + warnedDJ );
             console.log( "nextDJName:" + nextDJName );
 
+            bot.speak( "@" + userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( warnedDJ ) + 1 ] + ", you have 30 seconds to skip your stuck song before you are removed" );
+            bot.speak( `@${ nextDJName }, make sure you've got something ready ;-)` );
 
             // Set a new watchdog timer for the current song.
             curSongWatchdog = setTimeout( function () {
                 curSongWatchdog = null;
-
-                if ( warnedDJ !== undefined ) {
-                    if ( typeof userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( warnedDJ ) + 1 ] !== 'undefined' ) {
-                        bot.speak( "@" + userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( warnedDJ ) + 1 ] + ", you have 30 seconds to skip your stuck song before you are removed" );
-                        bot.speak( `@${ nextDJName }, make sure you've got something ready ;-)` );
-                    } else {
-                        bot.speak( "current dj, you have 30 seconds to skip your stuck song before you are removed" );
-                    }
-                }
 
                 //START THE 20 SEC TIMER
                 takedownTimer = setTimeout( function () {
