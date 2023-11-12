@@ -208,6 +208,7 @@ bot.on( 'newsong', function ( data ) {
     songFunctions.resetDownVotes();
     songFunctions.resetSnagCount();
     songFunctions.resetVoteSnagging();
+    botFunctions.clearAllTimers( userFunctions, roomFunctions, songFunctions );
 
     //procedure for getting song tags
     //console.info( "data.room.metadata.current_song:" + JSON.stringify( data.room.metadata.current_song ) );
@@ -501,6 +502,7 @@ bot.on( 'rem_moderator', function ( data ) {
 bot.on( 'endsong', function ( data ) {
     songFunctions.grabSongStats();
     const djID = data.room.metadata.current_dj;
+    roomFunctions.setLastDJ( djID );
 
     //bot says song stats for each song
     chatFunctions.readSongStats( data, songFunctions, botFunctions );

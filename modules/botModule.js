@@ -591,7 +591,7 @@ const botFunctions = ( bot ) => {
                 {
                     if ( musicDefaults.songLengthLimitOn === true ) {
                         const nextDJName = userFunctions.getUsername( userFunctions.getNextDJ() );
-                        bot.speak( `@${ djName }, your song is over ${ musicDefaults.songLengthLimit } mins long, you have 60 seconds to skip before being removed.` );
+                        bot.speak( `@${ djName }, your song is over ${ musicDefaults.songLengthLimit } mins long, you have ${ theTimeout } seconds to skip before being removed.` );
                         bot.speak( `@${ nextDJName }, make sure you've got something ready ;-)` );
 
                         // start the timer

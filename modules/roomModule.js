@@ -402,12 +402,12 @@ const roomFunctions = ( bot ) => {
 
         clearSongLimitTimer ( userFunctions, roomFunctions ) {
             //this is for the song length limit
-            if ( songLimitTimer !== null ) {
-                clearTimeout( songLimitTimer );
-                songLimitTimer = null;
+            if ( this.songLimitTimer !== null ) {
+                clearTimeout( this.songLimitTimer );
+                this.songLimitTimer = null;
 
-                if ( typeof userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( roomFunctions.lastdj() ) + 1 ] !== 'undefined' ) {
-                    bot.speak( "@" + userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( roomFunctions.lastdj() ) + 1 ] + ", Thanks buddy ;-)" );
+                if ( typeof userFunctions.getUsername( roomFunctions.lastdj() ) !== 'undefined' ) {
+                    bot.speak( "@" + userFunctions.getUsername( roomFunctions.lastdj() ) + ", Thanks buddy ;-)" );
                 } else {
                     bot.speak( 'Thanks buddy ;-)' );
                 }
