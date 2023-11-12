@@ -401,8 +401,10 @@ const roomFunctions = ( bot ) => {
         },
 
         clearSongLimitTimer ( userFunctions, roomFunctions ) {
+            console.group( "clearSongLimitTimer" );
             //this is for the song length limit
             if ( songLimitTimer !== null ) {
+                console.log( "songLimitTimer was not null" );
                 clearTimeout( songLimitTimer );
                 songLimitTimer = null;
 
@@ -412,6 +414,7 @@ const roomFunctions = ( bot ) => {
                     bot.speak( 'Thanks buddy ;-)' );
                 }
             }
+            console.groupEnd();
         }
     }
 }
