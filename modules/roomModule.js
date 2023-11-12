@@ -25,6 +25,7 @@ let rulesTimerRunning = false;
 let rulesMessageOn = true;
 let rulesInterval = 15; // how ofter, in minutes, the room rules will be displayed with the welcome messages
 let themeRandomizerEnabled = false;
+let maxDJs = roomDefaults.maxDJs;
 
 const themesDataFileName = process.env.THEMESDATA;
 
@@ -92,6 +93,26 @@ const roomFunctions = ( bot ) => {
             chatFunctions.botSpeak( theMessage, data );
         },
 
+        // ========================================================
+
+        // ========================================================
+        // Max DJs Functions
+        // ========================================================
+
+        maxDJs: () => maxDJs,
+
+        setMaxDJs: function ( value, data, chatFunctions ) {
+            const numValue = Number( value );
+
+            if ( isNaN( numValue ) ) {
+                chatFunctions.botSpeak( 'MaxDJs must be set to a number', data );
+            } else if ( numValue < 1 || numValue > 5 ) {
+                chatFunctions.botSpeak( "MaxDJs can't be bigger than 5 or less than 1", data );
+            } else {
+                maxDJs = numValue;
+                chatFunctions.botSpeak( 'The max No. of DJs is now ' + numValue, data );
+            }
+        },
         // ========================================================
 
         // ========================================================

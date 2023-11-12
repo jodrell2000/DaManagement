@@ -11,13 +11,14 @@ let afkPeople = []; //holds the userid of everyone who has used the /afk command
 let modPM = []; //holds the userid's of everyone in the /modpm feature
 let djList = []; //holds the userid of all the dj's who are on stage currently
 let notifyThisDJ = null; // holds the ID of the DJ being told they're next in the queue
+let superDJs = []; // list of users not removed by exceeding the playcount and who don't have to queue
 
 /* Previously banned users
  *
  */
 
 let bannedUsers = [ { id: "6040548a3f4bfc001be4c174", name: "bacon_cheeseburger" }, { id: "60d14bf5cd1ec800127fb964", name: "outlaw" }, { id: "625a5dd088b736001f4160c3", name: "MustardX" }, { id: "636e831117f5ac001d2331c7", name: "wub the fuzzizzle" }, { id: "6041125b3f4bfc001b27de48", name: "Eggman" }, { id: "617a2526d1a3d9001c8cd086", name: "Eggman" }, { id: "62b94b7388b736001dfd42da", name: "Eggman" }, { id: "61b457a8d1a3d9001ce3b8b0", name: "Eggman" }, { id: "604cfaa047c69b001b52cea5", name: "Eggman" }, { id: "61b460d8261cf0001dd4a8c6", name: "Eggman" }, { id: "61837c92caf438001c80d56a", name: "Eggman" } ]; //banned users list, put userids in string form here for permanent banning(put their name after their userid to tell who is banned).
-let permanentStageBan = [ { id: 636473737373 }, { id: 535253533353 } ]; //put userids in here to ban from djing permanently(put their name after their userid to tell who is banned)
+let permanentStageBan = [ { id: "60417796c2dbd9001be7573f" } ]; //put userids in here to ban from djing permanently(put their name after their userid to tell who is banned)
 let vipList = [];
 /* this is the vip list, it accepts userids as input, this is for when you have a special guest or guests in your room and you only
    want to hear them dj, leave this empty unless you want everyone other than the people whos userids are in the vip list to be automatically kicked from stage. */
@@ -337,6 +338,71 @@ const userFunctions = ( bot ) => {
             }
             console.log( "Regions array:" + regionsArray.filter( ( v, i, a ) => a.indexOf( v ) === i ) );
             return regionsArray.filter( ( v, i, a ) => a.indexOf( v ) === i );
+        },
+
+
+        // ========================================================
+
+        // ========================================================
+        // Super User Functions
+        // ========================================================
+
+        superDJs: () => superDJs,
+
+        addSuperDJ: function ( username, data, chatFunctions ) {
+            const userID = this.getUserIDFromUsername( username );
+            this.isSuperDJ( userID )
+                .then( ( isSuperDJ ) => {
+                    if ( !isSuperDJ ) {
+                        superDJs.push( userID );
+                        chatFunctions.botSpeak( this.getUsername( userID ) + " is now a SuperDJ", data );
+                    } else {
+                        chatFunctions.botSpeak( this.getUsername( userID ) + " is already a SuperDJ", data );
+                    }
+                } );
+        },
+
+        removeSuperDJ: function ( username, data, chatFunctions ) {
+            const userID = this.getUserIDFromUsername( username );
+            this.isSuperDJ( userID )
+                .then( ( isSuperDJ ) => {
+                    if ( !isSuperDJ ) {
+                        chatFunctions.botSpeak( this.getUsername( userID ) + " is not a SuperDJ??", data );
+                    } else {
+                        superDJs.splice( superDJs.indexOf( userID ), 1 )
+                        chatFunctions.botSpeak( this.getUsername( userID ) + " is no longer a SuperDJ", data );
+                    }
+                } );
+        },
+
+        isSuperDJ: function ( userID ) {
+            return new Promise( ( resolve ) => {
+                if ( superDJs.includes( userID ) ) {
+                    resolve( true );
+                } else {
+                    resolve( false );
+                }
+            } );
+        },
+
+        clearSuperDJs: function ( data, chatFunctions ) {
+            superDJs = [];
+            this.readSuperDJs( data, chatFunctions );
+        },
+
+        readSuperDJs: function ( data, chatFunctions ) {
+            if ( superDJs.length === 0 ) {
+                chatFunctions.botSpeak( "There are currently no SuperDJs", data );
+            } else {
+                let usernameArray = [];
+                for ( let i = 0; i < superDJs.length; i++ ) {
+                    let username = this.getUsername( superDJs[ i ] );
+                    usernameArray.push( username );
+                }
+                let usernameList = usernameArray.join( ', ' );
+
+                chatFunctions.botSpeak( "The current SuperDJs are " + usernameList, data );
+            }
         },
 
         // ========================================================
@@ -1151,6 +1217,10 @@ const userFunctions = ( bot ) => {
                 return [ true, '' ];
             }
 
+            if ( superDJs.includes( theUserID ) ) {
+                return [ true, '' ];
+            }
+
             if ( !this.isUserVIP( theUserID ) && roomDefaults.vipsOnly ) {
                 return [ false, "The VIP list is active...and you're not on the list. Sorry!" ];
             }
@@ -1171,7 +1241,7 @@ const userFunctions = ( bot ) => {
                 }
             }
 
-            if ( this.refreshDJCount() + this.djList().length >= 5 ) {
+            if ( this.refreshDJCount() + this.djList().length >= roomFunctions.maxDJs() ) {
                 return [ false, '@' + this.getUsername( theUserID ) + ', sorry, but I\'m holding that spot for someone in the refresh list' ];
             }
 
@@ -1221,8 +1291,8 @@ const userFunctions = ( bot ) => {
         // ========================================================
 
 
-        removeDJsOverPlaylimit: function ( data, chatFunctions, userID ) {
-            if ( this.DJPlaysLimited() === true ) {
+        removeDJsOverPlaylimit: async function ( data, chatFunctions, userID ) {
+            if ( this.DJPlaysLimited() === true && !superDJs.includes( userID ) ) {
 
                 if ( userID !== authModule.USERID && this.isCurrentDJ( data, userID ) && this.getDJCurrentPlayCount( userID ) >= this.DJsPlayLimit() ) {
                     if ( this.userExists( userID ) ) {

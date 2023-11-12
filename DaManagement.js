@@ -89,12 +89,12 @@ setInterval( function () { userFunctions.roomIdleCheck( roomDefaults, chatFuncti
 
 // every 5 seconds, check if the there's an empty DJ slot, and prompt the next in the queue to join the decks, remove them if they don't
 setInterval( function () {
-    if ( roomDefaults.queueActive !== true && userFunctions.howManyDJs() === roomDefaults.maxDJs ) {
+    if ( roomDefaults.queueActive !== true && ( userFunctions.howManyDJs() >= roomFunctions.maxDJs() ) ) {
         roomDefaults.queueActive = true;
         chatFunctions.botSpeak( "The Queue is now active", null, true, null );
     }
 
-    if ( roomDefaults.queueActive === true && ( userFunctions.refreshDJCount() + userFunctions.howManyDJs() ) < roomDefaults.maxDJs ) {
+    if ( roomDefaults.queueActive === true && ( userFunctions.refreshDJCount() + userFunctions.howManyDJs() ) < roomFunctions.maxDJs() ) {
         if ( userFunctions.queueList().length > 0 ) {
             userFunctions.setDJToNotify( userFunctions.headOfQueue() );
             if ( botFunctions.sayOnce() === true ) {
@@ -401,7 +401,7 @@ bot.on( 'snagged', function ( data ) {
     userFunctions.updateUserLastSnagged( data.userid, databaseFunctions ); //update the afk position of people who add a song to their queue
 } )
 
-//this activates when a user joins the stage.
+//this activates when a user joins the stage
 bot.on( 'add_dj', function ( data ) {
     let OKToDJ;
     let theMessage;

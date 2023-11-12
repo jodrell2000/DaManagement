@@ -342,6 +342,27 @@ const commandFunctions = ( bot ) => {
     moderatorQueueCommands.setdjplaycount.help = "Sets a DJs current playcount. This will let you give a DJ extra plays, or fewer, if the playLimit is set";
     moderatorQueueCommands.setdjplaycount.sampleArguments = [ 2, 'jodrell' ];
 
+    moderatorQueueCommands.setmaxdjs = ( { data, args, chatFunctions, roomFunctions } ) => { roomFunctions.setMaxDJs( args[ 0 ], data, chatFunctions ) }
+    moderatorQueueCommands.setmaxdjs.argumentCount = 1;
+    moderatorQueueCommands.setmaxdjs.help = "Sets the max number of DJs allowed on stage";
+    moderatorQueueCommands.setmaxdjs.sampleArguments = [ 2 ];
+
+    moderatorQueueCommands.addsuperdj = ( { data, args, chatFunctions, userFunctions } ) => { userFunctions.addSuperDJ( reassembleArgs( args, 0 ), data, chatFunctions ) }
+    moderatorQueueCommands.addsuperdj.argumentCount = 1;
+    moderatorQueueCommands.addsuperdj.help = "Add a DJ to the SuperDJs list";
+    moderatorQueueCommands.addsuperdj.sampleArguments = [ "Jodrell" ];
+
+    moderatorQueueCommands.removesuperdj = ( { data, args, chatFunctions, userFunctions } ) => { userFunctions.removeSuperDJ( reassembleArgs( args, 0 ), data, chatFunctions ) }
+    moderatorQueueCommands.removesuperdj.argumentCount = 1;
+    moderatorQueueCommands.removesuperdj.help = "Remove a DJ from the SuperDJs list";
+    moderatorQueueCommands.removesuperdj.sampleArguments = [ "Jodrell" ];
+
+    moderatorQueueCommands.listsuperdjs = ( { data, chatFunctions, userFunctions } ) => { userFunctions.readSuperDJs( data, chatFunctions ) }
+    moderatorQueueCommands.listsuperdjs.help = "List the SuperDJs";
+
+    moderatorQueueCommands.clearsuperdjs = ( { data, chatFunctions, userFunctions } ) => { userFunctions.clearSuperDJs( data, chatFunctions ) }
+    moderatorQueueCommands.clearsuperdjs.help = "Remove all SuperDJs";
+
     // #############################################
     // Moderator Only Dynamic Chat commands
     // #############################################
