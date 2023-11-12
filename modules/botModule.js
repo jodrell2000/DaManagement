@@ -575,6 +575,7 @@ const botFunctions = ( bot ) => {
         },
 
         checkOnNewSong: function ( data, roomFunctions, songFunctions, userFunctions ) {
+            console.group( "checkOnNewSong" );
             const length = data.room.metadata.current_song.metadata.length;
             const theDJID = data.room.metadata.current_dj;
             const masterIndex = userFunctions.masterIds().indexOf( theDJID ); //used to tell whether current dj is on the master id's list or not
@@ -600,9 +601,11 @@ const botFunctions = ( bot ) => {
                             roomFunctions.songLimitTimer = null;
                             userFunctions.removeDJ( theDJID, `DJ @${ djName } was removed because their song was over the length limit` ); // Remove Saved DJ from last newsong call
                         }, theTimeout * 1000 ); // Current DJ has 20 seconds to skip before they are removed
+                        console.log( "songLimitTimer:" + roomFunctions.songLimitTimer );
                     }
                 }
             }
+            console.groupEnd();
         },
 
         // ========================================================
