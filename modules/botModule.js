@@ -574,39 +574,34 @@ const botFunctions = ( bot ) => {
         },
 
         checkOnNewSong: function ( data, roomFunctions, songFunctions, userFunctions ) {
-            console.group( "checkOnNewSong" );
             const length = data.room.metadata.current_song.metadata.length;
-            console.log( "length;" + length );
             const theDJID = data.room.metadata.current_dj;
-            console.log( "theDJID;" + theDJID );
             const masterIndex = userFunctions.masterIds().indexOf( theDJID ); //used to tell whether current dj is on the master id's list or not
-            console.log( "masterIndex;" + masterIndex );
             const djName = userFunctions.getUsername( theDJID );
-            console.log( "djName;" + djName );
 
             //clears timers if previously set
             this.clearAllTimers( userFunctions, roomFunctions, songFunctions );
 
-            // this removes the user from the stage if their song is over the length limit and they don't skip
+            songFunctions.startSongWatchdog( data, userFunctions, roomFunctions );
+
+            //this removes the user from the stage if their song is over the length limit and the don't skip
             let theTimeout = 60;
             if ( ( length / theTimeout ) >= musicDefaults.songLengthLimit ) {
                 if ( theDJID === authModule.USERID || masterIndex === -1 ) //if dj is the bot or not a master
                 {
                     if ( musicDefaults.songLengthLimitOn === true ) {
-                        songFunctions.startSongWatchdog( data, userFunctions, roomFunctions );
+                        const nextDJName = userFunctions.getUsername( userFunctions.getNextDJ() );
+                        bot.speak( `@${ djName }, your song is over ${ musicDefaults.songLengthLimit } mins long, you have 60 seconds to skip before being removed.` );
+                        bot.speak( `@${ nextDJName }, make sure you've got something ready ;-)` );
 
-                        // bot.speak( `@${ djName }, your song is over ${ musicDefaults.songLengthLimit } mins long, you have 60 seconds to skip before being removed.` );
-                        // bot.speak( `@${ nextDJName }, make sure you've got something ready ;-)` );
-
-                        // // start the timer
-                        // roomFunctions.songLimitTimer = setTimeout( function () {
-                        //     roomFunctions.songLimitTimer = null;
-                        //     userFunctions.removeDJ( theDJID, `DJ @${ djName } was removed because their song was over the length limit` ); // Remove Saved DJ from last newsong call
-                        // }, theTimeout * 1000 ); // Current DJ has 20 seconds to skip before they are removed
+                        // start the timer
+                        roomFunctions.songLimitTimer = setTimeout( function () {
+                            roomFunctions.songLimitTimer = null;
+                            userFunctions.removeDJ( theDJID, `DJ @${ djName } was removed because their song was over the length limit` ); // Remove Saved DJ from last newsong call
+                        }, theTimeout * 1000 ); // Current DJ has 20 seconds to skip before they are removed
                     }
                 }
             }
-            console.groupEnd();
         },
 
         // ========================================================
