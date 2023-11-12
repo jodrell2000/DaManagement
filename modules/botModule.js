@@ -567,6 +567,7 @@ const botFunctions = ( bot ) => {
         },
 
         clearAllTimers: function ( userFunctions, roomFunctions, songFunctions ) {
+            console.log( "Clear all timers" );
             userFunctions.clearInformTimer( roomFunctions );
             roomFunctions.clearSongLimitTimer( userFunctions, roomFunctions );
             songFunctions.clearWatchDogTimer();
