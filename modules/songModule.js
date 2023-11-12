@@ -234,10 +234,10 @@ const songFunctions = ( bot ) => {
             console.group( "startSongWatchdog" );
             console.log( "here:" );
             const length = data.room.metadata.current_song.metadata.length;
-            const lastDJ = roomFunctions.lastdj();
+            const warnedDJ = userFunctions.getCurrentDJID();
             const nextDJName = userFunctions.getUsername( userFunctions.getNextDJ() );
             console.log( "length:" + length );
-            console.log( "lastDJ:" + lastDJ );
+            console.log( "warnedDJ:" + warnedDJ );
             console.log( "nextDJName:" + nextDJName );
 
 
@@ -245,9 +245,9 @@ const songFunctions = ( bot ) => {
             curSongWatchdog = setTimeout( function () {
                 curSongWatchdog = null;
 
-                if ( lastDJ !== undefined ) {
-                    if ( typeof userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( lastDJ ) + 1 ] !== 'undefined' ) {
-                        bot.speak( "@" + userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( lastDJ ) + 1 ] + ", you have 30 seconds to skip your stuck song before you are removed" );
+                if ( warnedDJ !== undefined ) {
+                    if ( typeof userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( warnedDJ ) + 1 ] !== 'undefined' ) {
+                        bot.speak( "@" + userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( warnedDJ ) + 1 ] + ", you have 30 seconds to skip your stuck song before you are removed" );
                         bot.speak( `@${ nextDJName }, make sure you've got something ready ;-)` );
                     } else {
                         bot.speak( "current dj, you have 30 seconds to skip your stuck song before you are removed" );
@@ -257,10 +257,10 @@ const songFunctions = ( bot ) => {
                 //START THE 20 SEC TIMER
                 takedownTimer = setTimeout( function () {
                     takedownTimer = null;
-                    console.log( "lastDJ:" + lastDJ );
+                    console.log( "lastDJ:" + warnedDJ );
                     console.log( "currentDJ:" + roomFunctions.lastdj() );
-                    if ( lastDJ === roomFunctions.lastdj() ) {
-                        userFunctions.removeDJ( lastDJ, 'DJ removed because of a stuck song issue' ); // Remove Saved DJ from last newsong call
+                    if ( warnedDJ === roomFunctions.lastdj() ) {
+                        userFunctions.removeDJ( warnedDJ, 'DJ removed because of a stuck song issue' ); // Remove Saved DJ from last newsong call
                     }
                 }, 30 * 1000 ); // Current DJ has 30 seconds to skip before they are removed
             }, ( length + 10 ) * 1000 ); //Timer expires 10 seconds after the end of the song, if not cleared by a newsong
