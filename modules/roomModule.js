@@ -402,8 +402,8 @@ const roomFunctions = ( bot ) => {
 
         clearSongLimitTimer ( userFunctions, roomFunctions ) {
             //this is for the song length limit
-            if ( this.songLimitTimer !== null ) {
-                clearTimeout( this.songLimitTimer );
+            if ( this.songLimitTimer() !== null ) {
+                clearTimeout( this.songLimitTimer() );
                 this.songLimitTimer = null;
 
                 if ( typeof userFunctions.getUsername( roomFunctions.lastdj() ) !== 'undefined' ) {
