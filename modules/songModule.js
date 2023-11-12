@@ -249,6 +249,8 @@ const songFunctions = ( bot ) => {
                 //START THE 20 SEC TIMER
                 takedownTimer = setTimeout( function () {
                     takedownTimer = null;
+                    console.log( "lastDJ:" + lastDJ );
+                    console.log( "currentDJ:" + roomFunctions.lastdj() );
                     if ( lastDJ === roomFunctions.lastdj() ) {
                         userFunctions.removeDJ( lastDJ, 'DJ removed because of a stuck song issue' ); // Remove Saved DJ from last newsong call
                     }
