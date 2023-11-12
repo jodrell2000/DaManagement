@@ -402,12 +402,12 @@ const roomFunctions = ( bot ) => {
 
         clearSongLimitTimer ( userFunctions, roomFunctions ) {
             console.group( "clearSongLimitTimer" );
-            console.log( "songLimitTimer:" + songLimitTimer );
+            console.log( "songLimitTimer:" + this.songLimitTimer );
             //this is for the song length limit
-            if ( songLimitTimer !== null ) {
+            if ( this.songLimitTimer !== null ) {
                 console.log( "songLimitTimer was not null" );
                 clearTimeout( songLimitTimer );
-                songLimitTimer = null;
+                this.songLimitTimer = null;
 
                 if ( typeof userFunctions.getUsername( roomFunctions.lastdj() ) !== 'undefined' ) {
                     bot.speak( "@" + userFunctions.getUsername( roomFunctions.lastdj() ) + ", Thanks buddy ;-)" );
