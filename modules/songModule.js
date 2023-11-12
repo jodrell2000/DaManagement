@@ -232,7 +232,7 @@ const songFunctions = ( bot ) => {
 
         startSongWatchdog ( data, userFunctions, roomFunctions ) {
             console.group( "startSongWatchdog" );
-            console.log( "here:" + lastDJ );
+            console.log( "here:" );
             const length = data.room.metadata.current_song.metadata.length;
             const lastDJ = roomFunctions.lastdj();
             const nextDJName = userFunctions.getUsername( userFunctions.getNextDJ() );
@@ -244,10 +244,10 @@ const songFunctions = ( bot ) => {
 
                 if ( lastDJ !== undefined ) {
                     if ( typeof userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( lastDJ ) + 1 ] !== 'undefined' ) {
-                        bot.speak( "@" + userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( lastDJ ) + 1 ] + ", you have 20 seconds to skip your stuck song before you are removed" );
+                        bot.speak( "@" + userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( lastDJ ) + 1 ] + ", you have 30 seconds to skip your stuck song before you are removed" );
                         bot.speak( `@${ nextDJName }, make sure you've got something ready ;-)` );
                     } else {
-                        bot.speak( "current dj, you have 20 seconds to skip your stuck song before you are removed" );
+                        bot.speak( "current dj, you have 30 seconds to skip your stuck song before you are removed" );
                     }
                 }
 
@@ -259,7 +259,7 @@ const songFunctions = ( bot ) => {
                     if ( lastDJ === roomFunctions.lastdj() ) {
                         userFunctions.removeDJ( lastDJ, 'DJ removed because of a stuck song issue' ); // Remove Saved DJ from last newsong call
                     }
-                }, 20 * 1000 ); // Current DJ has 20 seconds to skip before they are removed
+                }, 30 * 1000 ); // Current DJ has 30 seconds to skip before they are removed
             }, ( length + 10 ) * 1000 ); //Timer expires 10 seconds after the end of the song, if not cleared by a newsong
             console.groupEnd();
         },
