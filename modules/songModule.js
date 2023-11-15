@@ -230,19 +230,19 @@ const songFunctions = ( bot ) => {
             }
         },
 
-        startSongWatchdog ( data, userFunctions, roomFunctions ) {
+        startSongWatchdog ( data, userFunctions ) {
             const length = data.room.metadata.current_song.metadata.length;
-            const lastDJ = roomFunctions.lastdj();
-            console.log( "lastDJ:" + roomFunctions.lastdj() );
-            console.log( "last DJ Username:" + userFunctions.getUsername( lastDJ ) );
+            const watchedDJ = userFunctions.getCurrentDJID();
+            console.log( "lastDJ:" + userFunctions.getCurrentDJID() );
+            console.log( "last DJ Username:" + userFunctions.getUsername( watchedDJ ) );
 
             // Set a new watchdog timer for the current song.
             curSongWatchdog = setTimeout( function () {
                 curSongWatchdog = null;
 
-                if ( lastDJ !== undefined ) {
-                    if ( userFunctions.userExists( lastDJ ) !== 'undefined' ) {
-                        bot.speak( "@" + userFunctions.getUsername( lastDJ ) + ", you have 20 seconds to skip your stuck song before you are removed" );
+                if ( watchedDJ !== undefined ) {
+                    if ( userFunctions.userExists( watchedDJ ) !== 'undefined' ) {
+                        bot.speak( "@" + userFunctions.getUsername( watchedDJ ) + ", you have 20 seconds to skip your stuck song before you are removed" );
                     } else {
                         bot.speak( "current dj, you have 20 seconds to skip your stuck song before you are removed" );
                     }
@@ -251,7 +251,7 @@ const songFunctions = ( bot ) => {
                 //START THE 20 SEC TIMER
                 takedownTimer = setTimeout( function () {
                     takedownTimer = null;
-                    userFunctions.removeDJ( lastDJ, 'DJ removed because of a stuck song issue' ); // Remove Saved DJ from last newsong call
+                    userFunctions.removeDJ( watchedDJ, 'DJ removed because of a stuck song issue' ); // Remove Saved DJ from last newsong call
                 }, 20 * 1000 ); // Current DJ has 20 seconds to skip before they are removed
             }, ( length + 10 ) * 1000 ); //Timer expires 10 seconds after the end of the song, if not cleared by a newsong
         },

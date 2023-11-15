@@ -582,7 +582,7 @@ const botFunctions = ( bot ) => {
             //clears timers if previously set
             this.clearAllTimers( userFunctions, roomFunctions, songFunctions );
 
-            songFunctions.startSongWatchdog( data, userFunctions, roomFunctions );
+            songFunctions.startSongWatchdog( data, userFunctions );
 
             //this removes the user from the stage if their song is over the length limit and the don't skip
             let theTimeout = 60;
