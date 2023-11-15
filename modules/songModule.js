@@ -233,15 +233,16 @@ const songFunctions = ( bot ) => {
         startSongWatchdog ( data, userFunctions, roomFunctions ) {
             const length = data.room.metadata.current_song.metadata.length;
             const lastDJ = roomFunctions.lastdj();
-            console.log( "lastDJ:" + roomFunctions.lastdj() )
+            console.log( "lastDJ:" + roomFunctions.lastdj() );
+            console.log( "last DJ Username:" + userFunctions.getUsername( lastDJ ) );
 
             // Set a new watchdog timer for the current song.
             curSongWatchdog = setTimeout( function () {
                 curSongWatchdog = null;
 
                 if ( lastDJ !== undefined ) {
-                    if ( typeof userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( lastDJ ) + 1 ] !== 'undefined' ) {
-                        bot.speak( "@" + userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( lastDJ ) + 1 ] + ", you have 20 seconds to skip your stuck song before you are removed" );
+                    if ( userFunctions.userExists( lastDJ ) !== 'undefined' ) {
+                        bot.speak( "@" + userFunctions.getUsername( lastDJ ) + ", you have 20 seconds to skip your stuck song before you are removed" );
                     } else {
                         bot.speak( "current dj, you have 20 seconds to skip your stuck song before you are removed" );
                     }
