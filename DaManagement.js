@@ -135,8 +135,6 @@ bot.on( 'ready', function ( data ) {
 
     //format the musicDefaults.bannedArtists list at runtime
     roomFunctions.formatBannedArtists();
-
-    chatFunctions.botSpeak( "System online...", data );
 } );
 
 //starts up when a new person joins the room
@@ -195,6 +193,8 @@ bot.on( 'roomChanged', function ( data ) {
         // ask users for their regions if we don't have them
         userFunctions.checkUsersHaveRegions( data, chatFunctions );
         userFunctions.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
+
+        chatFunctions.botSpeak( "System online...", data );
     }
     catch ( err ) {
         console.log( 'error', 'unable to join the room the room due to err: ' + err.toString() );
