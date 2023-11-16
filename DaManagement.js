@@ -130,7 +130,7 @@ setInterval( function () {
 //     chatFunctions.repeatWelcomeMessage(userFunctions);
 // },  roomDefaults.howOftenToRepeatMessage * 60 * 1000)
 
-bot.on( 'ready', function () {
+bot.on( 'ready', function ( data ) {
     userFunctions.botStartReset( botFunctions, songFunctions );
 
     //format the musicDefaults.bannedArtists list at runtime
@@ -193,6 +193,8 @@ bot.on( 'roomChanged', function ( data ) {
         // ask users for their regions if we don't have them
         userFunctions.checkUsersHaveRegions( data, chatFunctions );
         userFunctions.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
+
+        chatFunctions.botSpeak( "System online...", data );
     }
     catch ( err ) {
         console.log( 'error', 'unable to join the room the room due to err: ' + err.toString() );
