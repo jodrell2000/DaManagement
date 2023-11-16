@@ -246,7 +246,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
         // ========================================================
 
         userGreeting: function ( data, userID, theUsername, roomFunctions, userFunctions, databaseFunctions ) {
-            if ( theUsername !== "Guest" ) {
+            if ( theUsername !== "Guest" || !userFunctions.isThisTheBot( userID ) ) {
                 const customGreeting = userMessages.userGreetings.find( ( { id } ) => id === userID );
                 let theMessage;
 

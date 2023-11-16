@@ -130,11 +130,13 @@ setInterval( function () {
 //     chatFunctions.repeatWelcomeMessage(userFunctions);
 // },  roomDefaults.howOftenToRepeatMessage * 60 * 1000)
 
-bot.on( 'ready', function () {
+bot.on( 'ready', function ( data ) {
     userFunctions.botStartReset( botFunctions, songFunctions );
 
     //format the musicDefaults.bannedArtists list at runtime
     roomFunctions.formatBannedArtists();
+
+    chatFunctions.botSpeak( "System online...", data );
 } );
 
 //starts up when a new person joins the room
