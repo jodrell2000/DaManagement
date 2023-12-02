@@ -402,9 +402,9 @@ const roomFunctions = ( bot ) => {
 
         clearSongLimitTimer ( userFunctions, roomFunctions ) {
             //this is for the song length limit
-            if ( this.songLimitTimer() !== null ) {
-                clearTimeout( this.songLimitTimer() );
-                this.songLimitTimer = null;
+            if ( roomFunctions.songLimitTimer() !== null ) {
+                clearTimeout( roomFunctions.songLimitTimer() );
+                roomFunctions.songLimitTimer = null;
 
                 if ( typeof userFunctions.getUsername( roomFunctions.lastdj() ) !== 'undefined' ) {
                     bot.speak( "@" + userFunctions.getUsername( roomFunctions.lastdj() ) + ", Thanks buddy ;-)" );

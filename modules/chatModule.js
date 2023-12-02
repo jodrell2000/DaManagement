@@ -274,7 +274,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
                     theMessage = theMessage.replace( "@username", "@" + theUsername );
                     theMessage = theMessage.replace( "@roomName", roomFunctions.roomName() );
 
-                    this.botSpeak( theMessage, null, roomFunctions.greetInPublic(), userID );
+                    this.botSpeak( theMessage, data, roomFunctions.greetInPublic(), userID );
                 }
             }
         },
