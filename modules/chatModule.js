@@ -246,6 +246,10 @@ const chatFunctions = ( bot, roomDefaults ) => {
         // ========================================================
 
         userGreeting: function ( data, userID, theUsername, roomFunctions, userFunctions, databaseFunctions ) {
+            console.group( "userGreeting" );
+            console.log( "userID:" + userID );
+            console.log( "theUsername:" + theUsername );
+            console.log( "isThisTheBot:" + userFunctions.isThisTheBot( userID ) );
             if ( theUsername !== "Guest" && !userFunctions.isThisTheBot( userID ) ) {
                 const customGreeting = userMessages.userGreetings.find( ( { id } ) => id === userID );
                 let theMessage;
@@ -277,6 +281,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
                     this.botSpeak( theMessage, null, roomFunctions.greetInPublic(), userID );
                 }
             }
+            console.groupEnd();
         },
 
         readSongStats: function ( data, songFunctions, botFunctions ) {
