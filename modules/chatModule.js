@@ -251,7 +251,9 @@ const chatFunctions = ( bot, roomDefaults ) => {
             console.log( "theUsername:" + theUsername );
             console.log( "isThisTheBot:" + userFunctions.isThisTheBot( userID ) );
             if ( theUsername !== "Guest" && !userFunctions.isThisTheBot( userID ) ) {
+                console.log( "Inside the if" );
                 const customGreeting = userMessages.userGreetings.find( ( { id } ) => id === userID );
+                console.log( "customGreeting:" + customGreeting );
                 let theMessage;
 
                 if ( customGreeting !== undefined ) {
