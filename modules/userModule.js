@@ -260,8 +260,14 @@ const userFunctions = ( bot ) => {
         },
 
         checkAndStoreUserRegion: function ( data, args, chatFunctions, videoFunctions, databaseFunctions ) {
-            let theRegion = args[ 0 ].toUpperCase();
             let validRegion = true;
+
+            if ( args[ 0 ] === undefined ) {
+                chatFunctions.botSpeak( 'You must give a region code eg, `/myregion GB`. Please use one of the 2 character ISO country codes, https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2', data );
+                return;
+            }
+
+            let theRegion = args[ 0 ].toUpperCase();
             const userID = this.whoSentTheCommand( data );
 
             if ( theRegion.length !== 2 ) {
