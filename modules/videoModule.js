@@ -150,36 +150,36 @@ const videoFunctions = () => {
             regionsWeCareAbout = new Set( musicDefaults.alertRegions );
         },
 
-        // checkVideoRegionAlert: function ( data, videoID, userFunctions, chatFunctions, botFunctions ) {
-        //     if ( botFunctions.checkVideoRegions() ) {
-        //         authorize( CLIENT_SECRET_PATH, TOKEN_PATH, SCOPES )
-        //             .then( ( oauthClient ) => getRegionRestrictions( oauthClient, videoID ) )
-        //             .then( ( restrictions ) => {
-        //                 if ( !restrictions ) {
-        //                     return;
-        //                 }
+        checkVideoRegionAlertOld: function ( data, videoID, userFunctions, chatFunctions, botFunctions ) {
+            if ( botFunctions.checkVideoRegions() ) {
+                authorize( CLIENT_SECRET_PATH, TOKEN_PATH, SCOPES )
+                    .then( ( oauthClient ) => getRegionRestrictions( oauthClient, videoID ) )
+                    .then( ( restrictions ) => {
+                        if ( !restrictions ) {
+                            return;
+                        }
 
-        //                 if ( restrictions.hasOwnProperty( `allowed` ) ) {
-        //                     if ( restrictions.allowed ) {
-        //                         alertIfRegionsNotAllowed( restrictions, userFunctions, ( msg ) =>
-        //                             chatFunctions.botSpeak( msg, data )
-        //                         );
-        //                     }
-        //                     return;
-        //                 }
+                        if ( restrictions.hasOwnProperty( `allowed` ) ) {
+                            if ( restrictions.allowed ) {
+                                alertIfRegionsNotAllowed( restrictions, userFunctions, ( msg ) =>
+                                    chatFunctions.botSpeak( msg, data )
+                                );
+                            }
+                            return;
+                        }
 
-        //                 if ( restrictions.hasOwnProperty( `blocked` ) ) {
-        //                     if ( restrictions.blocked ) {
-        //                         alertIfRegionsBlocked( restrictions, userFunctions, ( msg ) =>
-        //                             chatFunctions.botSpeak( msg, data )
-        //                         );
-        //                     }
-        //                 }
+                        if ( restrictions.hasOwnProperty( `blocked` ) ) {
+                            if ( restrictions.blocked ) {
+                                alertIfRegionsBlocked( restrictions, userFunctions, ( msg ) =>
+                                    chatFunctions.botSpeak( msg, data )
+                                );
+                            }
+                        }
 
-        //             } )
-        //             .catch( err => console.error( `Error occurred in videoFunctions.checkVideoRegionAlert() : ${ err }` ) );
-        //     }
-        // },
+                    } )
+                    .catch( err => console.error( `Error occurred in videoFunctions.checkVideoRegionAlert() : ${ err }` ) );
+            }
+        },
 
 
 
@@ -195,7 +195,12 @@ const videoFunctions = () => {
                     }
 
                     const regionCode = body.items[ 0 ]?.contentDetails?.regionRestriction?.blocked[ 0 ];
+                    console.log( "body:" + JSON.stringify( body ) );
                     console.log( "regionCode:" + JSON.stringify( regionCode ) );
+
+                    if ( !regionCode ) {
+                        return;
+                    }
 
                     if ( regionCode ) {
                         alertIfRegionsBlocked( { blocked: true, blockedRegions: [ regionCode ] }, userFunctions, ( msg ) =>
