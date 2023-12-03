@@ -1,15 +1,6 @@
-// load the googleAPI
-// let { google } = require( "googleapis" );
-// let authorize = require( "./oauth2lib" );
 const request = require( 'request' );
 
-
 let { setIntersection, setDifference } = require( "../modules/setlib" );
-
-// let SCOPES = [ "https://www.googleapis.com/auth/youtube.readonly" ];
-// let CLIENT_SECRET_PATH = "client_secret.json";
-// let TOKEN_DIR = ( process.env.HOME || process.env.HOMEPATH ) + "/.credentials/";
-// let TOKEN_PATH = TOKEN_DIR + "theManagementCredentials.json";
 
 const countryLookup = require( 'country-code-lookup' );
 
@@ -60,26 +51,6 @@ const videoFunctions = () => {
             return countriesString;
         }
     }
-
-    // async function queryVideoDetails ( auth, videoID ) {
-    //     let service = google.youtube( "v3" );
-    //     return service.videos
-    //         .list( {
-    //             auth: auth,
-    //             part: "snippet,contentDetails,statistics",
-    //             id: videoID,
-    //         } )
-    //         .then( ( { data } ) => {
-    //             // console.log( JSON.stringify( data ) );
-    //             return data.items[ 0 ].contentDetails;
-    //         } )
-    //         .catch( err => console.error( `Error occurred in videoFunctions.queryVideoDetails() : ${ err }` ) );
-    // }
-
-    // async function getRegionRestrictions ( auth, videoID ) {
-    //     const { regionRestriction } = await queryVideoDetails( auth, videoID );
-    //     return regionRestriction;
-    // }
 
     return {
         listAlertRegions: function ( data, chatFunctions ) {
