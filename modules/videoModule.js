@@ -194,22 +194,29 @@ const videoFunctions = () => {
                         return;
                     }
 
-                    const regionCode = body.items[ 0 ]?.contentDetails?.regionRestriction?.blocked[ 0 ];
+                    const restrictions = body.items[ 0 ]?.contentDetails?.regionRestriction;
                     console.log( "body:" + JSON.stringify( body ) );
-                    console.log( "regionCode:" + JSON.stringify( regionCode ) );
+                    console.log( "restrictions:" + JSON.stringify( restrictions ) );
 
-                    if ( !regionCode ) {
+                    if ( !restrictions ) {
                         return;
                     }
 
-                    if ( regionCode ) {
-                        alertIfRegionsBlocked( { blocked: true, blockedRegions: [ regionCode ] }, userFunctions, ( msg ) =>
-                            chatFunctions.botSpeak( msg, data )
-                        );
-                    } else {
-                        alertIfRegionsNotAllowed( { allowed: true }, userFunctions, ( msg ) =>
-                            chatFunctions.botSpeak( msg, data )
-                        );
+                    if ( restrictions.hasOwnProperty( `allowed` ) ) {
+                        if ( restrictions.allowed ) {
+                            alertIfRegionsNotAllowed( restrictions, userFunctions, ( msg ) =>
+                                chatFunctions.botSpeak( msg, data )
+                            );
+                        }
+                        return;
+                    }
+
+                    if ( restrictions.hasOwnProperty( `blocked` ) ) {
+                        if ( restrictions.blocked ) {
+                            alertIfRegionsBlocked( restrictions, userFunctions, ( msg ) =>
+                                chatFunctions.botSpeak( msg, data )
+                            );
+                        }
                     }
                 } );
             }
