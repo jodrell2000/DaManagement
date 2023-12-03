@@ -260,9 +260,15 @@ const userFunctions = ( bot ) => {
         },
 
         checkAndStoreUserRegion: function ( data, args, chatFunctions, videoFunctions, databaseFunctions ) {
-            let theRegion = args[ 0 ].toUpperCase();
             let validRegion = true;
             const userID = this.whoSentTheCommand( data );
+
+            if ( args[ 0 ] === undefined ) {
+                chatFunctions.botSpeak( '@' + this.getUsername( userID ) + ' you must give a region code eg, `/myregion GB`. Please use one of the 2 character ISO country codes, https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2', data );
+                return;
+            }
+
+            let theRegion = args[ 0 ].toUpperCase();
 
             if ( theRegion.length !== 2 ) {
                 validRegion = false;
@@ -273,7 +279,7 @@ const userFunctions = ( bot ) => {
             if ( validRegion ) {
                 this.storeUserRegion( data, userID, theRegion, chatFunctions, videoFunctions, databaseFunctions )
             } else {
-                chatFunctions.botSpeak( 'That region is not recognised. Please use one of the 2 character ISO country codes, https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2', data );
+                chatFunctions.botSpeak( '@' + this.getUsername( userID ) + ' that region is not recognised. Please use one of the 2 character ISO country codes, https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2', data );
             }
         },
 
@@ -285,7 +291,7 @@ const userFunctions = ( bot ) => {
             this.deleteUserWantsNoRegion( userID, data, videoFunctions, chatFunctions, databaseFunctions );
             this.storeUserData( userID, "region", region, databaseFunctions );
 
-            chatFunctions.botSpeak( "The region " + countryLookup.byIso( region ).country + " has been added to your user", data );
+            chatFunctions.botSpeak( "@" + this.getUsername( userID ) + " the region " + countryLookup.byIso( region ).country + " has been added to your user", data );
             this.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
         },
 
