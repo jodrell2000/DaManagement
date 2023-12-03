@@ -291,7 +291,7 @@ const userFunctions = ( bot ) => {
             this.deleteUserWantsNoRegion( userID, data, videoFunctions, chatFunctions, databaseFunctions );
             this.storeUserData( userID, "region", region, databaseFunctions );
 
-            chatFunctions.botSpeak( "The region " + countryLookup.byIso( region ).country + " has been added to your user", data );
+            chatFunctions.botSpeak( "@" + this.getUsername( userID ) + " the region " + countryLookup.byIso( region ).country + " has been added to your user", data );
             this.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
         },
 
