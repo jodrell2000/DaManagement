@@ -151,7 +151,6 @@ const videoFunctions = () => {
         },
 
         checkVideoRegionAlert: function ( data, videoID, userFunctions, chatFunctions, botFunctions ) {
-            console.group( "checkVideoRegionAlert" );
             if ( botFunctions.checkVideoRegions() ) {
                 const apiUrl = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${ videoID }&key=${ process.env.YOUTUBE_API_KEY }`;
 
@@ -162,8 +161,6 @@ const videoFunctions = () => {
                     }
 
                     const restrictions = body.items[ 0 ]?.contentDetails?.regionRestriction;
-                    console.log( "body:" + JSON.stringify( body ) );
-                    console.log( "restrictions:" + JSON.stringify( restrictions ) );
 
                     if ( !restrictions ) {
                         return;
@@ -187,7 +184,6 @@ const videoFunctions = () => {
                     }
                 } );
             }
-            console.groupEnd();
         },
 
         // this is pretty horrible, but nothing in here is easy to test
