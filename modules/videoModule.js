@@ -150,34 +150,61 @@ const videoFunctions = () => {
             regionsWeCareAbout = new Set( musicDefaults.alertRegions );
         },
 
+        // checkVideoRegionAlert: function ( data, videoID, userFunctions, chatFunctions, botFunctions ) {
+        //     if ( botFunctions.checkVideoRegions() ) {
+        //         authorize( CLIENT_SECRET_PATH, TOKEN_PATH, SCOPES )
+        //             .then( ( oauthClient ) => getRegionRestrictions( oauthClient, videoID ) )
+        //             .then( ( restrictions ) => {
+        //                 if ( !restrictions ) {
+        //                     return;
+        //                 }
+
+        //                 if ( restrictions.hasOwnProperty( `allowed` ) ) {
+        //                     if ( restrictions.allowed ) {
+        //                         alertIfRegionsNotAllowed( restrictions, userFunctions, ( msg ) =>
+        //                             chatFunctions.botSpeak( msg, data )
+        //                         );
+        //                     }
+        //                     return;
+        //                 }
+
+        //                 if ( restrictions.hasOwnProperty( `blocked` ) ) {
+        //                     if ( restrictions.blocked ) {
+        //                         alertIfRegionsBlocked( restrictions, userFunctions, ( msg ) =>
+        //                             chatFunctions.botSpeak( msg, data )
+        //                         );
+        //                     }
+        //                 }
+
+        //             } )
+        //             .catch( err => console.error( `Error occurred in videoFunctions.checkVideoRegionAlert() : ${ err }` ) );
+        //     }
+        // },
+
+
+
         checkVideoRegionAlert: function ( data, videoID, userFunctions, chatFunctions, botFunctions ) {
             if ( botFunctions.checkVideoRegions() ) {
-                authorize( CLIENT_SECRET_PATH, TOKEN_PATH, SCOPES )
-                    .then( ( oauthClient ) => getRegionRestrictions( oauthClient, videoID ) )
-                    .then( ( restrictions ) => {
-                        if ( !restrictions ) {
-                            return;
-                        }
+                const apiUrl = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${ videoID }&key=${ process.env.YOUTUBE_API_KEY }`;
 
-                        if ( restrictions.hasOwnProperty( `allowed` ) ) {
-                            if ( restrictions.allowed ) {
-                                alertIfRegionsNotAllowed( restrictions, userFunctions, ( msg ) =>
-                                    chatFunctions.botSpeak( msg, data )
-                                );
-                            }
-                            return;
-                        }
+                request( apiUrl, { json: true }, ( error, response, body ) => {
+                    if ( error ) {
+                        console.error( `Error occurred in videoFunctions.checkVideoRegionAlert() : ${ error }` );
+                        return;
+                    }
 
-                        if ( restrictions.hasOwnProperty( `blocked` ) ) {
-                            if ( restrictions.blocked ) {
-                                alertIfRegionsBlocked( restrictions, userFunctions, ( msg ) =>
-                                    chatFunctions.botSpeak( msg, data )
-                                );
-                            }
-                        }
+                    const regionCode = body.items[ 0 ]?.contentDetails?.regionRestriction?.blocked[ 0 ];
 
-                    } )
-                    .catch( err => console.error( `Error occurred in videoFunctions.checkVideoRegionAlert() : ${ err }` ) );
+                    if ( regionCode ) {
+                        alertIfRegionsBlocked( { blocked: true, blockedRegions: [ regionCode ] }, userFunctions, ( msg ) =>
+                            chatFunctions.botSpeak( msg, data )
+                        );
+                    } else {
+                        alertIfRegionsNotAllowed( { allowed: true }, userFunctions, ( msg ) =>
+                            chatFunctions.botSpeak( msg, data )
+                        );
+                    }
+                } );
             }
         },
 
