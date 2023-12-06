@@ -82,7 +82,7 @@ const videoFunctions = () => {
             if ( botFunctions.checkVideoRegions() ) {
                 fetchVideoDetails( videoID, ( error, body ) => {
                     if ( !error ) {
-                        processVideoDetails( data, body, videoID, userFunctions, chatFunctions );
+                        processVideoDetails( data, body, userFunctions, chatFunctions );
                     }
                 } );
             }
