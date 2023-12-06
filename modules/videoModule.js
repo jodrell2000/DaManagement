@@ -35,7 +35,6 @@ const videoFunctions = () => {
     }
 
     function processVideoDetails ( data, body, userFunctions, chatFunctions ) {
-        console.log( `body: ${ JSON.stringify( body ) }` );
         const restrictions = body.items[ 0 ]?.contentDetails?.regionRestriction;
 
         if ( !restrictions ) {
@@ -80,7 +79,6 @@ const videoFunctions = () => {
 
     return {
         checkVideoRegionAlert: function ( data, videoID, userFunctions, chatFunctions, botFunctions ) {
-            console.group( "checkVideoRegionAlert" );
             if ( botFunctions.checkVideoRegions() ) {
                 fetchVideoDetails( videoID, ( error, body ) => {
                     if ( !error ) {
@@ -88,7 +86,6 @@ const videoFunctions = () => {
                     }
                 } );
             }
-            console.groupEnd();
         },
 
         listAlertRegions: function ( data, chatFunctions ) {
