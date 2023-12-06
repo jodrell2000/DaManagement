@@ -163,46 +163,6 @@ const videoFunctions = () => {
             regionsWeCareAbout = new Set( musicDefaults.alertRegions );
         },
 
-        // checkVideoRegionAlertOld: function ( data, videoID, userFunctions, chatFunctions, botFunctions ) {
-        //     console.group( "checkVideoRegionAlert" );
-        //     if ( botFunctions.checkVideoRegions() ) {
-        //         const apiUrl = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${ videoID }&key=${ process.env.YOUTUBE_API_KEY }`;
-
-        //         request( apiUrl, { json: true }, ( error, response, body ) => {
-        //             console.log( "body:" + JSON.stringify( body ) );
-
-        //             if ( error ) {
-        //                 console.error( `Error occurred in videoFunctions.checkVideoRegionAlert() : ${ error }` );
-        //                 return;
-        //             }
-
-        //             const restrictions = body.items[ 0 ]?.contentDetails?.regionRestriction;
-
-        //             if ( !restrictions ) {
-        //                 return;
-        //             }
-
-        //             if ( restrictions.hasOwnProperty( `allowed` ) ) {
-        //                 if ( restrictions.allowed ) {
-        //                     alertIfRegionsNotAllowed( restrictions, userFunctions, ( msg ) =>
-        //                         chatFunctions.botSpeak( msg, data )
-        //                     );
-        //                 }
-        //                 return;
-        //             }
-
-        //             if ( restrictions.hasOwnProperty( `blocked` ) ) {
-        //                 if ( restrictions.blocked ) {
-        //                     alertIfRegionsBlocked( restrictions, userFunctions, ( msg ) =>
-        //                         chatFunctions.botSpeak( msg, data )
-        //                     );
-        //                 }
-        //             }
-        //         } );
-        //     }
-        //     console.groupEnd();
-        // },
-
         // this is pretty horrible, but nothing in here is easy to test
         test_alertIfRegionsNotAllowed: alertIfRegionsNotAllowed,
         test_alertIfRegionsBlocked: alertIfRegionsBlocked,
