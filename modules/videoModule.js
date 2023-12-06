@@ -61,22 +61,28 @@ const videoFunctions = () => {
         },
 
         checkVideoStatus: function ( videoIDs ) {
+            console.group( "checkVideoStatus" );
             return new Promise( ( resolve, reject ) => {
-                let youtubeURL = `https://www.googleapis.com/youtube/v3/videos?id=${ videoIDs }&part=status&key=${ process.env.YOUTUBE_API_KEY }`
+                let youtubeURL = `https://www.googleapis.com/youtube/v3/videos?id=${ videoIDs }&part=status&key=${ process.env.YOUTUBE_API_KEY }`;
+
                 request( youtubeURL, { json: true }, ( error, res, body ) => {
-
+                    console.log( "body:" + JSON.stringify( body ) );
                     if ( error ) {
-                        reject( `Something went wrong. Try again later.` );
+                        reject( `Error making request: ${ error }` );
+                        return;
                     }
 
-                    if ( !body.hasOwnProperty( 'items' ) ) {
-                        reject( `No data returned` );
+                    if ( res.statusCode !== 200 ) {
+                        reject( `HTTP error: ${ res.statusCode }` );
+                        return;
                     }
 
-                    if ( !Array.isArray( body.items ) || !body.items.length ) {
-                        reject( `No data returned` );
+                    if ( !body.hasOwnProperty( 'items' ) || !Array.isArray( body.items ) || !body.items.length ) {
+                        reject( `No data returned from YouTube API` );
+                        return;
                     }
 
+                    console.groupEnd();
                     resolve( body.items );
                 } );
             } );

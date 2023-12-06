@@ -130,7 +130,7 @@ setInterval( function () {
 //     chatFunctions.repeatWelcomeMessage(userFunctions);
 // },  roomDefaults.howOftenToRepeatMessage * 60 * 1000)
 
-bot.on( 'ready', function ( data ) {
+bot.on( 'ready', function () {
     userFunctions.botStartReset( botFunctions, songFunctions );
 
     //format the musicDefaults.bannedArtists list at runtime
