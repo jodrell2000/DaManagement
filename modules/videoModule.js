@@ -34,9 +34,9 @@ const videoFunctions = () => {
         } );
     }
 
-    function processVideoDetails ( data, userFunctions, chatFunctions ) {
-        console.log( `body: ${ JSON.stringify( data ) }` );
-        const restrictions = data.items[ 0 ]?.contentDetails?.regionRestriction;
+    function processVideoDetails ( data, body, userFunctions, chatFunctions ) {
+        console.log( `body: ${ JSON.stringify( body ) }` );
+        const restrictions = body.items[ 0 ]?.contentDetails?.regionRestriction;
 
         if ( !restrictions ) {
             return;
@@ -79,6 +79,18 @@ const videoFunctions = () => {
     }
 
     return {
+        checkVideoRegionAlert: function ( data, videoID, userFunctions, chatFunctions, botFunctions ) {
+            console.group( "checkVideoRegionAlert" );
+            if ( botFunctions.checkVideoRegions() ) {
+                fetchVideoDetails( videoID, ( error, body ) => {
+                    if ( !error ) {
+                        processVideoDetails( data, body, videoID, userFunctions, chatFunctions );
+                    }
+                } );
+            }
+            console.groupEnd();
+        },
+
         listAlertRegions: function ( data, chatFunctions ) {
             const regionsAsArray = Array.from( regionsWeCareAbout );
             let regionReport = `The list of regions that will trigger a blocked alert is currently ` + turnCodesIntoCountries( regionsAsArray );
@@ -151,20 +163,7 @@ const videoFunctions = () => {
             regionsWeCareAbout = new Set( musicDefaults.alertRegions );
         },
 
-        checkVideoRegionAlert: function ( videoID, userFunctions, chatFunctions, botFunctions ) {
-            console.group( "checkVideoRegionAlert" );
-            if ( botFunctions.checkVideoRegions() ) {
-                fetchVideoDetails( videoID, ( error, body ) => {
-                    if ( !error ) {
-                        processVideoDetails( body, userFunctions, chatFunctions );
-                    }
-                } );
-            }
-            console.groupEnd();
-        },
-
-
-        // checkVideoRegionAlert: function ( data, videoID, userFunctions, chatFunctions, botFunctions ) {
+        // checkVideoRegionAlertOld: function ( data, videoID, userFunctions, chatFunctions, botFunctions ) {
         //     console.group( "checkVideoRegionAlert" );
         //     if ( botFunctions.checkVideoRegions() ) {
         //         const apiUrl = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${ videoID }&key=${ process.env.YOUTUBE_API_KEY }`;
