@@ -249,6 +249,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
             console.group( "userGreeting" );
             console.log( "theUsername:" + theUsername );
             console.log( "userID:" + userID );
+            console.log( "isUsersWelcomeTimerActive:" + userFunctions.isUsersWelcomeTimerActive( userID ) );
             console.log( "is bot?:" + JSON.stringify( userFunctions.isThisTheBot( userID ) ) );
             if ( theUsername !== "Guest" && !userFunctions.isThisTheBot( userID ) ) {
                 const customGreeting = userMessages.userGreetings.find( ( { id } ) => id === userID );
