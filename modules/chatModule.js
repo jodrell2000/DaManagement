@@ -9,11 +9,6 @@ const chatFunctions = ( bot, roomDefaults ) => {
 
     return {
         botSpeak: function ( message, data, publicChat, recipient ) {
-            console.group( "botSpeak" );
-            console.log( "message:" + message );
-            console.log( "publicChat:" + publicChat );
-            console.log( "recipient:" + recipient );
-
             let pmCommand;
 
             if ( recipient === undefined && data !== null ) {
@@ -28,7 +23,6 @@ const chatFunctions = ( bot, roomDefaults ) => {
             } else {
                 this.botChat( message );
             }
-            console.groupEnd();
         },
 
         botChat: function ( message ) {
@@ -289,7 +283,10 @@ const chatFunctions = ( bot, roomDefaults ) => {
                     console.log( "roomFunctions.greetInPublic():" + roomFunctions.greetInPublic() );
                     console.log( "userID:" + userID );
 
-                    this.botSpeak( theMessage, data, roomFunctions.greetInPublic(), userID );
+                    // Delay the execution of the greeting
+                    setTimeout( () => {
+                        this.botSpeak( theMessage, data, roomFunctions.greetInPublic(), userID );
+                    }, 5 * 1000 ); // seconds * 1000 to convert to milliseconds
                 }
             }
             console.groupEnd();
