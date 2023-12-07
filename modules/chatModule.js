@@ -246,14 +246,8 @@ const chatFunctions = ( bot, roomDefaults ) => {
         // ========================================================
 
         userGreeting: function ( data, userID, theUsername, roomFunctions, userFunctions, databaseFunctions ) {
-            console.group( "userGreeting" );
-            console.log( "theUsername:" + theUsername );
-            console.log( "userID:" + userID );
-            console.log( "isUsersWelcomeTimerActive:" + userFunctions.isUsersWelcomeTimerActive( userID ) );
-            console.log( "is bot?:" + JSON.stringify( userFunctions.isThisTheBot( userID ) ) );
             if ( theUsername !== "Guest" && !userFunctions.isThisTheBot( userID ) ) {
                 const customGreeting = userMessages.userGreetings.find( ( { id } ) => id === userID );
-                console.log( "customGreeting:" + JSON.stringify( customGreeting ) );
                 let theMessage;
 
                 if ( customGreeting !== undefined ) {
@@ -279,14 +273,11 @@ const chatFunctions = ( bot, roomDefaults ) => {
 
                     theMessage = theMessage.replace( "@username", "@" + theUsername );
                     theMessage = theMessage.replace( "@roomName", roomFunctions.roomName() );
-                    console.log( "theMessage:" + theMessage );
-                    console.log( "roomFunctions.greetInPublic():" + roomFunctions.greetInPublic() );
-                    console.log( "userID:" + userID );
 
                     // Delay the execution of the greeting
                     setTimeout( () => {
                         this.botSpeak( theMessage, data, roomFunctions.greetInPublic(), userID );
-                    }, 5 * 1000 ); // seconds * 1000 to convert to milliseconds
+                    }, 2 * 1000 ); // seconds * 1000 to convert to milliseconds
                 }
             }
             console.groupEnd();
