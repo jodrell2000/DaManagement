@@ -249,7 +249,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
             console.group( "userGreeting" );
             console.log( "theUsername:" + theUsername );
             console.log( "userID:" + userID );
-            console.log( "is bot?:" + userFunctions.isThisTheBot( userID ) );
+            console.log( "is bot?:" + JSON.stringify( userFunctions.isThisTheBot( userID ) ) );
             if ( theUsername !== "Guest" && !userFunctions.isThisTheBot( userID ) ) {
                 const customGreeting = userMessages.userGreetings.find( ( { id } ) => id === userID );
                 console.log( "customGreeting:" + customGreeting );
@@ -278,6 +278,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
 
                     theMessage = theMessage.replace( "@username", "@" + theUsername );
                     theMessage = theMessage.replace( "@roomName", roomFunctions.roomName() );
+                    console.log( "theMessage:" + theMessage );
 
                     this.botSpeak( theMessage, data, roomFunctions.greetInPublic(), userID );
                 }
