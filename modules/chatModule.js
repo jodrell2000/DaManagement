@@ -9,6 +9,11 @@ const chatFunctions = ( bot, roomDefaults ) => {
 
     return {
         botSpeak: function ( message, data, publicChat, recipient ) {
+            console.group( "botSpeak" );
+            console.log( "message:" + message );
+            console.log( "publicChat:" + publicChat );
+            console.log( "recipient:" + recipient );
+
             let pmCommand;
 
             if ( recipient === undefined && data !== null ) {
@@ -23,6 +28,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
             } else {
                 this.botChat( message );
             }
+            console.groupEnd();
         },
 
         botChat: function ( message ) {
