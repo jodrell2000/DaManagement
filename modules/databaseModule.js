@@ -16,6 +16,7 @@ const databaseFunctions = () => {
                 mysql.pool.getConnection( ( ex, connection ) => {
                     if ( ex ) {
                         console.log( "Error: " + ex + query, values );
+                        reject( ex );
                     } else {
                         connection.query( query, values, function ( ex, results, fields ) {
                             connection.release();
@@ -28,7 +29,7 @@ const databaseFunctions = () => {
                         } );
                     }
                 } );
-            } )
+            } );
         },
 
         buildSaveUserQuery: function ( userObject ) {
@@ -80,9 +81,13 @@ const databaseFunctions = () => {
 
         },
 
-        writeUserDataToDatabase: function ( userObjeect ) {
-            const query = this.buildSaveUserQuery( userObjeect );
-            this.runQuery( query );
+        writeUserDataToDatabase: async function ( userObject ) {
+            try {
+                const query = this.buildSaveUserQuery( userObject );
+                await this.runQuery( query );
+            } catch ( error ) {
+                throw new Error( `Error writing user data to database: ${ error.message }` );
+            }
         },
 
         // ========================================================
@@ -119,9 +124,16 @@ const databaseFunctions = () => {
         // ========================================================
 
         storeUserData: function ( userObject ) {
-            const userToSave = this.removeUnsavableDataFromUser( userObject );
-            this.writeUserDataToDisk( userToSave );
-            this.writeUserDataToDatabase( userToSave );
+            return new Promise( ( resolve, reject ) => {
+                try {
+                    const userToSave = this.removeUnsavableDataFromUser( userObject );
+                    this.writeUserDataToDisk( userToSave );
+                    this.writeUserDataToDatabase( userToSave );
+                    resolve( 'User data stored successfully' );
+                } catch ( error ) {
+                    reject( error );
+                }
+            } );
         },
 
         removeUnsavableDataFromUser: function ( userObject ) {
@@ -139,6 +151,18 @@ const databaseFunctions = () => {
             delete editedUser[ "welcomeTimer" ];
 
             return editedUser;
+        },
+
+        // ========================================================
+
+        // ========================================================
+        // RoboCoin Audit Functions
+        // ========================================================
+
+        saveRoboCoinAudit: function ( userID, before, after, numCoins, changeReason ) {
+            const theQuery = "INSERT INTO roboCoinAudit (users_id, before, after, numCoins, changeReason) VALUES (?, ?, ?, ?, ?);";
+            const values = [ userID, before, after, numCoins, changeReason ]
+            return this.runQuery( theQuery, values )
         },
 
         // ========================================================

@@ -265,7 +265,7 @@ bot.on( 'newsong', function ( data ) {
         } )
         .then( () => {
             chatFunctions.botSpeak( "Have 10 RoboCoin as a thank you", data );
-            userFunctions.updateRoboCoins( djID, userFunctions.getRoboCoins( djID ) + 10, databaseFunctions )
+            userFunctions.addRoboCoins( djID, 10, "Played Robo's favourite artist", databaseFunctions );
         } )
         .then( () => {
             botFunctions.chooseNewFavourite( databaseFunctions );

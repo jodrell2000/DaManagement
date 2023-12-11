@@ -134,11 +134,17 @@ const userFunctions = ( bot ) => {
             theUsersList = databaseFunctions.readAllUserDataFromDisk();
         },
 
-        storeUserData: function ( userID, key, value, databaseFunctions ) {
+        storeUserData: async function ( userID, key, value, databaseFunctions ) {
             if ( this.userExists( userID ) && this.getUsername( userID ) !== "Guest" ) {
-                const userPosition = this.getPositionOnUsersList( userID );
-                theUsersList[ userPosition ][ key ] = value;
-                databaseFunctions.storeUserData( theUsersList[ userPosition ] );
+                try {
+                    const userPosition = this.getPositionOnUsersList( userID );
+                    theUsersList[ userPosition ][ key ] = value;
+                    await databaseFunctions.storeUserData( theUsersList[ userPosition ] );
+                    console.log( "User data stored successfully" );
+                } catch ( error ) {
+                    console.error( "Error storing user data:", error.message );
+                    // Handle the error as needed
+                }
             }
         },
 
@@ -2154,31 +2160,80 @@ const userFunctions = ( bot ) => {
         // ========================================================
 
         // ========================================================
-        // Coins Functions
+        // RoboCoin Functions
         // ========================================================
 
         getRoboCoins: function ( userID ) {
-            if ( this.userExists( userID ) ) {
-                let theCoins = theUsersList[ this.getPositionOnUsersList( userID ) ][ 'RoboCoins' ];
-                if ( theCoins === undefined ) {
-                    theCoins = 0;
-                }
+            return new Promise( ( resolve, reject ) => {
+                if ( this.userExists( userID ) ) {
+                    const position = this.getPositionOnUsersList( userID );
+                    let theCoins = theUsersList[ position ][ 'RoboCoins' ];
+                    if ( theCoins === undefined ) {
+                        theCoins = 0;
+                    }
 
-                return theCoins;
+                    resolve( theCoins );
+                } else {
+                    reject( new Error( 'User does not exist' ) );
+                }
+            } );
+        },
+
+        addRoboCoins: async function ( userID, numCoins, changeReason, databaseFunctions ) {
+            const addOperation = ( before, numCoins ) => before + numCoins;
+            await this.processRoboCoins( userID, numCoins, changeReason, addOperation, databaseFunctions );
+        },
+
+        subtractRoboCoins: async function ( userID, numCoins, changeReason, databaseFunctions ) {
+            const subtractOperation = ( before, numCoins ) => before - numCoins;
+            await this.processRoboCoins( userID, numCoins, changeReason, subtractOperation, databaseFunctions );
+        },
+
+        processRoboCoins: async function ( userID, numCoins, changeReason, operation, databaseFunctions ) {
+            try {
+                const before = await this.getRoboCoins( userID );
+                const updatedCoins = operation( before, numCoins );
+                await this.updateRoboCoins( userID, updatedCoins, databaseFunctions );
+                const after = await this.getRoboCoins( userID );
+
+                // Pass positive or negative numCoins to auditRoboCoin based on the type of operation
+                await this.auditRoboCoin( userID, before, after, operation === addOperation ? numCoins : -numCoins, changeReason, databaseFunctions );
+            } catch ( error ) {
+                console.error( `Error in ${ operation.name }:`, error.message );
+                throw error;
             }
         },
 
         updateRoboCoins: function ( userID, coins, databaseFunctions ) {
-            this.storeUserData( userID, "RoboCoins", coins, databaseFunctions );
+            return new Promise( ( resolve, reject ) => {
+                try {
+                    this.storeUserData( userID, "RoboCoins", coins, databaseFunctions );
+                    resolve();
+                } catch ( error ) {
+                    reject( new Error( 'User does not exist' ) );
+                }
+            } );
         },
 
-        readMyRoboCoin: function ( data, chatFunctions ) {
-            const userID = this.whoSentTheCommand( data );
-            const theCoins = this.getRoboCoins( userID );
-            chatFunctions.botSpeak( '@' + this.getUsername( userID ) + " you currently have " + theCoins + " RoboCoins", data );
-
+        auditRoboCoin: function ( userID, before, after, numCoins, changeReason, databaseFunctions ) {
+            try {
+                databaseFunctions.saveRoboCoinAudit( userID, before, after, numCoins, changeReason );
+            } catch ( error ) {
+                console.error( `Error in auditRoboCoin: ${ error.message }` );
+                // Handle the error as needed
+            }
         },
 
+        readMyRoboCoin: async function ( data, chatFunctions ) {
+            try {
+                const userID = this.whoSentTheCommand( data );
+                const theCoins = await this.getRoboCoins( userID );
+                chatFunctions.botSpeak( '@' + this.getUsername( userID ) + " you currently have " + theCoins + " RoboCoins", data );
+            } catch ( error ) {
+                console.error( "Error reading RoboCoins:", error.message );
+                // Handle the error as needed
+            }
+        },
     }
 }
 
