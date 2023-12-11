@@ -2,6 +2,7 @@ let chatDefaults = require( '../defaultSettings/chatDefaults.js' );
 let chatCommandItems = require( '../defaultSettings/chatCommandItems.js' );
 const Storage = require( 'node-storage' );
 const { dirname } = require( 'path' );
+const databaseFunctions = require( './databaseModule.js' );
 
 const generalCommands = {};
 const userCommands = {};
@@ -146,6 +147,15 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.avatar.argumentCount = 1;
     moderatorCommands.avatar.help = "Change Robo's avatar";
     moderatorCommands.avatar.sampleArguments = [ "13" ];
+
+    // #############################################
+    // RoboCoin commands
+    // #############################################
+
+    moderatorCommands.giverc = ( { data, args, userFunctions, chatFunctions, databaseFunctions } ) => { userFunctions.giveRoboCoin( data, args, chatFunctions, databaseFunctions ) }
+    moderatorCommands.giverc.argumentCount = 1;
+    moderatorCommands.giverc.help = "Give someone RoboCoin";
+    moderatorCommands.giverc.sampleArguments = [ "10" ];
 
     // #############################################
     // User commands
@@ -362,6 +372,8 @@ const commandFunctions = ( bot ) => {
 
     moderatorQueueCommands.clearsuperdjs = ( { data, chatFunctions, userFunctions } ) => { userFunctions.clearSuperDJs( data, chatFunctions ) }
     moderatorQueueCommands.clearsuperdjs.help = "Remove all SuperDJs";
+
+
 
     // #############################################
     // Moderator Only Dynamic Chat commands

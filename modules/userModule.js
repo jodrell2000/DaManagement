@@ -2234,6 +2234,20 @@ const userFunctions = ( bot ) => {
                 // Handle the error as needed
             }
         },
+
+        giveRoboCoins: function ( data, args, chatFunctions, databaseFunctions ) {
+            const userID = this.whoSentTheCommand( data );
+
+            if ( args[ 0 ] === undefined ) {
+                chatFunctions.botSpeak( '@' + this.getUsername( userID ) + ' you must give a number of coins to send', data );
+                return;
+            }
+
+            let numCoins = args[ 0 ];
+
+            this.addRoboCoins( userID, numCoins, "testing", databaseFunctions );
+            chatFunctions.botSpeak( "@" + this.getUsername( userID ) + " " + numCoins + " added", data );
+        },
     }
 }
 
