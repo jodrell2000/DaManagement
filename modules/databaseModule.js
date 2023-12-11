@@ -160,7 +160,7 @@ const databaseFunctions = () => {
         // ========================================================
 
         saveRoboCoinAudit: function ( userID, before, after, numCoins, changeReason ) {
-            const theQuery = "INSERT INTO roboCoinAudit (users_id, before, after, numCoins, changeReason) VALUES (?, ?, ?, ?, ?);";
+            const theQuery = "INSERT INTO roboCoinAudit (users_id, beforeChange, afterChange, numCoins, changeReason) VALUES (?, ?, ?, ?, ?);";
             const values = [ userID, before, after, numCoins, changeReason ]
             return this.runQuery( theQuery, values )
         },
