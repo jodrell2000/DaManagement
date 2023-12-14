@@ -129,7 +129,7 @@ process.on( 'unhandledRejection', ( reason, promise ) => {
     // Handle the error or log it as needed
 
     // Terminate the Node.js process
-    process.exit( 1 );
+    // process.exit( 1 );
 } );
 
 //repeats the Welcome message every 15 mins if /messageOn has been used.
