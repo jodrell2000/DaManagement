@@ -11,24 +11,28 @@ const databaseFunctions = () => {
         // Database Functions
         // ========================================================
 
-        runQuery: function ( query, values ) {
+        runQuery: async function ( query, values ) {
+            console.log( `Executing query: ${ query }, with values: ${ JSON.stringify( values ) }` );
             return new Promise( ( resolve, reject ) => {
                 mysql.pool.getConnection( ( ex, connection ) => {
                     if ( ex ) {
-                        console.log( "Error: " + ex + query, values );
-                        reject( ex );
+                        console.error( `Error acquiring connection from pool: ${ ex }` );
+                        reject( new Error( 'Error acquiring connection from pool' ) );
                     } else {
-                        connection.query( query, values, function ( ex, results, fields ) {
+                        connection.query( query, values, ( ex, results, fields ) => {
                             connection.release();
                             if ( ex ) {
-                                console.log( "Error:" + ex + "\n" + query );
-                                reject( ex );
+                                console.error( `Query execution failed: ${ ex }\nQuery: ${ query }` );
+                                reject( new Error( `Query execution failed: ${ ex }` ) );
                             } else {
                                 resolve( results );
                             }
                         } );
                     }
                 } );
+            } ).catch( error => {
+                console.error( 'Promise rejection with reason:', error );
+                throw error; // Rethrow the error for further investigation
             } );
         },
 
@@ -159,18 +163,24 @@ const databaseFunctions = () => {
         // RoboCoin Audit Functions
         // ========================================================
 
-        saveRoboCoinAudit: function ( userID, before, after, numCoins, changeReason ) {
+        saveRoboCoinAudit: async function ( userID, before, after, numCoins, changeReason ) {
             console.group( "saveRoboCoinAudit" );
-            console.log( "userID:" + userID );
-            console.log( "before:" + before );
-            console.log( "after:" + after );
-            console.log( "numCoins:" + numCoins );
-            console.log( "changeReason:" + changeReason );
 
             const theQuery = "INSERT INTO roboCoinAudit (users_id, beforeChange, afterChange, numCoins, changeReason) VALUES (?, ?, ?, ?, ?);";
-            const values = [ userID, before, after, numCoins, changeReason ]
-            console.groupEnd();
-            return this.runQuery( theQuery, values )
+            const values = [ userID, before, after, numCoins, changeReason ];
+
+            try {
+                console.log( "Executing query:", theQuery, "with values:", values );
+                const result = await this.runQuery( theQuery, values );
+                console.log( "Query successful:", result );
+                return result;
+            } catch ( error ) {
+                console.error( 'Error in saveRoboCoinAudit:', error.message );
+                // Handle the error as needed
+                throw error; // Rethrow the error if necessary
+            } finally {
+                console.groupEnd();
+            }
         },
 
         // ========================================================

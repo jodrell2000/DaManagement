@@ -124,6 +124,13 @@ setInterval( function () {
     chatFunctions.eventMessageIterator( botFunctions, userFunctions );
 }, roomDefaults.eventMessageRepeatTime * 60 * 1000 ); //repeats check
 
+process.on( 'unhandledRejection', ( reason, promise ) => {
+    console.error( 'Unhandled Rejection at:', promise, 'reason:', reason );
+    // Handle the error or log it as needed
+
+    // Terminate the Node.js process
+    process.exit( 1 );
+} );
 
 //repeats the Welcome message every 15 mins if /messageOn has been used.
 // setInterval( function() {

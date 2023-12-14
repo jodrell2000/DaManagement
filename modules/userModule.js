@@ -2272,16 +2272,16 @@ const userFunctions = ( bot ) => {
 
         auditRoboCoin: async function ( userID, before, after, numCoins, changeReason, databaseFunctions ) {
             console.group( "auditRoboCoin" );
-            databaseFunctions.saveRoboCoinAudit( userID, before, after, numCoins, changeReason )
-                .then( results => {
-                    // Handle successful query results
-                    console.log( 'Query successful:', results );
-                } )
-                .catch( error => {
-                    // Handle query error
-                    console.error( 'Query failed:', error );
-                } );
-            console.groupEnd();
+
+            try {
+                const results = await databaseFunctions.saveRoboCoinAudit( userID, before, after, numCoins, changeReason );
+                console.log( 'Query successful:', results );
+            } catch ( error ) {
+                console.error( 'Query failed:', error );
+                // Handle the error as needed
+            } finally {
+                console.groupEnd();
+            }
         },
 
         readMyRoboCoin: async function ( data, chatFunctions ) {
@@ -2295,47 +2295,56 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        giveRoboCoin: async function ( data, args, chatFunctions, databaseFunctions ) {
+        giveRoboCoin: function ( data, args, chatFunctions, databaseFunctions ) {
             console.group( "giveRoboCoin" );
-            const sendingUserID = this.whoSentTheCommand( data );
 
-            const numCoins = parseInt( args[ 0 ], 10 );
-            if ( numCoins === undefined || isNaN( numCoins ) ) {
-                chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + ' you must give a number of coins to send, eg. 10', data );
-                return;
-            }
+            return new Promise( async ( resolve, reject ) => {
+                const sendingUserID = this.whoSentTheCommand( data );
 
-            const receivingUserID = this.getUserIDFromUsername( this.returnUsernameFromMessageAfterArguments( data.text ) );
-            if ( args[ 1 ] === undefined ) {
-                chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + ' you must give the name of the user to send RoboCoins to', data );
-                return;
-            }
-            if ( receivingUserID === undefined ) {
-                chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + " I can't find that username", data );
-                return;
-            }
+                const numCoins = parseInt( args[ 0 ], 10 );
+                if ( numCoins === undefined || isNaN( numCoins ) ) {
+                    chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + ' you must give a number of coins to send, eg. 10', data );
+                    reject( 'Invalid number of coins' );
+                    return;
+                }
 
-            if ( !this.canUserAffordToSpendThisMuch( sendingUserID, numCoins ) ) {
-                chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + " you can't afford that much", data );
-                return;
-            }
+                const receivingUserID = this.getUserIDFromUsername( this.returnUsernameFromMessageAfterArguments( data.text ) );
+                if ( args[ 1 ] === undefined ) {
+                    chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + ' you must give the name of the user to send RoboCoins to', data );
+                    reject( 'No receiving user specified' );
+                    return;
+                }
+                if ( receivingUserID === undefined ) {
+                    chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + " I can't find that username", data );
+                    reject( 'User not found' );
+                    return;
+                }
 
+                if ( !this.canUserAffordToSpendThisMuch( sendingUserID, numCoins ) ) {
+                    chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + " you can't afford that much", data );
+                    reject( 'Insufficient funds' );
+                    return;
+                }
 
-            console.log( "sendingUserID:" + sendingUserID );
-            console.log( "receivingUserID:" + receivingUserID );
-            console.log( "numCoins:" + numCoins );
+                console.log( "sendingUserID:" + sendingUserID );
+                console.log( "receivingUserID:" + receivingUserID );
+                console.log( "numCoins:" + numCoins );
 
-            try {
-                // Use await to ensure that the operations happen in order
-                await this.subtractRoboCoins( sendingUserID, numCoins, "testing", databaseFunctions );
-                await this.addRoboCoins( receivingUserID, numCoins, "testing", databaseFunctions );
-                chatFunctions.botSpeak( "@" + this.getUsername( sendingUserID ) + " gave " + numCoins + " to @" + this.getUsername( receivingUserID ), data );
-            } catch ( error ) {
-                console.error( 'Error in giveRoboCoin:', error.message );
-                // Handle the error as needed
-                chatFunctions.botSpeak( "Error in processing the request", data );
-            }
-            console.groupEnd();
+                try {
+                    // Use await to ensure that the operations happen in order
+                    await this.subtractRoboCoins( sendingUserID, numCoins, "testing", databaseFunctions );
+                    await this.addRoboCoins( receivingUserID, numCoins, "testing", databaseFunctions );
+                    chatFunctions.botSpeak( "@" + this.getUsername( sendingUserID ) + " gave " + numCoins + " to @" + this.getUsername( receivingUserID ), data );
+                    resolve();
+                } catch ( error ) {
+                    console.error( 'Error in giveRoboCoin:', error.message );
+                    // Handle the error as needed
+                    chatFunctions.botSpeak( "Error in processing the request", data );
+                    reject( error.message );
+                } finally {
+                    console.groupEnd();
+                }
+            } );
         },
     }
 }
