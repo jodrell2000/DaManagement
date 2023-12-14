@@ -2199,12 +2199,15 @@ const userFunctions = ( bot ) => {
             } );
         },
 
-        canUserAffordToSpendThisMuch: function ( userID, numCoins ) {
+        canUserAffordToSpendThisMuch: async function ( userID, numCoins ) {
             return new Promise( ( resolve, reject ) => {
-                if ( this.getRoboCoins( userID ) >= numCoins ) {
+                const userRoboCoins = this.getRoboCoins( userID );
+
+                // Assuming getRoboCoins returns a numeric value synchronously
+                if ( userRoboCoins >= numCoins ) {
                     resolve( true );
                 } else {
-                    reject( false )
+                    reject( false );
                 }
             } );
         },
@@ -2320,17 +2323,18 @@ const userFunctions = ( bot ) => {
                     return;
                 }
 
-                if ( !this.canUserAffordToSpendThisMuch( sendingUserID, numCoins ) ) {
-                    chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + " you can't afford that much", data );
-                    reject( 'Insufficient funds' );
-                    return;
-                }
-
-                console.log( "sendingUserID:" + sendingUserID );
-                console.log( "receivingUserID:" + receivingUserID );
-                console.log( "numCoins:" + numCoins );
-
                 try {
+                    const userCanAfford = await this.canUserAffordToSpendThisMuch( sendingUserID, numCoins );
+                    if ( !userCanAfford ) {
+                        chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + " you can't afford that much", data );
+                        // Reject with an error message
+                        throw new Error( 'Insufficient funds' );
+                    }
+
+                    console.log( "sendingUserID:" + sendingUserID );
+                    console.log( "receivingUserID:" + receivingUserID );
+                    console.log( "numCoins:" + numCoins );
+
                     // Use await to ensure that the operations happen in order
                     await this.subtractRoboCoins( sendingUserID, numCoins, "testing", databaseFunctions );
                     await this.addRoboCoins( receivingUserID, numCoins, "testing", databaseFunctions );
