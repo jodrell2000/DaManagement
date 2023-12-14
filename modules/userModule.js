@@ -2311,8 +2311,8 @@ const userFunctions = ( bot ) => {
 
                         // Use Promise.all to ensure that the operations happen in parallel
                         return Promise.all( [
-                            this.subtractRoboCoins( sendingUserID, numCoins, "testing", databaseFunctions ),
-                            this.addRoboCoins( receivingUserID, numCoins, "testing", databaseFunctions ),
+                            this.subtractRoboCoins( sendingUserID, numCoins, "giveRoboCoin to " + this.getUsername( receivingUserID ), databaseFunctions ),
+                            this.addRoboCoins( receivingUserID, numCoins, "giveRoboCoin from " + this.getUsername( sendingUserID ), databaseFunctions ),
                         ] );
                     } )
                     .then( () => {
