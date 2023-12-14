@@ -61,7 +61,7 @@ const videoFunctions = videoModule( bot );
 const documentationFunctions = documentationModule();
 const databaseFunctions = databaseModule();
 const dateFunctions = dateModule();
-const mlFunctions = mlModule();
+// const mlFunctions = mlModule();
 
 // do something when the bot disconnects?
 // eslint-disable-next-line no-unused-vars
@@ -123,7 +123,6 @@ setInterval( function () { roomFunctions.clearDecksForVIPs( userFunctions, authM
 setInterval( function () {
     chatFunctions.eventMessageIterator( botFunctions, userFunctions );
 }, roomDefaults.eventMessageRepeatTime * 60 * 1000 ); //repeats check
-
 
 //repeats the Welcome message every 15 mins if /messageOn has been used.
 // setInterval( function() {
@@ -265,7 +264,7 @@ bot.on( 'newsong', function ( data ) {
         } )
         .then( () => {
             chatFunctions.botSpeak( "Have 10 RoboCoin as a thank you", data );
-            userFunctions.updateRoboCoins( djID, userFunctions.getRoboCoins( djID ) + 10, databaseFunctions )
+            userFunctions.addRoboCoins( djID, 10, "Played Robo's favourite artist", databaseFunctions );
         } )
         .then( () => {
             botFunctions.chooseNewFavourite( databaseFunctions );
@@ -364,7 +363,8 @@ bot.on( 'speak', function ( data ) {
     userFunctions.updateUserLastSpoke( theUserID, databaseFunctions ); //update the afk position of the speaker
 
     if ( commandFunctions.wasThisACommand( data ) ) {
-        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions );
+        // commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions );
+        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions );
     }
 
     //checks to see if someone is trying to speak to an afk person or not.
@@ -381,7 +381,8 @@ bot.on( 'speak', function ( data ) {
 //checks when the bot recieves a pm
 bot.on( 'pmmed', function ( data ) {
     if ( commandFunctions.wasThisACommand( data ) ) {
-        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions );
+        // commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions );
+        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions );
     }
 } );
 
