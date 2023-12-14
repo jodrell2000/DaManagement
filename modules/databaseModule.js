@@ -12,7 +12,6 @@ const databaseFunctions = () => {
         // ========================================================
 
         runQuery: async function ( query, values ) {
-            console.log( `Executing query: ${ query }, with values: ${ JSON.stringify( values ) }` );
             return new Promise( ( resolve, reject ) => {
                 mysql.pool.getConnection( ( ex, connection ) => {
                     if ( ex ) {
@@ -164,15 +163,11 @@ const databaseFunctions = () => {
         // ========================================================
 
         saveRoboCoinAudit: async function ( userID, before, after, numCoins, changeReason ) {
-            console.group( "saveRoboCoinAudit" );
-
             const theQuery = "INSERT INTO roboCoinAudit (users_id, beforeChange, afterChange, numCoins, changeReason) VALUES (?, ?, ?, ?, ?);";
             const values = [ userID, before, after, numCoins, changeReason ];
 
             try {
-                console.log( "Executing query:", theQuery, "with values:", values );
                 const result = await this.runQuery( theQuery, values );
-                console.log( "Query successful:", result );
                 return result;
             } catch ( error ) {
                 console.error( 'Error in saveRoboCoinAudit:', error.message );
@@ -201,9 +196,9 @@ const databaseFunctions = () => {
                                     return this.setTrackLength( result.insertId - 1 );
                                 } )
                         } )
-                        .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
+                        .catch( ( ex ) => { console.error( "Something went wrong: " + ex ); } );
                 } )
-                .catch( ( ex ) => { console.log( "Something went wrong: " + ex ); } );
+                .catch( ( ex ) => { console.error( "Something went wrong: " + ex ); } );
         },
 
         setTrackLength: function ( trackID ) {
@@ -258,7 +253,7 @@ const databaseFunctions = () => {
                     const values = [ songFunctions.previousUpVotes(), songFunctions.previousDownVotes(), songFunctions.previousSnags(), theID ];
                     return this.runQuery( query, values )
                 } )
-                .catch( ( ex ) => { console.log( "Something went wrong saving the song stats: .then( ( theID ) " + ex ); } );
+                .catch( ( ex ) => { console.error( "Something went wrong saving the song stats: .then( ( theID ) " + ex ); } );
         },
 
         getLastSongID: function ( theArtist, theTrack ) {
@@ -269,8 +264,8 @@ const databaseFunctions = () => {
                     if ( result.length !== 0 ) {
                         return result[ 0 ][ 'theID' ];
                     } else {
-                        console.log( "We couldn't find the last track in the DB?!?" );
-                        console.log( "Track: " + theTrack + " by: " + theArtist );
+                        console.error( "We couldn't find the last track in the DB?!?" );
+                        console.error( "Track: " + theTrack + " by: " + theArtist );
                     }
                 } )
         },
@@ -295,7 +290,7 @@ const databaseFunctions = () => {
                             return theLength;
                         } )
                 } )
-                .catch( ( ex ) => { console.log( "Something went wrong calculating the track length: " + ex ); } );
+                .catch( ( ex ) => { console.error( "Something went wrong calculating the track length: " + ex ); } );
         },
 
         getTrackPlayedTime: function ( trackID ) {
@@ -307,7 +302,7 @@ const databaseFunctions = () => {
                         return result[ 0 ][ 'timestampPlayed' ];
                     }
                 } )
-                .catch( ( ex ) => { console.log( "Something went wrong getting the track played time: " + ex ); } );
+                .catch( ( ex ) => { console.error( "Something went wrong getting the track played time: " + ex ); } );
         },
 
         // ========================================================
@@ -415,11 +410,11 @@ const databaseFunctions = () => {
                                     const values = [ commandCount + 1, commandID, trackID ];
                                     this.runQuery( query, values )
                                 } )
-                                .catch( ( ex ) => { console.log( "Something went wrong saving the extended stats: " + ex ); } );
+                                .catch( ( ex ) => { console.error( "Something went wrong saving the extended stats: " + ex ); } );
                         } )
-                        .catch( ( ex ) => { console.log( "Something went wrong finding the CommandID: " + ex ); } );
+                        .catch( ( ex ) => { console.error( "Something went wrong finding the CommandID: " + ex ); } );
                 } )
-                .catch( ( ex ) => { console.log( "Something went wrong getting the current Command count: " + ex ); } );
+                .catch( ( ex ) => { console.error( "Something went wrong getting the current Command count: " + ex ); } );
         },
 
         getCommandID: function ( theCommand ) {
