@@ -129,7 +129,7 @@ const databaseFunctions = () => {
                     const userToSave = this.removeUnsavableDataFromUser( userObject );
                     this.writeUserDataToDisk( userToSave );
                     this.writeUserDataToDatabase( userToSave );
-                    resolve( 'User data stored successfully' );
+                    resolve();
                 } catch ( error ) {
                     reject( error );
                 }
@@ -160,8 +160,16 @@ const databaseFunctions = () => {
         // ========================================================
 
         saveRoboCoinAudit: function ( userID, before, after, numCoins, changeReason ) {
+            console.group( "saveRoboCoinAudit" );
+            console.log( "userID:" + userID );
+            console.log( "before:" + before );
+            console.log( "after:" + after );
+            console.log( "numCoins:" + numCoins );
+            console.log( "changeReason:" + changeReason );
+
             const theQuery = "INSERT INTO roboCoinAudit (users_id, beforeChange, afterChange, numCoins, changeReason) VALUES (?, ?, ?, ?, ?);";
             const values = [ userID, before, after, numCoins, changeReason ]
+            console.groupEnd();
             return this.runQuery( theQuery, values )
         },
 

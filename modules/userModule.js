@@ -43,6 +43,10 @@ let djIdleLimit = roomDefaults.djIdleLimitThresholds[ 0 ]; // how long can DJs b
 let idleFirstWarningTime = roomDefaults.djIdleLimitThresholds[ 1 ];
 let idleSecondWarningTime = roomDefaults.djIdleLimitThresholds[ 2 ];
 
+const addRCOperation = ( before, coins ) => before + coins;
+const subtractRCOperation = ( before, coins ) => before - coins;
+
+
 const userFunctions = ( bot ) => {
 
     function formatSeconds ( seconds ) {
@@ -140,7 +144,6 @@ const userFunctions = ( bot ) => {
                     const userPosition = this.getPositionOnUsersList( userID );
                     theUsersList[ userPosition ][ key ] = value;
                     await databaseFunctions.storeUserData( theUsersList[ userPosition ] );
-                    console.log( "User data stored successfully" );
                 } catch ( error ) {
                     console.error( "Error storing user data:", error.message );
                     // Handle the error as needed
@@ -2160,6 +2163,23 @@ const userFunctions = ( bot ) => {
         // ========================================================
 
         // ========================================================
+        // Username Functions
+        // ========================================================
+
+        returnUsernameFromMessageAfterArguments: function ( theMessage ) {
+            const regex = /^\/giverc (\d+) (.+)$/;
+
+            // Use the regular expression to match the message
+            const match = theMessage.match( regex );
+
+            // If there is a match, return the username (captured in the second group)
+            // Otherwise, return null or an empty string based on your preference
+            return match ? match[ 2 ] : null;
+        },
+
+        // ========================================================
+
+        // ========================================================
         // RoboCoin Functions
         // ========================================================
 
@@ -2167,7 +2187,7 @@ const userFunctions = ( bot ) => {
             return new Promise( ( resolve, reject ) => {
                 if ( this.userExists( userID ) ) {
                     const position = this.getPositionOnUsersList( userID );
-                    let theCoins = theUsersList[ position ][ 'RoboCoins' ];
+                    let theCoins = parseInt( theUsersList[ position ][ 'RoboCoins' ], 10 );
                     if ( theCoins === undefined ) {
                         theCoins = 0;
                     }
@@ -2179,32 +2199,66 @@ const userFunctions = ( bot ) => {
             } );
         },
 
+        canUserAffordToSpendThisMuch: function ( userID, numCoins ) {
+            return new Promise( ( resolve, reject ) => {
+                if ( this.getRoboCoins( userID ) >= numCoins ) {
+                    resolve( true );
+                } else {
+                    reject( false )
+                }
+            } );
+        },
+
         addRoboCoins: async function ( userID, numCoins, changeReason, databaseFunctions ) {
-            const addOperation = ( before, numCoins ) => before + numCoins;
-            await this.processRoboCoins( userID, numCoins, changeReason, addOperation, databaseFunctions );
+            console.group( "addRoboCoins" );
+            try {
+                const coins = parseInt( numCoins, 10 );
+                await this.processRoboCoins( userID, coins, changeReason, addRCOperation, databaseFunctions );
+            } catch ( error ) {
+                console.error( 'Error in addRoboCoins:', error.message );
+                // Handle the error as needed
+            } finally {
+                console.groupEnd();
+            }
         },
 
         subtractRoboCoins: async function ( userID, numCoins, changeReason, databaseFunctions ) {
-            const subtractOperation = ( before, numCoins ) => before - numCoins;
-            await this.processRoboCoins( userID, numCoins, changeReason, subtractOperation, databaseFunctions );
+            console.group( "subtractRoboCoins" );
+            try {
+                const coins = parseInt( numCoins, 10 );
+                await this.processRoboCoins( userID, coins, changeReason, subtractRCOperation, databaseFunctions );
+            } catch ( error ) {
+                console.error( 'Error in subtractRoboCoins:', error.message );
+                // Handle the error as needed
+            } finally {
+                console.groupEnd();
+            }
         },
 
         processRoboCoins: async function ( userID, numCoins, changeReason, operation, databaseFunctions ) {
+            console.group( "processRoboCoins" );
             try {
                 const before = await this.getRoboCoins( userID );
+                console.log( "before:" + before );
                 const updatedCoins = operation( before, numCoins );
+                console.log( "updatedCoins:" + updatedCoins );
                 await this.updateRoboCoins( userID, updatedCoins, databaseFunctions );
                 const after = await this.getRoboCoins( userID );
+                console.log( "after:" + after );
 
                 // Pass positive or negative numCoins to auditRoboCoin based on the type of operation
-                await this.auditRoboCoin( userID, before, after, operation === addOperation ? numCoins : -numCoins, changeReason, databaseFunctions );
+                await this.auditRoboCoin( userID, before, after, operation === addRCOperation ? numCoins : -numCoins, changeReason, databaseFunctions );
             } catch ( error ) {
                 console.error( `Error in ${ operation.name }:`, error.message );
                 throw error;
             }
+            console.groupEnd();
         },
 
         updateRoboCoins: function ( userID, coins, databaseFunctions ) {
+            console.group( "updateRoboCoins" );
+            console.log( "userID:" + userID );
+            console.log( "coins:" + coins );
             return new Promise( ( resolve, reject ) => {
                 try {
                     this.storeUserData( userID, "RoboCoins", coins, databaseFunctions );
@@ -2212,16 +2266,22 @@ const userFunctions = ( bot ) => {
                 } catch ( error ) {
                     reject( new Error( 'User does not exist' ) );
                 }
+                console.groupEnd();
             } );
         },
 
-        auditRoboCoin: function ( userID, before, after, numCoins, changeReason, databaseFunctions ) {
-            try {
-                databaseFunctions.saveRoboCoinAudit( userID, before, after, numCoins, changeReason );
-            } catch ( error ) {
-                console.error( `Error in auditRoboCoin: ${ error.message }` );
-                // Handle the error as needed
-            }
+        auditRoboCoin: async function ( userID, before, after, numCoins, changeReason, databaseFunctions ) {
+            console.group( "auditRoboCoin" );
+            databaseFunctions.saveRoboCoinAudit( userID, before, after, numCoins, changeReason )
+                .then( results => {
+                    // Handle successful query results
+                    console.log( 'Query successful:', results );
+                } )
+                .catch( error => {
+                    // Handle query error
+                    console.error( 'Query failed:', error );
+                } );
+            console.groupEnd();
         },
 
         readMyRoboCoin: async function ( data, chatFunctions ) {
@@ -2235,18 +2295,47 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        giveRoboCoins: function ( data, args, chatFunctions, databaseFunctions ) {
-            const userID = this.whoSentTheCommand( data );
+        giveRoboCoin: async function ( data, args, chatFunctions, databaseFunctions ) {
+            console.group( "giveRoboCoin" );
+            const sendingUserID = this.whoSentTheCommand( data );
 
-            if ( args[ 0 ] === undefined ) {
-                chatFunctions.botSpeak( '@' + this.getUsername( userID ) + ' you must give a number of coins to send', data );
+            const numCoins = parseInt( args[ 0 ], 10 );
+            if ( numCoins === undefined || isNaN( numCoins ) ) {
+                chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + ' you must give a number of coins to send, eg. 10', data );
                 return;
             }
 
-            let numCoins = args[ 0 ];
+            const receivingUserID = this.getUserIDFromUsername( this.returnUsernameFromMessageAfterArguments( data.text ) );
+            if ( args[ 1 ] === undefined ) {
+                chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + ' you must give the name of the user to send RoboCoins to', data );
+                return;
+            }
+            if ( receivingUserID === undefined ) {
+                chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + " I can't find that username", data );
+                return;
+            }
 
-            this.addRoboCoins( userID, numCoins, "testing", databaseFunctions );
-            chatFunctions.botSpeak( "@" + this.getUsername( userID ) + " " + numCoins + " added", data );
+            if ( !this.canUserAffordToSpendThisMuch( sendingUserID, numCoins ) ) {
+                chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + " you can't afford that much", data );
+                return;
+            }
+
+
+            console.log( "sendingUserID:" + sendingUserID );
+            console.log( "receivingUserID:" + receivingUserID );
+            console.log( "numCoins:" + numCoins );
+
+            try {
+                // Use await to ensure that the operations happen in order
+                await this.subtractRoboCoins( sendingUserID, numCoins, "testing", databaseFunctions );
+                await this.addRoboCoins( receivingUserID, numCoins, "testing", databaseFunctions );
+                chatFunctions.botSpeak( "@" + this.getUsername( sendingUserID ) + " gave " + numCoins + " to @" + this.getUsername( receivingUserID ), data );
+            } catch ( error ) {
+                console.error( 'Error in giveRoboCoin:', error.message );
+                // Handle the error as needed
+                chatFunctions.botSpeak( "Error in processing the request", data );
+            }
+            console.groupEnd();
         },
     }
 }

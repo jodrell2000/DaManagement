@@ -153,9 +153,9 @@ const commandFunctions = ( bot ) => {
     // #############################################
 
     moderatorCommands.giverc = ( { data, args, userFunctions, chatFunctions, databaseFunctions } ) => { userFunctions.giveRoboCoin( data, args, chatFunctions, databaseFunctions ) }
-    moderatorCommands.giverc.argumentCount = 1;
+    moderatorCommands.giverc.argumentCount = 2;
     moderatorCommands.giverc.help = "Give someone RoboCoin";
-    moderatorCommands.giverc.sampleArguments = [ "10" ];
+    moderatorCommands.giverc.sampleArguments = [ "jodrell", "10" ];
 
     // #############################################
     // User commands
@@ -406,7 +406,7 @@ const commandFunctions = ( bot ) => {
 
     moderatorChatCommands.removechatcommandpicture = ( { data, chatFunctions, documentationFunctions } ) => { removeChatCommandPicture( data, chatFunctions, documentationFunctions ); }
     moderatorChatCommands.removechatcommandpicture.argumentCount = 2;
-    moderatorChatCommands.removechatcommandpicture.help = "Remove a pitcute from a dynamic chat command. The URL must match exactly and be surrounded by double quotes";
+    moderatorChatCommands.removechatcommandpicture.help = "Remove a picture from a dynamic chat command. The URL must match exactly and be surrounded by double quotes";
     moderatorChatCommands.removechatcommandpicture.sampleArguments = [ "command", "http://url.link/image.gif" ];
 
     // #############################
@@ -579,7 +579,8 @@ const commandFunctions = ( bot ) => {
             }
         },
 
-        parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions ) {
+        // parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions ) {
+        parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions ) {
             let senderID;
 
             if ( data.command === "pmmed" ) {
@@ -606,7 +607,7 @@ const commandFunctions = ( bot ) => {
                     documentationFunctions,
                     databaseFunctions,
                     dateFunctions,
-                    mlFunctions,
+                    // mlFunctions,
                 } );
             } else {
                 chatFunctions.botSpeak( "Sorry, that's not a command I recognise. Try " + chatDefaults.commandIdentifier + "list to find out more.", data );
@@ -646,7 +647,7 @@ const commandFunctions = ( bot ) => {
             return true;
         },
 
-        parseChatManagementCommandElements: function ( theMessage ) {
+        parseCommandElements: function ( theMessage ) {
             const splitData = [];
             const regex = new RegExp( '"[^"]+"|[\\S]+', 'g' );
             theMessage.match( regex ).forEach( element => {
@@ -785,7 +786,7 @@ const addChatCommandWithMessage = ( data, chatFunctions, documentationFunctions 
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
 
-    const splitData = commandModule.parseChatManagementCommandElements( data.text );
+    const splitData = commandModule.parseCommandElements( data.text );
     const newCommand = splitData[ 1 ];
     const commandMessage = splitData[ 2 ];
 
@@ -810,7 +811,7 @@ const addMessageToChatCommand = ( data, chatFunctions, documentationFunctions ) 
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
 
-    const splitData = commandModule.parseChatManagementCommandElements( data.text );
+    const splitData = commandModule.parseCommandElements( data.text );
     const theCommand = splitData[ 1 ];
     const theMessage = splitData[ 2 ];
 
@@ -838,7 +839,7 @@ const addPictureToChatCommand = ( data, chatFunctions, documentationFunctions ) 
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
 
-    const splitData = commandModule.parseChatManagementCommandElements( data.text );
+    const splitData = commandModule.parseCommandElements( data.text );
     const theCommand = splitData[ 1 ];
     const thePicture = splitData[ 2 ];
 
@@ -869,7 +870,7 @@ const removeChatCommand = ( data, chatFunctions, documentationFunctions ) => {
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
 
-    const splitData = commandModule.parseChatManagementCommandElements( data.text );
+    const splitData = commandModule.parseCommandElements( data.text );
     const theCommand = splitData[ 1 ];
 
     if ( !commandModule.isChatCommand( theCommand ) ) {
@@ -888,7 +889,7 @@ const removeChatCommandMessage = ( data, chatFunctions, documentationFunctions )
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
 
-    const splitData = commandModule.parseChatManagementCommandElements( data.text );
+    const splitData = commandModule.parseCommandElements( data.text );
     const theCommand = splitData[ 1 ];
     const theMessage = splitData[ 2 ];
 
@@ -921,7 +922,7 @@ const removeChatCommandPicture = ( data, chatFunctions, documentationFunctions )
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
 
-    const splitData = commandModule.parseChatManagementCommandElements( data.text );
+    const splitData = commandModule.parseCommandElements( data.text );
     const theCommand = splitData[ 1 ];
     const thePicture = splitData[ 2 ];
 
