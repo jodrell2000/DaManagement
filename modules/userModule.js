@@ -2259,13 +2259,49 @@ const userFunctions = ( bot ) => {
 
         auditRoboCoin: async function ( userID, before, after, numCoins, changeReason, databaseFunctions ) {
             try {
-                const results = await databaseFunctions.saveRoboCoinAudit( userID, before, after, numCoins, changeReason );
+                await databaseFunctions.saveRoboCoinAudit( userID, before, after, numCoins, changeReason );
             } catch ( error ) {
                 console.error( 'Query failed:', error );
             } finally {
                 console.groupEnd();
             }
         },
+
+        validateNumCoins: async function ( numCoins, sendingUserID, chatFunctions, reject, data ) {
+            if ( numCoins === undefined || isNaN( numCoins ) ) {
+                chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + ' you must give a number of coins to send, eg. 10', data );
+                reject( 'Invalid number of coins' );
+                return false;
+            }
+            return true;
+        },
+
+        validateReceivingUser: async function ( args, receivingUserID, sendingUserID, chatFunctions, reject, data ) {
+            if ( args[ 1 ] === undefined ) {
+                chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + ' you must give the name of the user to send RoboCoins to', data );
+                reject( 'No receiving user specified' );
+                return false;
+            }
+            if ( receivingUserID === undefined ) {
+                chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + " I can't find that username", data );
+                reject( 'User not found' );
+                return false;
+            }
+            return true;
+        },
+
+        handleError: async function ( error, chatFunctions, data, reject ) {
+            console.error( 'Error in giveRoboCoin:', JSON.stringify( error ) );
+            chatFunctions.botSpeak( "Error in processing the request", data );
+            reject( error.message );
+        },
+
+        // ========================================================
+
+        // ========================================================
+        // RoboCoin Commands
+        // ========================================================
+
 
         readMyRoboCoin: async function ( data, chatFunctions ) {
             try {
@@ -2278,58 +2314,27 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        validateNumCoins: async function(numCoins, sendingUserID, chatFunctions, data) {
-            if (numCoins === undefined || isNaN(numCoins)) {
-                chatFunctions.botSpeak('@' + this.getUsername(sendingUserID) + ' you must give a number of coins to send, eg. 10', data);
-                reject('Invalid number of coins');
-                return false;
-            }
-            return true;
-        },
-
-        validateReceivingUser: async function(args, sendingUserID, chatFunctions, data) {
-            const receivingUserID = this.getUserIDFromUsername(this.returnUsernameFromMessageAfterArguments(data.text));
-            if (args[1] === undefined) {
-                chatFunctions.botSpeak('@' + this.getUsername(sendingUserID) + ' you must give the name of the user to send RoboCoins to', data);
-                reject('No receiving user specified');
-                return false;
-            }
-            if (receivingUserID === undefined) {
-                chatFunctions.botSpeak('@' + this.getUsername(sendingUserID) + " I can't find that username", data);
-                reject('User not found');
-                return false;
-            }
-            return true;
-        },
-
-        handleError: async function (error, chatFunctions, data) {
-            console.error('Error in giveRoboCoin:', JSON.stringify(error));
-            chatFunctions.botSpeak("Error in processing the request", data);
-            reject(error.message);
-        },
-
         giveRoboCoin: async function ( data, args, chatFunctions, databaseFunctions ) {
             const sendingUserID = this.whoSentTheCommand( data );
+            const receivingUserID = this.getUserIDFromUsername( this.returnUsernameFromMessageAfterArguments( data.text ) );
             const numCoins = parseInt( args[ 0 ], 10 );
 
             return new Promise( ( resolve, reject ) => {
-                this.validateNumCoins( numCoins, sendingUserID, chatFunctions, data )
-                    .then( this.validateReceivingUser(args, sendingUserID, chatFunctions, data))
-                    .then( this.canUserAffordToSpendThisMuch( sendingUserID, numCoins ) )
-                    .then( () => {
-                        return Promise.all([
-                            this.subtractRoboCoins(sendingUserID, numCoins, "giveRoboCoin to " + this.getUsername(receivingUserID), databaseFunctions),
-                            this.addRoboCoins(receivingUserID, numCoins, "giveRoboCoin from " + this.getUsername(sendingUserID), databaseFunctions),
-                        ]);
-                    } )
+                this.validateNumCoins( numCoins, sendingUserID, chatFunctions, reject, data )
+                    .then( () => this.validateReceivingUser( args, receivingUserID, sendingUserID, chatFunctions, reject, data ) )
+                    .then( () => this.canUserAffordToSpendThisMuch( sendingUserID, numCoins ) )
+                    .then( () => Promise.all( [
+                        this.subtractRoboCoins( sendingUserID, numCoins, "giveRoboCoin to " + this.getUsername( receivingUserID ), databaseFunctions ),
+                        this.addRoboCoins( receivingUserID, numCoins, "giveRoboCoin from " + this.getUsername( sendingUserID ), databaseFunctions ),
+                    ] ) )
                     .then( () => {
                         chatFunctions.botSpeak( "@" + this.getUsername( sendingUserID ) + " gave " + numCoins + " to @" + this.getUsername( receivingUserID ), data );
                         resolve();
                     } )
                     .catch( ( error ) => {
-                        this.handleError(error, chatFunctions, data);
+                        this.handleError( error, chatFunctions, data, reject );
+                        reject( error ); // Ensure to reject the promise in case of an error
                     } );
-
             } );
         },
     }
