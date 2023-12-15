@@ -2,6 +2,7 @@ let chatDefaults = require( '../defaultSettings/chatDefaults.js' );
 let chatCommandItems = require( '../defaultSettings/chatCommandItems.js' );
 const Storage = require( 'node-storage' );
 const { dirname } = require( 'path' );
+const databaseFunctions = require( './databaseModule.js' );
 
 const generalCommands = {};
 const userCommands = {};
@@ -40,16 +41,16 @@ const commandFunctions = ( bot ) => {
     generalCommands.djplays = ( { data, userFunctions, chatFunctions } ) => { userFunctions.djPlaysCommand( data, chatFunctions ); }
     generalCommands.djplays.help = "How many track has each DJ played = current(total if different)";
 
-    generalCommands.escortme = ( { data, userFunctions, chatFunctions } ) => { userFunctions.enableEscortMe( data, chatFunctions ); }
+    generalCommands.escortme = ( { data, userFunctions, chatFunctions, databaseFunctions } ) => { userFunctions.enableEscortMe( data, chatFunctions, databaseFunctions ); }
     generalCommands.escortme.help = "Have yourself removed from the decks after your track finishes playing";
 
-    generalCommands.stopescortme = ( { data, userFunctions, chatFunctions } ) => { userFunctions.disableEscortMe( data, chatFunctions ); }
+    generalCommands.stopescortme = ( { data, userFunctions, chatFunctions, databaseFunctions } ) => { userFunctions.disableEscortMe( data, chatFunctions, databaseFunctions ); }
     generalCommands.stopescortme.help = "Stop yourself from being removed from the decks after your track finishes playing";
 
     generalCommands.whatsplaylimit = ( { data, userFunctions, chatFunctions } ) => { userFunctions.whatsPlayLimit( data, chatFunctions ); }
     generalCommands.whatsplaylimit.help = "Is the DJ Play Limit enabled, and if so what it's set to";
 
-    generalCommands.refresh = ( { data, botFunctions, userFunctions, chatFunctions } ) => { userFunctions.refreshCommand( data, chatFunctions, botFunctions ); }
+    generalCommands.refresh = ( { data, botFunctions, userFunctions, chatFunctions, databaseFunctions } ) => { userFunctions.refreshCommand( data, chatFunctions, botFunctions, databaseFunctions ); }
     generalCommands.refresh.help = "Hold your spot on stage for one minute if you need to refresh your browser";
 
     generalCommands.regionalerts = ( { data, botFunctions, videoFunctions, chatFunctions } ) => { botFunctions.reportRegionCheckStatus( data, videoFunctions, chatFunctions ); }
@@ -67,13 +68,31 @@ const commandFunctions = ( bot ) => {
     generalCommands.theme = ( { data, roomFunctions, chatFunctions } ) => { roomFunctions.readTheme( data, chatFunctions ); }
     generalCommands.theme.help = "Tells you what the current teme is, if there is one";
 
-    generalCommands.myregion = ( { data, args, userFunctions, chatFunctions, videoFunctions } ) => { userFunctions.checkAndStoreUserRegion( data, args, chatFunctions, videoFunctions ); }
+    generalCommands.myregion = ( { data, args, userFunctions, chatFunctions, videoFunctions, databaseFunctions } ) => { userFunctions.checkAndStoreUserRegion( data, args, chatFunctions, videoFunctions, databaseFunctions ); }
     generalCommands.myregion.argumentCount = 1;
     generalCommands.myregion.help = "Set the region you're in so that video regions can be checked automatically";
     generalCommands.myregion.sampleArguments = [ "GB" ];
 
-    generalCommands.noregion = ( { data, userFunctions, chatFunctions, videoFunctions } ) => { userFunctions.storeNoRegion( data, chatFunctions, videoFunctions ); }
+    generalCommands.noregion = ( { data, userFunctions, chatFunctions, videoFunctions, databaseFunctions } ) => { userFunctions.storeNoRegion( data, chatFunctions, videoFunctions, databaseFunctions ); }
     generalCommands.noregion.help = "Your regions will be removed and you won't be asked again to set one";
+
+    generalCommands.deletetrack = ( { data, botFunctions, userFunctions, chatFunctions, songFunctions } ) => { botFunctions.deleteCurrentTrackFromBotPlaylist( data, userFunctions, chatFunctions, songFunctions ); }
+    generalCommands.deletetrack.help = "Delete whatever track Robo is currently playing";
+
+    // generalCommands.bbboot = ( { data, userFunctions, chatFunctions, databaseFunctions } ) => { userFunctions.bbBoot( data, chatFunctions, databaseFunctions ); }
+    // generalCommands.bbboot.help = "BBBoot @Bukkake. If it's been more than 24hrs since the last boot, BB gets booted. If it's been less, you do! ;-)";
+
+    generalCommands.robocoin = ( { data, userFunctions, chatFunctions } ) => { userFunctions.readMyRoboCoin( data, chatFunctions ); }
+    generalCommands.robocoin.help = "How many Robo points do you have?";
+
+    generalCommands.songinfo = ( { songFunctions, data, databaseFunctions, mlFunctions, chatFunctions } ) => { songFunctions.songInfoCommand( data, databaseFunctions, mlFunctions, chatFunctions ); }
+    generalCommands.songinfo.help = "Lookup song info from Discogs";
+
+    generalCommands.searchspotify = ( { songFunctions, data, databaseFunctions, mlFunctions, chatFunctions } ) => { songFunctions.searchSpotifyCommand( data, databaseFunctions, mlFunctions, chatFunctions ); }
+    generalCommands.searchspotify.help = "Lookup song info from Spotify";
+
+    generalCommands.searchmusicbrainz = ( { songFunctions, data, databaseFunctions, mlFunctions, chatFunctions } ) => { songFunctions.searchMusicBrainzCommand( data, databaseFunctions, mlFunctions, chatFunctions ); }
+    generalCommands.searchmusicbrainz.help = "Lookup song info from Music Brainz";
 
     // #############################################
     // General user Queue commands
@@ -123,6 +142,20 @@ const commandFunctions = ( bot ) => {
 
     botCommands.playlist = ( { data, chatFunctions } ) => { chatFunctions.readPlaylistStats( data ); }
     botCommands.playlist.help = "Tells you how many songs are in the Bot playlist";
+
+    moderatorCommands.avatar = ( { data, args, botFunctions, chatFunctions } ) => { botFunctions.changeAvatar( data, args, chatFunctions ) }
+    moderatorCommands.avatar.argumentCount = 1;
+    moderatorCommands.avatar.help = "Change Robo's avatar";
+    moderatorCommands.avatar.sampleArguments = [ "13" ];
+
+    // #############################################
+    // RoboCoin commands
+    // #############################################
+
+    moderatorCommands.giverc = ( { data, args, userFunctions, chatFunctions, databaseFunctions } ) => { userFunctions.giveRoboCoin( data, args, chatFunctions, databaseFunctions ) }
+    moderatorCommands.giverc.argumentCount = 2;
+    moderatorCommands.giverc.help = "Give someone RoboCoin";
+    moderatorCommands.giverc.sampleArguments = [ "jodrell", "10" ];
 
     // #############################################
     // User commands
@@ -238,6 +271,40 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.removealias.help = "Remove an alias from a command";
     moderatorCommands.removealias.sampleArguments = [ "alias", "command" ];
 
+    moderatorCommands.settheme = ( { data, args, chatFunctions, roomFunctions } ) => { roomFunctions.setThemeCommand( data, reassembleArgs( args ), chatFunctions ); }
+    moderatorCommands.settheme.help = "Set a theme for the room";
+
+    moderatorCommands.notheme = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.removeThemeCommand( data, chatFunctions ); }
+    moderatorCommands.notheme.help = "Set a theme for the room";
+
+    moderatorCommands.randomtheme = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.themeRandomizer( data, chatFunctions ); }
+    moderatorCommands.randomtheme.help = "Enable/Disable the theme randomizer";
+
+    moderatorCommands.readrandomthemes = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.readRandomThemes( data, chatFunctions ); }
+    moderatorCommands.randomtheme.help = "Enable/Disable the theme randomizer";
+
+    moderatorCommands.randomthemeadd = ( { data, args, chatFunctions, roomFunctions, documentationFunctions } ) => { roomFunctions.randomThemeAdd( data, reassembleArgs( args ), chatFunctions, documentationFunctions ); }
+    moderatorCommands.randomthemeadd.argumentCount = 1;
+    moderatorCommands.randomthemeadd.help = "Add a theme to the randomizer";
+    moderatorCommands.randomthemeadd.sampleArguments = [ "The Weather" ];
+
+    moderatorCommands.randomthemeremove = ( { data, args, chatFunctions, roomFunctions, documentationFunctions } ) => { roomFunctions.randomThemeRemove( data, reassembleArgs( args ), chatFunctions, documentationFunctions ); }
+    moderatorCommands.randomthemeremove.argumentCount = 1;
+    moderatorCommands.randomthemeremove.help = "Remove a theme from the randomizer";
+    moderatorCommands.randomthemeremove.sampleArguments = [ "The Weather" ];
+
+    moderatorCommands.readfavouriteartist = ( { data, chatFunctions, botFunctions, databaseFunctions } ) => { botFunctions.readFavouriteArtist( data, chatFunctions, databaseFunctions ); }
+    moderatorCommands.readfavouriteartist.help = "Read Robos favourite artist";
+
+    moderatorCommands.choosenewfavourite = ( { botFunctions, databaseFunctions } ) => { botFunctions.chooseNewFavourite( databaseFunctions ); }
+    moderatorCommands.choosenewfavourite.help = "Pick a new favourite artist";
+
+    moderatorCommands.askbard = ( { botFunctions, data, args, chatFunctions, mlFunctions } ) => { botFunctions.askBardCommand( data, reassembleArgs( args ), chatFunctions, mlFunctions ); }
+    moderatorCommands.askbard.help = "Talk to Robo via Bard";
+
+    moderatorCommands.askchatgpt = ( { botFunctions, data, args, chatFunctions, mlFunctions } ) => { botFunctions.askChatGPTCommand( data, reassembleArgs( args ), chatFunctions, mlFunctions ); }
+    moderatorCommands.askchatgpt.help = "Talk to Robo via Bard";
+
     // #############################################
     // Moderator Greeting commands
     // #############################################
@@ -247,12 +314,6 @@ const commandFunctions = ( bot ) => {
 
     moderatorWelcomeCommands.greetoff = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.greetOffCommand( data, chatFunctions ); }
     moderatorWelcomeCommands.greetoff.help = "Disable user greetings";
-
-    moderatorWelcomeCommands.settheme = ( { data, args, chatFunctions, roomFunctions } ) => { roomFunctions.setThemeCommand( data, reassembleArgs( args ), chatFunctions ); }
-    moderatorWelcomeCommands.settheme.help = "Set a theme for the room";
-
-    moderatorWelcomeCommands.notheme = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.removeThemeCommand( data, chatFunctions ); }
-    moderatorWelcomeCommands.notheme.help = "Set a theme for the room";
 
     moderatorWelcomeCommands.enablerules = ( { data, chatFunctions, roomFunctions } ) => { roomFunctions.enableRulesMessageCommand( data, chatFunctions ); }
     moderatorWelcomeCommands.enablerules.help = "Have the room rules etc read out with the room greeting";
@@ -264,6 +325,7 @@ const commandFunctions = ( bot ) => {
     moderatorWelcomeCommands.rulesinterval.argumentCount = 1;
     moderatorWelcomeCommands.rulesinterval.help = "Set the interval, in minutes, for how often the room rules will be read out with the room greeting";
     moderatorWelcomeCommands.rulesinterval.sampleArguments = [ 15 ];
+
 
     // #############################################
     // Moderator Only Queue commands
@@ -285,10 +347,33 @@ const commandFunctions = ( bot ) => {
     moderatorQueueCommands.queueoff = ( { data, userFunctions, chatFunctions } ) => { userFunctions.disableQueue( data, chatFunctions ) }
     moderatorQueueCommands.queueoff.help = "Disables the queue";
 
-    moderatorQueueCommands.setdjplaycount = ( { data, args, userFunctions, chatFunctions } ) => { userFunctions.setDJCurrentPlaycountCommand( data, args[ 0 ], reassembleArgs( args, 1 ), chatFunctions ) }
+    moderatorQueueCommands.setdjplaycount = ( { data, args, userFunctions, chatFunctions, databaseFunctions } ) => { userFunctions.setDJCurrentPlaycountCommand( data, args[ 0 ], reassembleArgs( args, 1 ), chatFunctions, databaseFunctions ) }
     moderatorQueueCommands.setdjplaycount.argumentCount = 2;
     moderatorQueueCommands.setdjplaycount.help = "Sets a DJs current playcount. This will let you give a DJ extra plays, or fewer, if the playLimit is set";
     moderatorQueueCommands.setdjplaycount.sampleArguments = [ 2, 'jodrell' ];
+
+    moderatorQueueCommands.setmaxdjs = ( { data, args, chatFunctions, roomFunctions } ) => { roomFunctions.setMaxDJs( args[ 0 ], data, chatFunctions ) }
+    moderatorQueueCommands.setmaxdjs.argumentCount = 1;
+    moderatorQueueCommands.setmaxdjs.help = "Sets the max number of DJs allowed on stage";
+    moderatorQueueCommands.setmaxdjs.sampleArguments = [ 2 ];
+
+    moderatorQueueCommands.addsuperdj = ( { data, args, chatFunctions, userFunctions } ) => { userFunctions.addSuperDJ( reassembleArgs( args, 0 ), data, chatFunctions ) }
+    moderatorQueueCommands.addsuperdj.argumentCount = 1;
+    moderatorQueueCommands.addsuperdj.help = "Add a DJ to the SuperDJs list";
+    moderatorQueueCommands.addsuperdj.sampleArguments = [ "Jodrell" ];
+
+    moderatorQueueCommands.removesuperdj = ( { data, args, chatFunctions, userFunctions } ) => { userFunctions.removeSuperDJ( reassembleArgs( args, 0 ), data, chatFunctions ) }
+    moderatorQueueCommands.removesuperdj.argumentCount = 1;
+    moderatorQueueCommands.removesuperdj.help = "Remove a DJ from the SuperDJs list";
+    moderatorQueueCommands.removesuperdj.sampleArguments = [ "Jodrell" ];
+
+    moderatorQueueCommands.listsuperdjs = ( { data, chatFunctions, userFunctions } ) => { userFunctions.readSuperDJs( data, chatFunctions ) }
+    moderatorQueueCommands.listsuperdjs.help = "List the SuperDJs";
+
+    moderatorQueueCommands.clearsuperdjs = ( { data, chatFunctions, userFunctions } ) => { userFunctions.clearSuperDJs( data, chatFunctions ) }
+    moderatorQueueCommands.clearsuperdjs.help = "Remove all SuperDJs";
+
+
 
     // #############################################
     // Moderator Only Dynamic Chat commands
@@ -321,7 +406,7 @@ const commandFunctions = ( bot ) => {
 
     moderatorChatCommands.removechatcommandpicture = ( { data, chatFunctions, documentationFunctions } ) => { removeChatCommandPicture( data, chatFunctions, documentationFunctions ); }
     moderatorChatCommands.removechatcommandpicture.argumentCount = 2;
-    moderatorChatCommands.removechatcommandpicture.help = "Remove a pitcute from a dynamic chat command. The URL must match exactly and be surrounded by double quotes";
+    moderatorChatCommands.removechatcommandpicture.help = "Remove a picture from a dynamic chat command. The URL must match exactly and be surrounded by double quotes";
     moderatorChatCommands.removechatcommandpicture.sampleArguments = [ "command", "http://url.link/image.gif" ];
 
     // #############################
@@ -494,13 +579,21 @@ const commandFunctions = ( bot ) => {
             }
         },
 
-        parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions ) {
-            const senderID = data.userid;
+        // parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions ) {
+        parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions ) {
+            let senderID;
+
+            if ( data.command === "pmmed" ) {
+                senderID = data.senderid;
+            } else {
+                senderID = data.userid;
+            }
+
             const [ command, args, moderatorOnly ] = this.getCommandAndArguments( data.text, allCommands );
             if ( moderatorOnly && !userFunctions.isUserModerator( senderID ) ) {
                 chatFunctions.botSpeak( "Sorry, that function is only available to moderators", data );
             } else if ( args === 'dynamicChat' ) {
-                chatFunctions.dynamicChatCommand( data, userFunctions, command );
+                chatFunctions.dynamicChatCommand( data, userFunctions, command, databaseFunctions );
             } else if ( command ) {
                 command.call( null, {
                     data,
@@ -511,7 +604,10 @@ const commandFunctions = ( bot ) => {
                     songFunctions,
                     chatFunctions,
                     videoFunctions,
-                    documentationFunctions
+                    documentationFunctions,
+                    databaseFunctions,
+                    dateFunctions,
+                    // mlFunctions,
                 } );
             } else {
                 chatFunctions.botSpeak( "Sorry, that's not a command I recognise. Try " + chatDefaults.commandIdentifier + "list to find out more.", data );
@@ -551,7 +647,7 @@ const commandFunctions = ( bot ) => {
             return true;
         },
 
-        parseChatManagementCommandElements: function ( theMessage ) {
+        parseCommandElements: function ( theMessage ) {
             const splitData = [];
             const regex = new RegExp( '"[^"]+"|[\\S]+', 'g' );
             theMessage.match( regex ).forEach( element => {
@@ -690,7 +786,7 @@ const addChatCommandWithMessage = ( data, chatFunctions, documentationFunctions 
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
 
-    const splitData = commandModule.parseChatManagementCommandElements( data.text );
+    const splitData = commandModule.parseCommandElements( data.text );
     const newCommand = splitData[ 1 ];
     const commandMessage = splitData[ 2 ];
 
@@ -715,7 +811,7 @@ const addMessageToChatCommand = ( data, chatFunctions, documentationFunctions ) 
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
 
-    const splitData = commandModule.parseChatManagementCommandElements( data.text );
+    const splitData = commandModule.parseCommandElements( data.text );
     const theCommand = splitData[ 1 ];
     const theMessage = splitData[ 2 ];
 
@@ -743,7 +839,7 @@ const addPictureToChatCommand = ( data, chatFunctions, documentationFunctions ) 
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
 
-    const splitData = commandModule.parseChatManagementCommandElements( data.text );
+    const splitData = commandModule.parseCommandElements( data.text );
     const theCommand = splitData[ 1 ];
     const thePicture = splitData[ 2 ];
 
@@ -774,7 +870,7 @@ const removeChatCommand = ( data, chatFunctions, documentationFunctions ) => {
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
 
-    const splitData = commandModule.parseChatManagementCommandElements( data.text );
+    const splitData = commandModule.parseCommandElements( data.text );
     const theCommand = splitData[ 1 ];
 
     if ( !commandModule.isChatCommand( theCommand ) ) {
@@ -793,7 +889,7 @@ const removeChatCommandMessage = ( data, chatFunctions, documentationFunctions )
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
 
-    const splitData = commandModule.parseChatManagementCommandElements( data.text );
+    const splitData = commandModule.parseCommandElements( data.text );
     const theCommand = splitData[ 1 ];
     const theMessage = splitData[ 2 ];
 
@@ -826,7 +922,7 @@ const removeChatCommandPicture = ( data, chatFunctions, documentationFunctions )
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
 
-    const splitData = commandModule.parseChatManagementCommandElements( data.text );
+    const splitData = commandModule.parseCommandElements( data.text );
     const theCommand = splitData[ 1 ];
     const thePicture = splitData[ 2 ];
 

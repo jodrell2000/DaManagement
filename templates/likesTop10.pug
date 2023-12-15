@@ -1,0 +1,81 @@
+doctype html
+html(lang="en")
+  head
+    title Top 10 by Votes only
+    link(href='/styles/app.css' rel='stylesheet' type='text/css')
+    link(href='/modules/dragula/dist/dragula.css' rel='stylesheet' type='text/css')
+    link(href="/modules/@fortawesome/fontawesome-free/css/fontawesome.css" rel="stylesheet")
+    link(href="/modules/@fortawesome/fontawesome-free/css/solid.css" rel="stylesheet")
+    style.
+      #songqueue {
+        border-collapse: collapse;
+        border: 1px solid #ddd;
+        width: 100%;
+      }
+      #songqueue td, #songqueue th {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      #songqueue th {
+        background-color: #f2f2f2;
+        color: black;
+      }
+
+  body
+    h1 Top 10 by Votes only for #{formStartDate} to #{formEndDate}
+
+    ul
+    li
+        a(href=`http://141.147.86.68:8585/fullTop10?startDate=${linkStartDate}&endDate=${linkEndDate}`) Full Top 10 Lists
+    li
+        a(href=`http://141.147.86.68:8585/likesTop10?startDate=${linkStartDate}&endDate=${linkEndDate}`) Top 10 (Likes Only)
+    li
+        a(href=`http://141.147.86.68:8585/mostplayedartists?startDate=${linkStartDate}&endDate=${linkEndDate}`) Most Played Artists
+    li
+        a(href=`http://141.147.86.68:8585/mostplayedtracks?startDate=${linkStartDate}&endDate=${linkEndDate}`) Most Played Tracks
+    li
+        a(href=`http://141.147.86.68:8585/summary?startDate=${linkStartDate}&endDate=${linkEndDate}`) Room Summary & Top DJs
+
+    form(action='/likesTop10' method='GET')
+        label(for='startDate') Start Date:
+        input#startDate(type='date' name='startDate' value=formStartDate)
+        label(for='endDate') End Date:
+        input#endDate(type='date' name='endDate' value=formEndDate)
+        input(type='submit' value='Update')
+
+    table#songqueue
+        thead
+            tr
+                th Artist
+                th Track
+                td Upvotes
+                td Downvotes
+                th Play Count
+        tbody
+        each song in top10SongList
+            tr
+            td= song.artist
+            td= song.track
+            td= song.upvotes
+            td= song.downvotes
+            td= song.plays
+
+    h2 80s Only (excluding 90s and Covers day)
+
+    table#songqueue
+        thead
+            tr
+                th Artist
+                th Track
+                td Upvotes
+                td Downvotes
+                th Play Count
+        tbody
+        each song in top1080sSongList
+            tr
+            td= song.artist
+            td= song.track
+            td= song.upvotes
+            td= song.downvotes
+            td= song.plays

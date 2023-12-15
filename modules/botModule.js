@@ -22,6 +22,8 @@ let whenToGetOnStage = botDefaults.whenToGetOnStage; //when this many or less pe
 let whenToGetOffStage = botDefaults.whenToGetOffStage;
 let checkVideoRegions = musicDefaults.alertIfRegionBlocked;
 let refreshingEnabled = roomDefaults.refreshingEnabled;
+let favouriteArtist = null; // what's Robos current favouurite Artist (requires verified info in the DB)
+
 
 const botFunctions = ( bot ) => {
 
@@ -56,7 +58,7 @@ const botFunctions = ( bot ) => {
             const sleep = ( delay ) => new Promise( ( resolve ) => setTimeout( resolve( "done" ), delay ) )
 
             const shutMeDown = async () => {
-                chatFunctions.botSpeak( "Going away now...", data, true );
+                chatFunctions.botSpeak( "I'll be back...", data, true );
                 await sleep( 100 )
                 userFunctions.debugPrintTheUsersList();
                 await sleep( 100 )
@@ -66,12 +68,30 @@ const botFunctions = ( bot ) => {
             shutMeDown();
         },
 
+        changeAvatar: function ( data, args, chatFunctions ) {
+            const theID = args[ 0 ];
+            if ( isNaN( theID ) ) {
+                chatFunctions.botSpeak( "That's not a valid AvatarID...it needs to be a number", data );
+            } else {
+                if ( theID === "8" || theID === "4" || theID === "227" || theID === "2022" ) {
+                    chatFunctions.botSpeak( "NOPE! No Gingers here...", data );
+                } else {
+                    chatFunctions.botSpeak( "Changing...", data );
+                    bot.setAvatar( theID );
+                }
+            }
+        },
+
+        getUptime: function () {
+            this.setUptimeTime( Date.now() );
+            return this.uptimeTime() - this.botStartTime();
+        },
+
         reportUptime: function ( data, userFunctions, chatFunctions ) {
             let msecPerMinute = 1000 * 60;
             let msecPerHour = msecPerMinute * 60;
             let msecPerDay = msecPerHour * 24;
-            this.setUptimeTime( Date.now() );
-            let currentTime = this.uptimeTime() - this.botStartTime();
+            let currentTime = this.getUptime();
 
             let days = Math.floor( currentTime / msecPerDay );
             currentTime = currentTime - ( days * msecPerDay );
@@ -224,6 +244,57 @@ const botFunctions = ( bot ) => {
 
         lameCommand: function () {
             bot.vote( 'down' );
+        },
+
+        // ========================================================
+
+        async readFavouriteArtist ( data, chatFunctions, databaseFunctions ) {
+            const favouriteArtist = await this.favouriteArtist( databaseFunctions );
+            chatFunctions.botSpeak( "This week, I have been mostly listening to " + favouriteArtist, data );
+        },
+
+        favouriteArtist: function ( databaseFunctions ) {
+            if ( favouriteArtist !== null ) {
+                return Promise.resolve( favouriteArtist );
+            }
+
+            return databaseFunctions.getRandomVerifiedArtist()
+                .then( ( displayName ) => {
+                    return this.setFavouriteArtist( displayName );
+                } );
+        },
+
+        setFavouriteArtist: function ( value ) {
+            return new Promise( ( resolve, _ ) => {
+                favouriteArtist = value;
+                resolve( value );
+            } )
+        },
+
+        async chooseNewFavourite ( databaseFunctions ) {
+            await databaseFunctions.getRandomVerifiedArtist()
+                .then( ( displayName ) => {
+                    favouriteArtist = displayName;
+                } )
+        },
+
+        async isFavouriteArtist ( databaseFunctions, theArtist ) {
+            const currentFavourite = await this.favouriteArtist( databaseFunctions );
+
+            return new Promise( ( resolve, reject ) => {
+                databaseFunctions.getVerifiedArtistsFromName( theArtist )
+                    .then( ( array ) => {
+                        for ( let i = 0; i < array.length; i++ ) {
+                            if ( array[ i ].displayName === currentFavourite ) {
+                                resolve( currentFavourite );
+                                return;
+                            }
+                        }
+                    } )
+                    .catch( ( error ) => {
+                        reject( error );
+                    } );
+            } );
         },
 
         // ========================================================
@@ -466,6 +537,35 @@ const botFunctions = ( bot ) => {
             }
         },
 
+        isBotCurrentDJ: function ( userFunctions ) {
+            if ( userFunctions.getCurrentDJID() === authModule.USERID ) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+
+        deleteCurrentTrackFromBotPlaylist: function ( data, userFunctions, chatFunctions, songFunctions ) {
+            if ( this.isBotCurrentDJ( userFunctions ) !== true ) {
+                chatFunctions.botSpeak( "I can't delete anything if I'm not playing anything?!?", data, true );
+            } else {
+                chatFunctions.botSpeak( "OK, I'll delete that", data, true );
+
+                const senderID = userFunctions.whoSentTheCommand( data );
+                const senderUsername = userFunctions.getUsername( senderID );
+                let currentDateTime = require( 'moment' );
+
+                console.group( '! delete track ===============================' );
+                console.log( "The deletetrack command was issued by " + senderUsername + " at " + currentDateTime().format( 'DD/MM/yyyy HH:mm:ss' ) );
+                console.log( "The track removed was " + songFunctions.song() + " by " + songFunctions.artist() );
+                console.log( '========================================' );
+                console.groupEnd();
+
+                bot.playlistRemove( this.getPlaylistCount() - 1 );
+                bot.skip();
+            }
+        },
+
         clearAllTimers: function ( userFunctions, roomFunctions, songFunctions ) {
             userFunctions.clearInformTimer( roomFunctions );
             roomFunctions.clearSongLimitTimer( userFunctions, roomFunctions );
@@ -474,43 +574,50 @@ const botFunctions = ( bot ) => {
         },
 
         checkOnNewSong: function ( data, roomFunctions, songFunctions, userFunctions ) {
-            let length = data.room.metadata.current_song.metadata.length;
-            let masterIndex; //used to tell whether current dj is on the master id's list or not
+            const length = data.room.metadata.current_song.metadata.length;
+            const theDJID = data.room.metadata.current_dj;
+            const masterIndex = userFunctions.masterIds().indexOf( theDJID ); //used to tell whether current dj is on the master id's list or not
+            const djName = userFunctions.getUsername( theDJID );
 
             //clears timers if previously set
             this.clearAllTimers( userFunctions, roomFunctions, songFunctions );
 
-            // Set this after processing things from last timer calls
-            roomFunctions.setLastDJ( data.room.metadata.current_dj );
-            masterIndex = userFunctions.masterIds().indexOf( roomFunctions.lastdj() ); //master id's check
+            songFunctions.startSongWatchdog( data, userFunctions );
 
-            songFunctions.startSongWatchdog( data, userFunctions, roomFunctions );
-
-            //this boots the user if their song is over the length limit
-            if ( ( length / 60 ) >= musicDefaults.songLengthLimit ) {
-                if ( roomFunctions.lastdj() === authModule.USERID || masterIndex === -1 ) //if dj is the bot or not a master
+            //this removes the user from the stage if their song is over the length limit and the don't skip
+            let theTimeout = 60;
+            if ( ( length / theTimeout ) >= musicDefaults.songLengthLimit ) {
+                if ( theDJID === authModule.USERID || masterIndex === -1 ) //if dj is the bot or not a master
                 {
                     if ( musicDefaults.songLengthLimitOn === true ) {
-                        const currentDJ = userFunctions.theUsersList()[ userFunctions.theUsersList().indexOf( roomFunctions.lastdj() ) + 1 ];
-                        let DJName = `Current dj`;
+                        const nextDJName = userFunctions.getUsername( userFunctions.getNextDJ() );
+                        bot.speak( `@${ djName }, your song is over ${ musicDefaults.songLengthLimit } mins long, you have ${ theTimeout } seconds to skip before being removed.` );
+                        bot.speak( `@${ nextDJName }, make sure you've got something ready ;-)` );
 
-                        if ( currentDJ ) {
-                            if ( currentDJ.hasOwnProperty( `name` ) ) {
-                                DJName = `@${ currentDJ.name }`;
-                            }
-                        }
-
-                        bot.speak( `${ DJName }, your song is over ${ musicDefaults.songLengthLimit } mins long, you have 20 seconds to skip before being removed.` );
-
-                        //START THE 20 SEC TIMER
+                        // start the timer
                         roomFunctions.songLimitTimer = setTimeout( function () {
                             roomFunctions.songLimitTimer = null;
-                            userFunctions.removeDJ( roomFunctions.lastdj(), 'DJ removed because their song is over the length limit' ); // Remove Saved DJ from last newsong call
-                        }, 20 * 1000 ); // Current DJ has 20 seconds to skip before they are removed
+                            userFunctions.removeDJ( theDJID, `DJ @${ djName } was removed because their song was over the length limit` ); // Remove Saved DJ from last newsong call
+                        }, theTimeout * 1000 ); // Current DJ has 20 seconds to skip before they are removed
                     }
                 }
             }
         },
+
+        // ========================================================
+        // ML Chat Functions
+        // ========================================================
+
+        async askBardCommand ( data, theQuestion, chatFunctions, mlFunctions ) {
+            const answer = await mlFunctions.askBard( theQuestion );
+            chatFunctions.botSpeak( answer, data );
+        },
+
+        async askChatGPTCommand ( data, theQuestion, chatFunctions, mlFunctions ) {
+            const answer = await mlFunctions.askChatGPT( theQuestion );
+            chatFunctions.botSpeak( answer, data );
+        },
+
     }
 }
 

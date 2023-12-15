@@ -2,6 +2,7 @@
     Adam Reynolds 2021-2022
     version 0.1 (forked from chillybot)
     version 0.2 (forked from Mr. Roboto by Jake Smith)
+    version 0.3 (bears very little resemblance to the original now)
 */
 
 /*******************************BeginSetUp*****************************************************************************/
@@ -21,10 +22,17 @@ let songModule = require( './modules/songModule.js' );
 let commandModule = require( './modules/commandModule.js' );
 let videoModule = require( './modules/videoModule.js' );
 let documentationModule = require( './modules/documentationModule.js' );
+let databaseModule = require( './modules/databaseModule.js' );
+let dateModule = require( './modules/dateModule.js' );
+let mlModule = require( './modules/mlModule.js' );
 
 const express = require( 'express' )
 const app = express();
 const pug = require( 'pug' );
+const bodyParser = require( 'body-parser' );
+const dayjs = require( 'dayjs' );
+const utc = require( 'dayjs/plugin/utc' );
+dayjs.extend( utc )
 
 // client authentication
 app.use( authentication )
@@ -35,6 +43,8 @@ app.use( `/scripts`, express.static( './scripts' ) );
 app.use( `/modules`, express.static( './node_modules' ) );
 app.use( `/styles`, express.static( './styles' ) );
 app.use( express.json() );
+app.use( bodyParser.urlencoded( { extended: false } ) );
+
 /************************************EndSetUp**********************************************************************/
 
 let bot = new Bot( authModule.AUTH, authModule.USERID, authModule.ROOMID ); //initializes the bot
@@ -49,6 +59,9 @@ const roomFunctions = roomModule( bot );
 const commandFunctions = commandModule( bot );
 const videoFunctions = videoModule( bot );
 const documentationFunctions = documentationModule();
+const databaseFunctions = databaseModule();
+const dateFunctions = dateModule();
+// const mlFunctions = mlModule();
 
 // do something when the bot disconnects?
 // eslint-disable-next-line no-unused-vars
@@ -63,8 +76,11 @@ setInterval( function () {
 
 // check if DJs are idle every minute
 setInterval( function () {
-    if ( userFunctions.removeIdleDJs() === true ) {
-        userFunctions.idledOutDJCheck( roomDefaults, chatFunctions );
+    // only check for idle DJs if the bot has been up for more than a minute
+    if ( botFunctions.getUptime() > 60000 ) {
+        if ( userFunctions.removeIdleDJs() === true ) {
+            userFunctions.idledOutDJCheck( roomDefaults, chatFunctions, databaseFunctions );
+        }
     }
 }, 10 * 1000 );
 
@@ -72,13 +88,13 @@ setInterval( function () {
 setInterval( function () { userFunctions.roomIdleCheck( roomDefaults, chatFunctions ) }, 60 * 1000 )
 
 // every 5 seconds, check if the there's an empty DJ slot, and prompt the next in the queue to join the decks, remove them if they don't
-setInterval( function ( data ) {
-    if ( roomDefaults.queueActive !== true && userFunctions.howManyDJs() === roomDefaults.maxDJs ) {
+setInterval( function () {
+    if ( roomDefaults.queueActive !== true && ( userFunctions.howManyDJs() >= roomFunctions.maxDJs() ) ) {
         roomDefaults.queueActive = true;
         chatFunctions.botSpeak( "The Queue is now active", null, true, null );
     }
 
-    if ( roomDefaults.queueActive === true && ( userFunctions.refreshDJCount() + userFunctions.howManyDJs() ) < roomDefaults.maxDJs ) {
+    if ( roomDefaults.queueActive === true && ( userFunctions.refreshDJCount() + userFunctions.howManyDJs() ) < roomFunctions.maxDJs() ) {
         if ( userFunctions.queueList().length > 0 ) {
             userFunctions.setDJToNotify( userFunctions.headOfQueue() );
             if ( botFunctions.sayOnce() === true ) {
@@ -108,7 +124,6 @@ setInterval( function () {
     chatFunctions.eventMessageIterator( botFunctions, userFunctions );
 }, roomDefaults.eventMessageRepeatTime * 60 * 1000 ); //repeats check
 
-
 //repeats the Welcome message every 15 mins if /messageOn has been used.
 // setInterval( function() {
 //     chatFunctions.repeatWelcomeMessage(userFunctions);
@@ -126,15 +141,16 @@ bot.on( 'registered', function ( data ) {
     const userID = data.user[ 0 ].userid;
     const username = data.user[ 0 ].name;
 
-    userFunctions.userJoinsRoom( userID, username );
+    userFunctions.userJoinsRoom( userID, username, databaseFunctions );
 
-    const bootThisUser = userFunctions.bootNewUserCheck[ 0 ];
-    const bootMessage = userFunctions.bootNewUserCheck[ 1 ];
+    const bootThisUser = userFunctions.bootNewUserCheck( userID, username );
+    const bootUser = bootThisUser[ 0 ];
+    const bootUserMessage = bootThisUser[ 1 ];
 
-    if ( bootThisUser ) {
-        userFunctions.bootThisUser( userID, bootMessage );
+    if ( bootUser !== false ) {
+        userFunctions.bootThisUser( userID, bootUserMessage );
     } else {
-        chatFunctions.userGreeting( data, userID, username, roomFunctions, userFunctions )
+        chatFunctions.userGreeting( data, userID, username, roomFunctions, userFunctions, databaseFunctions )
     }
 
     userFunctions.askUserToSetRegion( userID, chatFunctions );
@@ -144,7 +160,7 @@ bot.on( 'registered', function ( data ) {
 //starts up when a user leaves the room
 bot.on( 'deregistered', function ( data ) {
     let theUserID = data.user[ 0 ].userid;
-    userFunctions.deregisterUser( theUserID );
+    userFunctions.deregisterUser( theUserID, databaseFunctions );
     userFunctions.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
 } )
 
@@ -154,10 +170,10 @@ bot.on( 'roomChanged', function ( data ) {
         userFunctions.resetUsersList();
 
         // load in and user data on disk first
-        userFunctions.readAllUserDataFromDisk();
+        userFunctions.initialUserDataLoad( databaseFunctions );
 
         //reset arrays in case this was triggered by the bot restarting
-        userFunctions.resetAllWarnMe( data );
+        userFunctions.resetAllWarnMe( data, databaseFunctions );
 
         //get & set information
         roomFunctions.setRoomDefaults( data );
@@ -165,16 +181,19 @@ bot.on( 'roomChanged', function ( data ) {
         // build in the users in the room, skip any already loaded from disk
         userFunctions.rebuildUserList( data );
 
-        userFunctions.resetModerators( data );
-        userFunctions.startAllUserTimers();
+        userFunctions.resetModerators( data, databaseFunctions );
+        userFunctions.startAllUserTimers( databaseFunctions );
         userFunctions.resetDJs( data );
 
         // set user as current DJ
-        userFunctions.setCurrentDJ( data.room.metadata.current_dj );
+        userFunctions.setCurrentDJ( data.room.metadata.current_dj, databaseFunctions );
+        songFunctions.getSongTags( data.room.metadata.current_song )
 
         // ask users for their regions if we don't have them
         userFunctions.checkUsersHaveRegions( data, chatFunctions );
         userFunctions.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
+
+        chatFunctions.botSpeak( "System online...", data );
     }
     catch ( err ) {
         console.log( 'error', 'unable to join the room the room due to err: ' + err.toString() );
@@ -184,17 +203,18 @@ bot.on( 'roomChanged', function ( data ) {
 //checks at the beggining of the song
 bot.on( 'newsong', function ( data ) {
     //resets counters and array for vote skipping
-    songFunctions.resetCheckVotes();
     songFunctions.resetVoteCountSkip();
     songFunctions.resetVotesLeft( roomDefaults.HowManyVotesToSkip );
     songFunctions.resetUpVotes();
     songFunctions.resetDownVotes();
     songFunctions.resetSnagCount();
     songFunctions.resetVoteSnagging();
+    botFunctions.clearAllTimers( userFunctions, roomFunctions, songFunctions );
 
     //procedure for getting song tags
     //console.info( "data.room.metadata.current_song:" + JSON.stringify( data.room.metadata.current_song ) );
     songFunctions.getSongTags( data.room.metadata.current_song )
+    databaseFunctions.saveLastSongStats( songFunctions );
 
     //set information
     roomFunctions.setDJCount( data.room.metadata.djs.length ); //the number of dj's on stage
@@ -202,7 +222,7 @@ bot.on( 'newsong', function ( data ) {
 
     // set user as current DJ
     let djID = data.room.metadata.current_dj;
-    userFunctions.setCurrentDJ( djID );
+    userFunctions.setCurrentDJ( djID, databaseFunctions );
 
     if ( songFunctions.ytid() !== undefined ) {
         videoFunctions.checkVideoRegionAlert( data, songFunctions.ytid(), userFunctions, chatFunctions, botFunctions );
@@ -234,6 +254,25 @@ bot.on( 'newsong', function ( data ) {
 
     //this is for /warnme
     userFunctions.warnMeCall( roomFunctions );
+
+    botFunctions.isFavouriteArtist( databaseFunctions, data.room.metadata.current_song.metadata.artist )
+        .then( ( result ) => {
+            if ( result !== false ) {
+                chatFunctions.botSpeak( "/props", data );
+                chatFunctions.botSpeak( "Awesome play..." + result + " is my favourite!", data );
+            }
+        } )
+        .then( () => {
+            chatFunctions.botSpeak( "Have 10 RoboCoin as a thank you", data );
+            userFunctions.addRoboCoins( djID, 10, "Played Robo's favourite artist", databaseFunctions );
+        } )
+        .then( () => {
+            botFunctions.chooseNewFavourite( databaseFunctions );
+        } )
+        .catch( ( error ) => {
+            console.error( error );
+        } );
+
 
     //removes current dj from stage if they play a banned song or artist.
     if ( musicDefaults.bannedArtists.length !== 0 && typeof songFunctions.artist() !== 'undefined' && typeof songFunctions.song() !== 'undefined' ) {
@@ -293,7 +332,12 @@ bot.on( 'newsong', function ( data ) {
         console.warn( botFunctions.getFormattedDate() + ' The DJ counts don\'t match...resetting them. Count from data is ' + data.room.metadata.djs.length + ', count from Bot is ' + userFunctions.howManyDJs() );
         userFunctions.resetDJs( data ); //reset current djs array
     }
-    console.groupEnd();
+
+    if ( roomFunctions.themeRandomizerEnabled() === true && userFunctions.lastDJPlaying() ) {
+        roomFunctions.announceNewRandomThene( data, chatFunctions );
+    }
+
+    databaseFunctions.saveTrackData( djID, data.room.metadata.current_song );
 } );
 
 //bot gets on stage and starts djing if no song is playing.
@@ -316,10 +360,11 @@ bot.on( 'speak', function ( data ) {
     userFunctions.name = data.name; //name of latest person to say something
     botFunctions.recordActivity();
 
-    userFunctions.updateUserLastSpoke( theUserID ); //update the afk position of the speaker
+    userFunctions.updateUserLastSpoke( theUserID, databaseFunctions ); //update the afk position of the speaker
 
     if ( commandFunctions.wasThisACommand( data ) ) {
-        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions );
+        // commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions );
+        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions );
     }
 
     //checks to see if someone is trying to speak to an afk person or not.
@@ -336,7 +381,8 @@ bot.on( 'speak', function ( data ) {
 //checks when the bot recieves a pm
 bot.on( 'pmmed', function ( data ) {
     if ( commandFunctions.wasThisACommand( data ) ) {
-        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions );
+        // commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions );
+        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions );
     }
 } );
 
@@ -344,7 +390,7 @@ bot.on( 'pmmed', function ( data ) {
 bot.on( 'update_votes', function ( data ) {
     songFunctions.recordUpVotes( data );
     songFunctions.recordDownVotes( data );
-    userFunctions.updateUserLastVoted( data.room.metadata.votelog[ 0 ][ 0 ] ); //update the afk position of people who vote for a song
+    userFunctions.updateUserLastVoted( data.room.metadata.votelog[ 0 ][ 0 ], databaseFunctions ); //update the afk position of people who vote for a song
 
     //this is for /autosnag, automatically adds songs that get over the awesome threshold
     if ( botDefaults.autoSnag === true && songFunctions.snagSong() === false && songFunctions.upVotes() >= botDefaults.howManyVotes && songFunctions.ALLREADYCALLED() === false ) {
@@ -356,10 +402,10 @@ bot.on( 'update_votes', function ( data ) {
 //checks who added a song and updates their position on the afk list.
 bot.on( 'snagged', function ( data ) {
     songFunctions.incrementSnagCount();
-    userFunctions.updateUserLastSnagged( data.userid ); //update the afk position of people who add a song to their queue
+    userFunctions.updateUserLastSnagged( data.userid, databaseFunctions ); //update the afk position of people who add a song to their queue
 } )
 
-//this activates when a user joins the stage.
+//this activates when a user joins the stage
 bot.on( 'add_dj', function ( data ) {
     let OKToDJ;
     let theMessage;
@@ -370,23 +416,23 @@ bot.on( 'add_dj', function ( data ) {
 
     if ( !OKToDJ ) {
         userFunctions.removeDJ( theUserID, 'User is not allowed to DJ so was removed' );
-        userFunctions.incrementSpamCounter( theUserID );
+        userFunctions.incrementSpamCounter( theUserID, databaseFunctions );
         chatFunctions.botSpeak( theMessage, data );
     }
 
     //sets dj's current songcount to zero when they enter the stage.
     //unless they used the refresh command, in which case its set to
     //what it was before they left the room
-    userFunctions.setDJCurrentPlayCount( theUserID, userFunctions.getUsersRefreshCurrentPlayCount[ theUserID ] );
+    userFunctions.setDJCurrentPlayCount( theUserID, userFunctions.getUsersRefreshCurrentPlayCount[ theUserID ], databaseFunctions );
 
     //keep the total playcount as it is, unless they've refreshed
     if ( totalPlayCount !== undefined ) {
-        userFunctions.setDJTotalPlayCount( theUserID, totalPlayCount );
+        userFunctions.setDJTotalPlayCount( theUserID, totalPlayCount, databaseFunctions );
     } else {
-        userFunctions.setDJTotalPlayCount( theUserID, userFunctions.getUsersRefreshTotalPlayCount[ theUserID ] );
+        userFunctions.setDJTotalPlayCount( theUserID, userFunctions.getUsersRefreshTotalPlayCount[ theUserID ], databaseFunctions );
     }
     //updates the afk position of the person who joins the stage.
-    userFunctions.updateUserJoinedStage( theUserID );
+    userFunctions.updateUserJoinedStage( theUserID, databaseFunctions );
 
     //adds a user to the Djs list when they join the stage.
     userFunctions.addDJToList( theUserID );
@@ -397,7 +443,7 @@ bot.on( 'add_dj', function ( data ) {
     }
 
     if ( userFunctions.isUserInRefreshList( theUserID ) ) {
-        userFunctions.removeRefreshFromUser( theUserID );
+        userFunctions.removeRefreshFromUser( theUserID, databaseFunctions );
     }
 
     //check to see if conditions are met for bot's autodjing feature
@@ -408,7 +454,7 @@ bot.on( 'add_dj', function ( data ) {
 bot.on( 'rem_dj', function ( data ) {
     let theUserID = data.user[ 0 ].userid;
     //removes user from the dj list when they leave the stage
-    userFunctions.resetDJFlags( theUserID );
+    userFunctions.resetDJFlags( theUserID, databaseFunctions );
 
     //gives them one chance to get off stage, then after that they're play limit is treated as normal
     if ( typeof userFunctions.getUsersRefreshCurrentPlayCount[ theUserID ] == 'number' && userFunctions.isUserInRefreshList( theUserID ) === false ) {
@@ -436,41 +482,171 @@ bot.on( 'rem_dj', function ( data ) {
     botFunctions.checkAutoDJing( userFunctions );
 
     //takes a user off the escort list if they leave the stage.
-    userFunctions.removeEscortMeFromUser( theUserID );
+    userFunctions.removeEscortMeFromUser( theUserID, databaseFunctions );
 } );
 
 bot.on( 'update_user', function ( data ) {
-    userFunctions.updateUser( data );
+    userFunctions.updateUser( data, databaseFunctions );
 } )
 
 //updates the moderator list when a moderator is added.
 bot.on( 'new_moderator', function ( data ) {
     const theUserID = data.userid;
-    userFunctions.addModerator( theUserID )
+    userFunctions.addModerator( theUserID, databaseFunctions )
 } )
 
 //updates the moderator list when a moderator is removed.
 bot.on( 'rem_moderator', function ( data ) {
     const theUserID = data.userid;
-    userFunctions.removeModerator( theUserID )
+    userFunctions.removeModerator( theUserID, databaseFunctions )
 } )
 
 //activates at the end of a song.
 bot.on( 'endsong', function ( data ) {
     songFunctions.grabSongStats();
     const djID = data.room.metadata.current_dj;
+    roomFunctions.setLastDJ( djID );
 
     //bot says song stats for each song
-    chatFunctions.readSongStats( data, songFunctions, botFunctions )
+    chatFunctions.readSongStats( data, songFunctions, botFunctions );
 
-    userFunctions.incrementDJPlayCount( djID );
+    userFunctions.incrementDJPlayCount( djID, databaseFunctions );
 
     // check the playlimit and remove the current DJ if they've reached it
     userFunctions.removeDJsOverPlaylimit( data, chatFunctions, djID );
 
-    roomFunctions.escortDJsDown( data, djID, botFunctions, userFunctions, chatFunctions );
+    roomFunctions.escortDJsDown( data, djID, botFunctions, userFunctions, chatFunctions, databaseFunctions );
 } );
 
+// ########################################################################
+// DB Song Editor
+// ########################################################################
+
+app.get( '/listunverified', async ( req, res ) => {
+    try {
+        const songList = await databaseFunctions.getUnverifiedSongList( req.query.byrecent );
+        let html = pug.renderFile( './templates/listUnverifiedSongs.pug', { songList } );
+        res.send( html );
+    } catch ( error ) {
+        console.error( error );
+        res.sendStatus( 500 );
+    }
+} );
+
+app.post( '/updateArtistDisplayName', ( req, res ) => {
+    const artistID = req.body.artistID;
+    const artistDisplayName = req.body.artistDisplayName;
+
+    // call a function with the artistID and artistDisplayName values
+    databaseFunctions.updateArtistDisplayName( artistID, artistDisplayName )
+        .then( () => {
+            const queryParams = new URLSearchParams( { byrecent: req.body.byrecent } );
+            const redirectUrl = '/listunverified?' + queryParams.toString();
+            res.redirect( redirectUrl );
+        } )
+} );
+
+app.post( '/updateTrackDisplayName', ( req, res ) => {
+    const trackID = req.body.trackID;
+    const trackDisplayName = req.body.trackDisplayName;
+
+    // call a function with the artistID and artistDisplayName values
+    databaseFunctions.updateTrackDisplayName( trackID, trackDisplayName )
+        .then( () => {
+            const queryParams = new URLSearchParams( { byrecent: req.body.byrecent } );
+            const redirectUrl = '/listunverified?' + queryParams.toString();
+            res.redirect( redirectUrl );
+        } )
+} );
+
+// ########################################################################
+// Top 10 Countddown Data
+// ########################################################################
+
+async function getTop10 ( req, res, functionName, templateFile ) {
+    try {
+        const { startDate, endDate } = req.query;
+        const [ formStartDate, formEndDate, linkStartDate, linkEndDate ] = [
+            dateFunctions.formStartDate( dayjs, startDate ),
+            dateFunctions.formEndDate( dayjs, endDate ),
+            dateFunctions.linkStartDate( dayjs, startDate ),
+            dateFunctions.linkEndDate( dayjs, endDate ),
+        ];
+        const [ top10SongList, top1080sSongList, top10WednesdaySongList, top10FridaySongList ] = await Promise.all( [
+            databaseFunctions[ functionName ]( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ) ),
+            databaseFunctions[ functionName ]( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ), [ 0, 1, 2, 3, 5 ] ),
+            databaseFunctions[ functionName ]( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ), [ 4 ] ),
+            databaseFunctions[ functionName ]( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ), [ 6 ] ),
+        ] );
+        const html = pug.renderFile( `./templates/${ templateFile }.pug`, {
+            top10SongList,
+            top1080sSongList,
+            top10WednesdaySongList,
+            top10FridaySongList,
+            formStartDate,
+            formEndDate,
+            linkStartDate,
+            linkEndDate,
+        } );
+        res.send( html );
+    } catch ( error ) {
+        console.error( error );
+        res.sendStatus( 500 );
+    }
+}
+
+async function getSummary ( req, res, templateFile ) {
+    try {
+        const { startDate, endDate } = req.query;
+        const [ formStartDate, formEndDate, linkStartDate, linkEndDate ] = [
+            dateFunctions.formStartDate( dayjs, startDate ),
+            dateFunctions.formEndDate( dayjs, endDate ),
+            dateFunctions.linkStartDate( dayjs, startDate ),
+            dateFunctions.linkEndDate( dayjs, endDate ),
+        ];
+        const [ summary, top10DJs ] = await Promise.all( [
+            databaseFunctions.roomSummaryResults( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ) ),
+            databaseFunctions.top10DJResults( dateFunctions.dbStartDate( dayjs, startDate ), dateFunctions.dbEndDate( dayjs, endDate ) ),
+        ] );
+        const html = pug.renderFile( `./templates/${ templateFile }.pug`, {
+            summary,
+            top10DJs,
+            formStartDate,
+            formEndDate,
+            linkStartDate,
+            linkEndDate,
+        } );
+        res.send( html );
+    } catch ( error ) {
+        console.error( error );
+        res.sendStatus( 500 );
+    }
+}
+
+app.get( '/fulltop10', async ( req, res ) => {
+    await getTop10( req, res, "fullTop10Results", "fullTop10" );
+} );
+
+app.get( '/likesTop10', async ( req, res ) => {
+    await getTop10( req, res, "top10ByLikesResults", "likesTop10" );
+} );
+
+app.get( '/mostplayedtracks', async ( req, res ) => {
+    await getTop10( req, res, "mostPlayedTracksResults", "mostplayedtracks" );
+} );
+
+app.get( '/mostplayedartists', async ( req, res ) => {
+    await getTop10( req, res, "mostPlayedArtistsResults", "mostplayedartists" );
+} );
+
+app.get( '/summary', async ( req, res ) => {
+    await getSummary( req, res, "summary" );
+} );
+
+
+// ########################################################################
+// Bot Plaaylist Editor
+// ########################################################################
 
 app.get( '/', function ( req, res ) {
     bot.playlistAll( ( playlistData ) => {
@@ -505,6 +681,10 @@ app.get( '/deletesong', ( req, res ) => {
     bot.playlistRemove( Number.parseInt( req.query.songindex ) );
     res.json( `refresh` );
 } );
+
+// ########################################################################
+// General functions
+// ########################################################################
 
 function authentication ( req, res, next ) {
     let authheader = req.headers.authorization;

@@ -1,15 +1,6 @@
-// load the googleAPI
-let { google } = require( "googleapis" );
-let authorize = require( "./oauth2lib" );
-const request = require('request');
-
+const request = require( 'request' );
 
 let { setIntersection, setDifference } = require( "../modules/setlib" );
-
-let SCOPES = [ "https://www.googleapis.com/auth/youtube.readonly" ];
-let CLIENT_SECRET_PATH = "client_secret.json";
-let TOKEN_DIR = ( process.env.HOME || process.env.HOMEPATH ) + "/.credentials/";
-let TOKEN_PATH = TOKEN_DIR + "theManagementCredentials.json";
 
 const countryLookup = require( 'country-code-lookup' );
 
@@ -18,28 +9,53 @@ let regionsWeCareAbout = new Set( musicDefaults.alertRegions );
 
 const videoFunctions = () => {
     function alertIfRegionsNotAllowed ( restrictions, userFunctions, notifier ) {
-        let missingRegions = setDifference(
-            regionsWeCareAbout,
-            restrictions.allowed
-        );
+        const missingRegions = setDifference( regionsWeCareAbout, restrictions.allowed || [] );
         if ( missingRegions.length ) {
-            notifier(
-                'Sorry @' + userFunctions.getUsername( userFunctions.getCurrentDJID() ) + ', this video can\'t be played in ' + turnCodesIntoCountries( missingRegions ) + '. Please consider skipping.'
-            );
+            notifier( `Sorry @${ userFunctions.getUsername( userFunctions.getCurrentDJID() ) }, this video can't be played in ${ turnCodesIntoCountries( missingRegions ) }. Please consider skipping.` );
         }
     }
 
     function alertIfRegionsBlocked ( restrictions, userFunctions, notifier ) {
-        let blockedRegions = setIntersection(
-            regionsWeCareAbout,
-            restrictions.blocked
-        );
+        const blockedRegions = setIntersection( regionsWeCareAbout, restrictions.blocked || [] );
         if ( blockedRegions.length ) {
-            notifier(
-                'Sorry @' + userFunctions.getUsername( userFunctions.getCurrentDJID() ) + ', this video can\'t be played in ' + turnCodesIntoCountries( blockedRegions ) + '. Please consider skipping.'
-            );
+            notifier( `Sorry @${ userFunctions.getUsername( userFunctions.getCurrentDJID() ) }, this video can't be played in ${ turnCodesIntoCountries( blockedRegions ) }. Please consider skipping.` );
         }
     }
+
+    function fetchVideoDetails ( videoID, callback ) {
+        const apiUrl = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${ videoID }&key=${ process.env.YOUTUBE_API_KEY }`;
+        request( apiUrl, { json: true }, ( error, response, body ) => {
+            if ( error ) {
+                console.error( `Error occurred in videoFunctions.fetchVideoDetails(): ${ error }` );
+                callback( error );
+                return;
+            }
+            callback( null, body );
+        } );
+    }
+
+    function processVideoDetails ( data, body, userFunctions, chatFunctions ) {
+        const restrictions = body.items[ 0 ]?.contentDetails?.regionRestriction;
+
+        if ( !restrictions ) {
+            return;
+        }
+
+        if ( 'allowed' in restrictions ) {
+            if ( restrictions.allowed ) {
+                alertIfRegionsNotAllowed( restrictions, userFunctions, ( msg ) =>
+                    chatFunctions.botSpeak( msg, data )
+                );
+            }
+        } else if ( 'blocked' in restrictions ) {
+            if ( restrictions.blocked ) {
+                alertIfRegionsBlocked( restrictions, userFunctions, ( msg ) =>
+                    chatFunctions.botSpeak( msg, data )
+                );
+            }
+        }
+    }
+
 
     function turnCodesIntoCountries ( regionCodes ) {
         let countriesString = '';
@@ -61,26 +77,17 @@ const videoFunctions = () => {
         }
     }
 
-    async function queryVideoDetails ( auth, videoID ) {
-        let service = google.youtube( "v3" );
-        return service.videos
-            .list( {
-                auth: auth,
-                part: "snippet,contentDetails,statistics",
-                id: videoID,
-            } )
-            .then( ( { data } ) => {
-                return data.items[ 0 ].contentDetails;
-            } )
-            .catch( err => console.error(`Error occurred in videoFunctions.queryVideoDetails() : ${err}`) );
-    }
-
-    async function getRegionRestrictions ( auth, videoID ) {
-        const { regionRestriction } = await queryVideoDetails( auth, videoID );
-        return regionRestriction;
-    }
-
     return {
+        checkVideoRegionAlert: function ( data, videoID, userFunctions, chatFunctions, botFunctions ) {
+            if ( botFunctions.checkVideoRegions() ) {
+                fetchVideoDetails( videoID, ( error, body ) => {
+                    if ( !error ) {
+                        processVideoDetails( data, body, userFunctions, chatFunctions );
+                    }
+                } );
+            }
+        },
+
         listAlertRegions: function ( data, chatFunctions ) {
             const regionsAsArray = Array.from( regionsWeCareAbout );
             let regionReport = `The list of regions that will trigger a blocked alert is currently ` + turnCodesIntoCountries( regionsAsArray );
@@ -88,26 +95,30 @@ const videoFunctions = () => {
             chatFunctions.botSpeak( regionReport, data );
         },
 
-        checkVideoStatus: function (videoIDs) {
-            return new Promise( (resolve, reject) => {
-                let youtubeURL = `https://www.googleapis.com/youtube/v3/videos?id=${videoIDs}&part=status&key=${process.env.YOUTUBE_API_KEY}`
-                request(youtubeURL, {json: true}, (error, res, body) => {
-        
-                    if (error) {
-                        reject(`Something went wrong. Try again later.`);
+        checkVideoStatus: function ( videoIDs ) {
+            return new Promise( ( resolve, reject ) => {
+                let youtubeURL = `https://www.googleapis.com/youtube/v3/videos?id=${ videoIDs }&part=status&key=${ process.env.YOUTUBE_API_KEY }`;
+
+                request( youtubeURL, { json: true }, ( error, res, body ) => {
+                    console.log( "body:" + JSON.stringify( body ) );
+                    if ( error ) {
+                        reject( `Error making request: ${ error }` );
+                        return;
                     }
-        
-                    if (!body.hasOwnProperty('items')) {
-                        reject(`No data returned`);
+
+                    if ( res.statusCode !== 200 ) {
+                        reject( `HTTP error: ${ res.statusCode }` );
+                        return;
                     }
-        
-                    if (!Array.isArray(body.items) || !body.items.length) {
-                        reject(`No data returned`);
+
+                    if ( !body.hasOwnProperty( 'items' ) || !Array.isArray( body.items ) || !body.items.length ) {
+                        reject( `No data returned from YouTube API` );
+                        return;
                     }
-        
-                    resolve(body.items);
-                });
-            });
+
+                    resolve( body.items );
+                } );
+            } );
         },
 
         addAlertRegion: function ( data, region, chatFunctions, announce = true ) {
@@ -147,37 +158,6 @@ const videoFunctions = () => {
 
         resetAlertRegions: function () {
             regionsWeCareAbout = new Set( musicDefaults.alertRegions );
-        },
-
-        checkVideoRegionAlert: function ( data, videoID, userFunctions, chatFunctions, botFunctions ) {
-            if ( botFunctions.checkVideoRegions() ) {
-                authorize( CLIENT_SECRET_PATH, TOKEN_PATH, SCOPES )
-                    .then( ( oauthClient ) => getRegionRestrictions( oauthClient, videoID ) )
-                    .then( ( restrictions ) => {
-                        if ( !restrictions ) {
-                            return;
-                        }
-
-                        if ( restrictions.hasOwnProperty(`allowed`) ) {
-                            if ( restrictions.allowed ) {
-                                alertIfRegionsNotAllowed( restrictions, userFunctions, ( msg ) =>
-                                    chatFunctions.botSpeak( msg, data )
-                                );
-                            }
-                            return;
-                        }
-
-                        if ( restrictions.hasOwnProperty(`blocked`) ) {
-                            if ( restrictions.blocked ) {
-                                alertIfRegionsBlocked( restrictions, userFunctions, ( msg ) =>
-                                    chatFunctions.botSpeak( msg, data )
-                                );
-                            }
-                        }
-
-                    } )
-                    .catch( err => console.error(`Error occurred in videoFunctions.checkVideoRegionAlert() : ${err}`) );
-            }
         },
 
         // this is pretty horrible, but nothing in here is easy to test
