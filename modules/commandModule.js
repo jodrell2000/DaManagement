@@ -152,7 +152,10 @@ const commandFunctions = ( bot ) => {
     // RoboCoin commands
     // #############################################
 
-    moderatorCommands.giverc = ( { data, args, userFunctions, chatFunctions, databaseFunctions } ) => { userFunctions.giveRoboCoin( data, args, chatFunctions, databaseFunctions ) }
+    moderatorCommands.confirm = ( { data, userFunctions } ) => { userFunctions.confirmCommand( data  ) }
+    moderatorCommands.confirm.help = "Confirm a command if requested";
+
+    moderatorCommands.giverc = ( { data, args, userFunctions, chatFunctions, databaseFunctions } ) => { userFunctions.giveRoboCoinCommand( data, args, chatFunctions, databaseFunctions ) }
     moderatorCommands.giverc.argumentCount = 2;
     moderatorCommands.giverc.help = "Give someone RoboCoin";
     moderatorCommands.giverc.sampleArguments = [ "jodrell", "10" ];
