@@ -137,7 +137,7 @@ bot.on( 'ready', function () {
 } );
 
 //starts up when a new person joins the room
-bot.on( 'registered', function ( data ) {
+bot.on( 'registered', async function ( data ) {
     const userID = data.user[ 0 ].userid;
     const username = data.user[ 0 ].name;
 
@@ -151,6 +151,10 @@ bot.on( 'registered', function ( data ) {
         userFunctions.bootThisUser( userID, bootUserMessage );
     } else {
         chatFunctions.userGreeting( data, userID, username, roomFunctions, userFunctions, databaseFunctions )
+    }
+
+    if ( !( await databaseFunctions.hasUserHadInitialRoboCoinGift( userID ) ) ) {
+        userFunctions.giveInitialRoboCoinGift( userID, databaseFunctions );
     }
 
     userFunctions.askUserToSetRegion( userID, chatFunctions );
