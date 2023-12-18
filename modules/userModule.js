@@ -43,7 +43,7 @@ let djIdleLimit = roomDefaults.djIdleLimitThresholds[ 0 ]; // how long can DJs b
 let idleFirstWarningTime = roomDefaults.djIdleLimitThresholds[ 1 ];
 let idleSecondWarningTime = roomDefaults.djIdleLimitThresholds[ 2 ];
 
-let functionStore; // store give RoboCoin callback functions
+let functionStore = []; // store give RoboCoin callback functions
 
 const addRCOperation = ( before, coins ) => ( before || 0 ) + coins;
 const subtractRCOperation = ( before, coins ) => ( before || 0 ) - coins;
@@ -335,7 +335,7 @@ const userFunctions = ( bot ) => {
             if ( userRegionsArray !== undefined ) {
                 for ( let userRegionLoop = 0; userRegionLoop < userRegionsArray.length; userRegionLoop++ ) {
                     thisRegion = userRegionsArray[ userRegionLoop ];
-                    if ( thisRegion !== {} ) {
+                    if ( Object.keys( thisRegion ).length > 0 ) {
                         videoFunctions.addAlertRegion( data, thisRegion, chatFunctions, false );
                     }
                 }
@@ -2316,52 +2316,72 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        giveRoboCoinCommand: async function (data, args, chatFunctions, databaseFunctions) {
-            const sendingUserID = this.whoSentTheCommand(data);
-            const receivingUserID = this.getUserIDFromUsername(this.returnUsernameFromMessageAfterArguments(data.text));
-            const numCoins = parseInt(args[0], 10);
+        giveRoboCoinCommand: async function ( data, args, chatFunctions, databaseFunctions ) {
+            const sendingUserID = this.whoSentTheCommand( data );
+            const receivingUserID = this.getUserIDFromUsername( this.returnUsernameFromMessageAfterArguments( data.text ) );
+            const numCoins = parseInt( args[ 0 ], 10 );
 
-            return new Promise((resolve, reject) => {
-                this.validateNumCoins(numCoins, sendingUserID, chatFunctions, reject, data)
-                    .then(() => this.validateReceivingUser(args, receivingUserID, sendingUserID, chatFunctions, reject, data))
-                    .then(() => this.canUserAffordToSpendThisMuch(sendingUserID, numCoins))
-                    .then(() => {
-                        functionStore[sendingUserID] = this.giveRoboCoinAction(sendingUserID, receivingUserID, numCoins, "Give RoboCoin", chatFunctions, databaseFunctions, data);
-                        setTimeout(() => {
-                            functionStore[sendingUserID] = null;
-                            resolve(); // Resolve the promise after the timeout
-                        }, 60 * 1000);
-                    })
-                    .catch((error) => {
-                        this.handleError(error, chatFunctions, data, reject);
-                        reject(error); // Ensure to reject the promise in case of an error
-                    });
-            });
+            return new Promise( ( resolve, reject ) => {
+                this.validateNumCoins( numCoins, sendingUserID, chatFunctions, reject, data )
+                    .then( () => this.validateReceivingUser( args, receivingUserID, sendingUserID, chatFunctions, reject, data ) )
+                    .then( () => this.canUserAffordToSpendThisMuch( sendingUserID, numCoins ) )
+                    .then( () => {
+                        functionStore[ sendingUserID + "function" ] = () => {
+                            return new Promise( ( innerResolve, innerReject ) => {
+                                this.giveRoboCoinAction( sendingUserID, receivingUserID, numCoins, "Give RoboCoin", chatFunctions, databaseFunctions, data )
+                                    .then( () => innerResolve() )
+                                    .catch( ( error ) => innerReject( error ) );
+                            } );
+                        };
+
+                        functionStore[ sendingUserID + "timeout" ] = setTimeout( () => {
+                            functionStore[ sendingUserID ] = null;
+                            chatFunctions.botSpeak( "@" + this.getUsername( sendingUserID ) + " give RoboCoins command timed out", data );
+                            resolve(); // Resolve the outer promise after the timeout
+                        }, 60 * 1000 );
+
+                        chatFunctions.botSpeak( "@" + this.getUsername( sendingUserID ) + " please send the command /confirm to confirm you want to spend " + numCoins + " RoboCoins", data );
+                    } )
+                    .catch( ( error ) => {
+                        this.handleError( error, chatFunctions, data, reject );
+                        reject( error ); // Ensure to reject the outer promise in case of an error
+                    } );
+            } );
         },
 
-        confirmCommand: function (data) {
-            const sendingUserID = this.whoSentTheCommand(data);
-            if (functionStore[sendingUserID]) {
-                functionStore[sendingUserID]();
-                functionStore[sendingUserID] = null;
-                clearTimeout(functionStore[sendingUserID])
+        confirmCommand: function ( data, chatFunctions ) {
+            const sendingUserID = this.whoSentTheCommand( data );
+            if ( functionStore && functionStore[ sendingUserID + "function" ] && typeof functionStore[ sendingUserID + "function" ] === 'function' ) {
+                functionStore[ sendingUserID + "function" ]()
+                    .then( () => {
+                        clearTimeout( functionStore[ sendingUserID + "timeout" ] );
+                    } )
+                    .then( () => {
+                        functionStore[ sendingUserID + "function" ] = null;
+                        functionStore[ sendingUserID + "timeout" ] = null;
+                    } )
+                    .catch( ( error ) => {
+                        console.error( 'Error confirming command:', error );
+                    } );
+            } else {
+                chatFunctions.botSpeak( "@" + this.getUsername( sendingUserID ) + " there's nothing to confirm??", data );
             }
         },
 
         giveRoboCoinAction: function ( sendingUserID, receivingUserID, numCoins, changeReason, chatFunctions, databaseFunctions, data ) {
-            return new Promise((resolve, reject) => {
-                this.subtractRoboCoins(sendingUserID, numCoins, changeReason + " to " + this.getUsername(receivingUserID), databaseFunctions)
-                    .then(() => this.addRoboCoins(receivingUserID, numCoins, changeReason + " from " + this.getUsername(sendingUserID), databaseFunctions)
+            return new Promise( ( resolve, reject ) => {
+                this.subtractRoboCoins( sendingUserID, numCoins, changeReason + " to " + this.getUsername( receivingUserID ), databaseFunctions )
+                    .then( () => this.addRoboCoins( receivingUserID, numCoins, changeReason + " from " + this.getUsername( sendingUserID ), databaseFunctions )
                     )
-                    .then(() => {
-                        chatFunctions.botSpeak("@" + this.getUsername(sendingUserID) + " gave " + numCoins + " to @" + this.getUsername(receivingUserID), data);
+                    .then( () => {
+                        chatFunctions.botSpeak( "@" + this.getUsername( sendingUserID ) + " gave " + numCoins + " to @" + this.getUsername( receivingUserID ), data );
                         resolve();
-                    })
-                    .catch((error) => {
-                        this.handleError(error, chatFunctions, data, reject);
-                        reject(error); // Ensure to reject the promise in case of an error
-                    });
-            })
+                    } )
+                    .catch( ( error ) => {
+                        this.handleError( error, chatFunctions, data, reject );
+                        reject( error ); // Ensure to reject the promise in case of an error
+                    } );
+            } )
         },
     }
 }

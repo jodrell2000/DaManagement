@@ -152,7 +152,7 @@ const commandFunctions = ( bot ) => {
     // RoboCoin commands
     // #############################################
 
-    moderatorCommands.confirm = ( { data, userFunctions } ) => { userFunctions.confirmCommand( data  ) }
+    moderatorCommands.confirm = ( { data, userFunctions, chatFunctions } ) => { userFunctions.confirmCommand( data, chatFunctions ) }
     moderatorCommands.confirm.help = "Confirm a command if requested";
 
     moderatorCommands.giverc = ( { data, args, userFunctions, chatFunctions, databaseFunctions } ) => { userFunctions.giveRoboCoinCommand( data, args, chatFunctions, databaseFunctions ) }
