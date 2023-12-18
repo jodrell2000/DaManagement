@@ -2213,27 +2213,27 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        addRoboCoins: async function ( userID, numCoins, changeReason, databaseFunctions ) {
+        addRoboCoins: async function ( userID, numCoins, changeReason, changeID, databaseFunctions ) {
             try {
                 const coins = parseInt( numCoins, 10 );
-                await this.processRoboCoins( userID, coins, changeReason, addRCOperation, databaseFunctions );
+                await this.processRoboCoins( userID, coins, changeReason, changeID, addRCOperation, databaseFunctions );
             } catch ( error ) {
                 console.error( 'Error in addRoboCoins:', error.message );
                 // Handle the error as needed
             }
         },
 
-        subtractRoboCoins: async function ( userID, numCoins, changeReason, databaseFunctions ) {
+        subtractRoboCoins: async function ( userID, numCoins, changeReason, changeID, databaseFunctions ) {
             try {
                 const coins = parseInt( numCoins, 10 );
-                await this.processRoboCoins( userID, coins, changeReason, subtractRCOperation, databaseFunctions );
+                await this.processRoboCoins( userID, coins, changeReason, changeID, subtractRCOperation, databaseFunctions );
             } catch ( error ) {
                 console.error( 'Error in subtractRoboCoins:', error.message );
                 // Handle the error as needed
             }
         },
 
-        processRoboCoins: async function ( userID, numCoins, changeReason, operation, databaseFunctions ) {
+        processRoboCoins: async function ( userID, numCoins, changeReason, changeID, operation, databaseFunctions ) {
             try {
                 const before = await this.getRoboCoins( userID );
                 const updatedCoins = operation( before, numCoins );
@@ -2241,7 +2241,7 @@ const userFunctions = ( bot ) => {
                 const after = await this.getRoboCoins( userID );
 
                 // Pass positive or negative numCoins to auditRoboCoin based on the type of operation
-                await this.auditRoboCoin( userID, before, after, operation === addRCOperation ? numCoins : -numCoins, changeReason, databaseFunctions );
+                await this.auditRoboCoin( userID, before, after, operation === addRCOperation ? numCoins : -numCoins, changeReason, changeID, databaseFunctions );
             } catch ( error ) {
                 console.error( `Error in ${ operation.name }:`, error.message );
                 throw error;
@@ -2259,9 +2259,9 @@ const userFunctions = ( bot ) => {
             } );
         },
 
-        auditRoboCoin: async function ( userID, before, after, numCoins, changeReason, databaseFunctions ) {
+        auditRoboCoin: async function ( userID, before, after, numCoins, changeReason, changeID, databaseFunctions ) {
             try {
-                await databaseFunctions.saveRoboCoinAudit( userID, before, after, numCoins, changeReason );
+                await databaseFunctions.saveRoboCoinAudit( userID, before, after, numCoins, changeReason, changeID );
             } catch ( error ) {
                 console.error( 'Query failed:', error );
             } finally {
@@ -2298,6 +2298,13 @@ const userFunctions = ( bot ) => {
             reject( error.message );
         },
 
+        giveInitialRoboCoinGift: async function ( userID, databaseFunctions ) {
+            const numCoins = 100;
+            const changeReason = "Welcome gift";
+            const changeID = 1;
+            this.addRoboCoins( userID, numCoins, changeReason, changeID, databaseFunctions );
+        },
+
         // ========================================================
 
         // ========================================================
@@ -2328,7 +2335,7 @@ const userFunctions = ( bot ) => {
                     .then( () => {
                         functionStore[ sendingUserID + "function" ] = () => {
                             return new Promise( ( innerResolve, innerReject ) => {
-                                this.giveRoboCoinAction( sendingUserID, receivingUserID, numCoins, "Give RoboCoin", chatFunctions, databaseFunctions, data )
+                                this.giveRoboCoinAction( sendingUserID, receivingUserID, numCoins, "Give RoboCoin", 2, chatFunctions, databaseFunctions, data )
                                     .then( () => innerResolve() )
                                     .catch( ( error ) => innerReject( error ) );
                             } );
@@ -2368,10 +2375,10 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        giveRoboCoinAction: function ( sendingUserID, receivingUserID, numCoins, changeReason, chatFunctions, databaseFunctions, data ) {
+        giveRoboCoinAction: function ( sendingUserID, receivingUserID, numCoins, changeReason, changeID, chatFunctions, databaseFunctions, data ) {
             return new Promise( ( resolve, reject ) => {
-                this.subtractRoboCoins( sendingUserID, numCoins, changeReason + " to " + this.getUsername( receivingUserID ), databaseFunctions )
-                    .then( () => this.addRoboCoins( receivingUserID, numCoins, changeReason + " from " + this.getUsername( sendingUserID ), databaseFunctions )
+                this.subtractRoboCoins( sendingUserID, numCoins, changeReason + " to " + this.getUsername( receivingUserID ), changeID, databaseFunctions )
+                    .then( () => this.addRoboCoins( receivingUserID, numCoins, changeReason + " from " + this.getUsername( sendingUserID ), changeID, databaseFunctions )
                     )
                     .then( () => {
                         chatFunctions.botSpeak( "@" + this.getUsername( sendingUserID ) + " gave " + numCoins + " to @" + this.getUsername( receivingUserID ), data );
