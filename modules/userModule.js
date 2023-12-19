@@ -2342,7 +2342,7 @@ const userFunctions = ( bot ) => {
                         };
 
                         functionStore[ sendingUserID + "timeout" ] = setTimeout( () => {
-                            functionStore[ sendingUserID ] = null;
+                            functionStore[ sendingUserID + "function" ] = null;
                             chatFunctions.botSpeak( "@" + this.getUsername( sendingUserID ) + " give RoboCoins command timed out", data );
                             resolve(); // Resolve the outer promise after the timeout
                         }, 60 * 1000 );
@@ -2356,7 +2356,7 @@ const userFunctions = ( bot ) => {
             } );
         },
 
-        confirmCommand: function ( data, chatFunctions ) {
+        confirmCommand: async function ( data, chatFunctions ) {
             const sendingUserID = this.whoSentTheCommand( data );
             if ( functionStore && functionStore[ sendingUserID + "function" ] && typeof functionStore[ sendingUserID + "function" ] === 'function' ) {
                 functionStore[ sendingUserID + "function" ]()
