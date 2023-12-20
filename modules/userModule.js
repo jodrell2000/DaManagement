@@ -2183,16 +2183,19 @@ const userFunctions = ( bot ) => {
             } );
         },
 
-        canUserAffordToSpendThisMuch: async function ( userID, numCoins ) {
+        canUserAffordToSpendThisMuch: async function (userID, numCoins, chatFunctions, data ) {
             try {
-                const userRoboCoins = await this.getRoboCoins( userID );
+                const userRoboCoins = await this.getRoboCoins(userID);
 
-                // Assuming getRoboCoins returns a numeric value synchronously
-                return userRoboCoins >= numCoins;
-            } catch ( error ) {
-                // Handle any errors that may occur in getRoboCoins
-                console.error( 'Error in canUserAffordToSpendThisMuch:', error.message );
-                throw new Error( 'Error checking user affordability' );
+                if (userRoboCoins >= numCoins) {
+                    return true;
+                } else {
+                    chatFunctions.botSpeak( "Sorry @" + this.getUsername( userID ) + " you can't afford that", data );
+                    throw new Error('Insufficient funds');
+                }
+            } catch (error) {
+                // Handle any errors that may occur in getRoboCoins or due to insufficient funds
+                throw new Error('Error checking user affordability');
             }
         },
 
@@ -2312,7 +2315,7 @@ const userFunctions = ( bot ) => {
             try {
                 await this.validateNumCoins( numCoins, sendingUserID, chatFunctions, data );
                 await this.validateReceivingUser( args, receivingUserID, sendingUserID, chatFunctions, data );
-                await this.canUserAffordToSpendThisMuch( sendingUserID, numCoins );
+                await this.canUserAffordToSpendThisMuch( sendingUserID, numCoins, chatFunctions, data );
 
                 functionStore[ sendingUserID + "function" ] = () => {
                     return new Promise( ( innerResolve, innerReject ) => {
