@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS roboCoinAuditTypes (
 
 INSERT INTO roboCoinAuditTypes (id, reason) VALUES
 (1, "Welcome Gift"),
-(2, "User Gift");
+(2, "User Gift"),
+(3, "RoboGift");
 
 ALTER TABLE roboCoinAudit
 ADD COLUMN auditType_id INT;
