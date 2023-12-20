@@ -2282,7 +2282,7 @@ const userFunctions = ( bot ) => {
             const changeID = 1;
             await this.addRoboCoins( userID, numCoins, changeReason, changeID, databaseFunctions );
             setTimeout(() => {
-                chatFunctions.botSpeak("@" + this.getUsername(userID) + " welcome to " + roomFunctions.roomName() + " room. Have a gift of 100 RoboCoins!", data);
+                chatFunctions.botSpeak("@" + this.getUsername(userID) + " welcome to the " + roomFunctions.roomName() + " room. Have a gift of 100 RoboCoins!", data);
             }, 3 * 1000);
         },
 
