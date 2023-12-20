@@ -9,21 +9,6 @@ CREATE TABLE IF NOT EXISTS roboCoinAudit (
   changeTime DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS roboCoinAuditTypes (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  reason VARCHAR(128) NOT NULL
-);
-
-INSERT INTO roboCoinAuditTypes (id, reason) VALUES
-(1, "Welcome Gift"),
-(2, "User Gift"),
-(3, "RoboGift");
-
-ALTER TABLE roboCoinAudit
-ADD COLUMN auditType_id INT;
-
-ALTER TABLE roboCoinAudit
-ADD INDEX userReason (users_id, auditType_id);
 
 ALTER TABLE artists
 DROP COLUMN `displayArtistsID`,

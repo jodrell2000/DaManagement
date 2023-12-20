@@ -162,9 +162,9 @@ const databaseFunctions = () => {
         // RoboCoin Audit Functions
         // ========================================================
 
-        saveRoboCoinAudit: async function ( userID, before, after, numCoins, changeReason, changeID ) {
-            const theQuery = "INSERT INTO roboCoinAudit (users_id, beforeChange, afterChange, numCoins, changeReason, auditType_id) VALUES (?, ?, ?, ?, ?, ?);";
-            const values = [ userID, before, after, numCoins, changeReason, changeID ];
+        saveRoboCoinAudit: async function ( userID, before, after, numCoins, changeReason ) {
+            const theQuery = "INSERT INTO roboCoinAudit (users_id, beforeChange, afterChange, numCoins, changeReason) VALUES (?, ?, ?, ?, ?);";
+            const values = [ userID, before, after, numCoins, changeReason ];
 
             try {
                 const result = await this.runQuery( theQuery, values );
@@ -173,22 +173,8 @@ const databaseFunctions = () => {
                 console.error( 'Error in saveRoboCoinAudit:', error.message );
                 // Handle the error as needed
                 throw error; // Rethrow the error if necessary
-            }
-        },
-
-        hasUserHadInitialRoboCoinGift: async function ( userID ) {
-            const theQuery = "SELECT COUNT(*) AS gifted FROM roboCoinAudit WHERE users_id=? AND auditType_id=1;";
-            const values = [ userID ];
-            try {
-                const result = await this.runQuery( theQuery, values );
-                const firstElement = result && result[ 0 ];
-                const giftedValue = firstElement && firstElement.gifted;
-
-                return giftedValue > 0;
-            } catch ( error ) {
-                console.error( 'Error in checking hasUserHadInitialRoboCoinGift in the DB:', error.message );
-                // Handle the error as needed
-                throw error; // Rethrow the error if necessary
+            } finally {
+                console.groupEnd();
             }
         },
 

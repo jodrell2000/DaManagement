@@ -137,9 +137,9 @@ bot.on( 'ready', function () {
 } );
 
 //starts up when a new person joins the room
-bot.on( 'registered', async function ( data ) {
+bot.on( 'registered', function ( data ) {
     const username = data.user[ 0 ].name;
-    if ( username !== "Guest" ) {
+    if ( username !== "Guest") {
         const userID = data.user[ 0 ].userid;
 
         userFunctions.userJoinsRoom( userID, username, databaseFunctions );
@@ -152,10 +152,6 @@ bot.on( 'registered', async function ( data ) {
             userFunctions.bootThisUser( userID, bootUserMessage );
         } else {
             chatFunctions.userGreeting( data, userID, username, roomFunctions, userFunctions, databaseFunctions )
-        }
-
-        if ( !( await databaseFunctions.hasUserHadInitialRoboCoinGift( userID ) ) ) {
-            await userFunctions.giveInitialRoboCoinGift( data, userID, databaseFunctions, chatFunctions, roomFunctions );
         }
 
         userFunctions.askUserToSetRegion( userID, chatFunctions );
@@ -171,20 +167,20 @@ bot.on( 'deregistered', function ( data ) {
         userFunctions.deregisterUser(theUserID, databaseFunctions);
         userFunctions.updateRegionAlertsFromUsers(data, videoFunctions, chatFunctions);
     }
-} );
+} )
 
 //starts up when bot first enters the room
-bot.on( 'roomChanged', async function ( data ) {
+bot.on( 'roomChanged', function ( data ) {
     try {
         userFunctions.resetUsersList();
 
         // load in and user data on disk first
         userFunctions.initialUserDataLoad( databaseFunctions );
 
-        // reset arrays in case this was triggered by the bot restarting
+        //reset arrays in case this was triggered by the bot restarting
         userFunctions.resetAllWarnMe( data, databaseFunctions );
 
-        // get & set information
+        //get & set information
         roomFunctions.setRoomDefaults( data );
 
         // build in the users in the room, skip any already loaded from disk
@@ -194,20 +190,18 @@ bot.on( 'roomChanged', async function ( data ) {
         userFunctions.startAllUserTimers( databaseFunctions );
         userFunctions.resetDJs( data );
 
-        if ( data.room.metadata.current_dj !== null ) {
-            userFunctions.setCurrentDJ( data.room.metadata.current_dj, databaseFunctions );
-        }
-        if ( data.room.metadata.current_song !== null ) {
-            songFunctions.getSongTags( data.room.metadata.current_song );
-        }
+        // set user as current DJ
+        userFunctions.setCurrentDJ( data.room.metadata.current_dj, databaseFunctions );
+        songFunctions.getSongTags( data.room.metadata.current_song )
+
         // ask users for their regions if we don't have them
         userFunctions.checkUsersHaveRegions( data, chatFunctions );
         userFunctions.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
 
         chatFunctions.botSpeak( "System online...", data );
-    } catch ( err ) {
-        console.error( 'Error in roomChanged event:', err );
-        console.log( 'error', 'Unable to join the room due to an error: ' + err.toString() );
+    }
+    catch ( err ) {
+        console.log( 'error', 'unable to join the room the room due to err: ' + err.toString() );
     }
 } );
 
@@ -275,7 +269,7 @@ bot.on( 'newsong', function ( data ) {
         } )
         .then( () => {
             chatFunctions.botSpeak( "Have 10 RoboCoin as a thank you", data );
-            userFunctions.addRoboCoins( djID, 10, "Played Robo's favourite artist", 3, databaseFunctions );
+            userFunctions.addRoboCoins( djID, 10, "Played Robo's favourite artist", databaseFunctions );
         } )
         .then( () => {
             botFunctions.chooseNewFavourite( databaseFunctions );
