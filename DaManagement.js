@@ -139,7 +139,7 @@ bot.on( 'ready', function () {
 //starts up when a new person joins the room
 bot.on( 'registered', async function ( data ) {
     const username = data.user[ 0 ].name;
-    if ( username !== "Guest") {
+    if ( username !== "Guest" ) {
         const userID = data.user[ 0 ].userid;
 
         userFunctions.userJoinsRoom( userID, username, databaseFunctions );
@@ -154,14 +154,14 @@ bot.on( 'registered', async function ( data ) {
             chatFunctions.userGreeting( data, userID, username, roomFunctions, userFunctions, databaseFunctions )
         }
 
-    if ( !( await databaseFunctions.hasUserHadInitialRoboCoinGift( userID ) ) ) {
-        await userFunctions.giveInitialRoboCoinGift( data, userID, databaseFunctions, chatFunctions, roomFunctions );
-    }
+        if ( !( await databaseFunctions.hasUserHadInitialRoboCoinGift( userID ) ) ) {
+            await userFunctions.giveInitialRoboCoinGift( data, userID, databaseFunctions, chatFunctions, roomFunctions );
+        }
 
-    userFunctions.askUserToSetRegion( userID, chatFunctions );
-    userFunctions.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
-}
-    } );
+        userFunctions.askUserToSetRegion( userID, chatFunctions );
+        userFunctions.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
+    }
+} );
 
 //starts up when a user leaves the room
 bot.on( 'deregistered', function ( data ) {
@@ -171,7 +171,7 @@ bot.on( 'deregistered', function ( data ) {
         userFunctions.deregisterUser(theUserID, databaseFunctions);
         userFunctions.updateRegionAlertsFromUsers(data, videoFunctions, chatFunctions);
     }
-} )
+} );
 
 //starts up when bot first enters the room
 bot.on( 'roomChanged', async function ( data ) {
