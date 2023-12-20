@@ -24,7 +24,7 @@ let videoModule = require( './modules/videoModule.js' );
 let documentationModule = require( './modules/documentationModule.js' );
 let databaseModule = require( './modules/databaseModule.js' );
 let dateModule = require( './modules/dateModule.js' );
-let mlModule = require( './modules/mlModule.js' );
+// let mlModule = require( './modules/mlModule.js' );
 
 const express = require( 'express' )
 const app = express();
@@ -200,7 +200,7 @@ bot.on( 'roomChanged', function ( data ) {
     }
 } );
 
-//checks at the beggining of the song
+//checks at the beginning of the song
 bot.on( 'newsong', function ( data ) {
     //resets counters and array for vote skipping
     songFunctions.resetVoteCountSkip();
