@@ -64,7 +64,7 @@ const userFunctions = ( bot ) => {
         const oneDaySeconds = 60 * 60 * 24;
         const oneHourSeconds = 60 * 60;
         const oneMinuteSeconds = 60;
-        let remaining = 0;
+        let remaining;
 
         const theDays = Math.floor( seconds / oneDaySeconds );
         remaining = seconds - ( theDays * oneDaySeconds );
@@ -1197,14 +1197,8 @@ const userFunctions = ( bot ) => {
             return stageBanned !== -1;
         },
 
-        isUserBannedFromRoom: function ( userID ) {
-            const banned = bannedUsers.findIndex( ( { id } ) => id === userID );
-
-            if ( banned !== -1 ) {
-                return true;
-            } else {
-                return false;
-            }
+        isUserBannedFromRoom: function (userID) {
+            return bannedUsers.some(({ id }) => id === userID);
         },
 
         isUserIDOnStage: function ( userID ) {
@@ -2102,11 +2096,7 @@ const userFunctions = ( bot ) => {
         },
 
         isBBHere: function () {
-            if ( this.isUserHere( this.bbUserID() ) ) {
-                return true;
-            } else {
-                return false;
-            }
+            return this.isUserHere(this.bbUserID());
         },
 
         canBBBeBooted: function () {
@@ -2118,15 +2108,8 @@ const userFunctions = ( bot ) => {
             return this.withinBBBootTime( userID, hours );
         },
 
-        withinBBBootTime: function ( userID, hours ) {
-            const msSinceLastBoot = Date.now() - this.getBBBootedTimestamp( userID );
-            const bootTheshold = 3600000 * hours;
-
-            if ( msSinceLastBoot < bootTheshold ) {
-                return false;
-            } else {
-                return true;
-            }
+        withinBBBootTime: function (userID, hours) {
+            return Date.now() - this.getBBBootedTimestamp(userID) >= 3600000 * hours;
         },
 
         bbBootSomeone: function ( data, bootedUserID, bootingUserID, bootMessage, chatFunctions, databaseFunctions ) {
@@ -2289,16 +2272,18 @@ const userFunctions = ( bot ) => {
             return true;
         },
 
-        handleError: async function ( error, chatFunctions, data ) {
+        handleError: async function ( error ) {
             console.error( 'Error in giveRoboCoin:', JSON.stringify( error ) );
-            // chatFunctions.botSpeak( "Error in processing the request", data );
         },
 
-        giveInitialRoboCoinGift: async function ( userID, databaseFunctions ) {
+        giveInitialRoboCoinGift: async function ( data, userID, databaseFunctions, chatFunctions, roomFunctions ) {
             const numCoins = 100;
             const changeReason = "Welcome gift";
             const changeID = 1;
-            this.addRoboCoins( userID, numCoins, changeReason, changeID, databaseFunctions );
+            await this.addRoboCoins( userID, numCoins, changeReason, changeID, databaseFunctions );
+            setTimeout(() => {
+                chatFunctions.botSpeak("@" + this.getUsername(userID) + " welcome to " + roomFunctions.roomName() + " room. Have a gift of 100 RoboCoins!", data);
+            }, 3 * 1000);
         },
 
         // ========================================================
@@ -2346,10 +2331,10 @@ const userFunctions = ( bot ) => {
             } catch ( error ) {
                 if ( error instanceof Error ) {
                     // If it's an instance of Error, pass the error object with its details
-                    this.handleError( error, chatFunctions, data );
+                    await this.handleError( error, chatFunctions, data );
                 } else {
                     // If it's not an instance of Error, create a new error object with the message
-                    this.handleError( new Error( error ), chatFunctions, data );
+                    await this.handleError( new Error( error ), chatFunctions, data );
                 }
             }
         },
