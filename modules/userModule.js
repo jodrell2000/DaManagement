@@ -43,6 +43,8 @@ let djIdleLimit = roomDefaults.djIdleLimitThresholds[ 0 ]; // how long can DJs b
 let idleFirstWarningTime = roomDefaults.djIdleLimitThresholds[ 1 ];
 let idleSecondWarningTime = roomDefaults.djIdleLimitThresholds[ 2 ];
 
+let functionStore = []; // store give RoboCoin callback functions
+
 const addRCOperation = ( before, coins ) => ( before || 0 ) + coins;
 const subtractRCOperation = ( before, coins ) => ( before || 0 ) - coins;
 
@@ -62,7 +64,7 @@ const userFunctions = ( bot ) => {
         const oneDaySeconds = 60 * 60 * 24;
         const oneHourSeconds = 60 * 60;
         const oneMinuteSeconds = 60;
-        let remaining = 0;
+        let remaining;
 
         const theDays = Math.floor( seconds / oneDaySeconds );
         remaining = seconds - ( theDays * oneDaySeconds );
@@ -333,7 +335,7 @@ const userFunctions = ( bot ) => {
             if ( userRegionsArray !== undefined ) {
                 for ( let userRegionLoop = 0; userRegionLoop < userRegionsArray.length; userRegionLoop++ ) {
                     thisRegion = userRegionsArray[ userRegionLoop ];
-                    if ( thisRegion !== {} ) {
+                    if ( Object.keys( thisRegion ).length > 0 ) {
                         videoFunctions.addAlertRegion( data, thisRegion, chatFunctions, false );
                     }
                 }
@@ -1195,14 +1197,8 @@ const userFunctions = ( bot ) => {
             return stageBanned !== -1;
         },
 
-        isUserBannedFromRoom: function ( userID ) {
-            const banned = bannedUsers.findIndex( ( { id } ) => id === userID );
-
-            if ( banned !== -1 ) {
-                return true;
-            } else {
-                return false;
-            }
+        isUserBannedFromRoom: function (userID) {
+            return bannedUsers.some(({ id }) => id === userID);
         },
 
         isUserIDOnStage: function ( userID ) {
@@ -2100,11 +2096,7 @@ const userFunctions = ( bot ) => {
         },
 
         isBBHere: function () {
-            if ( this.isUserHere( this.bbUserID() ) ) {
-                return true;
-            } else {
-                return false;
-            }
+            return this.isUserHere(this.bbUserID());
         },
 
         canBBBeBooted: function () {
@@ -2116,15 +2108,8 @@ const userFunctions = ( bot ) => {
             return this.withinBBBootTime( userID, hours );
         },
 
-        withinBBBootTime: function ( userID, hours ) {
-            const msSinceLastBoot = Date.now() - this.getBBBootedTimestamp( userID );
-            const bootTheshold = 3600000 * hours;
-
-            if ( msSinceLastBoot < bootTheshold ) {
-                return false;
-            } else {
-                return true;
-            }
+        withinBBBootTime: function (userID, hours) {
+            return Date.now() - this.getBBBootedTimestamp(userID) >= 3600000 * hours;
         },
 
         bbBootSomeone: function ( data, bootedUserID, bootingUserID, bootMessage, chatFunctions, databaseFunctions ) {
@@ -2198,40 +2183,43 @@ const userFunctions = ( bot ) => {
             } );
         },
 
-        canUserAffordToSpendThisMuch: async function ( userID, numCoins ) {
+        canUserAffordToSpendThisMuch: async function (userID, numCoins, chatFunctions, data ) {
             try {
-                const userRoboCoins = await this.getRoboCoins( userID );
+                const userRoboCoins = await this.getRoboCoins(userID);
 
-                // Assuming getRoboCoins returns a numeric value synchronously
-                return userRoboCoins >= numCoins;
-            } catch ( error ) {
-                // Handle any errors that may occur in getRoboCoins
-                console.error( 'Error in canUserAffordToSpendThisMuch:', error.message );
-                throw new Error( 'Error checking user affordability' );
+                if (userRoboCoins >= numCoins) {
+                    return true;
+                } else {
+                    chatFunctions.botSpeak( "Sorry @" + this.getUsername( userID ) + " you can't afford that", data );
+                    throw new Error('Insufficient funds');
+                }
+            } catch (error) {
+                // Handle any errors that may occur in getRoboCoins or due to insufficient funds
+                throw new Error('Error checking user affordability');
             }
         },
 
-        addRoboCoins: async function ( userID, numCoins, changeReason, databaseFunctions ) {
+        addRoboCoins: async function ( userID, numCoins, changeReason, changeID, databaseFunctions ) {
             try {
                 const coins = parseInt( numCoins, 10 );
-                await this.processRoboCoins( userID, coins, changeReason, addRCOperation, databaseFunctions );
+                await this.processRoboCoins( userID, coins, changeReason, changeID, addRCOperation, databaseFunctions );
             } catch ( error ) {
                 console.error( 'Error in addRoboCoins:', error.message );
                 // Handle the error as needed
             }
         },
 
-        subtractRoboCoins: async function ( userID, numCoins, changeReason, databaseFunctions ) {
+        subtractRoboCoins: async function ( userID, numCoins, changeReason, changeID, databaseFunctions ) {
             try {
                 const coins = parseInt( numCoins, 10 );
-                await this.processRoboCoins( userID, coins, changeReason, subtractRCOperation, databaseFunctions );
+                await this.processRoboCoins( userID, coins, changeReason, changeID, subtractRCOperation, databaseFunctions );
             } catch ( error ) {
                 console.error( 'Error in subtractRoboCoins:', error.message );
                 // Handle the error as needed
             }
         },
 
-        processRoboCoins: async function ( userID, numCoins, changeReason, operation, databaseFunctions ) {
+        processRoboCoins: async function ( userID, numCoins, changeReason, changeID, operation, databaseFunctions ) {
             try {
                 const before = await this.getRoboCoins( userID );
                 const updatedCoins = operation( before, numCoins );
@@ -2239,7 +2227,7 @@ const userFunctions = ( bot ) => {
                 const after = await this.getRoboCoins( userID );
 
                 // Pass positive or negative numCoins to auditRoboCoin based on the type of operation
-                await this.auditRoboCoin( userID, before, after, operation === addRCOperation ? numCoins : -numCoins, changeReason, databaseFunctions );
+                await this.auditRoboCoin( userID, before, after, operation === addRCOperation ? numCoins : -numCoins, changeReason, changeID, databaseFunctions );
             } catch ( error ) {
                 console.error( `Error in ${ operation.name }:`, error.message );
                 throw error;
@@ -2257,15 +2245,56 @@ const userFunctions = ( bot ) => {
             } );
         },
 
-        auditRoboCoin: async function ( userID, before, after, numCoins, changeReason, databaseFunctions ) {
+        auditRoboCoin: async function ( userID, before, after, numCoins, changeReason, changeID, databaseFunctions ) {
             try {
-                const results = await databaseFunctions.saveRoboCoinAudit( userID, before, after, numCoins, changeReason );
+                await databaseFunctions.saveRoboCoinAudit( userID, before, after, numCoins, changeReason, changeID );
             } catch ( error ) {
                 console.error( 'Query failed:', error );
             } finally {
                 console.groupEnd();
             }
         },
+
+        validateNumCoins: async function ( numCoins, sendingUserID, chatFunctions, data ) {
+            if ( numCoins === undefined || isNaN( numCoins ) ) {
+                chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + ' you must give a number of coins to send, e.g. giverc 10 username', data );
+                throw new Error( 'Invalid number of coins' );
+            }
+            return true;
+        },
+
+        validateReceivingUser: async function ( args, receivingUserID, sendingUserID, chatFunctions, data ) {
+            if ( args[ 1 ] === undefined ) {
+                chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + ' you must give the name of the user to send RoboCoins to, e.g. giverc 10 username', data );
+                throw new Error( 'No receiving user specified' );
+            }
+            if ( receivingUserID === undefined ) {
+                chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + " I can't find that username", data );
+                throw new Error( 'User not found' );
+            }
+            return true;
+        },
+
+        handleError: async function ( error ) {
+            console.error( 'Error in giveRoboCoin:', JSON.stringify( error ) );
+        },
+
+        giveInitialRoboCoinGift: async function ( data, userID, databaseFunctions, chatFunctions, roomFunctions ) {
+            const numCoins = 100;
+            const changeReason = "Welcome gift";
+            const changeID = 1;
+            await this.addRoboCoins( userID, numCoins, changeReason, changeID, databaseFunctions );
+            setTimeout(() => {
+                chatFunctions.botSpeak("@" + this.getUsername(userID) + " welcome to the " + roomFunctions.roomName() + " room. Have a gift of 100 RoboCoins!", data);
+            }, 3 * 1000);
+        },
+
+        // ========================================================
+
+        // ========================================================
+        // RoboCoin Commands
+        // ========================================================
+
 
         readMyRoboCoin: async function ( data, chatFunctions ) {
             try {
@@ -2278,54 +2307,71 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        giveRoboCoin: function ( data, args, chatFunctions, databaseFunctions ) {
-            return new Promise( ( resolve, reject ) => {
-                const sendingUserID = this.whoSentTheCommand( data );
+        giveRoboCoinCommand: async function ( data, args, chatFunctions, databaseFunctions ) {
+            const sendingUserID = this.whoSentTheCommand( data );
+            const receivingUserID = this.getUserIDFromUsername( this.returnUsernameFromMessageAfterArguments( data.text ) );
+            const numCoins = parseInt( args[ 0 ], 10 );
 
-                const numCoins = parseInt( args[ 0 ], 10 );
-                if ( numCoins === undefined || isNaN( numCoins ) ) {
-                    chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + ' you must give a number of coins to send, eg. 10', data );
-                    reject( 'Invalid number of coins' );
-                    return;
+            try {
+                await this.validateNumCoins( numCoins, sendingUserID, chatFunctions, data );
+                await this.validateReceivingUser( args, receivingUserID, sendingUserID, chatFunctions, data );
+                await this.canUserAffordToSpendThisMuch( sendingUserID, numCoins, chatFunctions, data );
+
+                functionStore[ sendingUserID + "function" ] = () => {
+                    return new Promise( ( innerResolve, innerReject ) => {
+                        this.giveRoboCoinAction( sendingUserID, receivingUserID, numCoins, "Give RoboCoin", 2, chatFunctions, databaseFunctions, data )
+                            .then( () => innerResolve() )
+                            .catch( ( error ) => innerReject( error ) );
+                    } );
+                };
+
+                functionStore[ sendingUserID + "timeout" ] = setTimeout( () => {
+                    functionStore[ sendingUserID + "function" ] = null;
+                    chatFunctions.botSpeak( "@" + this.getUsername( sendingUserID ) + " give RoboCoins command timed out", data );
+                }, 60 * 1000 );
+
+                chatFunctions.botSpeak( "@" + this.getUsername( sendingUserID ) + " please send the command /confirm to confirm you want to spend " + numCoins + " RoboCoins", data );
+            } catch ( error ) {
+                if ( error instanceof Error ) {
+                    // If it's an instance of Error, pass the error object with its details
+                    await this.handleError( error, chatFunctions, data );
+                } else {
+                    // If it's not an instance of Error, create a new error object with the message
+                    await this.handleError( new Error( error ), chatFunctions, data );
                 }
+            }
+        },
 
-                const receivingUserID = this.getUserIDFromUsername( this.returnUsernameFromMessageAfterArguments( data.text ) );
-                if ( args[ 1 ] === undefined ) {
-                    chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + ' you must give the name of the user to send RoboCoins to', data );
-                    reject( 'No receiving user specified' );
-                    return;
-                }
-                if ( receivingUserID === undefined ) {
-                    chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + " I can't find that username", data );
-                    reject( 'User not found' );
-                    return;
-                }
-
-                this.canUserAffordToSpendThisMuch( sendingUserID, numCoins )
-                    .then( ( userCanAfford ) => {
-                        if ( !userCanAfford ) {
-                            chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + " you can't afford that much", data );
-                            // Reject with an error message
-                            throw new Error( 'Insufficient funds' );
-                        }
-
-                        // Use Promise.all to ensure that the operations happen in parallel
-                        return Promise.all( [
-                            this.subtractRoboCoins( sendingUserID, numCoins, "giveRoboCoin to " + this.getUsername( receivingUserID ), databaseFunctions ),
-                            this.addRoboCoins( receivingUserID, numCoins, "giveRoboCoin from " + this.getUsername( sendingUserID ), databaseFunctions ),
-                        ] );
+        confirmCommand: async function ( data, chatFunctions ) {
+            const sendingUserID = this.whoSentTheCommand( data );
+            if ( functionStore && functionStore[ sendingUserID + "function" ] && typeof functionStore[ sendingUserID + "function" ] === 'function' ) {
+                functionStore[ sendingUserID + "function" ]()
+                    .then( () => {
+                        clearTimeout( functionStore[ sendingUserID + "timeout" ] );
                     } )
                     .then( () => {
-                        chatFunctions.botSpeak( "@" + this.getUsername( sendingUserID ) + " gave " + numCoins + " to @" + this.getUsername( receivingUserID ), data );
-                        resolve();
+                        functionStore[ sendingUserID + "function" ] = null;
+                        functionStore[ sendingUserID + "timeout" ] = null;
                     } )
                     .catch( ( error ) => {
-                        console.error( 'Error in giveRoboCoin:', JSON.stringify( error ) );
-                        // Handle the error as needed
-                        chatFunctions.botSpeak( "Error in processing the request", data );
-                        reject( error.message );
+                        console.error( 'Error confirming command:', error );
                     } );
-            } );
+            } else {
+                chatFunctions.botSpeak( "@" + this.getUsername( sendingUserID ) + " there's nothing to confirm??", data );
+            }
+        },
+
+        giveRoboCoinAction: async function ( sendingUserID, receivingUserID, numCoins, changeReason, changeID, chatFunctions, databaseFunctions, data ) {
+            try {
+                await this.subtractRoboCoins( sendingUserID, numCoins, changeReason + " to " + this.getUsername( receivingUserID ), changeID, databaseFunctions );
+                await this.addRoboCoins( receivingUserID, numCoins, changeReason + " from " + this.getUsername( sendingUserID ), changeID, databaseFunctions );
+
+                chatFunctions.botSpeak( "@" + this.getUsername( sendingUserID ) + " gave " + numCoins + " to @" + this.getUsername( receivingUserID ), data );
+                return Promise.resolve(); // Resolve the promise after successful execution
+            } catch ( error ) {
+                await this.handleError( error, chatFunctions, data );
+                throw error; // Rethrow the error to propagate the rejection
+            }
         },
     }
 }

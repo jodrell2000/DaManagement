@@ -95,6 +95,18 @@ const commandFunctions = ( bot ) => {
     generalCommands.searchmusicbrainz.help = "Lookup song info from Music Brainz";
 
     // #############################################
+    // RoboCoin commands
+    // #############################################
+
+    generalCommands.confirm = ( { data, userFunctions, chatFunctions } ) => { userFunctions.confirmCommand( data, chatFunctions ) }
+    generalCommands.confirm.help = "Confirm a command if requested";
+
+    generalCommands.giverc = ( { data, args, userFunctions, chatFunctions, databaseFunctions } ) => { userFunctions.giveRoboCoinCommand( data, args, chatFunctions, databaseFunctions ) }
+    generalCommands.giverc.argumentCount = 2;
+    generalCommands.giverc.help = "Give someone RoboCoin";
+    generalCommands.giverc.sampleArguments = [ "jodrell", "10" ];
+
+    // #############################################
     // General user Queue commands
     // #############################################
 
@@ -147,15 +159,6 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.avatar.argumentCount = 1;
     moderatorCommands.avatar.help = "Change Robo's avatar";
     moderatorCommands.avatar.sampleArguments = [ "13" ];
-
-    // #############################################
-    // RoboCoin commands
-    // #############################################
-
-    moderatorCommands.giverc = ( { data, args, userFunctions, chatFunctions, databaseFunctions } ) => { userFunctions.giveRoboCoin( data, args, chatFunctions, databaseFunctions ) }
-    moderatorCommands.giverc.argumentCount = 2;
-    moderatorCommands.giverc.help = "Give someone RoboCoin";
-    moderatorCommands.giverc.sampleArguments = [ "jodrell", "10" ];
 
     // #############################################
     // User commands
