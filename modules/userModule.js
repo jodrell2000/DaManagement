@@ -2373,6 +2373,16 @@ const userFunctions = ( bot ) => {
                 throw error; // Rethrow the error to propagate the rejection
             }
         },
+
+        // ========================================================
+
+        // ========================================================
+        // Testing Generalised Chargeable Commands
+        // ========================================================
+
+        wibble: async function (data, chatFunctions) {
+            chatFunctions.botSpeak( "wibble", data );
+        },
     }
 }
 
