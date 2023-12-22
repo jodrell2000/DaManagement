@@ -174,7 +174,7 @@ const commandFunctions = ( bot ) => {
     // Testing commands
     // #############################################
 
-    generalCommands.wibble = ( { data, userFunctions, chatFunctions } ) => { userFunctions.wibble( data, chatFunctions ); }
+    generalCommands.wibble = ( { data, userFunctions, chatFunctions } ) => { userFunctions.chargeMe(5, userFunctions.wibble( data, chatFunctions )); }
     generalCommands.wibble.help = "Just testing";
 
     // #############################################
