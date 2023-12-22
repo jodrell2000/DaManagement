@@ -2404,11 +2404,38 @@ const userFunctions = ( bot ) => {
             console.groupEnd();
         },
 
-        chargeMe: async function ( callCost, functionCall ) {
+        chargeMe: async function ( callCost, data, chatFunctions, functionCall ) {
             console.group( "chargeMe" );
             console.log( "callCost:" + callCost );
-            console.log( "functionCall:" + JSON.stringify( functionCall ) );
-            functionCall();
+            const sendingUserID = this.whoSentTheCommand( data );
+
+            try {
+                await this.canUserAffordToSpendThisMuch( sendingUserID, callCost, chatFunctions, data );
+
+                functionStore[ sendingUserID + "function" ] = () => {
+                    return new Promise( ( innerResolve, innerReject ) => {
+                        functionCall()
+                            .then( () => innerResolve() )
+                            .catch( ( error ) => innerReject( error ) );
+                    } );
+                };
+
+                functionStore[ sendingUserID + "timeout" ] = setTimeout( () => {
+                    functionStore[ sendingUserID + "function" ] = null;
+                    chatFunctions.botSpeak( "@" + this.getUsername( sendingUserID ) + " command timed out", data );
+                }, 60 * 1000 );
+
+                chatFunctions.botSpeak( "@" + this.getUsername( sendingUserID ) + " please send the command /confirm to confirm you want to spend " + callCost + " RoboCoins", data );
+
+            } catch ( error ) {
+                if ( error instanceof Error ) {
+                    // If it's an instance of Error, pass the error object with its details
+                    await this.handleError( error, chatFunctions, data );
+                } else {
+                    // If it's not an instance of Error, create a new error object with the message
+                    await this.handleError( new Error( error ), chatFunctions, data );
+                }
+            }
             console.groupEnd();
         },
     }
