@@ -17,7 +17,22 @@ let superDJs = []; // list of users not removed by exceeding the playcount and w
  *
  */
 
-let bannedUsers = [ { id: "6040548a3f4bfc001be4c174", name: "bacon_cheeseburger" }, { id: "60d14bf5cd1ec800127fb964", name: "outlaw" }, { id: "625a5dd088b736001f4160c3", name: "MustardX" }, { id: "636e831117f5ac001d2331c7", name: "wub the fuzzizzle" }, { id: "6041125b3f4bfc001b27de48", name: "Eggman" }, { id: "617a2526d1a3d9001c8cd086", name: "Eggman" }, { id: "62b94b7388b736001dfd42da", name: "Eggman" }, { id: "61b457a8d1a3d9001ce3b8b0", name: "Eggman" }, { id: "604cfaa047c69b001b52cea5", name: "Eggman" }, { id: "61b460d8261cf0001dd4a8c6", name: "Eggman" }, { id: "61837c92caf438001c80d56a", name: "Eggman" } ]; //banned users list, put userids in string form here for permanent banning(put their name after their userid to tell who is banned).
+let bannedUsers = [ { id: "6040548a3f4bfc001be4c174", name: "bacon_cheeseburger" }, {
+    id: "60d14bf5cd1ec800127fb964",
+    name: "outlaw"
+}, { id: "625a5dd088b736001f4160c3", name: "MustardX" }, {
+    id: "636e831117f5ac001d2331c7",
+    name: "wub the fuzzizzle"
+}, { id: "6041125b3f4bfc001b27de48", name: "Eggman" }, {
+    id: "617a2526d1a3d9001c8cd086",
+    name: "Eggman"
+}, { id: "62b94b7388b736001dfd42da", name: "Eggman" }, {
+    id: "61b457a8d1a3d9001ce3b8b0",
+    name: "Eggman"
+}, { id: "604cfaa047c69b001b52cea5", name: "Eggman" }, {
+    id: "61b460d8261cf0001dd4a8c6",
+    name: "Eggman"
+}, { id: "61837c92caf438001c80d56a", name: "Eggman" } ]; //banned users list, put userids in string form here for permanent banning(put their name after their userid to tell who is banned).
 let permanentStageBan = [ { id: "60417796c2dbd9001be7573f" } ]; //put userids in here to ban from djing permanently(put their name after their userid to tell who is banned)
 let vipList = [];
 /* this is the vip list, it accepts userids as input, this is for when you have a special guest or guests in your room and you only
@@ -50,17 +65,17 @@ const subtractRCOperation = ( before, coins ) => ( before || 0 ) - coins;
 
 const userFunctions = ( bot ) => {
 
-    function formatSeconds ( seconds ) {
+    function formatSeconds( seconds ) {
         return ( Math.floor( seconds / 60 ) ).toString() + ' minutes';
     }
 
-    function formatHours ( seconds ) {
+    function formatHours( seconds ) {
         const theHours = Math.floor( seconds / ( 60 * 60 ) );
         const theMinutes = Math.floor( ( ( seconds / ( 60 * 60 ) ) - theHours ) * 60 );
         return ( theHours ).toString() + ' hours ' + ( theMinutes ).toString() + ' minutes';
     }
 
-    function formatDays ( seconds ) {
+    function formatDays( seconds ) {
         const oneDaySeconds = 60 * 60 * 24;
         const oneHourSeconds = 60 * 60;
         const oneMinuteSeconds = 60;
@@ -77,7 +92,7 @@ const userFunctions = ( bot ) => {
         return ( theDays ).toString() + ' days, ' + ( theHours ).toString() + ' hours and ' + ( theMinutes ).toString() + ' minutes';
     }
 
-    function formatRelativeTime ( seconds ) {
+    function formatRelativeTime( seconds ) {
         if ( isNaN( seconds ) ) {
             return false
         } else if ( seconds < 60 * 60 ) {
@@ -596,7 +611,9 @@ const userFunctions = ( bot ) => {
 
         updateCommandCount: function ( receiverID, theCommand, databaseFunctions ) {
             let commandCount = this.getCommandCount( receiverID, theCommand );
-            if ( commandCount === undefined ) { commandCount = 0 }
+            if ( commandCount === undefined ) {
+                commandCount = 0
+            }
             this.storeUserData( receiverID, theCommand + 'Count', commandCount + 1, databaseFunctions );
             databaseFunctions.incrementCommandCountForCurrentTrack( theCommand );
         },
@@ -1197,8 +1214,8 @@ const userFunctions = ( bot ) => {
             return stageBanned !== -1;
         },
 
-        isUserBannedFromRoom: function (userID) {
-            return bannedUsers.some(({ id }) => id === userID);
+        isUserBannedFromRoom: function ( userID ) {
+            return bannedUsers.some( ( { id } ) => id === userID );
         },
 
         isUserIDOnStage: function ( userID ) {
@@ -1997,13 +2014,13 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        addWarnMeToUser ( userID, databaseFunctions ) {
+        addWarnMeToUser( userID, databaseFunctions ) {
             if ( this.isUserInUsersList( userID ) ) {
                 this.storeUserData( userID, "WarnMe", true, databaseFunctions );
             }
         },
 
-        removeWarnMeFromUser ( userID, databaseFunctions ) {
+        removeWarnMeFromUser( userID, databaseFunctions ) {
             if ( this.isUserInUsersList( userID ) ) {
                 this.deleteUserData( databaseFunctions, userID, "WarnMe" );
             }
@@ -2096,7 +2113,7 @@ const userFunctions = ( bot ) => {
         },
 
         isBBHere: function () {
-            return this.isUserHere(this.bbUserID());
+            return this.isUserHere( this.bbUserID() );
         },
 
         canBBBeBooted: function () {
@@ -2108,8 +2125,8 @@ const userFunctions = ( bot ) => {
             return this.withinBBBootTime( userID, hours );
         },
 
-        withinBBBootTime: function (userID, hours) {
-            return Date.now() - this.getBBBootedTimestamp(userID) >= 3600000 * hours;
+        withinBBBootTime: function ( userID, hours ) {
+            return Date.now() - this.getBBBootedTimestamp( userID ) >= 3600000 * hours;
         },
 
         bbBootSomeone: function ( data, bootedUserID, bootingUserID, bootMessage, chatFunctions, databaseFunctions ) {
@@ -2183,19 +2200,19 @@ const userFunctions = ( bot ) => {
             } );
         },
 
-        canUserAffordToSpendThisMuch: async function (userID, numCoins, chatFunctions, data ) {
+        canUserAffordToSpendThisMuch: async function ( userID, numCoins, chatFunctions, data ) {
             try {
-                const userRoboCoins = await this.getRoboCoins(userID);
+                const userRoboCoins = await this.getRoboCoins( userID );
 
-                if (userRoboCoins >= numCoins) {
+                if ( userRoboCoins >= numCoins ) {
                     return true;
                 } else {
                     chatFunctions.botSpeak( "Sorry @" + this.getUsername( userID ) + " you can't afford that", data );
-                    throw new Error('Insufficient funds');
+                    throw new Error( 'Insufficient funds' );
                 }
-            } catch (error) {
+            } catch ( error ) {
                 // Handle any errors that may occur in getRoboCoins or due to insufficient funds
-                throw new Error('Error checking user affordability');
+                throw new Error( 'Error checking user affordability' );
             }
         },
 
@@ -2284,9 +2301,9 @@ const userFunctions = ( bot ) => {
             const changeReason = "Welcome gift";
             const changeID = 1;
             await this.addRoboCoins( userID, numCoins, changeReason, changeID, databaseFunctions );
-            setTimeout(() => {
-                chatFunctions.botSpeak("@" + this.getUsername(userID) + " welcome to the " + roomFunctions.roomName() + " room. Have a gift of 100 RoboCoins!", data);
-            }, 3 * 1000);
+            setTimeout( () => {
+                chatFunctions.botSpeak( "@" + this.getUsername( userID ) + " welcome to the " + roomFunctions.roomName() + " room. Have a gift of 100 RoboCoins!", data );
+            }, 3 * 1000 );
         },
 
         // ========================================================
@@ -2373,6 +2390,55 @@ const userFunctions = ( bot ) => {
                 throw error; // Rethrow the error to propagate the rejection
             }
         },
+
+        // ========================================================
+
+        // ========================================================
+        // Testing Generalised Chargeable Commands
+        // ========================================================
+
+        wibble: async function ( data, chatFunctions ) {
+            chatFunctions.botSpeak( "wibble", data );
+        },
+
+        chargeMe: async function ( callCost, data, chatFunctions, databaseFunctions, functionCall ) {
+            const sendingUserID = this.whoSentTheCommand( data );
+
+            try {
+                await this.canUserAffordToSpendThisMuch( sendingUserID, callCost, chatFunctions, data );
+
+                functionStore[ sendingUserID + "function" ] = () => {
+                    return new Promise( ( innerResolve, innerReject ) => {
+                        this.runCommandAndChargeForIt(sendingUserID, callCost, functionCall, databaseFunctions)
+                            .then( () => innerResolve() )
+                            .catch( ( error ) => innerReject( error ) );
+                    } );
+                };
+
+                functionStore[ sendingUserID + "timeout" ] = setTimeout( () => {
+                    functionStore[ sendingUserID + "function" ] = null;
+                    chatFunctions.botSpeak( "@" + this.getUsername( sendingUserID ) + " command timed out", data );
+                }, 60 * 1000 );
+
+                chatFunctions.botSpeak( "@" + this.getUsername( sendingUserID ) + " please send the command /confirm to confirm you want to spend " + callCost + " RoboCoins", data );
+
+            } catch ( error ) {
+                if ( error instanceof Error ) {
+                    // If it's an instance of Error, pass the error object with its details
+                    await this.handleError( error, chatFunctions, data );
+                } else {
+                    // If it's not an instance of Error, create a new error object with the message
+                    await this.handleError( new Error( error ), chatFunctions, data );
+                }
+            }
+        },
+
+        runCommandAndChargeForIt: async function ( sendingUserID, callCost, functionCall, databaseFunctions) {
+            const changeReason = "Chargeable command";
+            const changeID = 4;
+            await this.subtractRoboCoins( sendingUserID, callCost, changeReason, changeID, databaseFunctions );
+            functionCall();
+        }
     }
 }
 

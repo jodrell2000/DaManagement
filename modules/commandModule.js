@@ -171,6 +171,13 @@ const commandFunctions = ( bot ) => {
     userCommands.whosafk.help = "Tells you which users have enabled AFK";
 
     // #############################################
+    // Testing commands
+    // #############################################
+
+    generalCommands.wibble = ({ data, userFunctions, chatFunctions, databaseFunctions }) => {userFunctions.chargeMe(5, data, chatFunctions, databaseFunctions, () => userFunctions.wibble(data, chatFunctions));};
+    generalCommands.wibble.help = "Just testing";
+
+    // #############################################
     // Moderator Only commands
     // #############################################
 
