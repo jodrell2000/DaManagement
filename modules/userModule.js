@@ -2404,7 +2404,7 @@ const userFunctions = ( bot ) => {
             console.groupEnd();
         },
 
-        chargeMe: async function ( callCost, data, chatFunctions, functionCall ) {
+        chargeMe: async function ( callCost, data, chatFunctions, databaseFunctions, functionCall ) {
             console.group( "chargeMe" );
             console.log( "callCost:" + callCost );
             const sendingUserID = this.whoSentTheCommand( data );
@@ -2414,7 +2414,7 @@ const userFunctions = ( bot ) => {
 
                 functionStore[ sendingUserID + "function" ] = () => {
                     return new Promise( ( innerResolve, innerReject ) => {
-                        functionCall()
+                        this.runCommandAndChargeForIt(sendingUserID, callCost, functionCall, databaseFunctions)
                             .then( () => innerResolve() )
                             .catch( ( error ) => innerReject( error ) );
                     } );
@@ -2438,6 +2438,16 @@ const userFunctions = ( bot ) => {
             }
             console.groupEnd();
         },
+
+        runCommandAndChargeForIt: async function ( sendingUserID, callCost, functionCall, databaseFunctions) {
+            console.group( "runCommandAndChargeForIt" );
+            console.log( "here" );
+            const changeReason = "Chargeable command";
+            const changeID = 4;
+            await this.subtractRoboCoins( sendingUserID, callCost, changeReason, changeID, databaseFunctions );
+            functionCall();
+            console.groupEnd();
+        }
     }
 }
 
