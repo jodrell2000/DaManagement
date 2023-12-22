@@ -2398,10 +2398,7 @@ const userFunctions = ( bot ) => {
         // ========================================================
 
         wibble: async function ( data, chatFunctions ) {
-            console.group( "chargeMe" );
-            console.log( "here:" );
             chatFunctions.botSpeak( "wibble", data );
-            console.groupEnd();
         },
 
         chargeMe: async function ( callCost, data, chatFunctions, databaseFunctions, functionCall ) {
@@ -2441,7 +2438,8 @@ const userFunctions = ( bot ) => {
 
         runCommandAndChargeForIt: async function ( sendingUserID, callCost, functionCall, databaseFunctions) {
             console.group( "runCommandAndChargeForIt" );
-            console.log( "here" );
+            console.log( "sendingUserID:" + sendingUserID );
+            console.log( "callCost:" + callCost );
             const changeReason = "Chargeable command";
             const changeID = 4;
             await this.subtractRoboCoins( sendingUserID, callCost, changeReason, changeID, databaseFunctions );
