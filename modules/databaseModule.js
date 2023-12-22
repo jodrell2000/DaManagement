@@ -127,6 +127,7 @@ const databaseFunctions = () => {
         // ========================================================
 
         storeUserData: function ( userObject ) {
+            console.log( "DB functions storeUserData:" );
             return new Promise( ( resolve, reject ) => {
                 try {
                     const userToSave = this.removeUnsavableDataFromUser( userObject );
@@ -163,6 +164,7 @@ const databaseFunctions = () => {
         // ========================================================
 
         saveRoboCoinAudit: async function ( userID, before, after, numCoins, changeReason, changeID ) {
+            console.log( "DB functions saveRoboCoinAudit:" );
             const theQuery = "INSERT INTO roboCoinAudit (users_id, beforeChange, afterChange, numCoins, changeReason, auditType_id) VALUES (?, ?, ?, ?, ?, ?);";
             const values = [ userID, before, after, numCoins, changeReason, changeID ];
 

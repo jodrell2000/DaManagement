@@ -155,6 +155,7 @@ const userFunctions = ( bot ) => {
         },
 
         storeUserData: async function ( userID, key, value, databaseFunctions ) {
+            console.log( "storeUserData:" );
             if ( this.userExists( userID ) && this.getUsername( userID ) !== "Guest" ) {
                 try {
                     const userPosition = this.getPositionOnUsersList( userID );
@@ -2227,6 +2228,7 @@ const userFunctions = ( bot ) => {
         },
 
         subtractRoboCoins: async function ( userID, numCoins, changeReason, changeID, databaseFunctions ) {
+            console.log( "subtractRoboCoins:" );
             try {
                 const coins = parseInt( numCoins, 10 );
                 await this.processRoboCoins( userID, coins, changeReason, changeID, subtractRCOperation, databaseFunctions );
@@ -2237,6 +2239,7 @@ const userFunctions = ( bot ) => {
         },
 
         processRoboCoins: async function ( userID, numCoins, changeReason, changeID, operation, databaseFunctions ) {
+            console.log( "processRoboCoins:" );
             try {
                 const before = await this.getRoboCoins( userID );
                 const updatedCoins = operation( before, numCoins );
@@ -2252,6 +2255,7 @@ const userFunctions = ( bot ) => {
         },
 
         updateRoboCoins: function ( userID, coins, databaseFunctions ) {
+            console.log( "updateRoboCoins:" );
             return new Promise( ( resolve, reject ) => {
                 try {
                     this.storeUserData( userID, "RoboCoins", coins, databaseFunctions );
@@ -2263,6 +2267,7 @@ const userFunctions = ( bot ) => {
         },
 
         auditRoboCoin: async function ( userID, before, after, numCoins, changeReason, changeID, databaseFunctions ) {
+            console.log( "auditRoboCoin:" );
             try {
                 await databaseFunctions.saveRoboCoinAudit( userID, before, after, numCoins, changeReason, changeID );
             } catch ( error ) {
