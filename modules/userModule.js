@@ -280,33 +280,38 @@ const userFunctions = ( bot ) => {
 
         getUserRegion: function ( userID ) {
             if ( this.userExists( userID ) ) {
-                if ( theUsersList[ this.getPositionOnUsersList( userID ) ][ 'region' ] !== undefined ) {
-                    return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'region' ]
+                const userPosition = this.getPositionOnUsersList( userID );
+                const userRegion = theUsersList[ userPosition ][ 'region' ];
+
+                // Check if 'region' is defined
+                if ( userRegion !== undefined ) {
+                    return userRegion;
                 }
             }
         },
 
-        checkAndStoreUserRegion: function ( data, args, chatFunctions, videoFunctions, databaseFunctions ) {
-            let validRegion = true;
+        myRegionCommand: async function ( data, args, chatFunctions, videoFunctions, databaseFunctions ) {
             const userID = this.whoSentTheCommand( data );
 
             if ( args[ 0 ] === undefined ) {
-                chatFunctions.botSpeak( '@' + this.getUsername( userID ) + ' you must give a region code eg, `/myregion GB`. Please use one of the 2 character ISO country codes, https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2', data );
+                chatFunctions.botSpeak( `@${ this.getUsername( userID ) } you must give a region code, e.g., \`/myregion GB\`. Please use one of the 2 character ISO country codes, [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)`, data );
                 return;
             }
 
-            let theRegion = args[ 0 ].toUpperCase();
+            const theRegion = args[ 0 ].toUpperCase();
+            const isValidRegion = theRegion.length === 2 && countryLookup.byIso( theRegion ) !== null;
 
-            if ( theRegion.length !== 2 ) {
-                validRegion = false;
-            } else if ( countryLookup.byIso( theRegion ) === null ) {
-                validRegion = false;
-            }
-
-            if ( validRegion ) {
-                this.storeUserRegion( data, userID, theRegion, chatFunctions, videoFunctions, databaseFunctions )
+            if ( !isValidRegion ) {
+                chatFunctions.botSpeak( `@${ this.getUsername( userID ) } that region is not recognized. Please use one of the 2 character ISO country codes, [ISO 3166-1 alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)`, data );
             } else {
-                chatFunctions.botSpeak( '@' + this.getUsername( userID ) + ' that region is not recognised. Please use one of the 2 character ISO country codes, https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2', data );
+                console.log( "this.getUserRegion( userID ): " + this.getUserRegion( userID ) );
+                if ( !this.getUserRegion( userID ) ) {
+                    this.storeUserRegion( data, userID, theRegion, chatFunctions, videoFunctions, databaseFunctions );
+                } else {
+                    await this.chargeMe( 50, data, chatFunctions, databaseFunctions, () =>
+                        this.storeUserRegion( data, userID, theRegion, chatFunctions, videoFunctions, databaseFunctions, "to change your region" )
+                    );
+                }
             }
         },
 
@@ -2207,7 +2212,7 @@ const userFunctions = ( bot ) => {
                 if ( userRoboCoins >= numCoins ) {
                     return true;
                 } else {
-                    chatFunctions.botSpeak( "Sorry @" + this.getUsername( userID ) + " you can't afford that", data );
+                    chatFunctions.botSpeak( "Sorry @" + this.getUsername( userID ) + " you can't afford " + numCoins + " RoboCoins for that", data );
                     throw new Error( 'Insufficient funds' );
                 }
             } catch ( error ) {
@@ -2293,7 +2298,7 @@ const userFunctions = ( bot ) => {
         },
 
         handleError: async function ( error ) {
-            console.error( 'Error in giveRoboCoin:', JSON.stringify( error ) );
+            console.error( 'RoboCoin error:', JSON.stringify( error ) );
         },
 
         giveInitialRoboCoinGift: async function ( data, userID, databaseFunctions, chatFunctions, roomFunctions ) {
@@ -2401,7 +2406,7 @@ const userFunctions = ( bot ) => {
             chatFunctions.botSpeak( "wibble", data );
         },
 
-        chargeMe: async function ( callCost, data, chatFunctions, databaseFunctions, functionCall ) {
+        chargeMe: async function ( callCost, data, chatFunctions, databaseFunctions, functionCall, description = "" ) {
             const sendingUserID = this.whoSentTheCommand( data );
 
             try {
@@ -2409,7 +2414,7 @@ const userFunctions = ( bot ) => {
 
                 functionStore[ sendingUserID + "function" ] = () => {
                     return new Promise( ( innerResolve, innerReject ) => {
-                        this.runCommandAndChargeForIt(sendingUserID, callCost, functionCall, databaseFunctions)
+                        this.runCommandAndChargeForIt( sendingUserID, callCost, functionCall, databaseFunctions, description )
                             .then( () => innerResolve() )
                             .catch( ( error ) => innerReject( error ) );
                     } );
@@ -2420,7 +2425,7 @@ const userFunctions = ( bot ) => {
                     chatFunctions.botSpeak( "@" + this.getUsername( sendingUserID ) + " command timed out", data );
                 }, 60 * 1000 );
 
-                chatFunctions.botSpeak( "@" + this.getUsername( sendingUserID ) + " please send the command /confirm to confirm you want to spend " + callCost + " RoboCoins", data );
+                chatFunctions.botSpeak( "@" + this.getUsername( sendingUserID ) + " please send the command /confirm to confirm you want to spend " + callCost + " RoboCoins " + description, data );
 
             } catch ( error ) {
                 if ( error instanceof Error ) {
@@ -2433,10 +2438,12 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        runCommandAndChargeForIt: async function ( sendingUserID, callCost, functionCall, databaseFunctions) {
-            const changeReason = "Chargeable command";
+        runCommandAndChargeForIt: async function ( sendingUserID, callCost, functionCall, databaseFunctions, description ) {
+            if ( description === "" ) {
+                description = "Chargeable command";
+            }
             const changeID = 4;
-            await this.subtractRoboCoins( sendingUserID, callCost, changeReason, changeID, databaseFunctions );
+            await this.subtractRoboCoins( sendingUserID, callCost, description, changeID, databaseFunctions );
             functionCall();
         }
     }
