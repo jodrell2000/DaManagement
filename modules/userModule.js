@@ -33,7 +33,8 @@ let bannedUsers = [ { id: "6040548a3f4bfc001be4c174", name: "bacon_cheeseburger"
     id: "61b460d8261cf0001dd4a8c6",
     name: "Eggman"
 }, { id: "61837c92caf438001c80d56a", name: "Eggman" } ]; //banned users list, put userids in string form here for permanent banning(put their name after their userid to tell who is banned).
-let permanentStageBan = [ { id: "60417796c2dbd9001be7573f" } ]; //put userids in here to ban from djing permanently(put their name after their userid to tell who is banned)
+let permanentStageBan = [ { id: "60417796c2dbd9001be7573f" }, { id: "6046b7f947b5e3001be33745" } ]; //put userids in here to ban from djing permanently(put their name after their userid to tell who is banned)
+// 6046b7f947b5e3001be33745 MC Swelter
 let vipList = [];
 /* this is the vip list, it accepts userids as input, this is for when you have a special guest or guests in your room and you only
    want to hear them dj, leave this empty unless you want everyone other than the people whos userids are in the vip list to be automatically kicked from stage. */
