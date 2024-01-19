@@ -23,6 +23,7 @@ let whenToGetOffStage = botDefaults.whenToGetOffStage;
 let checkVideoRegions = musicDefaults.alertIfRegionBlocked;
 let refreshingEnabled = roomDefaults.refreshingEnabled;
 let favouriteArtist = null; // what's Robos current favouurite Artist (requires verified info in the DB)
+let thunderdomeMode = false;
 
 
 const botFunctions = ( bot ) => {
@@ -49,6 +50,45 @@ const botFunctions = ( bot ) => {
 
         uptimeTime: () => uptimeTime,
         setUptimeTime: function ( value ) { uptimeTime = value; },
+
+        // ========================================================
+        // Thunderdome Functions
+        // ========================================================
+
+        thunderdomeMode: async function ( data, chatFunctions ) {
+            if ( thunderdomeMode === false ) {
+                thunderdomeMode = true;
+            } else {
+                thunderdomeMode = false;
+                // if game in play, stop after it finishes
+                // if game not running...
+                // reset DJ count limit
+                // remove everyone from the thunderdome queue
+                // unset the playlimits
+            }
+        },
+
+        startThunderdomeBattles: async function () {
+
+        },
+
+        stopThunderdomeBattles: async function () {
+
+        },
+
+        joinThunderdomeQueue: async function () {
+
+        },
+
+        leaveThunderdomeQueue: async function () {
+
+        },
+
+        thunderdomeVote: async function () {
+
+        },
+
+        // ========================================================
 
         // ========================================================
         // Bot Command Functions

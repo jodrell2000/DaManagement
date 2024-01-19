@@ -13,6 +13,8 @@ const moderatorQueueCommands = {};
 const moderatorWelcomeCommands = {};
 const moderatorChatCommands = {};
 const moderatorCommands = {};
+const moderatorThunderdomeCommands = {};
+const userThunderdomeCommands = {};
 
 const aliasDataFileName = process.env.ALIASDATA;
 const chatDataFileName = process.env.CHATDATA;
@@ -561,7 +563,6 @@ const commandFunctions = ( bot ) => {
     }
     moderatorQueueCommands.clearsuperdjs.help = "Remove all SuperDJs";
 
-
     // #############################################
     // Moderator Only Dynamic Chat commands
     // #############################################
@@ -608,6 +609,18 @@ const commandFunctions = ( bot ) => {
     moderatorChatCommands.removechatcommandpicture.help = "Remove a picture from a dynamic chat command. The URL must match exactly and be surrounded by double quotes";
     moderatorChatCommands.removechatcommandpicture.sampleArguments = [ "command", "http://url.link/image.gif" ];
 
+    // #############################################
+    // Thunderdome commands
+    // #############################################
+
+    moderatorThunderdomeCommands.thunderdome = ( { data, chatFunctions, botFunctions } ) => {
+        botFunctions.thunderdomeMode( data, args, chatFunctions );
+    moderatorThunderdomeCommands.thunderdome.help = "Toggle Thunderdome mode";
+
+
+    userThunderdomeCommands
+
+
     // #############################
     // end of fully checked commands
     // #############################
@@ -616,7 +629,8 @@ const commandFunctions = ( bot ) => {
         ...moderatorCommands,
         ...moderatorWelcomeCommands,
         ...moderatorQueueCommands,
-        ...moderatorChatCommands
+        ...moderatorChatCommands,
+        ...moderatorThunderdomeCommands
     }
 
     const allQueueCommands = {
@@ -626,7 +640,8 @@ const commandFunctions = ( bot ) => {
 
     const allGeneralCommands = {
         ...generalCommands,
-        ...userQueueCommands
+        ...userQueueCommands,
+        ...userThunderdomeCommands
     }
 
     const allCommands = {
