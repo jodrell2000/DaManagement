@@ -1,9 +1,9 @@
 /** The Management, Turntable.fm bot
-    Adam Reynolds 2021-2022
-    version 0.1 (forked from chillybot)
-    version 0.2 (forked from Mr. Roboto by Jake Smith)
-    version 0.3 (bears very little resemblance to the original now)
-*/
+ Adam Reynolds 2021-2022
+ version 0.1 (forked from chillybot)
+ version 0.2 (forked from Mr. Roboto by Jake Smith)
+ version 0.3 (bears very little resemblance to the original now)
+ */
 
 /*******************************BeginSetUp*****************************************************************************/
 /* load the ttapi */
@@ -24,6 +24,7 @@ let videoModule = require( './modules/videoModule.js' );
 let documentationModule = require( './modules/documentationModule.js' );
 let databaseModule = require( './modules/databaseModule.js' );
 let dateModule = require( './modules/dateModule.js' );
+let thunderdomeModule = require( './modules/thunderdomeModule.js' );
 // let mlModule = require( './modules/mlModule.js' );
 
 const express = require( 'express' )
@@ -61,11 +62,13 @@ const videoFunctions = videoModule( bot );
 const documentationFunctions = documentationModule();
 const databaseFunctions = databaseModule();
 const dateFunctions = dateModule();
+const thunderdomeFunctions = thunderdomeModule();
 // const mlFunctions = mlModule();
 
 // do something when the bot disconnects?
 // eslint-disable-next-line no-unused-vars
-bot.on( 'disconnected', function ( data ) { } );
+bot.on( 'disconnected', function ( data ) {
+} );
 
 // check if the bot is still connected every 5 seconds
 setInterval( function () {
@@ -85,7 +88,9 @@ setInterval( function () {
 }, 10 * 1000 );
 
 // check if the users are idle every minute
-setInterval( function () { userFunctions.roomIdleCheck( roomDefaults, chatFunctions ) }, 60 * 1000 )
+setInterval( function () {
+    userFunctions.roomIdleCheck( roomDefaults, chatFunctions )
+}, 60 * 1000 )
 
 // every 5 seconds, check if the there's an empty DJ slot, and prompt the next in the queue to join the decks, remove them if they don't
 setInterval( function () {
@@ -117,7 +122,9 @@ setInterval( function () {
 }, 5 * 1000 )
 
 //this kicks all users off-stage when the vip list is not empty...runs every 5 seconds
-setInterval( function () { roomFunctions.clearDecksForVIPs( userFunctions, authModule ) }, 5 * 1000 )
+setInterval( function () {
+    roomFunctions.clearDecksForVIPs( userFunctions, authModule )
+}, 5 * 1000 )
 
 // checks every 60 seconds, and sends event messages if there is one
 setInterval( function () {
@@ -166,10 +173,10 @@ bot.on( 'registered', async function ( data ) {
 //starts up when a user leaves the room
 bot.on( 'deregistered', function ( data ) {
     const username = data.user[ 0 ].name;
-    if ( username !== "Guest") {
-        let theUserID = data.user[0].userid;
-        userFunctions.deregisterUser(theUserID, databaseFunctions);
-        userFunctions.updateRegionAlertsFromUsers(data, videoFunctions, chatFunctions);
+    if ( username !== "Guest" ) {
+        let theUserID = data.user[ 0 ].userid;
+        userFunctions.deregisterUser( theUserID, databaseFunctions );
+        userFunctions.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
     }
 } );
 
@@ -298,34 +305,29 @@ bot.on( 'newsong', function ( data ) {
 
                     if ( typeof userFunctions.getUsername( djCheck ) !== 'undefined' ) {
                         bot.speak( '@' + userFunctions.getUsername( djCheck ) + ' you have played a banned track or artist.' );
-                    }
-                    else {
+                    } else {
                         bot.speak( 'current dj, you have played a banned track or artist.' );
                     }
                 }
-            }
-            else if ( musicDefaults.matchArtists ) //if just artist matching is enabled
+            } else if ( musicDefaults.matchArtists ) //if just artist matching is enabled
             {
                 if ( songFunctions.artist().match( roomFunctions.bannedArtistsMatcher() ) ) {
                     userFunctions.removeDJ( djCheck, 'DJ has played a banned song or artist' );
 
                     if ( typeof userFunctions.getUsername( djCheck ) !== 'undefined' ) {
                         bot.speak( '@' + userFunctions.getUsername( djCheck ) + ' you have played a banned artist.' );
-                    }
-                    else {
+                    } else {
                         bot.speak( 'current dj, you have played a banned artist.' );
                     }
                 }
-            }
-            else if ( musicDefaults.matchSongs ) //if just song matching is enabled
+            } else if ( musicDefaults.matchSongs ) //if just song matching is enabled
             {
                 if ( songFunctions.song().match( roomFunctions.bannedArtistsMatcher() ) ) {
                     userFunctions.removeDJ( djCheck, 'DJ has played a banned song or artist' );
 
                     if ( typeof userFunctions.getUsername( djCheck ) !== 'undefined' ) {
                         bot.speak( '@' + userFunctions.getUsername( djCheck ) + ' you have played a banned track.' );
-                    }
-                    else {
+                    } else {
                         bot.speak( 'current dj, you have played a banned track.' );
                     }
                 }
@@ -375,7 +377,7 @@ bot.on( 'speak', function ( data ) {
 
     if ( commandFunctions.wasThisACommand( data ) ) {
         // commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions );
-        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions );
+        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, thunderdomeFunctions );
     }
 
     //checks to see if someone is trying to speak to an afk person or not.
@@ -393,7 +395,7 @@ bot.on( 'speak', function ( data ) {
 bot.on( 'pmmed', function ( data ) {
     if ( commandFunctions.wasThisACommand( data ) ) {
         // commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions );
-        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions );
+        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, thunderdomeFunctions );
     }
 } );
 
@@ -574,7 +576,7 @@ app.post( '/updateTrackDisplayName', ( req, res ) => {
 // Top 10 Countdown Data
 // ########################################################################
 
-async function getTop10 ( req, res, functionName, templateFile ) {
+async function getTop10( req, res, functionName, templateFile ) {
     try {
         const { startDate, endDate } = req.query;
         const [ formStartDate, formEndDate, linkStartDate, linkEndDate ] = [
@@ -606,7 +608,7 @@ async function getTop10 ( req, res, functionName, templateFile ) {
     }
 }
 
-async function getSummary ( req, res, templateFile ) {
+async function getSummary( req, res, templateFile ) {
     try {
         const { startDate, endDate } = req.query;
         const [ formStartDate, formEndDate, linkStartDate, linkEndDate ] = [
@@ -697,7 +699,7 @@ app.get( '/deletesong', ( req, res ) => {
 // General functions
 // ########################################################################
 
-function authentication ( req, res, next ) {
+function authentication( req, res, next ) {
     let authheader = req.headers.authorization;
     // console.log(req.headers);
 

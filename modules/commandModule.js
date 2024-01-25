@@ -2,7 +2,6 @@ let chatDefaults = require( '../defaultSettings/chatDefaults.js' );
 let chatCommandItems = require( '../defaultSettings/chatCommandItems.js' );
 const Storage = require( 'node-storage' );
 const { dirname } = require( 'path' );
-const databaseFunctions = require( './databaseModule.js' );
 
 const generalCommands = {};
 const userCommands = {};
@@ -613,12 +612,48 @@ const commandFunctions = ( bot ) => {
     // Thunderdome commands
     // #############################################
 
-    moderatorThunderdomeCommands.thunderdome = ( { data, chatFunctions, botFunctions } ) => {
+    moderatorThunderdomeCommands.thunderdome = ( { data, args, chatFunctions, botFunctions } ) => {
         botFunctions.thunderdomeMode( data, args, chatFunctions );
+    }
     moderatorThunderdomeCommands.thunderdome.help = "Toggle Thunderdome mode";
 
 
-    userThunderdomeCommands
+    moderatorThunderdomeCommands.thunderdome = ( {
+                                                     data,
+                                                     thunderdomeFunctions,
+                                                     roomFunctions,
+                                                     userFunctions,
+                                                     chatFunctions
+                                                 } ) => {
+        thunderdomeFunctions.thunderdome( data, roomFunctions, userFunctions, chatFunctions )
+    }
+    moderatorThunderdomeCommands.thunderdome.help = "Start Thunderdome mode";
+
+    moderatorThunderdomeCommands.beginthunderdome = ( {
+                                                          data,
+                                                          thunderdomeFunctions,
+                                                          roomFunctions,
+                                                          userFunctions,
+                                                          chatFunctions
+                                                      } ) => {
+        thunderdomeFunctions.beginThunderdome( data, roomFunctions, userFunctions, chatFunctions )
+    }
+    moderatorThunderdomeCommands.beginthunderdome.help = "Start the Thunderdome fights!";
+
+    moderatorThunderdomeCommands.endthunderdome = ( { data, thunderdomeFunctions, roomFunctions, chatFunctions } ) => {
+        thunderdomeFunctions.endThunderdome( data, roomFunctions, chatFunctions )
+    }
+    moderatorThunderdomeCommands.endthunderdome.help = "End Thunderdome mode";
+
+    userThunderdomeCommands.enterDome = ( { data, thunderdomeFunctions, userFunctions, chatFunctions } ) => {
+        thunderdomeFunctions.enterDome( data, userFunctions, chatFunctions );
+    }
+    userThunderdomeCommands.enterDome.help = "Signup for the Thunderdome";
+
+    userThunderdomeCommands.leaveDome = ( { data, thunderdomeFunctions, userFunctions, chatFunctions } ) => {
+        thunderdomeFunctions.leaveDome( data, userFunctions, chatFunctions );
+    }
+    userThunderdomeCommands.enterDome.help = "Remove yourself from Thunderdome signup";
 
 
     // #############################
@@ -794,7 +829,7 @@ const commandFunctions = ( bot ) => {
         },
 
         // parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions ) {
-        parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions ) {
+        parseCommands: function ( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, thunderdomeFunctions ) {
             let senderID;
 
             if ( data.command === "pmmed" ) {
@@ -821,6 +856,7 @@ const commandFunctions = ( bot ) => {
                     documentationFunctions,
                     databaseFunctions,
                     dateFunctions,
+                    thunderdomeFunctions,
                     // mlFunctions,
                 } );
             } else {
