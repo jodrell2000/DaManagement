@@ -64,26 +64,26 @@ html(lang="en")
                         input(type='hidden' name='trackPlayedID' value=song.trackPlayedID)
                         button(type='submit') Split Artist
 
-        td= song.trackID
-        td= song.trackName
-        td
-            if song.trackDisplayName
-                | #{song.trackDisplayName}
-                form(action='/updateTrackDisplayName' method='POST')
-                    input(type='hidden' name='reset' value=true)
-                    input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
-                    input(type='hidden' name='trackID' value=song.trackID)
-                    button(type='submit') Reset
-            else
-                form(action='/updateTrackDisplayName' method='POST')
-                    input(type='text' name='trackDisplayName', value=song.trackName)
-                    input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
-                    input(type='hidden' name='trackID' value=song.trackID)
-                    button(type='submit') Update Track Name
-            form(action='/splitTrackName' method='POST')
-                input(type='hidden' name='trackName', value=song.trackName)
-                input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
-                input(type='hidden' name='trackPlayedID' value=song.trackPlayedID)
+                td= song.trackID
+                td= song.trackName
+                td
+                    if song.trackDisplayName
+                        | #{song.trackDisplayName}
+                        form(action='/updateTrackDisplayName' method='POST')
+                            input(type='hidden' name='reset' value=true)
+                            input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
+                            input(type='hidden' name='trackID' value=song.trackID)
+                            button(type='submit') Reset
+                    else
+                        form(action='/updateTrackDisplayName' method='POST')
+                            input(type='text' name='trackDisplayName', value=song.trackName)
+                            input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
+                            input(type='hidden' name='trackID' value=song.trackID)
+                            button(type='submit') Update Track Name
+                    form(action='/splitTrackName' method='POST')
+                        input(type='hidden' name='trackName', value=song.trackName)
+                        input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
+                        input(type='hidden' name='trackPlayedID' value=song.trackPlayedID)
     button(type='submit') Split Track Name
         td= song.length
         td
