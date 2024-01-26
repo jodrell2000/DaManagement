@@ -84,7 +84,6 @@ html(lang="en")
                         input(type='hidden' name='trackName', value=song.trackName)
                         input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
                         input(type='hidden' name='trackPlayedID' value=song.trackPlayedID)
-    button(type='submit') Split Track Name
-        td= song.length
-        td
-            a(href=`https://www.google.com/search?q=${ encodeURIComponent( song.artistName ) }%20${ encodeURIComponent( song.trackName ) }`, target="_blank") Search
+                        button(type='submit') Split Track Name
+                td= song.length
+                td a(href=`https://www.google.com/search?q=${ encodeURIComponent( song.artistName ) }%20${ encodeURIComponent( song.trackName ) }`, target="_blank") Search
