@@ -1,9 +1,9 @@
 /** The Management, Turntable.fm bot
-    Adam Reynolds 2021-2022
-    version 0.1 (forked from chillybot)
-    version 0.2 (forked from Mr. Roboto by Jake Smith)
-    version 0.3 (bears very little resemblance to the original now)
-*/
+ Adam Reynolds 2021-2022
+ version 0.1 (forked from chillybot)
+ version 0.2 (forked from Mr. Roboto by Jake Smith)
+ version 0.3 (bears very little resemblance to the original now)
+ */
 
 /*******************************BeginSetUp*****************************************************************************/
 /* load the ttapi */
@@ -166,10 +166,10 @@ bot.on( 'registered', async function ( data ) {
 //starts up when a user leaves the room
 bot.on( 'deregistered', function ( data ) {
     const username = data.user[ 0 ].name;
-    if ( username !== "Guest") {
-        let theUserID = data.user[0].userid;
-        userFunctions.deregisterUser(theUserID, databaseFunctions);
-        userFunctions.updateRegionAlertsFromUsers(data, videoFunctions, chatFunctions);
+    if ( username !== "Guest" ) {
+        let theUserID = data.user[ 0 ].userid;
+        userFunctions.deregisterUser( theUserID, databaseFunctions );
+        userFunctions.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
     }
 } );
 
@@ -298,34 +298,29 @@ bot.on( 'newsong', function ( data ) {
 
                     if ( typeof userFunctions.getUsername( djCheck ) !== 'undefined' ) {
                         bot.speak( '@' + userFunctions.getUsername( djCheck ) + ' you have played a banned track or artist.' );
-                    }
-                    else {
+                    } else {
                         bot.speak( 'current dj, you have played a banned track or artist.' );
                     }
                 }
-            }
-            else if ( musicDefaults.matchArtists ) //if just artist matching is enabled
+            } else if ( musicDefaults.matchArtists ) //if just artist matching is enabled
             {
                 if ( songFunctions.artist().match( roomFunctions.bannedArtistsMatcher() ) ) {
                     userFunctions.removeDJ( djCheck, 'DJ has played a banned song or artist' );
 
                     if ( typeof userFunctions.getUsername( djCheck ) !== 'undefined' ) {
                         bot.speak( '@' + userFunctions.getUsername( djCheck ) + ' you have played a banned artist.' );
-                    }
-                    else {
+                    } else {
                         bot.speak( 'current dj, you have played a banned artist.' );
                     }
                 }
-            }
-            else if ( musicDefaults.matchSongs ) //if just song matching is enabled
+            } else if ( musicDefaults.matchSongs ) //if just song matching is enabled
             {
                 if ( songFunctions.song().match( roomFunctions.bannedArtistsMatcher() ) ) {
                     userFunctions.removeDJ( djCheck, 'DJ has played a banned song or artist' );
 
                     if ( typeof userFunctions.getUsername( djCheck ) !== 'undefined' ) {
                         bot.speak( '@' + userFunctions.getUsername( djCheck ) + ' you have played a banned track.' );
-                    }
-                    else {
+                    } else {
                         bot.speak( 'current dj, you have played a banned track.' );
                     }
                 }
@@ -570,11 +565,37 @@ app.post( '/updateTrackDisplayName', ( req, res ) => {
         } )
 } );
 
+app.post( '/splitArtistName', ( req, res ) => {
+    const trackPlayedID = req.body.trackPlayedID;
+    const artistName = req.body.artistName;
+
+    // call a function with the artistID and artistDisplayName values
+    databaseFunctions.splitArtistName( trackPlayedID, artistName )
+        .then( () => {
+            const queryParams = new URLSearchParams( { byrecent: req.body.byrecent } );
+            const redirectUrl = '/listunverified?' + queryParams.toString();
+            res.redirect( redirectUrl );
+        } )
+} );
+
+app.post( '/splitTrackName', ( req, res ) => {
+    const trackPlayedID = req.body.trackPlayedID;
+    const trackName = req.body.trackName;
+
+    // call a function with the artistID and artistDisplayName values
+    databaseFunctions.splitTrackName( trackPlayedID, trackName )
+        .then( () => {
+            const queryParams = new URLSearchParams( { byrecent: req.body.byrecent } );
+            const redirectUrl = '/listunverified?' + queryParams.toString();
+            res.redirect( redirectUrl );
+        } )
+} );
+
 // ########################################################################
 // Top 10 Countdown Data
 // ########################################################################
 
-async function getTop10 ( req, res, functionName, templateFile ) {
+async function getTop10( req, res, functionName, templateFile ) {
     try {
         const { startDate, endDate } = req.query;
         const [ formStartDate, formEndDate, linkStartDate, linkEndDate ] = [
@@ -606,7 +627,7 @@ async function getTop10 ( req, res, functionName, templateFile ) {
     }
 }
 
-async function getSummary ( req, res, templateFile ) {
+async function getSummary( req, res, templateFile ) {
     try {
         const { startDate, endDate } = req.query;
         const [ formStartDate, formEndDate, linkStartDate, linkEndDate ] = [
@@ -697,7 +718,7 @@ app.get( '/deletesong', ( req, res ) => {
 // General functions
 // ########################################################################
 
-function authentication ( req, res, next ) {
+function authentication( req, res, next ) {
     let authheader = req.headers.authorization;
     // console.log(req.headers);
 

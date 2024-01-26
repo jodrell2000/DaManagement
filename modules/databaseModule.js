@@ -325,7 +325,7 @@ const databaseFunctions = () => {
         // DB Track Editing Functions
         // ========================================================
 
-        getRandomVerifiedArtist () {
+        getRandomVerifiedArtist() {
             return new Promise( ( resolve, _ ) => {
                 const selectQuery = "SELECT DISTINCT(displayName) FROM artists WHERE displayName IS NOT NULL ORDER BY RAND() LIMIT 1;";
                 const values = [];
@@ -339,7 +339,7 @@ const databaseFunctions = () => {
             } )
         },
 
-        getVerifiedArtistsFromName ( theArtist ) {
+        getVerifiedArtistsFromName( theArtist ) {
             const selectQuery = "SELECT displayName FROM artists WHERE artistName = ?;";
             const values = [ theArtist ];
 
@@ -349,7 +349,7 @@ const databaseFunctions = () => {
                 } );
         },
 
-        getVerifiedTracksFromName ( theSong ) {
+        getVerifiedTracksFromName( theSong ) {
             const selectQuery = "SELECT displayName FROM tracks WHERE trackName = ?;";
             const values = [ theSong ];
 
@@ -359,9 +359,10 @@ const databaseFunctions = () => {
                 } );
         },
 
-        getUnverifiedSongList ( byRecent ) {
+        getUnverifiedSongList( byRecent ) {
             const selectQuery = `
     SELECT 
+      tp.id AS trackPlayedID,
       a.id AS artistID, 
       a.artistName, 
       a.displayName AS artistDisplayName, 
@@ -387,7 +388,7 @@ const databaseFunctions = () => {
                 } );
         },
 
-        updateArtistDisplayName ( artistID, artistDisplayName ) {
+        updateArtistDisplayName( artistID, artistDisplayName ) {
             const selectQuery = "UPDATE artists SET displayName=? WHERE id=?;";
             const values = [ artistDisplayName, artistID ];
 
@@ -397,7 +398,34 @@ const databaseFunctions = () => {
                 } );
         },
 
-        updateTrackDisplayName ( trackID, trackDisplayName ) {
+        splitArtistName: async function ( trackPlayedID, artistName ) {
+            const updateTrackPlayedQuery = "UPDATE tracksPlayed SET artistID=? WHERE id=?;";
+
+            try {
+                const artistID = await this.createNewArtist( artistName );
+                const values = [ artistID, trackPlayedID ];
+
+                return await this.runQuery( updateTrackPlayedQuery, values );
+            } catch ( error ) {
+                console.error( "Error splitting artist name:", error );
+                throw error;
+            }
+        },
+
+        createNewArtist: async function ( artistName ) {
+            const createArtistQuery = "INSERT INTO artists SET artistName=?;";
+            const values = [ artistName ];
+
+            try {
+                const result = await this.runQuery( createArtistQuery, values );
+                return result.insertId;
+            } catch ( error ) {
+                console.error( "Error creating new artist:", error );
+                throw error;
+            }
+        },
+
+        updateTrackDisplayName( trackID, trackDisplayName ) {
             const selectQuery = "UPDATE tracks SET displayName=? WHERE id=?;";
             const values = [ trackDisplayName, trackID ];
 
@@ -405,6 +433,33 @@ const databaseFunctions = () => {
                 .then( ( result ) => {
                     return result;
                 } );
+        },
+
+        splitTrackName: async function ( trackPlayedID, trackName ) {
+            const updateTrackPlayedQuery = "UPDATE tracksPlayed SET trackID=? WHERE id=?;";
+
+            try {
+                const trackID = await this.createNewTrack( trackName );
+                const values = [ trackID, trackPlayedID ];
+
+                return await this.runQuery( updateTrackPlayedQuery, values );
+            } catch ( error ) {
+                console.error( "Error splitting artist name:", error );
+                throw error;
+            }
+        },
+
+        createNewTrack: async function ( trackName ) {
+            const createTrackQuery = "INSERT INTO tracks SET trackName=?;";
+            const values = [ trackName ];
+
+            try {
+                const result = await this.runQuery( createTrackQuery, values );
+                return result.insertId;
+            } catch ( error ) {
+                console.error( "Error creating new artist:", error );
+                throw error;
+            }
         },
 
         // ========================================================
@@ -493,7 +548,7 @@ const databaseFunctions = () => {
         // Top 10 Functions
         // ========================================================
 
-        async fullTop10Results ( startDate, endDate, includeDays = [ 0, 1, 2, 3, 4, 5, 6 ] ) {
+        async fullTop10Results( startDate, endDate, includeDays = [ 0, 1, 2, 3, 4, 5, 6 ] ) {
             const selectQuery = `SELECT COALESCE(a.displayName, a.artistName) AS "artist", COALESCE(t.displayName, t.trackname) AS "track", 
 (SUM(tp.upvotes-tp.downvotes) + SUM(tp.snags*6) + 
 SUM(IF(c.command='props', e.count, 0))*5 +
@@ -526,7 +581,7 @@ LIMIT 15;`;
             }
         },
 
-        async top10ByLikesResults ( startDate, endDate, includeDays = [ 0, 1, 2, 3, 4, 5, 6 ] ) {
+        async top10ByLikesResults( startDate, endDate, includeDays = [ 0, 1, 2, 3, 4, 5, 6 ] ) {
             const selectQuery = `SELECT COALESCE( a.displayName, a.artistName ) AS "artist", COALESCE( t.displayName, t.trackname ) AS "track", SUM( tp.upvotes ) as upvotes, SUM( tp.downvotes ) as 'downvotes',
                 count( tp.id ) AS "plays"
 FROM users u 
@@ -554,7 +609,7 @@ limit 15;`;
             }
         },
 
-        async mostPlayedTracksResults ( startDate, endDate, includeDays = [ 0, 1, 2, 3, 4, 5, 6 ] ) {
+        async mostPlayedTracksResults( startDate, endDate, includeDays = [ 0, 1, 2, 3, 4, 5, 6 ] ) {
             const selectQuery = `SELECT COALESCE(a.displayName, a.artistName) AS "artist", COALESCE(t.displayName, t.trackname) AS "track", SUM(tp.upvotes-tp.downvotes) as 'points',
 count(tp.id) AS "plays"
 FROM users u 
@@ -582,7 +637,7 @@ limit 15;`;
             }
         },
 
-        async mostPlayedArtistsResults ( startDate, endDate, includeDays = [ 0, 1, 2, 3, 4, 5, 6 ] ) {
+        async mostPlayedArtistsResults( startDate, endDate, includeDays = [ 0, 1, 2, 3, 4, 5, 6 ] ) {
             const selectQuery = `SELECT artist, COUNT(*) as "plays", SUM(points) as "points" FROM (
 SELECT COALESCE(a.displayName, a.artistName) as "artist", (tp.upvotes-tp.downvotes+(tp.snags*6)+ 
 SUM(IF(c.command='props', e.count, 0))*5+
@@ -616,7 +671,7 @@ limit 15;`;
             }
         },
 
-        async roomSummaryResults ( startDate, endDate ) {
+        async roomSummaryResults( startDate, endDate ) {
             const selectQuery = `SELECT COUNT(tp.id) AS "plays", COUNT(DISTINCT(u.id)) AS "djs", SUM(tp.upvotes) "upvotes",  SUM(tp.downvotes) as "downvotes"
 FROM tracksPlayed tp 
 JOIN users u ON tp.djID=u.id 
@@ -633,7 +688,7 @@ u.username != "Mr. Roboto";`;
             }
         },
 
-        async top10DJResults ( startDate, endDate ) {
+        async top10DJResults( startDate, endDate ) {
             const selectQuery = `SELECT dj, SUM(points) as "points" FROM (
 SELECT u.username as "dj", SUM(tp.upvotes)-SUM(tp.downvotes)+SUM(tp.snags*6)+
 (SUM(IF(c.command='props', e.count, 0))*5)+
@@ -667,8 +722,6 @@ LIMIT 11;`;
         // ========================================================
 
     }
-
-
 
 
 }

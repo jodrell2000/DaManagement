@@ -1,76 +1,90 @@
 doctype html
 html(lang="en")
-  head
-    title List of unverified songs from Robo's DB
-    link(href='/styles/app.css' rel='stylesheet' type='text/css')
-    link(href='/modules/dragula/dist/dragula.css' rel='stylesheet' type='text/css')
-    link(href="/modules/@fortawesome/fontawesome-free/css/fontawesome.css" rel="stylesheet")
-    link(href="/modules/@fortawesome/fontawesome-free/css/solid.css" rel="stylesheet")
-    style.
-      #songqueue {
-        border-collapse: collapse;
-        border: 1px solid #ddd;
-        width: 100%;
-      }
-      #songqueue td, #songqueue th {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-      }
-      #songqueue th {
-        background-color: #f2f2f2;
-        color: black;
-      }
+    head
+        title List of unverified songs from Robo's DB
+        link(href='/styles/app.css' rel='stylesheet' type='text/css')
+        link(href='/modules/dragula/dist/dragula.css' rel='stylesheet' type='text/css')
+        link(href="/modules/@fortawesome/fontawesome-free/css/fontawesome.css" rel="stylesheet")
+        link(href="/modules/@fortawesome/fontawesome-free/css/solid.css" rel="stylesheet")
+        style.
+            #songqueue {
+                border-collapse: collapse;
+                border: 1px solid #ddd;
+                width: 100%;
+            }
 
-  body
-    h1 Current list of unverified songs from Robo's DB
+            #songqueue td, #songqueue th {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }
 
-    table#songqueue
-        thead
-            tr
-                th artistID
-                th artistName
-                td artistDisplayName
-                th trackID
-                th trackName
-                th trackDisplayName
-                th length
-                th search
-        tbody
-        each song in songList
-            tr
-            td= song.artistID
-            td= song.artistName
-            td
-                if song.artistDisplayName
-                    | #{song.artistDisplayName}
-                    form(action='/updateArtistDisplayName' method='POST')
-                        input(type='hidden' name='reset' value=true)
+            #songqueue th {
+                background-color: #f2f2f2;
+                color: black;
+            }
+
+    body
+        h1 Current list of unverified songs from Robo's DB
+
+        table#songqueue
+            thead
+                tr
+                    th trackPlayedID
+                    th artistID
+                    th artistName
+                    td artistDisplayName
+                    th trackID
+                    th trackName
+                    th trackDisplayName
+                    th length
+                    th search
+            tbody
+            each song in songList
+                tr
+                td= song.artistID
+                td= song.artistName
+                td
+                    if song.artistDisplayName
+                        | #{song.artistDisplayName}
+                        form(action='/updateArtistDisplayName' method='POST')
+                            input(type='hidden' name='reset' value=true)
+                            input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
+                            input(type='hidden' name='artistID' value=song.artistID)
+                            button(type='submit') Reset
+                    else
+                        form(action='/updateArtistDisplayName' method='POST')
+                            input(type='text' name='artistDisplayName', value=song.artistName)
+                            input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
+                            input(type='hidden' name='artistID' value=song.artistID)
+                            button(type='submit') Update Artist
+                    form(action='/splitArtistName' method='POST')
+                        input(type='hidden' name='artistName', value=song.artistName)
                         input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
-                        input(type='hidden' name='artistID' value=song.artistID)
-                        button(type='submit') Reset
-                else
-                    form(action='/updateArtistDisplayName' method='POST')
-                        input(type='text' name='artistDisplayName', value=song.artistName)
-                        input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
-                        input(type='hidden' name='artistID' value=song.artistID)
-                        button(type='submit') UpdateDB
-            td= song.trackID
-            td= song.trackName
-            td
-                if song.trackDisplayName
-                    | #{song.trackDisplayName}
-                    form(action='/updateTrackDisplayName' method='POST')
-                        input(type='hidden' name='reset' value=true)
-                        input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
-                        input(type='hidden' name='trackID' value=song.trackID)
-                        button(type='submit') Reset
-                else
-                    form(action='/updateTrackDisplayName' method='POST')
-                        input(type='text' name='trackDisplayName', value=song.trackName)
-                        input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
-                        input(type='hidden' name='trackID' value=song.trackID)
-                        button(type='submit') UpdateDB
-            td= song.length
-            td
-                a(href=`https://www.google.com/search?q=${encodeURIComponent(song.artistName)}%20${encodeURIComponent(song.trackName)}`, target="_blank") Search
+                        input(type='hidden' name='trackPlayedID' value=song.trackPlayedID)
+                        button(type='submit') Split Artist
+
+        td= song.trackID
+        td= song.trackName
+        td
+            if song.trackDisplayName
+                | #{song.trackDisplayName}
+                form(action='/updateTrackDisplayName' method='POST')
+                    input(type='hidden' name='reset' value=true)
+                    input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
+                    input(type='hidden' name='trackID' value=song.trackID)
+                    button(type='submit') Reset
+            else
+                form(action='/updateTrackDisplayName' method='POST')
+                    input(type='text' name='trackDisplayName', value=song.trackName)
+                    input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
+                    input(type='hidden' name='trackID' value=song.trackID)
+                    button(type='submit') Update Track Name
+            form(action='/splitTrackName' method='POST')
+                input(type='hidden' name='trackName', value=song.trackName)
+                input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
+                input(type='hidden' name='trackPlayedID' value=song.trackPlayedID)
+    button(type='submit') Split Track Name
+        td= song.length
+        td
+            a(href=`https://www.google.com/search?q=${ encodeURIComponent( song.artistName ) }%20${ encodeURIComponent( song.trackName ) }`, target="_blank") Search
