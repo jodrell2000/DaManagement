@@ -26,7 +26,23 @@ html(lang="en")
 
     body
         h1 Current list of unverified songs from Robo's DB
-
+        form(action='/updateArtistDisplayName' method='POST')
+            input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
+            button(type='submit') By Recent
+        form(action='/updateArtistDisplayName' method='POST')
+            input(type='hidden' name='byartist' value='#{req.query.byartist}')
+            button(type='submit') By Recent
+        form(action='/updateArtistDisplayName' method='POST')
+            input(type='hidden' name='bytrack' value='#{req.query.bytrack}')
+            button(type='submit') By Recent
+        form(action='/updateArtistDisplayName' method='POST')
+            input(type='text' name='searchvalue')
+            input(type='hidden' name='searchtrack' value='#{req.query.searchtrack}')
+            button(type='submit') By Recent
+        form(action='/updateArtistDisplayName' method='POST')
+            input(type='text' name='searchvalue')
+            input(type='hidden' name='searchartist' value='#{req.query.searchartist}')
+            button(type='submit') By Recent
         table#songqueue
             thead
                 tr
