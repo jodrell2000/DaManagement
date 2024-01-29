@@ -530,8 +530,8 @@ bot.on( 'endsong', function ( data ) {
 
 app.get( '/listunverified', async ( req, res ) => {
     console.group( "listunverified" );
-    console.log( "req:", JSON.stringify( req ) );
-    console.log( "res:", JSON.stringify( res ) );
+    console.log( "req:", req );
+    console.log( "res:", res );
     try {
         const songList = await databaseFunctions.getUnverifiedSongList( req.query.byrecent );
         let html = pug.renderFile( './templates/listUnverifiedSongs.pug', { songList } );
