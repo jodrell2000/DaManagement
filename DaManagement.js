@@ -529,6 +529,9 @@ bot.on( 'endsong', function ( data ) {
 // ########################################################################
 
 app.get( '/listunverified', async ( req, res ) => {
+    console.group( "listunverified" );
+    console.log( "req:", JSON.stringify( req ) );
+    console.log( "res:", JSON.stringify( res ) );
     try {
         const songList = await databaseFunctions.getUnverifiedSongList( req.query.byrecent );
         let html = pug.renderFile( './templates/listUnverifiedSongs.pug', { songList } );
@@ -537,6 +540,7 @@ app.get( '/listunverified', async ( req, res ) => {
         console.error( error );
         res.sendStatus( 500 );
     }
+    console.groupEnd();
 } );
 
 app.post( '/updateArtistDisplayName', ( req, res ) => {
