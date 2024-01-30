@@ -31,25 +31,25 @@ html(lang="en")
             tr
             td
                 form(action='/updateArtistDisplayName' method='POST')
-                    input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
+                    input(type='hidden' name='sort' value='time')
                     button(type='submit') Sort by Recent
             td
                 form(action='/updateArtistDisplayName' method='POST')
-                    input(type='hidden' name='byartist' value='#{req.query.byartist}')
+                    input(type='hidden' name='sort' value='artist')
                     button(type='submit') Sort by Artist
             td
                 form(action='/updateArtistDisplayName' method='POST')
-                    input(type='hidden' name='bytrack' value='#{req.query.bytrack}')
+                    input(type='hidden' name='sort' value='track')
                     button(type='submit') Sort by Track
             td
                 form(action='/updateArtistDisplayName' method='POST')
                     input(type='text' name='searchvalue')
-                    input(type='hidden' name='searchtrack' value='#{req.query.searchtrack}')
+                    input(type='hidden' name='search' value='artist')
                     button(type='submit') Search by Track
             td
                 form(action='/updateArtistDisplayName' method='POST')
                     input(type='text' name='searchvalue')
-                    input(type='hidden' name='searchartist' value='#{req.query.searchartist}')
+                    input(type='hidden' name='search' value='track')
                     button(type='submit') Search by Artist
     table#songqueue
         thead
@@ -73,18 +73,18 @@ html(lang="en")
                     | #{song.artistDisplayName}
                     form(action='/updateArtistDisplayName' method='POST')
                         input(type='hidden' name='reset' value=true)
-                        input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
+                        input(type='hidden' name='sort' value='#{req.query.sort}')
                         input(type='hidden' name='artistID' value=song.artistID)
                         button(type='submit') Reset
                 else
                     form(action='/updateArtistDisplayName' method='POST')
                         input(type='text' name='artistDisplayName', value=song.artistName)
-                        input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
+                        input(type='hidden' name='sort' value='#{req.query.sort}')
                         input(type='hidden' name='artistID' value=song.artistID)
                         button(type='submit') Update Artist
                 form(action='/splitArtistName' method='POST')
                     input(type='hidden' name='artistName', value=song.artistName)
-                    input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
+                    input(type='hidden' name='sort' value='#{req.query.sort}')
                     input(type='hidden' name='trackPlayedID' value=song.trackPlayedID)
                     button(type='submit') Split Artist
 
@@ -95,18 +95,18 @@ html(lang="en")
                     | #{song.trackDisplayName}
                     form(action='/updateTrackDisplayName' method='POST')
                         input(type='hidden' name='reset' value=true)
-                        input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
+                        input(type='hidden' name='sort' value='#{req.query.sort}')
                         input(type='hidden' name='trackID' value=song.trackID)
                         button(type='submit') Reset
                 else
                     form(action='/updateTrackDisplayName' method='POST')
                         input(type='text' name='trackDisplayName', value=song.trackName)
-                        input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
+                        input(type='hidden' name='sort' value='#{req.query.sort}')
                         input(type='hidden' name='trackID' value=song.trackID)
                         button(type='submit') Update Track Name
                 form(action='/splitTrackName' method='POST')
                     input(type='hidden' name='trackName', value=song.trackName)
-                    input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
+                    input(type='hidden' name='sort' value='#{req.query.sort}')
                     input(type='hidden' name='trackPlayedID' value=song.trackPlayedID)
                     button(type='submit') Split Track Name
             td= song.length

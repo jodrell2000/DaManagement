@@ -533,7 +533,7 @@ app.get( '/listunverified', async ( req, res ) => {
     console.log( "req:", req );
     console.log( "res:", res );
     try {
-        const songList = await databaseFunctions.getUnverifiedSongList( req.query.byrecent );
+        const songList = await databaseFunctions.getUnverifiedSongList( req.query );
         let html = pug.renderFile( './templates/listUnverifiedSongs.pug', { songList } );
         res.send( html );
     } catch ( error ) {
@@ -550,7 +550,7 @@ app.post( '/updateArtistDisplayName', ( req, res ) => {
     // call a function with the artistID and artistDisplayName values
     databaseFunctions.updateArtistDisplayName( artistID, artistDisplayName )
         .then( () => {
-            const queryParams = new URLSearchParams( { byrecent: req.body.byrecent } );
+            const queryParams = new URLSearchParams( { query: req.query.sort } );
             const redirectUrl = '/listunverified?' + queryParams.toString();
             res.redirect( redirectUrl );
         } )
@@ -563,7 +563,7 @@ app.post( '/updateTrackDisplayName', ( req, res ) => {
     // call a function with the artistID and artistDisplayName values
     databaseFunctions.updateTrackDisplayName( trackID, trackDisplayName )
         .then( () => {
-            const queryParams = new URLSearchParams( { byrecent: req.body.byrecent } );
+            const queryParams = new URLSearchParams( { query: req.query.sort } );
             const redirectUrl = '/listunverified?' + queryParams.toString();
             res.redirect( redirectUrl );
         } )
@@ -576,7 +576,7 @@ app.post( '/splitArtistName', ( req, res ) => {
     // call a function with the artistID and artistDisplayName values
     databaseFunctions.splitArtistName( trackPlayedID, artistName )
         .then( () => {
-            const queryParams = new URLSearchParams( { byrecent: req.body.byrecent } );
+            const queryParams = new URLSearchParams( { query: req.query.sort } );
             const redirectUrl = '/listunverified?' + queryParams.toString();
             res.redirect( redirectUrl );
         } )
@@ -589,7 +589,7 @@ app.post( '/splitTrackName', ( req, res ) => {
     // call a function with the artistID and artistDisplayName values
     databaseFunctions.splitTrackName( trackPlayedID, trackName )
         .then( () => {
-            const queryParams = new URLSearchParams( { byrecent: req.body.byrecent } );
+            const queryParams = new URLSearchParams( { query: req.query.sort } );
             const redirectUrl = '/listunverified?' + queryParams.toString();
             res.redirect( redirectUrl );
         } )
