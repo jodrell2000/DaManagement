@@ -359,26 +359,42 @@ const databaseFunctions = () => {
                 } );
         },
 
-        getUnverifiedSongList( byRecent ) {
+        getUnverifiedSongList( sort ) {
+            let orderByClause = '';
+
+            switch ( sort ) {
+                case 'time':
+                    orderByClause = ' ORDER BY tp.whenPlayed DESC';
+                    break;
+                case 'artist':
+                    orderByClause = ' ORDER BY COALESCE(a.displayName, a.artistName) ASC, COALESCE(t.displayName, t.trackname) ASC';
+                    break;
+                case 'track':
+                    orderByClause = ' ORDER BY COALESCE(t.displayName, t.trackname) ASC, COALESCE(a.displayName, a.artistName) ASC';
+                    break;
+                default:
+                    orderByClause = ' ORDER BY COALESCE(a.displayName, a.artistName) ASC, COALESCE(t.displayName, t.trackname) ASC';
+            }
+
             const selectQuery = `
-    SELECT 
-      tp.id AS trackPlayedID,
-      a.id AS artistID, 
-      a.artistName, 
-      a.displayName AS artistDisplayName, 
-      t.id AS trackID, 
-      t.trackName, 
-      t.displayName AS trackDisplayName, 
-      ROUND(AVG(tp.length)) AS length 
-    FROM 
-      tracksPlayed tp 
-      JOIN artists a ON a.id=tp.artistID 
-      JOIN tracks t ON t.id=tp.trackID 
-    WHERE 
-      a.displayName IS NULL OR t.displayName IS NULL 
-      ${ byRecent ? `GROUP BY tp.id ORDER BY tp.whenPlayed DESC ` : `GROUP BY a.id,t.id 
-    ORDER BY COALESCE( a.displayName, a.artistName ), COALESCE( t.displayName, t.trackname ) ` } 
-    LIMIT 50`;
+        SELECT 
+            tp.id AS trackPlayedID,
+            a.id AS artistID, 
+            a.artistName, 
+            a.displayName AS artistDisplayName, 
+            t.id AS trackID, 
+            t.trackName, 
+            t.displayName AS trackDisplayName, 
+            ROUND(AVG(tp.length)) AS length 
+        FROM 
+            tracksPlayed tp 
+            JOIN artists a ON a.id=tp.artistID 
+            JOIN tracks t ON t.id=tp.trackID 
+        WHERE 
+            a.displayName IS NULL OR t.displayName IS NULL
+        GROUP BY tp.id
+        ${orderByClause}
+        LIMIT 50`;
 
             const values = [];
 
@@ -387,7 +403,6 @@ const databaseFunctions = () => {
                     return result;
                 } );
         },
-
         updateArtistDisplayName( artistID, artistDisplayName ) {
             const selectQuery = "UPDATE artists SET displayName=? WHERE id=?;";
             const values = [ artistDisplayName, artistID ];
