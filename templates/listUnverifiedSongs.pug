@@ -41,11 +41,11 @@ html(lang="en")
                     button(type='submit') Sort by Track
             td
                 form(action='/listunverified' method='GET')
-                    input(type='text' name='trackName', value=search.trackName)
+                    input(type='text' name='trackName')
                     button(type='submit') Search by Track
             td
                 form(action='/listunverified' method='GET')
-                    input(type='text' name='artistName', value=search.artistName)
+                    input(type='text' name='artistName')
                     button(type='submit') Search by Artist
     table#songqueue
         thead
