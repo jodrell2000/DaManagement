@@ -32,12 +32,11 @@ html(lang="en")
             td
                 form(action='/listunverified' method='GET')
                     label
-                        input(type='radio' name='sort' value='time' checked=sort === 'time') By Recent
+                        input(type='radio' name='sort' value='time' checked=sort === 'value') By Recent
                     label
-                        input(type='radio' name='sort' value='artist' checked=sort === 'artist') By Artist
+                        input(type='radio' name='sort' value='artist' checked=sort === 'value') By Artist
                     label
-                        input(type='radio' name='sort' value='track' checked=sort === 'track') By Track
-                    input(type='hidden' name='sort' value=sort)
+                        input(type='radio' name='sort' value='track' checked=sort === 'value') By Track
                     input(type='hidden' name='where' value="track")
                     input(type='text' name='searchTerm')
                     button(type='submit') Search by Track
@@ -45,11 +44,11 @@ html(lang="en")
             td
                 form(action='/listunverified' method='GET')
                     label
-                        input(type='radio' name='sort' value='time' checked=sort === 'time') By Recent
+                        input(type='radio' name='sort' value='time' checked=sort === 'value') By Recent
                     label
-                        input(type='radio' name='sort' value='artist' checked=sort === 'artist') By Artist
+                        input(type='radio' name='sort' value='artist' checked=sort === 'value') By Artist
                     label
-                        input(type='radio' name='sort' value='track' checked=sort === 'track') By Track
+                        input(type='radio' name='sort' value='track' checked=sort === 'value') By Track
                     input(type='hidden' name='sort' value=sort)
                     input(type='hidden' name='where' value="artist")
                     input(type='text' name='searchTerm')
