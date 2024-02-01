@@ -365,7 +365,7 @@ const databaseFunctions = () => {
             console.log( "where:", args.where );
             console.log( "searchTerm:", args.searchTerm );
             let orderByClause = '';
-            let whereClause = ' AND ';
+            let whereClause = '';
 
             switch ( args.sort ) {
                 case 'time':
@@ -383,10 +383,10 @@ const databaseFunctions = () => {
 
             switch ( args.where ) {
                 case 'track':
-                    whereClause = whereClause + "t.trackName LIKE '%" + args.searchTerm + "%'";
+                    whereClause = " AND t.trackName LIKE '%" + args.searchTerm + "%'";
                     break;
                 case 'artist':
-                    whereClause = whereClause + "a.artistName LIKE '%" + args.searchTerm + "%'";
+                    whereClause = " AND a.artistName LIKE '%" + args.searchTerm + "%'";
                     break;
             }
 
