@@ -360,6 +360,8 @@ const databaseFunctions = () => {
         },
 
         getUnverifiedSongList( sort ) {
+            console.group( "getUnverifiedSongList" );
+            console.log( "sort:", sort );
             let orderByClause = '';
 
             switch ( sort ) {
@@ -397,12 +399,15 @@ const databaseFunctions = () => {
         LIMIT 50`;
 
             const values = [];
+            console.log( "selectQuery:", selectQuery );
+            console.groupEnd();
 
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
                     return result;
                 } );
         },
+
         updateArtistDisplayName( artistID, artistDisplayName ) {
             const selectQuery = "UPDATE artists SET displayName=? WHERE id=?;";
             const values = [ artistDisplayName, artistID ];
