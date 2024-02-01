@@ -30,15 +30,15 @@ html(lang="en")
         tbody
             tr
             td
-                form(action='/updateArtistDisplayName' method='POST')
+                form(action='/updateArtistDisplayName?sort=time' method='POST')
                     input(type='hidden' name='sort' value='#{req.sort.time}')
                     button(type='submit') Sort by Recent
             td
-                form(action='/updateArtistDisplayName' method='POST')
+                form(action='/updateArtistDisplayName?sort=artist' method='POST')
                     input(type='hidden' name='sort' value='#{req.sort.artist}')
                     button(type='submit') Sort by Artist
             td
-                form(action='/updateArtistDisplayName' method='POST')
+                form(action='/updateArtistDisplayName?sort=track' method='POST')
                     input(type='hidden' name='sort' value='#{req.sort.track}')
                     button(type='submit') Sort by Track
             td
