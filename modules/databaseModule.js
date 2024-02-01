@@ -359,7 +359,7 @@ const databaseFunctions = () => {
                 } );
         },
 
-        getUnverifiedSongList( sort ) {
+        getUnverifiedSongList( args ) {
             console.group( "getUnverifiedSongList" );
             console.log( "sort:", sort );
             let orderByClause = '';

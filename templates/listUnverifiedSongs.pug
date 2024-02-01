@@ -30,23 +30,28 @@ html(lang="en")
         tbody
             tr
             td
-                form(action='/listunverified?foo=bar' method='GET')
-                    input(type='hidden' name='wibble' value="wobble")
-                    input(type='hidden' name='bibble' value="bobble")
+                form(action='/listunverified' method='GET')
+                    input(type='hidden' name='sort' value="time")
                     button(type='submit') Sort by Recent
             td
-                form(action='/listunverified?sort=artist' method='GET')
+                form(action='/listunverified' method='GET')
+                    input(type='hidden' name='sort' value="artist")
                     button(type='submit') Sort by Artist
             td
-                form(action='/listunverified?sort=track' method='GET')
+                form(action='/listunverified' method='GET')
+                    input(type='hidden' name='sort' value="track")
                     button(type='submit') Sort by Track
             td
                 form(action='/listunverified' method='GET')
-                    input(type='text' name='trackName')
+                    input(type='hidden' name='sort' value="track")
+                    input(type='hidden' name='where' value="bobble")
+                    input(type='text' name='searchTerm')
                     button(type='submit') Search by Track
             td
                 form(action='/listunverified' method='GET')
-                    input(type='text' name='artistName')
+                    input(type='hidden' name='sort' value="artist")
+                    input(type='hidden' name='where' value="bobble")
+                    input(type='text' name='searchTerm')
                     button(type='submit') Search by Artist
     table#songqueue
         thead
