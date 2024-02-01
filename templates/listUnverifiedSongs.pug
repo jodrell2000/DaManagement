@@ -31,25 +31,18 @@ html(lang="en")
             tr
             td
                 form(action='/updateArtistDisplayName?sort=time' method='POST')
-                    input(type='hidden' name='sort' value='#{req.sort.time}')
                     button(type='submit') Sort by Recent
             td
                 form(action='/updateArtistDisplayName?sort=artist' method='POST')
-                    input(type='hidden' name='sort' value='#{req.sort.artist}')
                     button(type='submit') Sort by Artist
             td
                 form(action='/updateArtistDisplayName?sort=track' method='POST')
-                    input(type='hidden' name='sort' value='#{req.sort.track}')
                     button(type='submit') Sort by Track
             td
                 form(action='/updateArtistDisplayName' method='POST')
-                    input(type='text' name='searchvalue')
-                    input(type='hidden' name='search' value='artist')
                     button(type='submit') Search by Track
             td
                 form(action='/updateArtistDisplayName' method='POST')
-                    input(type='text' name='searchvalue')
-                    input(type='hidden' name='search' value='track')
                     button(type='submit') Search by Artist
     table#songqueue
         thead

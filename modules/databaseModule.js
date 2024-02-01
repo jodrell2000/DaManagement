@@ -402,10 +402,10 @@ const databaseFunctions = () => {
             console.log( "selectQuery:", selectQuery );
             console.groupEnd();
 
-            return this.runQuery( selectQuery, values )
-                .then( ( result ) => {
-                    return result;
-                } );
+            // return this.runQuery( selectQuery, values )
+            //     .then( ( result ) => {
+            //         return result;
+            //     } );
         },
 
         updateArtistDisplayName( artistID, artistDisplayName ) {
