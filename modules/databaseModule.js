@@ -361,10 +361,10 @@ const databaseFunctions = () => {
 
         getUnverifiedSongList( args ) {
             console.group( "getUnverifiedSongList" );
-            console.log( "sort:", sort );
+            console.log( "sort:", args );
             let orderByClause = '';
 
-            switch ( sort ) {
+            switch ( args ) {
                 case 'time':
                     orderByClause = ' ORDER BY tp.whenPlayed DESC';
                     break;
