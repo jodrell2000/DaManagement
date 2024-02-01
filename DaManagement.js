@@ -533,7 +533,7 @@ app.get( '/listunverified', async ( req, res ) => {
     console.log( "req:", req );
     console.log( "res:", res );
     try {
-        const songList = await databaseFunctions.getUnverifiedSongList( req.query.sort, req.query.search );
+        const songList = await databaseFunctions.getUnverifiedSongList( req.sort, req.query );
         let html = pug.renderFile( './templates/listUnverifiedSongs.pug', { songList } );
         res.send( html );
     } catch ( error ) {
