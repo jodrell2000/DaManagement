@@ -44,13 +44,13 @@ html(lang="en")
             td
                 form(action='/listunverified' method='GET')
                     input(type='hidden' name='sort' value="track")
-                    input(type='hidden' name='where' value="bobble")
+                    input(type='hidden' name='where' value="track")
                     input(type='text' name='searchTerm')
                     button(type='submit') Search by Track
             td
                 form(action='/listunverified' method='GET')
                     input(type='hidden' name='sort' value="artist")
-                    input(type='hidden' name='where' value="bobble")
+                    input(type='hidden' name='where' value="artist")
                     input(type='text' name='searchTerm')
                     button(type='submit') Search by Artist
     table#songqueue
@@ -68,6 +68,7 @@ html(lang="en")
         tbody
         each song in songList
             tr
+            td= song.trackPlayedID
             td= song.artistID
             td= song.artistName
             td

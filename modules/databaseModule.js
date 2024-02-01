@@ -365,6 +365,7 @@ const databaseFunctions = () => {
             console.log( "where:", args.where );
             console.log( "searchTerm:", args.searchTerm );
             let orderByClause = '';
+            let whereClause = ' AND ';
 
             switch ( args.sort ) {
                 case 'time':
@@ -378,6 +379,15 @@ const databaseFunctions = () => {
                     break;
                 default:
                     orderByClause = ' ORDER BY COALESCE(a.displayName, a.artistName) ASC, COALESCE(t.displayName, t.trackname) ASC';
+            }
+
+            switch ( args.where ) {
+                case 'track':
+                    whereClause = whereClause + "t.trackName LIKE '%" + args.searchTerm + "%'";
+                    break;
+                case 'artist':
+                    whereClause = whereClause + "a.artistName LIKE '%" + args.searchTerm + "%'";
+                    break;
             }
 
             const selectQuery = `
@@ -396,6 +406,7 @@ const databaseFunctions = () => {
             JOIN tracks t ON t.id=tp.trackID 
         WHERE 
             a.displayName IS NULL OR t.displayName IS NULL
+            ${whereClause}
         GROUP BY tp.id
         ${orderByClause}
         LIMIT 50`;
