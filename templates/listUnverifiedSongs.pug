@@ -32,24 +32,27 @@ html(lang="en")
             td
                 form(action='/listunverified' method='GET')
                     input(type='hidden' name='sort' value="time")
+                    input(type='hidden' name='where' value=where)
                     button(type='submit') Sort by Recent
                 form(action='/listunverified' method='GET')
                     input(type='hidden' name='sort' value="artist")
+                    input(type='hidden' name='where' value=where)
                     button(type='submit') Sort by Artist
                 form(action='/listunverified' method='GET')
                     input(type='hidden' name='sort' value="track")
+                    input(type='hidden' name='where' value=where)
                     button(type='submit') Sort by Track
             tr
             td
                 form(action='/listunverified' method='GET')
-                    input(type='hidden' name='sort' value="track")
+                    input(type='hidden' name='sort' value=sort)
                     input(type='hidden' name='where' value="track")
                     input(type='text' name='searchTerm')
                     button(type='submit') Search by Track
             tr
             td
                 form(action='/listunverified' method='GET')
-                    input(type='hidden' name='sort' value="artist")
+                    input(type='hidden' name='sort' value=sort)
                     input(type='hidden' name='where' value="artist")
                     input(type='text' name='searchTerm')
                     button(type='submit') Search by Artist
