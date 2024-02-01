@@ -383,11 +383,13 @@ const databaseFunctions = () => {
 
             switch ( args.where ) {
                 case 'track':
-                    whereClause = " AND t.trackName LIKE '%" + args.searchTerm + "%'";
+                    whereClause = "t.trackName LIKE '%" + args.searchTerm + "%'";
                     break;
                 case 'artist':
-                    whereClause = " AND a.artistName LIKE '%" + args.searchTerm + "%'";
+                    whereClause = "a.artistName LIKE '%" + args.searchTerm + "%'";
                     break;
+                default:
+                    whereClause = "a.displayName IS NULL OR t.displayName IS NULL";
             }
 
             const selectQuery = `
@@ -405,7 +407,6 @@ const databaseFunctions = () => {
             JOIN artists a ON a.id=tp.artistID 
             JOIN tracks t ON t.id=tp.trackID 
         WHERE 
-            a.displayName IS NULL OR t.displayName IS NULL
             ${whereClause}
         GROUP BY tp.id
         ${orderByClause}
