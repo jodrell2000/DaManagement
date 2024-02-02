@@ -361,6 +361,7 @@ const databaseFunctions = () => {
 
         getUnverifiedSongList( args ) {
             console.group( "getUnverifiedSongList" );
+            console.log( "args:", JSON.stringify( args ) );
             console.log( "sort:", args.sort );
             console.log( "where:", args.where );
             console.log( "searchTerm:", args.searchTerm );
