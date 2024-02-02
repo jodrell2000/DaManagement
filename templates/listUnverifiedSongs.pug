@@ -54,8 +54,8 @@ html(lang="en")
                         input(type='radio' name='sort' value='track' checked=sort === 'track')
                         | By Track
                     input(type='hidden' name='where' value="track")
-                    if ( req.body && req.body.searchTerm )
-                        input(type='text' name='searchTerm' value=req.body.searchTerm)
+                    if ( '#{req.query}' && '#{req.query.searchTerm}' )
+                        input(type='text' name='searchTerm' value='#{req.query.searchTerm}')
                     else
                         input(type='text' name='searchTerm')
                     button(type='submit') Search by Track
@@ -72,8 +72,8 @@ html(lang="en")
                         input(type='radio' name='sort' value='track' checked=sort === 'track')
                         | By Track
                     input(type='hidden' name='where' value="artist")
-                    if ( req.body && req.body.searchTerm )
-                        input(type='text' name='searchTerm' value=req.body.searchTerm)
+                    if ( res.body && res.body.searchTerm )
+                        input(type='text' name='searchTerm' value=res.body.searchTerm)
                     else
                         input(type='text' name='searchTerm')
                     button(type='submit') Search by Artist
