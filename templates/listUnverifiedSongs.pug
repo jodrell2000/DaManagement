@@ -54,7 +54,7 @@ html(lang="en")
                         input(type='radio' name='sort' value='track' checked=sort === 'track')
                         | By Track
                     input(type='hidden' name='where' value="track")
-                    input(type='text' name='searchTerm' value='searchTerm')
+                    input(type='text' name='searchTerm' value=body.searchTerm)
                     button(type='submit') Search by Track
             tr
             td
@@ -69,7 +69,7 @@ html(lang="en")
                         input(type='radio' name='sort' value='track' checked=sort === 'track')
                         | By Track
                     input(type='hidden' name='where' value="artist")
-                    input(type='text' name='searchTerm' value='searchTerm')
+                    input(type='text' name='searchTerm' value=body.searchTerm)
                     button(type='submit') Search by Artist
 
     table#songqueue
