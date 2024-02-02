@@ -555,9 +555,9 @@ app.get( '/listunverified', async ( req, res ) => {
 app.post( '/updateArtistDisplayName', ( req, res ) => {
     const artistID = req.body.artistID;
     const artistDisplayName = req.body.artistDisplayName;
-    const sortParam = req.body.sort || '';
-    const whereParam = req.body.where || '';
-    const searchParam = req.body.searchTerm || '';
+    const sortParam = req.body.sort || req.query.sort || '';
+    const whereParam = req.body.where || req.query.sort || '';
+    const searchParam = req.body.searchTerm || req.query.sort || '';
 
     // call a function with the artistID and artistDisplayName values
     databaseFunctions.updateArtistDisplayName( artistID, artistDisplayName )
@@ -571,9 +571,9 @@ app.post( '/updateArtistDisplayName', ( req, res ) => {
 app.post( '/updateTrackDisplayName', ( req, res ) => {
     const trackID = req.body.trackID;
     const trackDisplayName = req.body.trackDisplayName;
-    const sortParam = req.query.sort || '';
-    const whereParam = req.query.where || '';
-    const searchParam = req.query.searchTerm || '';
+    const sortParam = req.body.sort || req.query.sort || '';
+    const whereParam = req.body.where || req.query.sort || '';
+    const searchParam = req.body.searchTerm || req.query.sort || '';
 
     // call a function with the artistID and artistDisplayName values
     databaseFunctions.updateTrackDisplayName( trackID, trackDisplayName )
@@ -587,9 +587,9 @@ app.post( '/updateTrackDisplayName', ( req, res ) => {
 app.post( '/splitArtistName', ( req, res ) => {
     const trackPlayedID = req.body.trackPlayedID;
     const artistName = req.body.artistName;
-    const sortParam = req.query.sort || '';
-    const whereParam = req.query.where || '';
-    const searchParam = req.query.searchTerm || '';
+    const sortParam = req.body.sort || req.query.sort || '';
+    const whereParam = req.body.where || req.query.sort || '';
+    const searchParam = req.body.searchTerm || req.query.sort || '';
 
     // call a function with the artistID and artistDisplayName values
     databaseFunctions.splitArtistName( trackPlayedID, artistName )
@@ -603,9 +603,9 @@ app.post( '/splitArtistName', ( req, res ) => {
 app.post( '/splitTrackName', ( req, res ) => {
     const trackPlayedID = req.body.trackPlayedID;
     const trackName = req.body.trackName;
-    const sortParam = req.query.sort || '';
-    const whereParam = req.query.where || '';
-    const searchParam = req.query.searchTerm || '';
+    const sortParam = req.body.sort || req.query.sort || '';
+    const whereParam = req.body.where || req.query.sort || '';
+    const searchParam = req.body.searchTerm || req.query.sort || '';
 
     // call a function with the artistID and artistDisplayName values
     databaseFunctions.splitTrackName( trackPlayedID, trackName )
