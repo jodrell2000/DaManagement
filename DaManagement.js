@@ -554,9 +554,9 @@ app.post( '/updateArtistDisplayName', ( req, res ) => {
     console.log( "res:", res );
     const artistID = req.body.artistID;
     const artistDisplayName = req.body.artistDisplayName;
-    const sortParam = req.query.sort || '';
-    const whereParam = req.query.where || '';
-    const searchParam = req.query.searchTerm || '';
+    const sortParam = req.body.sort || '';
+    const whereParam = req.body.where || '';
+    const searchParam = req.body.searchTerm || '';
 
     // call a function with the artistID and artistDisplayName values
     databaseFunctions.updateArtistDisplayName( artistID, artistDisplayName )
