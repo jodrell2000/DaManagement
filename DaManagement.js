@@ -536,8 +536,9 @@ app.get( '/listunverified', async ( req, res ) => {
         const sortParam = req.body.sort || req.query.sort || '';
         const whereParam = req.body.where || req.query.where || '';
         const searchParam = req.body.searchTerm || req.query.searchTerm || '';
+        const dbSearchArgs = req.query || req.body;
 
-        const songList = await databaseFunctions.getUnverifiedSongList( req.query );
+        const songList = await databaseFunctions.getUnverifiedSongList( dbSearchArgs );
         let html = pug.renderFile( './templates/listUnverifiedSongs.pug', {
             songList,
             sort: sortParam,
