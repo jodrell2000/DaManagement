@@ -54,10 +54,10 @@ html(lang="en")
                         input(type='radio' name='sort' value='track' checked=sort === 'track')
                         | By Track
                     input(type='hidden' name='where' value="track")
-                    - if (req.query && req.query.searchTerm)
-                    input(type='text' name='searchTerm' value=req.query.searchTerm)
-                    - else
-                    input(type='text' name='searchTerm')
+                    if ( req.query && req.query.searchTerm )
+                        input(type='text' name='searchTerm' value=req.query.searchTerm)
+                    else
+                        input(type='text' name='searchTerm')
                     button(type='submit') Search by Track
             tr
             td
@@ -72,9 +72,9 @@ html(lang="en")
                         input(type='radio' name='sort' value='track' checked=sort === 'track')
                         | By Track
                     input(type='hidden' name='where' value="artist")
-                    - if (req.query && req.query.searchTerm)
+                    if ( req.query && req.query.searchTerm )
                         input(type='text' name='searchTerm' value=req.query.searchTerm)
-                    - else
+                    else
                         input(type='text' name='searchTerm')
                     button(type='submit') Search by Artist
 
