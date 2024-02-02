@@ -533,9 +533,9 @@ app.get( '/listunverified', async ( req, res ) => {
     console.log( "req:", req );
     console.log( "res:", res );
     try {
-        const sortParam = req.query.sort || '';
-        const whereParam = req.query.where || '';
-        const searchParam = req.query.searchTerm || '';
+        const sortParam = req.body.sort || req.query.sort || '';
+        const whereParam = req.body.where || req.query.where || '';
+        const searchParam = req.body.searchTerm || req.query.searchTerm || '';
 
         const songList = await databaseFunctions.getUnverifiedSongList( req.query );
         let html = pug.renderFile( './templates/listUnverifiedSongs.pug', {
@@ -556,8 +556,8 @@ app.post( '/updateArtistDisplayName', ( req, res ) => {
     const artistID = req.body.artistID;
     const artistDisplayName = req.body.artistDisplayName;
     const sortParam = req.body.sort || req.query.sort || '';
-    const whereParam = req.body.where || req.query.sort || '';
-    const searchParam = req.body.searchTerm || req.query.sort || '';
+    const whereParam = req.body.where || req.query.where || '';
+    const searchParam = req.body.searchTerm || req.query.searchTerm || '';
 
     // call a function with the artistID and artistDisplayName values
     databaseFunctions.updateArtistDisplayName( artistID, artistDisplayName )
@@ -572,8 +572,8 @@ app.post( '/updateTrackDisplayName', ( req, res ) => {
     const trackID = req.body.trackID;
     const trackDisplayName = req.body.trackDisplayName;
     const sortParam = req.body.sort || req.query.sort || '';
-    const whereParam = req.body.where || req.query.sort || '';
-    const searchParam = req.body.searchTerm || req.query.sort || '';
+    const whereParam = req.body.where || req.query.where || '';
+    const searchParam = req.body.searchTerm || req.query.searchTerm || '';
 
     // call a function with the artistID and artistDisplayName values
     databaseFunctions.updateTrackDisplayName( trackID, trackDisplayName )
@@ -588,8 +588,8 @@ app.post( '/splitArtistName', ( req, res ) => {
     const trackPlayedID = req.body.trackPlayedID;
     const artistName = req.body.artistName;
     const sortParam = req.body.sort || req.query.sort || '';
-    const whereParam = req.body.where || req.query.sort || '';
-    const searchParam = req.body.searchTerm || req.query.sort || '';
+    const whereParam = req.body.where || req.query.where || '';
+    const searchParam = req.body.searchTerm || req.query.searchTerm || '';
 
     // call a function with the artistID and artistDisplayName values
     databaseFunctions.splitArtistName( trackPlayedID, artistName )
@@ -604,8 +604,8 @@ app.post( '/splitTrackName', ( req, res ) => {
     const trackPlayedID = req.body.trackPlayedID;
     const trackName = req.body.trackName;
     const sortParam = req.body.sort || req.query.sort || '';
-    const whereParam = req.body.where || req.query.sort || '';
-    const searchParam = req.body.searchTerm || req.query.sort || '';
+    const whereParam = req.body.where || req.query.where || '';
+    const searchParam = req.body.searchTerm || req.query.searchTerm || '';
 
     // call a function with the artistID and artistDisplayName values
     databaseFunctions.splitTrackName( trackPlayedID, trackName )
