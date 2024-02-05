@@ -427,7 +427,7 @@ const databaseFunctions = () => {
             const selectQuery = "UPDATE artists SET displayName=? WHERE id=?;";
             const values = [ artistDisplayName, artistID ];
 
-            return databaseFunctions.runQuery( selectQuery, values )
+            return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
                     return result;
                 } );
