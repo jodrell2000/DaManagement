@@ -199,6 +199,7 @@ const databaseFunctions = () => {
         // ========================================================
 
         saveTrackData: function ( djID, songData ) {
+            console.log( JSON.stringify( songData ) );
             return this.getArtistID( songData.metadata.artist )
                 .then( ( artistID ) => {
                     this.getTrackID( songData.metadata.song )
