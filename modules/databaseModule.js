@@ -251,7 +251,7 @@ const databaseFunctions = () => {
                 .then( ( artistID ) => {
                     this.getTrackID( songData.metadata.song )
                         .then( ( trackID ) => {
-                            let theQuery = "INSERT INTO tracksPlayed (artistID, trackID, djID, videoData_id) VALUES (?, ?, ?);"
+                            let theQuery = "INSERT INTO tracksPlayed (artistID, trackID, djID, videoData_id) VALUES (?, ?, ?, ?);"
                             let values = [ artistID, trackID, djID, videoData_id ];
                             return this.runQuery( theQuery, values )
                                 .then( ( result ) => {
