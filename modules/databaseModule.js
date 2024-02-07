@@ -222,7 +222,6 @@ const databaseFunctions = () => {
         // ========================================================
 
         saveTrackData: function ( djID, songData ) {
-            console.log( JSON.stringify( songData ) );
             this.saveTrackDataOld( djID, songData );
             this.saveYouTubeTrackData( djID, songData );
         },
@@ -257,7 +256,6 @@ const databaseFunctions = () => {
 
         saveTrackDataOld: function ( djID, songData ) {
             const videoData_id = songData.metadata.ytid || songData.metadata.scid;
-            console.log( JSON.stringify( songData ) );
             return this.getArtistID( songData.metadata.artist )
                 .then( ( artistID ) => {
                     this.getTrackID( songData.metadata.song )
