@@ -188,7 +188,14 @@ const databaseFunctions = () => {
 
             try {
                 const result = await this.runQuery( theQuery, theValues );
-                return result;
+
+                if ( result && result[ 0 ].password_hash !== null ) {
+                    // If there is a result, return the password hash
+                    return result[ 0 ].password_hash;
+                } else {
+                    // If the result is empty, the user doesn't exist
+                    return false;
+                }
             } catch ( error ) {
                 console.error( 'Error in retrieveHashedPassword:', error.message );
                 // Handle the error as needed
