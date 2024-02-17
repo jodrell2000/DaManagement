@@ -91,7 +91,8 @@ html(lang="en")
         tbody
         each song in songList
             tr
-            td= song.videoData_id
+            td
+                a(href=`https://www.youtube.com/watch?v=${ encodeURIComponent( song.videoData_id ) }`, target="_blank") song.videoData_id
             td= song.artistName
             td
                 if song.artistDisplayName
