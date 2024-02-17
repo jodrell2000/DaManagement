@@ -1,0 +1,21 @@
+//- signup.pug
+
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title Sign Up
+        link(rel="stylesheet", href="/styles/signup.css")
+    body
+        h1 Sign Up
+        form(action="/signup", method="post")
+            label(for="email") Email:
+            input(type="email", id="email", name="email", required)
+            label(for="username") Username:
+            input(type="text", id="username", name="username", required)
+            label(for="password") Password:
+            input(type="password", id="password", name="password", required)
+            label(for="confirmPassword") Confirm Password:
+            input(type="password", id="confirmPassword", name="confirmPassword", required)
+            button(type="submit") Sign Up

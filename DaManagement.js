@@ -717,7 +717,7 @@ app.get( '/deletesong', ( req, res ) => {
 
 app.get( '/signup', ( req, res ) => {
     // Render your signup page here
-    res.send( 'This is the signup page' );
+    res.render( './templates/signup' );
 } );
 
 app.post( '/signup', async ( req, res ) => {
