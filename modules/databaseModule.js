@@ -461,7 +461,7 @@ const databaseFunctions = () => {
                        v.artistName,
                        v.artistDisplayName,
                        v.trackName,
-                       v.trackDisplayName    AS trackDisplayName,
+                       v.trackDisplayName,
                        ROUND(AVG(tp.length)) AS length
                 FROM tracksPlayed tp
                          JOIN videoData v ON v.id = tp.videoData_id
