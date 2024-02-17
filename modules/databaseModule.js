@@ -189,7 +189,7 @@ const databaseFunctions = () => {
             try {
                 const result = await this.runQuery( theQuery, theValues );
 
-                if ( result && result[ 0 ].password_hash !== null ) {
+                if ( result && result.length > 0 && result[ 0 ].password_hash !== null ) {
                     // If there is a result, return the password hash
                     return result[ 0 ].password_hash;
                 } else {
