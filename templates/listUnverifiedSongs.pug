@@ -92,7 +92,7 @@ html(lang="en")
         each song in songList
             tr
             td
-                a(href=`https://www.youtube.com/watch?v=${ encodeURIComponent( song.videoData_id ) }`, target="_blank") song.videoData_id
+                a(href=`https://www.youtube.com/watch?v=${ encodeURIComponent( song.videoData_id ) }`, target="_blank") ${song.videoData_id}
             td= song.artistName
             td
                 if song.artistDisplayName
