@@ -28,7 +28,6 @@ let dateModule = require( './modules/dateModule.js' );
 
 const express = require( 'express' )
 const app = express();
-const signup = express();
 const pug = require( 'pug' );
 const bodyParser = require( 'body-parser' );
 const dayjs = require( 'dayjs' );
@@ -711,7 +710,7 @@ app.get( '/deletesong', ( req, res ) => {
 // General functions
 // ########################################################################
 
-signup.post( '/signup', async ( req, res ) => {
+app.post( '/signup', async ( req, res ) => {
     const { email, username, password, confirmPassword } = req.body;
 
     // Check if the passwords match
@@ -770,10 +769,14 @@ async function authentication( req, res, next ) {
             // If the passwords match, the user is authenticated
             next();
         } else {
-            const err = new Error( 'Incorrect username or password' );
-            res.setHeader( 'WWW-Authenticate', 'Basic' );
-            err.status = 401;
-            return next( err );
+            if ( req.originalUrl === '/signup' ) {
+                return res.redirect( '/signup' );
+            } else {
+                const err = new Error( 'Incorrect username or password' );
+                res.setHeader( 'WWW-Authenticate', 'Basic' );
+                err.status = 401;
+                return next( err );
+            }
         }
     } catch ( error ) {
         console.error( 'Error during authentication:', error );
