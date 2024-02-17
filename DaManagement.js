@@ -715,6 +715,11 @@ app.get( '/deletesong', ( req, res ) => {
 // General functions
 // ########################################################################
 
+app.get( '/signup', ( req, res ) => {
+    // Render your signup page here
+    res.send( 'This is the signup page' );
+} );
+
 app.post( '/signup', async ( req, res ) => {
     const { email, username, password, confirmPassword } = req.body;
 
