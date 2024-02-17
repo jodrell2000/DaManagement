@@ -436,40 +436,37 @@ const databaseFunctions = () => {
                     orderByClause = ' ORDER BY tp.whenPlayed DESC';
                     break;
                 case 'artist':
-                    orderByClause = ' ORDER BY COALESCE(a.displayName, a.artistName) ASC, COALESCE(t.displayName, t.trackname) ASC';
+                    orderByClause = ' ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC';
                     break;
                 case 'track':
-                    orderByClause = ' ORDER BY COALESCE(t.displayName, t.trackname) ASC, COALESCE(a.displayName, a.artistName) ASC';
+                    orderByClause = ' ORDER BY COALESCE(v.trackDisplayName, v.trackName) ASC, COALESCE(v.artistDisplayName, v.artistName) ASC';
                     break;
                 default:
-                    orderByClause = ' ORDER BY COALESCE(a.displayName, a.artistName) ASC, COALESCE(t.displayName, t.trackname) ASC';
+                    orderByClause = ' ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC';
             }
 
             switch ( args.where ) {
                 case 'track':
-                    whereClause = "t.trackName LIKE '%" + args.searchTerm + "%'";
+                    whereClause = "v.trackName LIKE '%" + args.searchTerm + "%'";
                     break;
                 case 'artist':
-                    whereClause = "a.artistName LIKE '%" + args.searchTerm + "%'";
+                    whereClause = "v.artistName LIKE '%" + args.searchTerm + "%'";
                     break;
                 default:
-                    whereClause = "a.displayName IS NULL OR t.displayName IS NULL";
+                    whereClause = "v.artistDisplayName IS NULL OR v.trackDisplayName IS NULL";
             }
 
             const selectQuery = `
-                SELECT tp.id                 AS trackPlayedID,
-                       a.id                  AS artistID,
-                       a.artistName,
-                       a.displayName         AS artistDisplayName,
-                       t.id                  AS trackID,
-                       t.trackName,
-                       t.displayName         AS trackDisplayName,
+                SELECT tp.videoData_id       AS videoID,
+                       v.artistName,
+                       v.artistDisplayName,
+                       v.trackName,
+                       v.trackDisplayName    AS trackDisplayName,
                        ROUND(AVG(tp.length)) AS length
                 FROM tracksPlayed tp
-                         JOIN artists a ON a.id = tp.artistID
-                         JOIN tracks t ON t.id = tp.trackID
+                         JOIN videoData v ON v.id = tp.videoData_id
                 WHERE ${ whereClause }
-                GROUP BY tp.id ${ orderByClause }
+                GROUP BY v.id ${ orderByClause }
                 LIMIT 50`;
 
             const values = [];
@@ -658,10 +655,10 @@ const databaseFunctions = () => {
                                           JOIN artists a ON tp.artistID = a.id
                                           LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id
                                           LEFT JOIN commandsToCount c ON c.id = e.commandsToCount_id
-                                 WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ?
-                                   AND tp.length > 60
-                                   AND u.username != "Mr. Roboto"
-                                   AND DAYOFWEEK(CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central")) IN
+                                 WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND
+                                       tp.length > 60 AND
+                                       u.username != "Mr. Roboto" AND
+                                       DAYOFWEEK(CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central")) IN
                                        (${ includeDays.join( ', ' ) })
                                  GROUP BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname)
                                  ORDER BY 3 DESC, 4 DESC
@@ -690,10 +687,10 @@ const databaseFunctions = () => {
                                           JOIN artists a ON tp.artistID = a.id
                                           LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id
                                           LEFT JOIN commandsToCount c ON c.id = e.commandsToCount_id
-                                 WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ?
-                                   AND tp.length > 60
-                                   AND u.username != "Mr. Roboto"
-                                   AND DAYOFWEEK(CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central")) IN
+                                 WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND
+                                       tp.length > 60 AND
+                                       u.username != "Mr. Roboto" AND
+                                       DAYOFWEEK(CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central")) IN
                                        (${ includeDays.join( ', ' ) })
                                  GROUP BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname)
                                  ORDER BY 3 DESC, 4 ASC, 5 DESC
@@ -721,10 +718,10 @@ const databaseFunctions = () => {
                                           JOIN artists a ON tp.artistID = a.id
                                           LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id
                                           LEFT JOIN commandsToCount c ON c.id = e.commandsToCount_id
-                                 WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ?
-                                   AND tp.length > 60
-                                   AND u.username != "Mr. Roboto"
-                                   AND DAYOFWEEK(CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central")) IN
+                                 WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND
+                                       tp.length > 60 AND
+                                       u.username != "Mr. Roboto" AND
+                                       DAYOFWEEK(CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central")) IN
                                        (${ includeDays.join( ', ' ) })
                                  GROUP BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname)
                                  ORDER BY 4 DESC, 3 DESC
@@ -756,10 +753,10 @@ const databaseFunctions = () => {
                                                 JOIN artists a ON tp.artistID = a.id
                                                 LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id
                                                 LEFT JOIN commandsToCount c ON c.id = e.commandsToCount_id
-                                       WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ?
-                                         AND tp.length > 60
-                                         AND u.username != "Mr. Roboto"
-                                         AND DAYOFWEEK(CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central")) IN
+                                       WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND
+                                             tp.length > 60 AND
+                                             u.username != "Mr. Roboto" AND
+                                             DAYOFWEEK(CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central")) IN
                                              (${ includeDays.join( ', ' ) })
                                        GROUP BY tp.id, COALESCE(a.displayName, a.artistName)) trackPoints
                                  GROUP BY Artist
@@ -784,8 +781,8 @@ const databaseFunctions = () => {
                                         SUM(tp.downvotes)      as "downvotes"
                                  FROM tracksPlayed tp
                                           JOIN users u ON tp.djID = u.id
-                                 WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ?
-                                   AND u.username != "Mr. Roboto";`;
+                                 WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND
+                                       u.username != "Mr. Roboto";`;
             const values = [ startDate, endDate ];
 
             try {
@@ -811,8 +808,8 @@ const databaseFunctions = () => {
                                                 JOIN artists a ON tp.artistID = a.id
                                                 LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id
                                                 LEFT JOIN commandsToCount c ON c.id = e.commandsToCount_id
-                                       WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ?
-                                         AND tp.length > 60
+                                       WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND
+                                             tp.length > 60
                                        GROUP BY tp.id, u.username) trackPoints
                                  GROUP BY dj
                                  ORDER BY 2 DESC
