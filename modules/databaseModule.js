@@ -466,7 +466,7 @@ const databaseFunctions = () => {
                     orderByClause = 'GROUP BY v.id, COALESCE(v.trackDisplayName, v.trackName), COALESCE(v.artistDisplayName, v.artistName) ORDER BY COALESCE(v.trackDisplayName, v.trackName) ASC, COALESCE(v.artistDisplayName, v.artistName) ASC';
                     break;
                 default:
-                    orderByClause = 'GROUP BY v.id, COALESCE(v.artistDisplayName, v.artistName), COALESCE(v.trackDisplayName, v.trackName) ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC';
+                    orderByClause = 'GROUP BY v.id, COALESCE(v.artistDisplayName, v.artistName), COALESCE(v.trackDisplayName, v.trackName), tp.length ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC';
             }
 
             switch ( args.where ) {
