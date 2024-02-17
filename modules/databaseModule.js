@@ -58,6 +58,7 @@ const databaseFunctions = () => {
             let propsCount = 0;
             let RoboCoins = 0;
             let here = "";
+            let email = "";
             let password_hash = "NULL";
 
             if ( userObject[ "moderator" ] !== undefined ) { moderator = userObject[ "moderator" ] }
@@ -78,13 +79,14 @@ const databaseFunctions = () => {
             if ( userObject[ "propsCount" ] !== undefined ) { propsCount = userObject[ "propsCount" ] }
             if ( userObject[ "RoboCoins" ] !== undefined ) { RoboCoins = userObject[ "RoboCoins" ] }
             if ( userObject[ "here" ] !== undefined ) { here = userObject[ "here" ] }
+            if ( userObject[ "email" ] !== undefined ) { email = userObject[ "email" ] }
             if ( userObject[ "password_hash" ] !== undefined ) { password_hash = userObject[ "password_hash" ] }
 
             const query = `REPLACE
                                INTO users (id, userInfo, username, moderator, joinTime, currentDJ, lastVoted, lastSpoke,
                                            currentPlayCount, totalPlayCount, joinedStage, firstIdleWarning,
                                            secondIdleWarning, spamCount, lastSnagged, region, BBBootTimestamp,
-                                           noiceCount, propsCount, RoboCoins, here, password_hash)
+                                           noiceCount, propsCount, RoboCoins, here, password_hash, email)
                            VALUES ("${ id }", '${ userInfo }', "${ username }",
                                    ${ moderator },
                                    ${ joinTime },
@@ -104,7 +106,8 @@ const databaseFunctions = () => {
                                    ${ propsCount },
                                    ${ RoboCoins },
                                    "${ here }",
-                                   ${ password_hash });`;
+                                   "${ password_hash }",
+                                   "${ email }");`;
 
             return query;
 
@@ -199,6 +202,24 @@ const databaseFunctions = () => {
             } catch ( error ) {
                 console.error( 'Error in retrieveHashedPassword:', error.message );
                 // Handle the error as needed
+                throw error; // Rethrow the error if necessary
+            }
+        },
+
+        getUsersEmailAddress: async function ( userID ) {
+            const theQuery = "SELECT email FROM users WHERE id = ?";
+            const theValues = [ userID ];
+
+            try {
+                const result = await this.runQuery( theQuery, theValues );
+
+                if ( result && result.length > 0 && result[ 0 ].email !== null && result[ 0 ].email !== "" ) {
+                    return result[ 0 ].email;
+                } else {
+                    return false;
+                }
+            } catch ( error ) {
+                console.error( 'Error in retrieveHashedPassword:', error.message );
                 throw error; // Rethrow the error if necessary
             }
         },

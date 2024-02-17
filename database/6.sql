@@ -20,6 +20,9 @@ ALTER TABLE users
     ADD COLUMN password_hash VARCHAR(255),
     ADD INDEX username (username);
 
+ALTER TABLE users
+    ADD COLUMN email VARCHAR(255);
+
 # find and update videoData table with display names from existing tables
 SELECT vd.id, vd.artistName, vd.artistDisplayName, a.displayName
 FROM videoData vd

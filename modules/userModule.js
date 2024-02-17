@@ -197,6 +197,16 @@ const userFunctions = ( bot ) => {
             }
         },
 
+        verifyUsersEmail: async function ( userID, databaseFunctions ) {
+            try {
+                const emailAddress = await databaseFunctions.getUsersEmailAddress( userID );
+                return !!emailAddress;
+            } catch ( error ) {
+                console.error( 'Error in verifyUsersEmail:', error );
+                return false; // Return false in case of an error
+            }
+        },
+
         getUserIDFromData: function ( data ) {
             return data.userid;
         },

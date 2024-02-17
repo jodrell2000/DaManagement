@@ -710,6 +710,34 @@ app.get( '/deletesong', ( req, res ) => {
 // General functions
 // ########################################################################
 
+app.post( '/signup', async ( req, res ) => {
+    const { email, username, password, confirmPassword } = req.body;
+
+    // Check if the passwords match
+    if ( password !== confirmPassword ) {
+        return res.status( 400 ).send( 'Passwords do not match' );
+    }
+
+    // Check if the user exists
+    const user = userFunctions.userExists( userFunctions.getUserIDFromUsername( username ) );
+    if ( !user ) {
+        return res.status( 400 ).send( 'User does not exist' );
+    }
+
+    const verify = userFunctions.verifyUsersEmail( userFunctions.getUserIDFromUsername( username ), databaseFunctions );
+    if ( !verify ) {
+        return res.status( 400 ).send( 'Users email does not match' );
+    }
+
+    // Hash the password before storing it in the database
+    const passwordHash = await bcrypt.hash( password, 10 );
+
+    // Store the user information in the database (in this case, a simple array)
+    await setPassword( { email, username, passwordHash } );
+
+    res.send( 'Sign up successful' );
+} );
+
 async function authentication( req, res, next ) {
     const authHeader = req.headers.authorization;
 
@@ -730,10 +758,8 @@ async function authentication( req, res, next ) {
         console.log( "hashedPassword:" + hashedPassword );
 
         if ( !hashedPassword ) {
-            // If the user doesn't have a password set, allow them to set one
-            req.username = username;
-            req.password = password;
-            return setPassword( req, res, next );
+            // If the user doesn't have a password set, redirect to the signup page
+            res.redirect( '/signup' );
         }
 
         // Compare hashed password from the database with the provided password
@@ -776,5 +802,5 @@ async function setPassword( req, res, next ) {
 }
 
 app.listen( ( 8585 ), () => {
-    console.log( "Server is Running " );
+    console.log( "Server is Running" );
 } )
