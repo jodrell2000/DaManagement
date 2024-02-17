@@ -58,7 +58,7 @@ const databaseFunctions = () => {
             let propsCount = 0;
             let RoboCoins = 0;
             let here = "";
-            let password_hash = NULL;
+            let password_hash = "NULL";
 
             if ( userObject[ "moderator" ] !== undefined ) { moderator = userObject[ "moderator" ] }
             if ( userObject[ "joinTime" ] !== undefined ) { joinTime = userObject[ "joinTime" ] }
