@@ -403,7 +403,7 @@ const databaseFunctions = () => {
         },
 
         getVerifiedArtistsFromName( theArtist ) {
-            const selectQuery = "SELECT displayName FROM artists WHERE artistName = ?;";
+            const selectQuery = "SELECT artistDisplayName FROM videoData WHERE artistName = ?;";
             const values = [ theArtist ];
 
             return this.runQuery( selectQuery, values )
@@ -413,7 +413,7 @@ const databaseFunctions = () => {
         },
 
         getVerifiedTracksFromName( theSong ) {
-            const selectQuery = "SELECT displayName FROM tracks WHERE trackName = ?;";
+            const selectQuery = "SELECT trackDisplayName FROM videoData WHERE trackName = ?;";
             const values = [ theSong ];
 
             return this.runQuery( selectQuery, values )
@@ -479,9 +479,9 @@ const databaseFunctions = () => {
                 } );
         },
 
-        updateArtistDisplayName( artistID, artistDisplayName ) {
-            const selectQuery = "UPDATE artists SET displayName=? WHERE id=?;";
-            const values = [ artistDisplayName, artistID ];
+        updateArtistDisplayName( id, artistDisplayName ) {
+            const selectQuery = "UPDATE videoData SET artistDisplayName=? WHERE id=?;";
+            const values = [ artistDisplayName, id ];
 
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
@@ -489,68 +489,14 @@ const databaseFunctions = () => {
                 } );
         },
 
-        splitArtistName: async function ( trackPlayedID, artistName ) {
-            const updateTrackPlayedQuery = "UPDATE tracksPlayed SET artistID=? WHERE id=?;";
-
-            try {
-                const artistID = await this.createNewArtist( artistName );
-                const values = [ artistID, trackPlayedID ];
-
-                return await this.runQuery( updateTrackPlayedQuery, values );
-            } catch ( error ) {
-                console.error( "Error splitting artist name:", error );
-                throw error;
-            }
-        },
-
-        createNewArtist: async function ( artistName ) {
-            const createArtistQuery = "INSERT INTO artists SET artistName=?;";
-            const values = [ artistName ];
-
-            try {
-                const result = await this.runQuery( createArtistQuery, values );
-                return result.insertId;
-            } catch ( error ) {
-                console.error( "Error creating new artist:", error );
-                throw error;
-            }
-        },
-
-        updateTrackDisplayName( trackID, trackDisplayName ) {
-            const selectQuery = "UPDATE tracks SET displayName=? WHERE id=?;";
-            const values = [ trackDisplayName, trackID ];
+        updateTrackDisplayName( id, trackDisplayName ) {
+            const selectQuery = "UPDATE videoData SET trackDisplayName=? WHERE id=?;";
+            const values = [ trackDisplayName, id ];
 
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
                     return result;
                 } );
-        },
-
-        splitTrackName: async function ( trackPlayedID, trackName ) {
-            const updateTrackPlayedQuery = "UPDATE tracksPlayed SET trackID=? WHERE id=?;";
-
-            try {
-                const trackID = await this.createNewTrack( trackName );
-                const values = [ trackID, trackPlayedID ];
-
-                return await this.runQuery( updateTrackPlayedQuery, values );
-            } catch ( error ) {
-                console.error( "Error splitting artist name:", error );
-                throw error;
-            }
-        },
-
-        createNewTrack: async function ( trackName ) {
-            const createTrackQuery = "INSERT INTO tracks SET trackName=?;";
-            const values = [ trackName ];
-
-            try {
-                const result = await this.runQuery( createTrackQuery, values );
-                return result.insertId;
-            } catch ( error ) {
-                console.error( "Error creating new artist:", error );
-                throw error;
-            }
         },
 
         // ========================================================

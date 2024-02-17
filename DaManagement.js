@@ -528,59 +528,8 @@ bot.on( 'endsong', function ( data ) {
 // DB Song Editor
 // ########################################################################
 
-// const handleUpdate = ( req, res, updateFunction ) => {
-//     const { sort, where, searchTerm } = req.body || req.query || {};
-//     const id = req.body.trackID || req.body.artistID || req.body.trackPlayedID;
-//     const displayName = req.body.trackDisplayName || req.body.artistDisplayName || req.body.artistName || req.body.trackName;
-//
-//     updateFunction( id, displayName )
-//         .then( () => {
-//             const queryParams = new URLSearchParams( { sort, where, searchTerm } );
-//             const redirectUrl = '/listunverified?' + queryParams.toString();
-//             res.redirect( redirectUrl );
-//         } )
-//         .catch( ( error ) => {
-//             console.error( error );
-//             res.sendStatus( 500 );
-//         } );
-// };
-//
-// app.get( '/listunverified', async ( req, res ) => {
-//     console.group( "listunverified" );
-//     console.log( "req:", req );
-//     console.log( "res:", res );
-//     try {
-//         const { sort, where, searchTerm } = req.body || req.query || {};
-//         const songList = await databaseFunctions.getUnverifiedSongList( req.query || req.body );
-//         const html = pug.renderFile( './templates/listUnverifiedSongs.pug', { songList, sort, where, searchTerm } );
-//         res.send( html );
-//     } catch ( error ) {
-//         console.error( error );
-//         res.sendStatus( 500 );
-//     }
-//     console.groupEnd();
-// } );
-//
-// app.post( '/updateArtistDisplayName', ( req, res ) => {
-//     handleUpdate( req, res, databaseFunctions.updateArtistDisplayName );
-// } );
-//
-// app.post( '/updateTrackDisplayName', ( req, res ) => {
-//     handleUpdate( req, res, databaseFunctions.updateTrackDisplayName );
-// } );
-//
-// app.post( '/splitArtistName', ( req, res ) => {
-//     handleUpdate( req, res, databaseFunctions.splitArtistName );
-// } );
-//
-// app.post( '/splitTrackName', ( req, res ) => {
-//     handleUpdate( req, res, databaseFunctions.splitTrackName );
-// } );
-
 app.get( '/listunverified', async ( req, res ) => {
     console.group( "listunverified" );
-    // console.log( "req:", req );
-    // console.log( "res:", res );
     try {
         const sortParam = req.body.sort || req.query.sort || '';
         const whereParam = req.body.where || req.query.where || '';
@@ -603,14 +552,13 @@ app.get( '/listunverified', async ( req, res ) => {
 } );
 
 app.post( '/updateArtistDisplayName', ( req, res ) => {
-    const artistID = req.body.artistID;
+    const videoData_id = req.body.videoData_id;
     const artistDisplayName = req.body.artistDisplayName;
     const sortParam = req.body.sort || req.query.sort || '';
     const whereParam = req.body.where || req.query.where || '';
     const searchParam = req.body.searchTerm || req.query.searchTerm || '';
 
-    // call a function with the artistID and artistDisplayName values
-    databaseFunctions.updateArtistDisplayName( artistID, artistDisplayName )
+    databaseFunctions.updateArtistDisplayName( videoData_id, artistDisplayName )
         .then( () => {
             const queryParams = new URLSearchParams( { sort: sortParam, where: whereParam, searchTerm: searchParam } );
             const redirectUrl = '/listunverified?' + queryParams.toString();
@@ -619,46 +567,13 @@ app.post( '/updateArtistDisplayName', ( req, res ) => {
 } );
 
 app.post( '/updateTrackDisplayName', ( req, res ) => {
-    const trackID = req.body.trackID;
+    const videoData_id = req.body.videoData_id;
     const trackDisplayName = req.body.trackDisplayName;
     const sortParam = req.body.sort || req.query.sort || '';
     const whereParam = req.body.where || req.query.where || '';
     const searchParam = req.body.searchTerm || req.query.searchTerm || '';
 
-    // call a function with the artistID and artistDisplayName values
-    databaseFunctions.updateTrackDisplayName( trackID, trackDisplayName )
-        .then( () => {
-            const queryParams = new URLSearchParams( { sort: sortParam, where: whereParam, searchTerm: searchParam } );
-            const redirectUrl = '/listunverified?' + queryParams.toString();
-            res.redirect( redirectUrl );
-        } )
-} );
-
-app.post( '/splitArtistName', ( req, res ) => {
-    const trackPlayedID = req.body.trackPlayedID;
-    const artistName = req.body.artistName;
-    const sortParam = req.body.sort || req.query.sort || '';
-    const whereParam = req.body.where || req.query.where || '';
-    const searchParam = req.body.searchTerm || req.query.searchTerm || '';
-
-    // call a function with the artistID and artistDisplayName values
-    databaseFunctions.splitArtistName( trackPlayedID, artistName )
-        .then( () => {
-            const queryParams = new URLSearchParams( { sort: sortParam, where: whereParam, searchTerm: searchParam } );
-            const redirectUrl = '/listunverified?' + queryParams.toString();
-            res.redirect( redirectUrl );
-        } )
-} );
-
-app.post( '/splitTrackName', ( req, res ) => {
-    const trackPlayedID = req.body.trackPlayedID;
-    const trackName = req.body.trackName;
-    const sortParam = req.body.sort || req.query.sort || '';
-    const whereParam = req.body.where || req.query.where || '';
-    const searchParam = req.body.searchTerm || req.query.searchTerm || '';
-
-    // call a function with the artistID and artistDisplayName values
-    databaseFunctions.splitTrackName( trackPlayedID, trackName )
+    databaseFunctions.updateTrackDisplayName( videoData_id, trackDisplayName )
         .then( () => {
             const queryParams = new URLSearchParams( { sort: sortParam, where: whereParam, searchTerm: searchParam } );
             const redirectUrl = '/listunverified?' + queryParams.toString();
