@@ -58,6 +58,7 @@ const databaseFunctions = () => {
             let propsCount = 0;
             let RoboCoins = 0;
             let here = "";
+            let password_hash = ""
 
             if ( userObject[ "moderator" ] !== undefined ) { moderator = userObject[ "moderator" ] }
             if ( userObject[ "joinTime" ] !== undefined ) { joinTime = userObject[ "joinTime" ] }
@@ -77,12 +78,13 @@ const databaseFunctions = () => {
             if ( userObject[ "propsCount" ] !== undefined ) { propsCount = userObject[ "propsCount" ] }
             if ( userObject[ "RoboCoins" ] !== undefined ) { RoboCoins = userObject[ "RoboCoins" ] }
             if ( userObject[ "here" ] !== undefined ) { here = userObject[ "here" ] }
+            if ( userObject[ "password_hash" ] !== undefined ) { password_hash = userObject[ "password_hash" ] }
 
             const query = `REPLACE
                                INTO users (id, userInfo, username, moderator, joinTime, currentDJ, lastVoted, lastSpoke,
                                            currentPlayCount, totalPlayCount, joinedStage, firstIdleWarning,
                                            secondIdleWarning, spamCount, lastSnagged, region, BBBootTimestamp,
-                                           noiceCount, propsCount, RoboCoins, here)
+                                           noiceCount, propsCount, RoboCoins, here, password_hash)
                            VALUES ("${ id }", '${ userInfo }', "${ username }",
                                    ${ moderator },
                                    ${ joinTime },
@@ -101,7 +103,8 @@ const databaseFunctions = () => {
                                    ${ noiceCount },
                                    ${ propsCount },
                                    ${ RoboCoins },
-                                   "${ here }");`;
+                                   "${ here }",
+                                   ${ password_hash });`;
 
             return query;
 
@@ -177,6 +180,20 @@ const databaseFunctions = () => {
             delete editedUser[ "welcomeTimer" ];
 
             return editedUser;
+        },
+
+        retrieveHashedPassword: async function ( username ) {
+            const theQuery = "SELECT password_hash FROM users WHERE username = ?";
+            const theValues = [ username ];
+
+            try {
+                const result = await this.runQuery( theQuery, theValues );
+                return result;
+            } catch ( error ) {
+                console.error( 'Error in retrieveHashedPassword:', error.message );
+                // Handle the error as needed
+                throw error; // Rethrow the error if necessary
+            }
         },
 
         // ========================================================

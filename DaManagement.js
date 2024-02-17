@@ -710,43 +710,68 @@ app.get( '/deletesong', ( req, res ) => {
 // General functions
 // ########################################################################
 
-function authentication( req, res, next ) {
-    let authheader = req.headers.authorization;
-    // console.log(req.headers);
+async function authentication( req, res, next ) {
+    const authHeader = req.headers.authorization;
 
-    if ( !authheader ) {
-        let err = new Error( 'You are not authenticated!' );
-        res.setHeader( 'WWW-Authenticate', 'Basic' );
-        err.status = 401;
-        return next( err )
-    }
-
-    let auth = new Buffer.from( authheader.split( ' ' )[ 1 ],
-        'base64' ).toString().split( ':' );
-    let user = auth[ 0 ];
-    let pass = auth[ 1 ];
-
-    const saltRounds = 10;
-    bcrypt.hash( pass, saltRounds, ( err, hash ) => {
-        if ( err ) {
-            // Handle error
-            console.error( err );
-        } else {
-            // Store 'hash' in the database
-            console.log( 'Hashed password:', hash );
-        }
-    } );
-    if ( user === process.env.PLAYLIST_USERNAME && pass === process.env.PLAYLIST_PASSWORD ) {
-
-        // If Authorized user
-        next();
-    } else {
-        let err = new Error( 'You are not authenticated to access the playlist controls!' );
+    if ( !authHeader ) {
+        const err = new Error( 'You are not authenticated!' );
         res.setHeader( 'WWW-Authenticate', 'Basic' );
         err.status = 401;
         return next( err );
     }
 
+    const auth = Buffer.from( authHeader.split( ' ' )[ 1 ], 'base64' ).toString().split( ':' );
+    const username = auth[ 0 ];
+    const password = auth[ 1 ];
+
+    try {
+        // Retrieve hashed password from the database based on the username
+        const hashedPassword = await databaseFunctions.retrieveHashedPassword( username );
+
+        if ( !hashedPassword ) {
+            // If the user doesn't have a password set, allow them to set one
+            req.username = username;
+            req.password = password;
+            return setPassword( req, res, next );
+        }
+
+        // Compare hashed password from the database with the provided password
+        const match = await bcrypt.compare( password, hashedPassword );
+
+        if ( match ) {
+            // If the passwords match, the user is authenticated
+            next();
+        } else {
+            const err = new Error( 'Incorrect username or password' );
+            res.setHeader( 'WWW-Authenticate', 'Basic' );
+            err.status = 401;
+            return next( err );
+        }
+    } catch ( error ) {
+        console.error( 'Error during authentication:', error );
+        const err = new Error( 'Internal server error' );
+        err.status = 500;
+        return next( err );
+    }
+}
+
+async function setPassword( req, res, next ) {
+    const { username, password } = req;
+    try {
+        // Hash the provided password
+        const hashedPassword = await bcrypt.hash( password, 10 );
+
+        const userID = userFunctions.getUserIDFromUsername( username );
+        await userFunctions.storeUserData( userID, "password_hash", hashedPassword, databaseFunctions );
+
+        // Proceed to the next middleware or route
+        next();
+    } catch ( error ) {
+        console.error( 'Error setting password:', error );
+        const err = new Error( 'Internal server error' );
+        err.status = 500;
+        return next( err );
+    }
 }
 
 app.listen( ( 8585 ), () => {
