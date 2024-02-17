@@ -28,6 +28,7 @@ let dateModule = require( './modules/dateModule.js' );
 
 const express = require( 'express' )
 const app = express();
+const signup = express();
 const pug = require( 'pug' );
 const bodyParser = require( 'body-parser' );
 const dayjs = require( 'dayjs' );
@@ -710,7 +711,7 @@ app.get( '/deletesong', ( req, res ) => {
 // General functions
 // ########################################################################
 
-app.post( '/signup', async ( req, res ) => {
+signup.post( '/signup', async ( req, res ) => {
     const { email, username, password, confirmPassword } = req.body;
 
     // Check if the passwords match
