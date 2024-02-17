@@ -727,6 +727,7 @@ async function authentication( req, res, next ) {
     try {
         // Retrieve hashed password from the database based on the username
         const hashedPassword = await databaseFunctions.retrieveHashedPassword( username );
+        console.log( "hashedPassword:" + hashedPassword );
 
         if ( !hashedPassword ) {
             // If the user doesn't have a password set, allow them to set one
