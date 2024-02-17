@@ -769,8 +769,8 @@ async function authentication( req, res, next ) {
             // If the passwords match, the user is authenticated
             next();
         } else {
-            if ( req.originalUrl === '/signup' ) {
-                return res.redirect( '/signup' );
+            if ( req.originalUrl !== '/signup' ) {
+                return res.redirect( '/' );
             } else {
                 const err = new Error( 'Incorrect username or password' );
                 res.setHeader( 'WWW-Authenticate', 'Basic' );
