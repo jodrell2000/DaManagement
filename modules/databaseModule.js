@@ -457,12 +457,12 @@ const databaseFunctions = () => {
             }
 
             const selectQuery = `
-                SELECT tp.videoData_id       AS videoID,
+                SELECT tp.videoData_id,
                        v.artistName,
                        v.artistDisplayName,
                        v.trackName,
                        v.trackDisplayName,
-                       ROUND(AVG(tp.length)) AS length
+                       tp.length
                 FROM tracksPlayed tp
                          JOIN videoData v ON v.id = tp.videoData_id
                 WHERE ${ whereClause }
