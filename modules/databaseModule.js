@@ -433,16 +433,16 @@ const databaseFunctions = () => {
 
             switch ( args.sort ) {
                 case 'time':
-                    orderByClause = ' ORDER BY tp.whenPlayed DESC';
+                    orderByClause = 'ORDER BY tp.whenPlayed DESC';
                     break;
                 case 'artist':
-                    orderByClause = ' ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC';
+                    orderByClause = 'GROUP BY v.id, COALESCE(v.artistDisplayName, v.artistName), COALESCE(v.trackDisplayName, v.trackName) ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC';
                     break;
                 case 'track':
-                    orderByClause = ' ORDER BY COALESCE(v.trackDisplayName, v.trackName) ASC, COALESCE(v.artistDisplayName, v.artistName) ASC';
+                    orderByClause = 'GROUP BY v.id, COALESCE(v.trackDisplayName, v.trackName), COALESCE(v.artistDisplayName, v.artistName) ORDER BY COALESCE(v.trackDisplayName, v.trackName) ASC, COALESCE(v.artistDisplayName, v.artistName) ASC';
                     break;
                 default:
-                    orderByClause = ' ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC';
+                    orderByClause = 'GROUP BY v.id, COALESCE(v.artistDisplayName, v.artistName), COALESCE(v.trackDisplayName, v.trackName) ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC';
             }
 
             switch ( args.where ) {
@@ -466,7 +466,7 @@ const databaseFunctions = () => {
                 FROM tracksPlayed tp
                          JOIN videoData v ON v.id = tp.videoData_id
                 WHERE ${ whereClause }
-                GROUP BY v.id ${ orderByClause }
+                          ${ orderByClause }
                 LIMIT 50`;
 
             const values = [];
