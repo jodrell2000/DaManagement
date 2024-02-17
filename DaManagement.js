@@ -33,6 +33,8 @@ const bodyParser = require( 'body-parser' );
 const dayjs = require( 'dayjs' );
 const utc = require( 'dayjs/plugin/utc' );
 dayjs.extend( utc )
+const bcrypt = require( 'bcrypt' );
+
 
 // client authentication
 app.use( authentication )
@@ -724,6 +726,16 @@ function authentication( req, res, next ) {
     let user = auth[ 0 ];
     let pass = auth[ 1 ];
 
+    const saltRounds = 10;
+    bcrypt.hash( pass, saltRounds, ( err, hash ) => {
+        if ( err ) {
+            // Handle error
+            console.error( err );
+        } else {
+            // Store 'hash' in the database
+            console.log( 'Hashed password:', hash );
+        }
+    } );
     if ( user === process.env.PLAYLIST_USERNAME && pass === process.env.PLAYLIST_PASSWORD ) {
 
         // If Authorized user
