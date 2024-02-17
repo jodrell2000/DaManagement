@@ -717,7 +717,7 @@ app.get( '/deletesong', ( req, res ) => {
 
 app.get( '/signup', ( req, res ) => {
     // Render your signup page here
-    let html = pug.renderFile( './templates/signup' );
+    let html = pug.renderFile( './templates/signup.pug' );
     res.send( html );
 
 } );
