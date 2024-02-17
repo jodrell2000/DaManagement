@@ -37,7 +37,12 @@ const bcrypt = require( 'bcrypt' );
 
 
 // client authentication
-app.use( authentication )
+app.use( ( req, res, next ) => {
+    if ( req.originalUrl === '/signup' ) {
+        return next();
+    }
+    authentication( req, res, next );
+} );
 
 app.use( express.json() );
 
@@ -759,7 +764,10 @@ async function authentication( req, res, next ) {
 
         if ( !hashedPassword ) {
             // If the user doesn't have a password set, redirect to the signup page
-            res.redirect( '/signup' );
+            if ( req.originalUrl !== '/signup' ) {
+                return res.redirect( '/signup' );
+            }
+            return next();
         }
 
         // Compare hashed password from the database with the provided password
@@ -767,16 +775,12 @@ async function authentication( req, res, next ) {
 
         if ( match ) {
             // If the passwords match, the user is authenticated
-            next();
+            return next();
         } else {
-            if ( req.originalUrl !== '/signup' ) {
-                return res.redirect( '/' );
-            } else {
-                const err = new Error( 'Incorrect username or password' );
-                res.setHeader( 'WWW-Authenticate', 'Basic' );
-                err.status = 401;
-                return next( err );
-            }
+            const err = new Error( 'Incorrect username or password' );
+            res.setHeader( 'WWW-Authenticate', 'Basic' );
+            err.status = 401;
+            return next( err );
         }
     } catch ( error ) {
         console.error( 'Error during authentication:', error );
