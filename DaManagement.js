@@ -738,6 +738,7 @@ app.post( '/signup', async ( req, res ) => {
     }
 
     const verify = userFunctions.verifyUsersEmail( userID, databaseFunctions );
+    console.log( "verify:" + verify );
     if ( !verify ) {
         return res.status( 400 ).send( 'Users email does not match' );
     }
@@ -805,7 +806,7 @@ async function setPassword( req, res, next ) {
         await userFunctions.storeUserData( userID, "password_hash", passwordHash, databaseFunctions );
 
         // Proceed to the next middleware or route
-        next();
+        return next();
     } catch ( error ) {
         console.error( 'Error setting password:', error );
         const err = new Error( 'Internal server error' );
