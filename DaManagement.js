@@ -557,6 +557,8 @@ app.get( '/listunverified', async ( req, res ) => {
 } );
 
 app.post( '/updateArtistDisplayName', ( req, res ) => {
+    const { username } = req.body;
+    console.log( "username:" + username );
     const videoData_id = req.body.videoData_id;
     const artistDisplayName = req.body.artistDisplayName;
     const sortParam = req.body.sort || req.query.sort || '';
