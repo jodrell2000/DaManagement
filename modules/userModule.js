@@ -2218,7 +2218,7 @@ const userFunctions = ( bot ) => {
             return new Promise( ( resolve, reject ) => {
                 if ( this.userExists( userID ) ) {
                     const position = this.getPositionOnUsersList( userID );
-                    let theCoins = parseFloat( theUsersList[ position ][ 'RoboCoins' ] ).toFixed( 2 );
+                    let theCoins = parseFloat( theUsersList[ position ][ 'RoboCoins' ] );
                     if ( isNaN( theCoins ) ) {
                         theCoins = 0;
                     }
@@ -2343,7 +2343,7 @@ const userFunctions = ( bot ) => {
             try {
                 const userID = this.whoSentTheCommand( data );
                 const theCoins = await this.getRoboCoins( userID );
-                chatFunctions.botSpeak( '@' + this.getUsername( userID ) + " you currently have " + theCoins + " RoboCoins", data );
+                chatFunctions.botSpeak( '@' + this.getUsername( userID ) + " you currently have " + parseFloat( theCoins ).toFixed( 2 ) + " RoboCoins", data );
             } catch ( error ) {
                 console.error( "Error reading RoboCoins:", error.message );
                 // Handle the error as needed
