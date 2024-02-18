@@ -198,12 +198,18 @@ const userFunctions = ( bot ) => {
         },
 
         setEmailAddress: async function ( data, args, chatFunctions, databaseFunctions ) {
-            const username = args[ 0 ];
-            const userID = this.getUserIDFromUsername( username );
-            const email = args[ 1 ];
-            await this.storeUserData( userID, "email", email, databaseFunctions );
-        },
+            try {
+                const username = args[ 0 ];
+                const userID = this.getUserIDFromUsername( username );
+                const email = args[ 1 ];
 
+                await this.storeUserData( userID, "email", email, databaseFunctions );
+                chatFunctions.botSpeak( 'Email address for ' + username + ' set to ' + email, data );
+            } catch ( error ) {
+                console.error( 'Error setting email address:', error );
+                throw error;
+            }
+        },
         verifyUsersEmail: async function ( userID, givenEmail, databaseFunctions ) {
             try {
                 const returnedEmail = await databaseFunctions.getUsersEmailAddress( userID );
