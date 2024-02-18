@@ -63,3 +63,18 @@ WHERE tp.videoData_id = vd.id AND
       t.id = tp.trackID AND
       t.displayName IS NOT NULL AND
       vd.trackDisplayName IS NULL;
+
+
+SELECT tp.videoData_id,
+       v.artistName,
+       v.artistDisplayName,
+       v.trackName,
+       v.trackDisplayName,
+       max(tp.whenPlayed)
+FROM tracksPlayed tp
+         JOIN videoData v ON v.id = tp.videoData_id
+WHERE v.artistDisplayName IS NULL OR
+      v.trackDisplayName IS NULL
+GROUP BY tp.videoData_id
+ORDER BY MAX(tp.whenPlayed) DESC
+LIMIT 50

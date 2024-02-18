@@ -471,7 +471,7 @@ const databaseFunctions = () => {
 
             switch ( args.sort ) {
                 case 'time':
-                    orderByClause = 'GROUP BY tp.videoData_id ORDER BY tp.whenPlayed DESC';
+                    orderByClause = 'GROUP BY tp.videoData_id ORDER BY MAX(tp.whenPlayed) DESC';
                     break;
                 case 'artist':
                     orderByClause = 'GROUP BY tp.videoData_id ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC';
@@ -495,12 +495,12 @@ const databaseFunctions = () => {
             }
 
             const selectQuery = `
-                SELECT DISTINCT tp.videoData_id,
-                                v.artistName,
-                                v.artistDisplayName,
-                                v.trackName,
-                                v.trackDisplayName,
-                                max(tp.whenPlayed)
+                SELECT tp.videoData_id,
+                       v.artistName,
+                       v.artistDisplayName,
+                       v.trackName,
+                       v.trackDisplayName,
+                       MAX(tp.whenPlayed)
                 FROM tracksPlayed tp
                          JOIN videoData v ON v.id = tp.videoData_id
                 WHERE ${ whereClause }
