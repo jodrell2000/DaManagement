@@ -2246,22 +2246,22 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        addRoboCoins: async function ( userID, numCoins, changeReason, changeID, databaseFunctions ) {
-            try {
-                const coins = parseFloat( numCoins );
-                await this.processRoboCoins( userID, coins, changeReason, changeID, addRCOperation, databaseFunctions );
-            } catch ( error ) {
-                console.error( 'Error in addRoboCoins:', error.message );
-                // Handle the error as needed
-            }
-        },
-
         subtractRoboCoins: async function ( userID, numCoins, changeReason, changeID, databaseFunctions ) {
             try {
                 const coins = parseFloat( numCoins );
                 await this.processRoboCoins( userID, coins, changeReason, changeID, subtractRCOperation, databaseFunctions );
             } catch ( error ) {
                 console.error( 'Error in subtractRoboCoins:', error.message );
+                // Handle the error as needed
+            }
+        },
+
+        addRoboCoins: async function ( userID, numCoins, changeReason, changeID, databaseFunctions ) {
+            try {
+                const coins = parseFloat( numCoins );
+                await this.processRoboCoins( userID, coins, changeReason, changeID, addRCOperation, databaseFunctions );
+            } catch ( error ) {
+                console.error( 'Error in addRoboCoins:', error.message );
                 // Handle the error as needed
             }
         },
@@ -2291,14 +2291,12 @@ const userFunctions = ( bot ) => {
             console.group( "updateRoboCoins" );
             console.log( "coins:" + coins );
             console.groupEnd();
-            return new Promise( ( resolve, reject ) => {
-                try {
-                    this.storeUserData( userID, "RoboCoins", coins, databaseFunctions );
-                    resolve();
-                } catch ( error ) {
-                    reject( new Error( 'User does not exist' ) );
-                }
-            } );
+            try {
+                await this.storeUserData( userID, "RoboCoins", coins, databaseFunctions );
+                return; // Resolve the promise without value (implicit)
+            } catch ( error ) {
+                throw new Error( 'User does not exist' ); // Reject the promise
+            }
         },
 
         auditRoboCoin: async function ( userID, before, after, numCoins, changeReason, changeID, databaseFunctions ) {
