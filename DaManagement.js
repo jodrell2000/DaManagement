@@ -556,36 +556,55 @@ app.get( '/listunverified', async ( req, res ) => {
     }
 } );
 
-app.post( '/updateArtistDisplayName', ( req, res ) => {
-    const username = req.username;
-    console.log( "username:" + username );
-    const videoData_id = req.body.videoData_id;
-    const artistDisplayName = req.body.artistDisplayName;
-    const sortParam = req.body.sort || req.query.sort || '';
-    const whereParam = req.body.where || req.query.where || '';
-    const searchParam = req.body.searchTerm || req.query.searchTerm || '';
+app.post( '/updateArtistDisplayName', async ( req, res ) => {
+    try {
+        const username = req.username;
+        const videoData_id = req.body.videoData_id;
+        const artistDisplayName = req.body.artistDisplayName;
+        const sortParam = req.body.sort || req.query.sort || '';
+        const whereParam = req.body.where || req.query.where || '';
+        const searchParam = req.body.searchTerm || req.query.searchTerm || '';
 
-    databaseFunctions.updateArtistDisplayName( videoData_id, artistDisplayName )
-        .then( () => {
-            const queryParams = new URLSearchParams( { sort: sortParam, where: whereParam, searchTerm: searchParam } );
-            const redirectUrl = '/listunverified?' + queryParams.toString();
-            res.redirect( redirectUrl );
-        } )
+        await databaseFunctions.updateArtistDisplayName( videoData_id, artistDisplayName );
+
+        const userID = userFunctions.getUserIDFromUsername( username );
+        const numCoins = 0.02;
+        const changeReason = "Fixed artist name for " + videoData_id;
+        const changeID = 5;
+        await userFunctions.addRoboCoins( userID, numCoins, changeReason, changeID, databaseFunctions );
+
+        const queryParams = new URLSearchParams( { sort: sortParam, where: whereParam, searchTerm: searchParam } );
+        const redirectUrl = '/listunverified?' + queryParams.toString();
+        res.redirect( redirectUrl );
+    } catch ( error ) {
+        console.error( 'Error in updateArtistDisplayName:', error );
+        res.status( 500 ).send( 'Internal server error' );
+    }
 } );
+app.post( '/updateTrackDisplayName', async ( req, res ) => {
+    try {
+        const username = req.username;
+        const videoData_id = req.body.videoData_id;
+        const trackDisplayName = req.body.trackDisplayName;
+        const sortParam = req.body.sort || req.query.sort || '';
+        const whereParam = req.body.where || req.query.where || '';
+        const searchParam = req.body.searchTerm || req.query.searchTerm || '';
 
-app.post( '/updateTrackDisplayName', ( req, res ) => {
-    const videoData_id = req.body.videoData_id;
-    const trackDisplayName = req.body.trackDisplayName;
-    const sortParam = req.body.sort || req.query.sort || '';
-    const whereParam = req.body.where || req.query.where || '';
-    const searchParam = req.body.searchTerm || req.query.searchTerm || '';
+        await databaseFunctions.updateTrackDisplayName( videoData_id, trackDisplayName );
 
-    databaseFunctions.updateTrackDisplayName( videoData_id, trackDisplayName )
-        .then( () => {
-            const queryParams = new URLSearchParams( { sort: sortParam, where: whereParam, searchTerm: searchParam } );
-            const redirectUrl = '/listunverified?' + queryParams.toString();
-            res.redirect( redirectUrl );
-        } )
+        const userID = userFunctions.getUserIDFromUsername( username );
+        const numCoins = 0.02;
+        const changeReason = "Fixed track name for " + videoData_id;
+        const changeID = 5;
+        await userFunctions.addRoboCoins( userID, numCoins, changeReason, changeID, databaseFunctions );
+
+        const queryParams = new URLSearchParams( { sort: sortParam, where: whereParam, searchTerm: searchParam } );
+        const redirectUrl = '/listunverified?' + queryParams.toString();
+        res.redirect( redirectUrl );
+    } catch ( error ) {
+        console.error( 'Error in updateArtistDisplayName:', error );
+        res.status( 500 ).send( 'Internal server error' );
+    }
 } );
 
 // ########################################################################

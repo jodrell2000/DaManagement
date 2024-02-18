@@ -23,6 +23,9 @@ ALTER TABLE users
 ALTER TABLE users
     ADD COLUMN email VARCHAR(255);
 
+INSERT INTO roboCoinAuditTypes (id, reason)
+VALUES (5, "Track fixing");
+
 # find and update videoData table with display names from existing tables
 SELECT vd.id, vd.artistName, vd.artistDisplayName, a.displayName
 FROM videoData vd
