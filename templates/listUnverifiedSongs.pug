@@ -93,7 +93,7 @@ html(lang="en")
             td
                 a(href=`https://www.youtube.com/watch?v=${ encodeURIComponent( song.videoData_id ) }`, target="_blank") #{song.videoData_id}
             td
-                a(href=`http://141.147.86.68:8585/listunverified?sort=artist&where=artist&searchTerm=${ encodeURIComponent( song.artistName ) }`, target="_blank") #{song.artistName}
+                a(href=`http://141.147.86.68:8585/listunverified?sort=artist&where=artist&searchTerm=${ encodeURIComponent( song.artistName ) }`) #{song.artistName}
             td
                 if song.artistDisplayName
                     | #{song.artistDisplayName}
@@ -114,7 +114,7 @@ html(lang="en")
                         button(type='submit') Update Artist
 
             td
-                a(href=`http://141.147.86.68:8585/listunverified?sort=track&where=track&searchTerm=${ encodeURIComponent( song.trackName ) }`, target="_blank") #{song.trackName}
+                a(href=`http://141.147.86.68:8585/listunverified?sort=track&where=track&searchTerm=${ encodeURIComponent( song.trackName ) }`) #{song.trackName}
             td
                 if song.trackDisplayName
                     | #{song.trackDisplayName}
