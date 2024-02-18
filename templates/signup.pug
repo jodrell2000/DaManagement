@@ -7,23 +7,20 @@ html(lang="en")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         title Sign Up
         link(rel="stylesheet", href="/styles/signup.css")
-    body
-        h1 Sign Up
-        form(action="/signup", method="post")
-            label(for="email")
-                | Email:
+body
+    h1 Sign Up
+    form(action="/signup", method="post")
+        div
+            label(for="email") Email:
             input(type="email", id="email", name="email", required)
-
-            label(for="username")
-                | Username:
+        div
+            label(for="username") Username:
             input(type="text", id="username", name="username", required)
-
-            label(for="password")
-                | Password:
+        div
+            label(for="password") Password:
             input(type="password", id="password", name="password", required)
-
-            label(for="confirmPassword")
-                | Confirm Password:
+        div
+            label(for="confirmPassword") Confirm Password:
             input(type="password", id="confirmPassword", name="confirmPassword", required)
-
-            button(type="submit") Sign Up Now
+        div
+            button(type="submit") Sign Up
