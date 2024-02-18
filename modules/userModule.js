@@ -284,20 +284,20 @@ const userFunctions = ( bot ) => {
         // User Region Functions
         // ========================================================
 
-        checkUsersHaveRegions: function ( data, chatFunctions ) {
+        checkUsersHaveRegions: async function ( data, chatFunctions ) {
             let userID;
 
             for ( let userCount = 0; userCount < data.users.length; userCount++ ) {
                 if ( typeof data.users[ userCount ] !== 'undefined' ) {
                     userID = data.users[ userCount ].userid;
                     if ( this.userExists( userID ) ) {
-                        this.askUserToSetRegion( userID, chatFunctions );
+                        await this.askUserToSetRegion( userID, chatFunctions );
                     }
                 }
             }
         },
 
-        askUserToSetRegion: function ( userID, chatFunctions ) {
+        askUserToSetRegion: async function ( userID, chatFunctions ) {
             if ( !this.getUserRegion( userID ) && !this.userWantsNoRegion( userID ) ) {
                 chatFunctions.botPM( "If you'd like me to check that videos are playable in your region, please set it using the command '" + chatDefaults.commandIdentifier + "myRegion XX'. Replace XX with a valid 2 letter country code https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2 If you want to not be asked this again please user the command '" + chatDefaults.commandIdentifier + "noRegion'", userID );
             }
@@ -340,8 +340,8 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        userWantsNoRegion: function ( userID ) {
-            return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'noregion' ];
+        userWantsNoRegion: async function ( userID ) {
+            return theUsersList[ await this.getPositionOnUsersList( userID ) ][ 'noregion' ];
         },
 
         storeUserRegion: function ( data, userID, region, chatFunctions, videoFunctions, databaseFunctions ) {
