@@ -159,7 +159,7 @@ const userFunctions = ( bot ) => {
         storeUserData: async function ( userID, key, value, databaseFunctions ) {
             if ( this.userExists( userID ) && this.getUsername( userID ) !== "Guest" ) {
                 try {
-                    const userPosition = this.getPositionOnUsersList( userID );
+                    const userPosition = await this.getPositionOnUsersList( userID );
                     theUsersList[ userPosition ][ key ] = value;
                     await databaseFunctions.storeUserData( theUsersList[ userPosition ] );
                 } catch ( error ) {
@@ -1868,7 +1868,7 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        getPositionOnUsersList: function ( userID ) {
+        getPositionOnUsersList: async function ( userID ) {
             return theUsersList.findIndex( ( { id } ) => id === userID )
         },
 

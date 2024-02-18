@@ -35,7 +35,7 @@ const databaseFunctions = () => {
             } );
         },
 
-        buildSaveUserQuery: function ( userObject ) {
+        buildSaveUserQuery: async function ( userObject ) {
             const id = userObject[ "id" ];
             const userInfo = JSON.stringify( userObject ).replace( "'", "\\'" );
             const username = userObject[ "username" ];
@@ -115,7 +115,7 @@ const databaseFunctions = () => {
 
         writeUserDataToDatabase: async function ( userObject ) {
             try {
-                const query = this.buildSaveUserQuery( userObject );
+                const query = await this.buildSaveUserQuery( userObject );
                 await this.runQuery( query );
             } catch ( error ) {
                 throw new Error( `Error writing user data to database: ${ error.message }` );
