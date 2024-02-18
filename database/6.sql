@@ -34,6 +34,14 @@ ALTER TABLE users
 INSERT INTO roboCoinAuditTypes (id, reason)
 VALUES (5, "Track fixing");
 
+ALTER TABLE tracksPlayed
+    ADD INDEX whenPlayed (whenPlayed);
+
+ALTER TABLE videoData
+    ADD INDEX artistDisplayName(artistDisplayName),
+    ADD INDEX trackDisplayName(trackDisplayName);
+
+
 # find and update videoData table with display names from existing tables
 SELECT vd.id, vd.artistName, vd.artistDisplayName, a.displayName
 FROM videoData vd
@@ -77,4 +85,18 @@ WHERE v.artistDisplayName IS NULL OR
       v.trackDisplayName IS NULL
 GROUP BY tp.videoData_id
 ORDER BY MAX(tp.whenPlayed) DESC
+LIMIT 50
+
+
+
+SELECT tp.videoData_id,
+       v.artistName,
+       v.artistDisplayName,
+       v.trackName,
+       v.trackDisplayName,
+       tp.whenPlayed
+FROM tracksPlayed tp
+         JOIN videoData v ON v.id = tp.videoData_id
+WHERE v.artistDisplayName IS NULL OR v.trackDisplayName IS NULL
+GROUP BY tp.videoData_id ORDER BY tp.whenPlayed DESC
 LIMIT 50
