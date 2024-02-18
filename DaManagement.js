@@ -557,7 +557,8 @@ app.get( '/listunverified', async ( req, res ) => {
 } );
 
 app.post( '/updateArtistDisplayName', ( req, res ) => {
-    console.log( "body:" + req.body );
+    const username = req.username;
+    console.log( "username:" + username );
     const videoData_id = req.body.videoData_id;
     const artistDisplayName = req.body.artistDisplayName;
     const sortParam = req.body.sort || req.query.sort || '';
@@ -788,6 +789,7 @@ async function authentication( req, res, next ) {
 
         if ( match ) {
             // If the passwords match, the user is authenticated
+            req.username = username;
             return next();
         } else {
             const err = new Error( 'Incorrect username or password' );
