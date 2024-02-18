@@ -476,21 +476,21 @@ const databaseFunctions = () => {
                     orderByClause = 'ORDER BY tp.whenPlayed DESC';
                     break;
                 case 'artist':
-                    orderByClause = 'GROUP BY v.id, COALESCE(v.artistDisplayName, v.artistName), COALESCE(v.trackDisplayName, v.trackName), tp.length ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC';
+                    orderByClause = 'ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC';
                     break;
                 case 'track':
-                    orderByClause = 'GROUP BY v.id, COALESCE(v.trackDisplayName, v.trackName), COALESCE(v.artistDisplayName, v.artistName), tp.length ORDER BY COALESCE(v.trackDisplayName, v.trackName) ASC, COALESCE(v.artistDisplayName, v.artistName) ASC';
+                    orderByClause = 'ORDER BY COALESCE(v.trackDisplayName, v.trackName) ASC, COALESCE(v.artistDisplayName, v.artistName) ASC';
                     break;
                 default:
-                    orderByClause = 'GROUP BY v.id, COALESCE(v.artistDisplayName, v.artistName), COALESCE(v.trackDisplayName, v.trackName), tp.length ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC';
+                    orderByClause = 'ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC';
             }
 
             switch ( args.where ) {
                 case 'track':
-                    whereClause = "v.trackName LIKE '%" + args.searchTerm + "%'";
+                    whereClause = "v.trackName LIKE '%" + args.searchTerm + "%' OR v.trackDisplayName LIKE '%" + args.searchTerm + "%'";
                     break;
                 case 'artist':
-                    whereClause = "v.artistName LIKE '%" + args.searchTerm + "%'";
+                    whereClause = "v.artistName LIKE '%" + args.searchTerm + "%' OR v.artistDisplayName LIKE '%" + args.searchTerm + "%'";
                     break;
                 default:
                     whereClause = "v.artistDisplayName IS NULL OR v.trackDisplayName IS NULL";

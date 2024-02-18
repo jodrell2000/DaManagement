@@ -536,7 +536,6 @@ bot.on( 'endsong', function ( data ) {
 // ########################################################################
 
 app.get( '/listunverified', async ( req, res ) => {
-    console.group( "listunverified" );
     try {
         const sortParam = req.body.sort || req.query.sort || '';
         const whereParam = req.body.where || req.query.where || '';
@@ -555,7 +554,6 @@ app.get( '/listunverified', async ( req, res ) => {
         console.error( error );
         res.sendStatus( 500 );
     }
-    console.groupEnd();
 } );
 
 app.post( '/updateArtistDisplayName', ( req, res ) => {
