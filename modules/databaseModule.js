@@ -497,12 +497,12 @@ const databaseFunctions = () => {
             }
 
             const selectQuery = `
-                SELECT tp.videoData_id,
-                       v.artistName,
-                       v.artistDisplayName,
-                       v.trackName,
-                       v.trackDisplayName,
-                       tp.length
+                SELECT DISTINCT tp.videoData_id,
+                                v.artistName,
+                                v.artistDisplayName,
+                                v.trackName,
+                                v.trackDisplayName,
+                                tp.length
                 FROM tracksPlayed tp
                          JOIN videoData v ON v.id = tp.videoData_id
                 WHERE ${ whereClause }
