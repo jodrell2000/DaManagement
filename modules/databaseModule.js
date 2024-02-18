@@ -126,7 +126,7 @@ const databaseFunctions = () => {
         // File Functions
         // ========================================================
 
-        writeUserDataToDisk: function ( userObject ) {
+        writeUserDataToDisk: async function ( userObject ) {
             const userID = userObject[ "id" ];
             const dataFilePath = `${ dirname( require.main.filename ) }/data/users/${ userID }.json`;
             fs.writeFileSync( dataFilePath, JSON.stringify( userObject ), function ( err ) {
@@ -155,17 +155,15 @@ const databaseFunctions = () => {
         // Persistent User Functions
         // ========================================================
 
-        storeUserData: function ( userObject ) {
-            return new Promise( ( resolve, reject ) => {
-                try {
-                    const userToSave = this.removeUnsavableDataFromUser( userObject );
-                    this.writeUserDataToDisk( userToSave );
-                    this.writeUserDataToDatabase( userToSave );
-                    resolve();
-                } catch ( error ) {
-                    reject( error );
-                }
-            } );
+        storeUserData: async function ( userObject ) {
+            try {
+                const userToSave = this.removeUnsavableDataFromUser( userObject );
+                await this.writeUserDataToDisk( userToSave );
+                await this.writeUserDataToDatabase( userToSave );
+                return Promise.resolve(); // Resolve the promise
+            } catch ( error ) {
+                return Promise.reject( error ); // Reject the promise
+            }
         },
 
         removeUnsavableDataFromUser: function ( userObject ) {
