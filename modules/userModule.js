@@ -2267,11 +2267,16 @@ const userFunctions = ( bot ) => {
         },
 
         processRoboCoins: async function ( userID, numCoins, changeReason, changeID, operation, databaseFunctions ) {
+            console.group( "processRoboCoins" );
+            console.log( "numCoins:" + numCoins );
             try {
                 const before = await this.getRoboCoins( userID );
-                const updatedCoins = operation( before, numCoins );
+                console.log( "before:" + before );
+                const updatedCoins = await operation( before, numCoins );
+                console.log( "updatedCoins:" + updatedCoins );
                 await this.updateRoboCoins( userID, updatedCoins, databaseFunctions );
                 const after = await this.getRoboCoins( userID );
+                console.log( "after:" + after );
 
                 // Pass positive or negative numCoins to auditRoboCoin based on the type of operation
                 await this.auditRoboCoin( userID, before, after, operation === addRCOperation ? numCoins : -numCoins, changeReason, changeID, databaseFunctions );
