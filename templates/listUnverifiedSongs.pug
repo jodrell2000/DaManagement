@@ -124,6 +124,7 @@ html(lang="en")
                 else
                     form(action='/updateTrackDisplayName' method='POST')
                         input(type='text' name='trackDisplayName', value=song.trackName)
+                        input(type='hidden' name='where' value=where)
                         input(type='hidden' name='sort' value=sort)
                         input(type='hidden' name='searchTerm' value=searchTerm)
                         input(type='hidden' name='videoData_id' value=song.videoData_id)

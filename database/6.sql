@@ -52,17 +52,3 @@ WHERE tp.videoData_id = vd.id AND
       t.id = tp.trackID AND
       t.displayName IS NOT NULL AND
       vd.trackDisplayName IS NULL;
-
-
-SELECT tp.videoData_id,
-       v.artistName,
-       v.artistDisplayName,
-       v.trackName,
-       v.trackDisplayName,
-       tp.length
-FROM tracksPlayed tp
-         JOIN videoData v ON v.id = tp.videoData_id
-WHERE v.trackName LIKE '%Marillion%' OR
-      v.trackDisplayName LIKE '%Marillion%'
-ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC
-LIMIT 50;
