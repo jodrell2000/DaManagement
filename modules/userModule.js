@@ -199,8 +199,9 @@ const userFunctions = ( bot ) => {
 
         setEmailAddress: function ( data, args, chatFunctions, databaseFunctions ) {
             console.group( "setEmailAddress" );
-            console.log( "data:" + JSON.stringify( data ) );
             console.log( "args:" + args );
+            console.log( "user:" + args[ 0 ] );
+            console.log( "email:" + args[ 1 ] );
             console.groupEnd();
             // this.storeUserData( userID, "email", value, databaseFunctions )
         },
