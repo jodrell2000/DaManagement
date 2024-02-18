@@ -747,7 +747,7 @@ app.post( '/signup', async ( req, res ) => {
     // Store the user information in the database (in this case, a simple array)
     await setPassword( { email, username, passwordHash } );
 
-    res.send( 'Sign up successful' );
+    res.redirect( '/listunverified' );
 } );
 
 async function authentication( req, res, next ) {

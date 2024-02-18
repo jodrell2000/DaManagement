@@ -10,12 +10,17 @@ html(lang="en")
     body
         h1 Sign Up
         form(action="/signup", method="post")
-            label(for="email") Email:
+            label(for="email")
+                | Email:
             input(type="email", id="email", name="email", required)
-            label(for="username") Username:
+            label(for="username")
+            | Username:
             input(type="text", id="username", name="username", required)
-            label(for="password") Password:
+            label(for="password")
+            | Password:
             input(type="password", id="password", name="password", required)
-            label(for="confirmPassword") Confirm Password:
+            label(for="confirmPassword")
+            | Confirm Password:
             input(type="password", id="confirmPassword", name="confirmPassword", required)
-            button(type="submit") Sign Up
+            button(type="submit")
+            | Sign Up
