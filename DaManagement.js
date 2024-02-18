@@ -722,7 +722,7 @@ app.get( '/signup', ( req, res ) => {
 
 } );
 
-app.post( '/signup', async ( req, res ) => {
+app.post( '/signup', async ( req, res, next ) => {
     const { email, username, password, confirmPassword } = req.body;
     const userID = userFunctions.getUserIDFromUsername( username );
 
@@ -737,9 +737,8 @@ app.post( '/signup', async ( req, res ) => {
         return res.status( 400 ).send( 'User does not exist' );
     }
 
-    userFunctions.verifyUsersEmail( userID, databaseFunctions )
+    userFunctions.verifyUsersEmail( userID, email, databaseFunctions )
         .then( verify => {
-            console.log( "verify:" + verify );
             if ( !verify ) {
                 return res.status( 400 ).send( 'User\'s email does not match' );
             }
@@ -754,7 +753,7 @@ app.post( '/signup', async ( req, res ) => {
     const passwordHash = await bcrypt.hash( password, 10 );
 
     // Store the user information in the database (in this case, a simple array)
-    await setPassword( { username, passwordHash } );
+    await setPassword( { username, passwordHash, next } );
 
     res.redirect( '/listunverified' );
 } );
@@ -776,7 +775,6 @@ async function authentication( req, res, next ) {
     try {
         // Retrieve hashed password from the database based on the username
         const hashedPassword = await databaseFunctions.retrieveHashedPassword( username );
-        console.log( "hashedPassword:" + hashedPassword );
 
         if ( !hashedPassword ) {
             // If the user doesn't have a password set, redirect to the signup page
