@@ -724,6 +724,7 @@ app.get( '/signup', ( req, res ) => {
 
 app.post( '/signup', async ( req, res ) => {
     const { email, username, password, confirmPassword } = req.body;
+    const userID = userFunctions.getUserIDFromUsername( username );
 
     // Check if the passwords match
     if ( password !== confirmPassword ) {
@@ -731,12 +732,12 @@ app.post( '/signup', async ( req, res ) => {
     }
 
     // Check if the user exists
-    const user = userFunctions.userExists( userFunctions.getUserIDFromUsername( username ) );
+    const user = userFunctions.userExists( userID );
     if ( !user ) {
         return res.status( 400 ).send( 'User does not exist' );
     }
 
-    const verify = userFunctions.verifyUsersEmail( userFunctions.getUserIDFromUsername( username ), databaseFunctions );
+    const verify = userFunctions.verifyUsersEmail( userID, databaseFunctions );
     if ( !verify ) {
         return res.status( 400 ).send( 'Users email does not match' );
     }
@@ -745,7 +746,7 @@ app.post( '/signup', async ( req, res ) => {
     const passwordHash = await bcrypt.hash( password, 10 );
 
     // Store the user information in the database (in this case, a simple array)
-    await setPassword( { email, username, passwordHash } );
+    await setPassword( { username, passwordHash } );
 
     res.redirect( '/listunverified' );
 } );
@@ -798,13 +799,10 @@ async function authentication( req, res, next ) {
 }
 
 async function setPassword( req, res, next ) {
-    const { username, password } = req;
+    const { username, passwordHash } = req;
     try {
-        // Hash the provided password
-        const hashedPassword = await bcrypt.hash( password, 10 );
-
         const userID = userFunctions.getUserIDFromUsername( username );
-        await userFunctions.storeUserData( userID, "password_hash", hashedPassword, databaseFunctions );
+        await userFunctions.storeUserData( userID, "password_hash", passwordHash, databaseFunctions );
 
         // Proceed to the next middleware or route
         next();
