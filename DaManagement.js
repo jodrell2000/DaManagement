@@ -38,7 +38,7 @@ const bcrypt = require( 'bcrypt' );
 
 // client authentication
 app.use( ( req, res, next ) => {
-    if ( req.originalUrl === '/signup' ) {
+    if ( req.originalUrl === '/signup' || req.originalUrl === '/instructions' ) {
         return next();
     }
     authentication( req, res, next );
@@ -733,6 +733,13 @@ app.get( '/deletesong', ( req, res ) => {
 // ########################################################################
 // General functions
 // ########################################################################
+
+app.get( '/instructions', ( req, res ) => {
+    // Render your signup page here
+    let html = pug.renderFile( './templates/instructions.pug' );
+    res.send( html );
+
+} );
 
 app.get( '/signup', ( req, res ) => {
     // Render your signup page here
