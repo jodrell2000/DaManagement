@@ -197,6 +197,14 @@ const userFunctions = ( bot ) => {
             }
         },
 
+        setEmailAddress: function ( data, args, chatFunctions, databaseFunctions ) {
+            console.group( "setEmailAddress" );
+            console.log( "data:" + JSON.stringify( data ) );
+            console.log( "args:" + args );
+            console.groupEnd();
+            // this.storeUserData( userID, "email", value, databaseFunctions )
+        },
+
         verifyUsersEmail: async function ( userID, givenEmail, databaseFunctions ) {
             try {
                 const returnedEmail = await databaseFunctions.getUsersEmailAddress( userID );
