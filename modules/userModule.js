@@ -159,7 +159,7 @@ const userFunctions = ( bot ) => {
         storeUserData: async function ( userID, key, value, databaseFunctions ) {
             if ( this.userExists( userID ) && this.getUsername( userID ) !== "Guest" ) {
                 try {
-                    const userPosition = await this.getPositionOnUsersList( userID );
+                    const userPosition = this.getPositionOnUsersList( userID );
                     theUsersList[ userPosition ][ key ] = value;
                     await databaseFunctions.storeUserData( theUsersList[ userPosition ] );
                 } catch ( error ) {
@@ -284,20 +284,20 @@ const userFunctions = ( bot ) => {
         // User Region Functions
         // ========================================================
 
-        checkUsersHaveRegions: async function ( data, chatFunctions ) {
+        checkUsersHaveRegions: function ( data, chatFunctions ) {
             let userID;
 
             for ( let userCount = 0; userCount < data.users.length; userCount++ ) {
                 if ( typeof data.users[ userCount ] !== 'undefined' ) {
                     userID = data.users[ userCount ].userid;
                     if ( this.userExists( userID ) ) {
-                        await this.askUserToSetRegion( userID, chatFunctions );
+                        this.askUserToSetRegion( userID, chatFunctions );
                     }
                 }
             }
         },
 
-        askUserToSetRegion: async function ( userID, chatFunctions ) {
+        askUserToSetRegion: function ( userID, chatFunctions ) {
             if ( !this.getUserRegion( userID ) && !this.userWantsNoRegion( userID ) ) {
                 chatFunctions.botPM( "If you'd like me to check that videos are playable in your region, please set it using the command '" + chatDefaults.commandIdentifier + "myRegion XX'. Replace XX with a valid 2 letter country code https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2 If you want to not be asked this again please user the command '" + chatDefaults.commandIdentifier + "noRegion'", userID );
             }
@@ -340,8 +340,8 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        userWantsNoRegion: async function ( userID ) {
-            return theUsersList[ await this.getPositionOnUsersList( userID ) ][ 'noregion' ];
+        userWantsNoRegion: function ( userID ) {
+            return theUsersList[ this.getPositionOnUsersList( userID ) ][ 'noregion' ];
         },
 
         storeUserRegion: function ( data, userID, region, chatFunctions, videoFunctions, databaseFunctions ) {
@@ -1868,7 +1868,7 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        getPositionOnUsersList: async function ( userID ) {
+        getPositionOnUsersList: function ( userID ) {
             return theUsersList.findIndex( ( { id } ) => id === userID )
         },
 
