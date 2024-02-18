@@ -510,6 +510,7 @@ const databaseFunctions = () => {
 
             const values = [];
 
+            console.log( selectQuery );
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
                     return result;
