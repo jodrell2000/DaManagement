@@ -2248,7 +2248,7 @@ const userFunctions = ( bot ) => {
 
         addRoboCoins: async function ( userID, numCoins, changeReason, changeID, databaseFunctions ) {
             try {
-                const coins = parseFloat( ( numCoins, 10 ).toFixed( 2 ) );
+                const coins = parseFloat( numCoins ).toFixed( 2 );
                 await this.processRoboCoins( userID, coins, changeReason, changeID, addRCOperation, databaseFunctions );
             } catch ( error ) {
                 console.error( 'Error in addRoboCoins:', error.message );
@@ -2258,7 +2258,7 @@ const userFunctions = ( bot ) => {
 
         subtractRoboCoins: async function ( userID, numCoins, changeReason, changeID, databaseFunctions ) {
             try {
-                const coins = parseFloat( ( numCoins, 10 ).toFixed( 2 ) );
+                const coins = parseFloat( numCoins ).toFixed( 2 );
                 await this.processRoboCoins( userID, coins, changeReason, changeID, subtractRCOperation, databaseFunctions );
             } catch ( error ) {
                 console.error( 'Error in subtractRoboCoins:', error.message );
