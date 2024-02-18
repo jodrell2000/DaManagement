@@ -23,6 +23,14 @@ ALTER TABLE users
 ALTER TABLE users
     ADD COLUMN email VARCHAR(255);
 
+ALTER TABLE roboCoinAudit
+    MODIFY COLUMN beforeChange DECIMAL(10, 2),
+    MODIFY COLUMN afterChange DECIMAL(10, 2),
+    MODIFY COLUMN numCoins DECIMAL(10, 2);
+
+ALTER TABLE users
+    MODIFY COLUMN RoboCoins DECIMAL(10, 2);
+
 INSERT INTO roboCoinAuditTypes (id, reason)
 VALUES (5, "Track fixing");
 
