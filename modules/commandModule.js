@@ -444,7 +444,7 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.randomthemeremove.sampleArguments = [ "The Weather" ];
 
     moderatorCommands.setemailaddress = ( { data, args, chatFunctions, userFunctions, databaseFunctions } ) => {
-        userFunctions.setEmailAddress( data, args, chatFunctions, databaseFunctions );
+        userFunctions.setEmailAddress( data, args, chatFunctions, databaseFunctions ).then();
     }
     moderatorCommands.setemailaddress.argumentCount = 2;
     moderatorCommands.setemailaddress.help = "Set a users email address for secondary authentication";

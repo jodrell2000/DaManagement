@@ -164,7 +164,7 @@ const userFunctions = ( bot ) => {
                     await databaseFunctions.storeUserData( theUsersList[ userPosition ] );
                 } catch ( error ) {
                     console.error( "Error storing user data:", error.message );
-                    // Handle the error as needed
+                    throw error;
                 }
             }
         },
@@ -197,13 +197,11 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        setEmailAddress: function ( data, args, chatFunctions, databaseFunctions ) {
-            console.group( "setEmailAddress" );
-            console.log( "args:" + args );
-            console.log( "user:" + args[ 0 ] );
-            console.log( "email:" + args[ 1 ] );
-            console.groupEnd();
-            // this.storeUserData( userID, "email", value, databaseFunctions )
+        setEmailAddress: async function ( data, args, chatFunctions, databaseFunctions ) {
+            const username = args[ 0 ];
+            const userID = this.getUserIDFromUsername( username );
+            const email = args[ 1 ];
+            await this.storeUserData( userID, "email", email, databaseFunctions );
         },
 
         verifyUsersEmail: async function ( userID, givenEmail, databaseFunctions ) {
