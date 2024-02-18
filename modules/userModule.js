@@ -2218,7 +2218,7 @@ const userFunctions = ( bot ) => {
             return new Promise( ( resolve, reject ) => {
                 if ( this.userExists( userID ) ) {
                     const position = this.getPositionOnUsersList( userID );
-                    let theCoins = parseInt( theUsersList[ position ][ 'RoboCoins' ], 10 );
+                    let theCoins = parseFloat( theUsersList[ position ][ 'RoboCoins' ] );
                     if ( isNaN( theCoins ) ) {
                         theCoins = 0;
                     }
