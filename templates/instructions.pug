@@ -29,7 +29,7 @@ html
                 li Enter and verify the password you want to use
                 li Click "Sign Up"
 
-            h2 Work time!!!
+            h2 What is all this?!?
             p Browse to http://141.147.86.68:8585/listunverified and log in if necessary. You'll see a list of YouTube videos that have either the artist or track name unverified
 
             p There are 6 columns containing the info
@@ -41,4 +41,56 @@ html
                 li "Track Display Name": This is either the corrected Track name and a Reset button that will remove that fix, or a text box containing the youTube value that you can edit and click "Update Track Name" to send the change to the DB
                 li "Search Link": This is a link that will open a Google search for the artist and track name...again, useful if the tags are really bad, or you want to verify the spelling etc
 
-            p
+            p Above the columns there are a number of ways to refine the searches. I've found you can do things faster if you try and fix tracks by a particular band for instance.
+
+            p There are 3 search you can perform. Each search allows you to order the results by either when they  were played (By Recent), by Artist name or by track name. You can do that by clicking one of the radio buttons
+
+            p The first search "Get unverified tracks" is the default one and only returns tracks where either the Artist or Track name hasn't been verified
+
+            p The next two searches allow you to find and filter by either the Artist name or Track name. Both of these are searching on both the youTube tag, and the corrected version
+
+            h2 Work time...what do I actually do?
+
+            p Currently the first line of my list has a corrected tag "'Til Tuesday" for the artist, and a youTube track name of "Winning The War - 3/26/1986 - Ritz". That track name is displayed in both the youTube Track Name column, showing that it's the original tag, and also in the text box in the Track Display Name column
+
+            p I'm not familier with that track so I click the search link and find a number of other tracks also with the partial name "3/26/1986 - Ritz", as well as a track called "Winning the War"
+
+            p I'll edit the contents of the text box down to just Winning the War and click "Update Track Name". When I click that the page will refresh, and in this case that line will disappear because both the Artist and Track names are now verified
+
+            p I wonder what other tracks 'Til Tuuesday have in the DB, and if they need fixing. Enter "tuesday" in text box next to the "Search by Artist" button and click it. You'll now see any tracks by any artist that has a partial match for the word Tuesday and all of their data
+
+            p you can more quickly do this kind of search by clicking either the Artist or Track names in the youTube column names. Click and search around and find whatever needs fixing!
+
+            h2 Examples
+            p The following are all youTube tags for an Artist that should correctly be set to Motörhead
+            ul
+                li Motörhead
+                li MOTÖRHEAD
+                li Motörhead Official
+
+            p The following are all youTube tags for a Track that should correctly be set to Whole Lotta Rosie
+            ul
+                li Whole Lotta Rosie
+                li Whole Lotta Rosie (Official Audio)
+                li Whole Lotta Rosie (Official Video)
+                li AC/DC Whole Lotta Rosie (Bon Scott) Live 1977
+                li Whole Lotta Rosie (live)
+            p Things can get trickier with track names, especially where remixes come in. Remember what we're trying to do here is be able to group plays together so that the stats add up and we can tell how popular things are.
+            p All of the following should be considered to be the same Track name
+            ul
+                li Track name (Alon Cohen Remix)
+                li Track name Live
+                li Track name (Synthwave Remix)
+                li Track name (12" Extended Remix) 1988
+                li Track name remix by Astrophysics
+                li Track name Remix - Robot Dance Vs. Break Dance
+                li Track name (Music Video) HD
+                li Track name - 7" 1986
+                li Track name - Artist Name
+                li "Track name"
+                li Track name (live video)
+
+            h2 OK, but what about covers?
+            p The artist should be set to the artist performing the track, and the track name should be correct, without and extra "cover of" etc etc
+            p eg. we have Chris Cornell as an artist, and "Nothing Compares 2 U" (Prince Cover) [Live @ SiriusXM] | Lithium as a track name
+            p The artist name should remain as Chris Cornell, and the Track name should be changed to "Nothing Compares 2 U"
