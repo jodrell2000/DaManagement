@@ -2286,7 +2286,9 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        updateRoboCoins: function ( userID, coins, databaseFunctions ) {
+        updateRoboCoins: async function ( userID, coins, databaseFunctions ) {
+            console.group( "updateRoboCoins" );
+            console.log( "coins:" + coins );
             return new Promise( ( resolve, reject ) => {
                 try {
                     this.storeUserData( userID, "RoboCoins", coins, databaseFunctions );
