@@ -2267,19 +2267,11 @@ const userFunctions = ( bot ) => {
         },
 
         processRoboCoins: async function ( userID, numCoins, changeReason, changeID, operation, databaseFunctions ) {
-            console.group( "processRoboCoins" );
-            console.log( "numCoins:" + numCoins );
             try {
                 const before = await this.getRoboCoins( userID );
-                console.log( "before:" + before );
-                console.log( "type of before:" + typeof before );
                 const updatedCoins = await operation( before, numCoins );
-                console.log( "updatedCoins:" + updatedCoins );
-                console.log( "type of updatedCoins:" + typeof updatedCoins );
                 await this.updateRoboCoins( userID, updatedCoins, databaseFunctions );
                 const after = await this.getRoboCoins( userID );
-                console.log( "after:" + after );
-                console.log( "type of after:" + typeof after );
 
                 // Pass positive or negative numCoins to auditRoboCoin based on the type of operation
                 await this.auditRoboCoin( userID, before, after, operation === addRCOperation ? numCoins : -numCoins, changeReason, changeID, databaseFunctions );
@@ -2287,13 +2279,9 @@ const userFunctions = ( bot ) => {
                 console.error( `Error in ${ operation.name }:`, error.message );
                 throw error;
             }
-            console.groupEnd();
         },
 
         updateRoboCoins: async function ( userID, coins, databaseFunctions ) {
-            console.group( "updateRoboCoins" );
-            console.log( "coins:" + coins );
-            console.groupEnd();
             try {
                 await this.storeUserData( userID, "RoboCoins", coins, databaseFunctions );
                 return; // Resolve the promise without value (implicit)
@@ -2307,8 +2295,6 @@ const userFunctions = ( bot ) => {
                 await databaseFunctions.saveRoboCoinAudit( userID, before, after, numCoins, changeReason, changeID );
             } catch ( error ) {
                 console.error( 'Query failed:', error );
-            } finally {
-                console.groupEnd();
             }
         },
 
