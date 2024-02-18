@@ -737,11 +737,18 @@ app.post( '/signup', async ( req, res ) => {
         return res.status( 400 ).send( 'User does not exist' );
     }
 
-    const verify = userFunctions.verifyUsersEmail( userID, databaseFunctions );
-    console.log( "verify:" + verify );
-    if ( !verify ) {
-        return res.status( 400 ).send( 'Users email does not match' );
-    }
+    userFunctions.verifyUsersEmail( userID, databaseFunctions )
+        .then( verify => {
+            console.log( "verify:" + verify );
+            if ( !verify ) {
+                return res.status( 400 ).send( 'User\'s email does not match' );
+            }
+            // Handle other cases where the email is verified
+        } )
+        .catch( error => {
+            console.error( 'Error verifying user email:', error );
+            return res.status( 500 ).send( 'Internal server error' );
+        } );
 
     // Hash the password before storing it in the database
     const passwordHash = await bcrypt.hash( password, 10 );
