@@ -471,7 +471,7 @@ const databaseFunctions = () => {
 
             switch ( args.sort ) {
                 case 'time':
-                    orderByClause = 'GROUP BY tp.videoData_id ORDER BY tp.whenPlayed DESC';
+                    orderByClause = 'ORDER BY tp.whenPlayed DESC';
                     break;
                 case 'artist':
                     orderByClause = 'GROUP BY tp.videoData_id ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC';
