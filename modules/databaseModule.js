@@ -468,11 +468,6 @@ const databaseFunctions = () => {
         },
 
         getUnverifiedSongList( args ) {
-            console.group( "getUnverifiedSongList" );
-            console.log( "args:", JSON.stringify( args ) );
-            console.log( "sort:", args.sort );
-            console.log( "where:", args.where );
-            console.log( "searchTerm:", args.searchTerm );
             let orderByClause = '';
             let whereClause = '';
 
@@ -481,10 +476,10 @@ const databaseFunctions = () => {
                     orderByClause = 'ORDER BY tp.whenPlayed DESC';
                     break;
                 case 'artist':
-                    orderByClause = 'GROUP BY v.id, COALESCE(v.artistDisplayName, v.artistName), COALESCE(v.trackDisplayName, v.trackName) ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC';
+                    orderByClause = 'GROUP BY v.id, COALESCE(v.artistDisplayName, v.artistName), COALESCE(v.trackDisplayName, v.trackName), tp.length ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC';
                     break;
                 case 'track':
-                    orderByClause = 'GROUP BY v.id, COALESCE(v.trackDisplayName, v.trackName), COALESCE(v.artistDisplayName, v.artistName) ORDER BY COALESCE(v.trackDisplayName, v.trackName) ASC, COALESCE(v.artistDisplayName, v.artistName) ASC';
+                    orderByClause = 'GROUP BY v.id, COALESCE(v.trackDisplayName, v.trackName), COALESCE(v.artistDisplayName, v.artistName), tp.length ORDER BY COALESCE(v.trackDisplayName, v.trackName) ASC, COALESCE(v.artistDisplayName, v.artistName) ASC';
                     break;
                 default:
                     orderByClause = 'GROUP BY v.id, COALESCE(v.artistDisplayName, v.artistName), COALESCE(v.trackDisplayName, v.trackName), tp.length ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC';
@@ -515,8 +510,6 @@ const databaseFunctions = () => {
                 LIMIT 50`;
 
             const values = [];
-            console.log( "selectQuery:", selectQuery );
-            console.groupEnd();
 
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
