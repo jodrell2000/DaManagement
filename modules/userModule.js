@@ -2284,11 +2284,13 @@ const userFunctions = ( bot ) => {
                 console.error( `Error in ${ operation.name }:`, error.message );
                 throw error;
             }
+            console.groupEnd();
         },
 
         updateRoboCoins: async function ( userID, coins, databaseFunctions ) {
             console.group( "updateRoboCoins" );
             console.log( "coins:" + coins );
+            console.groupEnd();
             return new Promise( ( resolve, reject ) => {
                 try {
                     this.storeUserData( userID, "RoboCoins", coins, databaseFunctions );
