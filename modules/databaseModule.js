@@ -471,16 +471,16 @@ const databaseFunctions = () => {
 
             switch ( args.sort ) {
                 case 'time':
-                    orderByClause = 'GROUP BY tp.videoData_id, tp.whenPlayed ORDER BY tp.whenPlayed DESC';
+                    orderByClause = 'GROUP BY tp.videoData_id ORDER BY tp.whenPlayed DESC';
                     break;
                 case 'artist':
-                    orderByClause = 'GROUP BY tp.videoData_id, tp.whenPlayed ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC';
+                    orderByClause = 'GROUP BY tp.videoData_id ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC';
                     break;
                 case 'track':
-                    orderByClause = 'GROUP BY tp.videoData_id, tp.whenPlayed ORDER BY COALESCE(v.trackDisplayName, v.trackName) ASC, COALESCE(v.artistDisplayName, v.artistName) ASC';
+                    orderByClause = 'GROUP BY tp.videoData_id ORDER BY COALESCE(v.trackDisplayName, v.trackName) ASC, COALESCE(v.artistDisplayName, v.artistName) ASC';
                     break;
                 default:
-                    orderByClause = 'GROUP BY tp.videoData_id, tp.whenPlayed ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC';
+                    orderByClause = 'GROUP BY tp.videoData_id ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC';
             }
 
             switch ( args.where ) {
@@ -500,8 +500,7 @@ const databaseFunctions = () => {
                                 v.artistDisplayName,
                                 v.trackName,
                                 v.trackDisplayName,
-                                ROUND(AVG(tp.length)) AS "length",
-                                tp.whenPlayed
+                                max(tp.whenPlayed)
                 FROM tracksPlayed tp
                          JOIN videoData v ON v.id = tp.videoData_id
                 WHERE ${ whereClause }

@@ -86,7 +86,6 @@ html(lang="en")
                 td Artist Display Name
                 th Track Name
                 th Track Display Name
-                th Length
                 th Search Link
         tbody
         each song in songList
@@ -132,6 +131,5 @@ html(lang="en")
                         input(type='hidden' name='searchTerm' value=searchTerm)
                         input(type='hidden' name='videoData_id' value=song.videoData_id)
                         button(type='submit') Update Track Name
-            td= song.length
             td
                 a(href=`https://www.google.com/search?q=${ encodeURIComponent( song.artistName ) }%20${ encodeURIComponent( song.trackName ) }`, target="_blank") Search
