@@ -82,9 +82,9 @@ html(lang="en")
         thead
             tr
                 th youTube Link
-                th Artist Name
+                th YouTube Artist Name
                 td Artist Display Name
-                th Track Name
+                th YouTube Track Name
                 th Track Display Name
                 th Search Link
         tbody
@@ -92,7 +92,8 @@ html(lang="en")
             tr
             td
                 a(href=`https://www.youtube.com/watch?v=${ encodeURIComponent( song.videoData_id ) }`, target="_blank") #{song.videoData_id}
-            td= song.artistName
+            td
+                a(href=`http://141.147.86.68:8585/listunverified?sort=artist&where=artist&searchTerm=${ encodeURIComponent( song.artistName ) }`, target="_blank") #{song.artistName}
             td
                 if song.artistDisplayName
                     | #{song.artistDisplayName}
@@ -112,7 +113,8 @@ html(lang="en")
                         input(type='hidden' name='videoData_id' value=song.videoData_id)
                         button(type='submit') Update Artist
 
-            td= song.trackName
+            td
+                a(href=`http://141.147.86.68:8585/listunverified?sort=track&where=track&searchTerm=${ encodeURIComponent( song.trackName ) }`, target="_blank") #{song.trackName}
             td
                 if song.trackDisplayName
                     | #{song.trackDisplayName}
