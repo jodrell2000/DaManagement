@@ -500,7 +500,8 @@ const databaseFunctions = () => {
                                 v.artistDisplayName,
                                 v.trackName,
                                 v.trackDisplayName,
-                                ROUND(AVG(tp.length))
+                                ROUND(AVG(tp.length)),
+                                tp.whenPlayed
                 FROM tracksPlayed tp
                          JOIN videoData v ON v.id = tp.videoData_id
                 WHERE ${ whereClause }
