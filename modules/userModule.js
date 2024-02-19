@@ -198,6 +198,8 @@ const userFunctions = ( bot ) => {
         },
 
         setEmailAddress: async function ( data, args, chatFunctions, databaseFunctions ) {
+            console.group( "setEmailAddress:" );
+            console.log( "args:" + JSON.stringify( args ) );
             try {
                 const username = args[ 0 ];
                 const userID = this.getUserIDFromUsername( username );
@@ -209,6 +211,7 @@ const userFunctions = ( bot ) => {
                 console.error( 'Error setting email address:', error );
                 throw error;
             }
+            console.groupEnd();
         },
         verifyUsersEmail: async function ( userID, givenEmail, databaseFunctions ) {
             try {
