@@ -38,7 +38,7 @@ dayjs.extend( utc )
 const bcrypt = require( 'bcrypt' );
 
 // Use Morgan middleware for logging
-app.use( morgan( 'dev' ) );
+// app.use( morgan( 'dev' ) );
 
 // serve static files from teh images folder
 app.use( '/images', express.static( path.join( __dirname, 'images' ) ) );
