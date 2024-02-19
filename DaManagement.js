@@ -793,7 +793,9 @@ async function authentication( req, res, next ) {
     if ( !authHeader ) {
         const err = new Error( 'You are not authenticated!' );
         res.setHeader( 'WWW-Authenticate', 'Basic' );
+        res.statusCode = 401;
         res.status( 401 ).send( err );
+        res.end( 'You are not authenticated!' );
         return;
     }
 
