@@ -40,7 +40,7 @@ app.use( express.static( 'images' ) );
 
 // client authentication
 app.use( ( req, res, next ) => {
-    if ( req.originalUrl === '/signup' || req.originalUrl === '/instructions' ) {
+    if ( req.originalUrl === '/signup' || req.originalUrl === '/instructions' || req.originalUrl === '/images' ) {
         return next();
     }
     authentication( req, res, next );
