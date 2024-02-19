@@ -37,8 +37,8 @@ dayjs.extend( utc )
 const bcrypt = require( 'bcrypt' );
 
 // Use Morgan middleware for logging
-const morgan = require( 'morgan' );
-app.use( morgan( 'dev' ) );
+// const morgan = require( 'morgan' );
+// app.use( morgan( 'dev' ) );
 
 // serve static files from teh images folder
 app.use( '/images', express.static( path.join( __dirname, 'images' ) ) );
@@ -752,10 +752,7 @@ app.get( '/signup', ( req, res ) => {
 } );
 
 app.post( '/signup', async ( req, res, next ) => {
-    console.group( "signup" );
     const { email, username, password, confirmPassword } = req.body;
-    console.log( "email:" + email );
-    console.log( "username:" + username );
     const userID = userFunctions.getUserIDFromUsername( username );
 
     // Check if the passwords match
@@ -788,7 +785,6 @@ app.post( '/signup', async ( req, res, next ) => {
     await setPassword( { username, passwordHash, next } );
 
     res.redirect( '/listunverified' );
-    console.groupEnd();
 } );
 
 async function authentication( req, res, next ) {
