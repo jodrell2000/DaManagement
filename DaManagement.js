@@ -28,6 +28,7 @@ let dateModule = require( './modules/dateModule.js' );
 
 const express = require( 'express' );
 const morgan = require( 'morgan' );
+const path = require( 'path' );
 const app = express();
 const pug = require( 'pug' );
 const bodyParser = require( 'body-parser' );
@@ -40,7 +41,7 @@ const bcrypt = require( 'bcrypt' );
 app.use( morgan( 'dev' ) );
 
 // serve static files from teh images folder
-app.use( express.static( 'images' ) );
+app.use( '/images', express.static( path.join( __dirname, 'images' ) ) );
 
 // client authentication
 app.use( ( req, res, next ) => {
