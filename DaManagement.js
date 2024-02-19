@@ -35,6 +35,8 @@ const utc = require( 'dayjs/plugin/utc' );
 dayjs.extend( utc )
 const bcrypt = require( 'bcrypt' );
 
+// serve static files from teh images folder
+app.use( express.static( 'images' ) );
 
 // client authentication
 app.use( ( req, res, next ) => {
