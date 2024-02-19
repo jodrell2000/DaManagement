@@ -468,6 +468,7 @@ const databaseFunctions = () => {
         getUnverifiedSongList( args ) {
             let orderByClause = '';
             let whereClause = '';
+            const values = [];
 
             switch ( args.sort ) {
                 case 'time':
@@ -485,13 +486,15 @@ const databaseFunctions = () => {
 
             switch ( args.where ) {
                 case 'track':
-                    whereClause = "v.trackName LIKE '%" + args.searchTerm + "%' OR v.trackDisplayName LIKE '%" + args.searchTerm + "%'";
+                    whereClause = 'v.trackName LIKE ? OR v.trackDisplayName LIKE ?';
+                    values.push( `%${ args.searchTerm }%`, `%${ args.searchTerm }%` );
                     break;
                 case 'artist':
-                    whereClause = "v.artistName LIKE '%" + args.searchTerm + "%' OR v.artistDisplayName LIKE '%" + args.searchTerm + "%'";
+                    whereClause = 'v.artistName LIKE ? OR v.artistDisplayName LIKE ?';
+                    values.push( `%${ args.searchTerm }%`, `%${ args.searchTerm }%` );
                     break;
                 default:
-                    whereClause = "v.artistDisplayName IS NULL OR v.trackDisplayName IS NULL";
+                    whereClause = 'v.artistDisplayName IS NULL OR v.trackDisplayName IS NULL';
             }
 
             const selectQuery = `
@@ -506,8 +509,6 @@ const databaseFunctions = () => {
                 WHERE ${ whereClause }
                           ${ orderByClause }
                 LIMIT 50`;
-
-            const values = [];
 
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
