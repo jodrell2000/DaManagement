@@ -201,9 +201,11 @@ const userFunctions = ( bot ) => {
             console.group( "setEmailAddress:" );
             console.log( "args:" + JSON.stringify( args ) );
             try {
-                const username = args[ 0 ];
+                const username = args.slice( 0, args.length - 1 ).join( " " );
+                console.log( "username:" + username );
                 const userID = this.getUserIDFromUsername( username );
-                const email = args[ 1 ];
+                const email = args[ args.length - 1 ];
+                console.log( "email:" + email );
 
                 await this.storeUserData( userID, "email", email, databaseFunctions );
                 chatFunctions.botSpeak( 'Email address for ' + username + ' set to ' + email, data );
@@ -213,6 +215,7 @@ const userFunctions = ( bot ) => {
             }
             console.groupEnd();
         },
+
         verifyUsersEmail: async function ( userID, givenEmail, databaseFunctions ) {
             try {
                 const returnedEmail = await databaseFunctions.getUsersEmailAddress( userID );
