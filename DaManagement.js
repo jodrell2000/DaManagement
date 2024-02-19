@@ -27,7 +27,6 @@ let dateModule = require( './modules/dateModule.js' );
 // let mlModule = require( './modules/mlModule.js' );
 
 const express = require( 'express' );
-const morgan = require( 'morgan' );
 const path = require( 'path' );
 const app = express();
 const pug = require( 'pug' );
@@ -38,6 +37,7 @@ dayjs.extend( utc )
 const bcrypt = require( 'bcrypt' );
 
 // Use Morgan middleware for logging
+// const morgan = require( 'morgan' );
 // app.use( morgan( 'dev' ) );
 
 // serve static files from teh images folder
@@ -50,8 +50,6 @@ app.use( ( req, res, next ) => {
     }
     authentication( req, res, next );
 } );
-
-app.use( express.json() );
 
 app.use( `/scripts`, express.static( './scripts' ) );
 app.use( `/modules`, express.static( './node_modules' ) );
@@ -742,14 +740,12 @@ app.get( '/deletesong', ( req, res ) => {
 // ########################################################################
 
 app.get( '/instructions', ( req, res ) => {
-    // Render your signup page here
     let html = pug.renderFile( './templates/instructions.pug' );
     res.send( html );
 
 } );
 
 app.get( '/signup', ( req, res ) => {
-    // Render your signup page here
     let html = pug.renderFile( './templates/signup.pug' );
     res.send( html );
 
