@@ -26,7 +26,8 @@ let databaseModule = require( './modules/databaseModule.js' );
 let dateModule = require( './modules/dateModule.js' );
 // let mlModule = require( './modules/mlModule.js' );
 
-const express = require( 'express' )
+const express = require( 'express' );
+const morgan = require( 'morgan' );
 const app = express();
 const pug = require( 'pug' );
 const bodyParser = require( 'body-parser' );
@@ -34,6 +35,9 @@ const dayjs = require( 'dayjs' );
 const utc = require( 'dayjs/plugin/utc' );
 dayjs.extend( utc )
 const bcrypt = require( 'bcrypt' );
+
+// Use Morgan middleware for logging
+app.use( morgan( 'dev' ) );
 
 // serve static files from teh images folder
 app.use( express.static( 'images' ) );
