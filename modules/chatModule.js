@@ -302,7 +302,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
                 console.log( "trackName:" + trackName );
 
                 if ( botFunctions.readSongStats() ) {
-                    this.botSpeak( 'Stats for...\nArtist:' + artistName + '\nTitle: ' + trackName +
+                    this.botSpeak( 'Artist: ' + artistName + '\nTitle: ' + trackName +
                         '\n:thumbsup:' + songFunctions.previousUpVotes() +
                         ':thumbsdown:' + songFunctions.previousDownVotes() +
                         ':heart:' + songFunctions.previousSnags(), data );
