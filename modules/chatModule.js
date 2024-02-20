@@ -291,13 +291,13 @@ const chatFunctions = ( bot, roomDefaults ) => {
             try {
                 let artistName = await songFunctions.getArtistName( youtube_id, databaseFunctions );
                 if ( !artistName ) {
-                    artistName = songFunctions.artist();
+                    artistName = songFunctions.previousArtist();
                 }
                 console.log( "artistName:" + artistName );
 
                 let trackName = await songFunctions.getTrackName( youtube_id, databaseFunctions );
                 if ( !trackName ) {
-                    trackName = songFunctions.song();
+                    trackName = songFunctions.previousTrack();
                 }
                 console.log( "trackName:" + trackName );
 
