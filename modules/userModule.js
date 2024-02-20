@@ -2300,13 +2300,10 @@ const userFunctions = ( bot ) => {
         },
 
         validateNumCoins: async function ( numCoins, sendingUserID, chatFunctions, data ) {
-            console.group( "validateNumCoins" );
-            console.log( "numCoins:" + numCoins );
             if ( numCoins === undefined || isNaN( numCoins ) ) {
                 chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + ' you must give a number of coins to send, e.g. giverc 10 username', data );
                 throw new Error( 'Invalid number of coins' );
             }
-            console.groupEnd();
             return true;
         },
 
@@ -2359,9 +2356,6 @@ const userFunctions = ( bot ) => {
             const numCoins = parseFloat( args.pop() );
             const username = args.join( " " );
             const receivingUserID = this.getUserIDFromUsername( username );
-            console.log( "args:" + JSON.stringify( args ) );
-            console.log( "numcoins:" + numCoins );
-            console.log( "username:" + username );
 
             try {
                 await this.validateNumCoins( numCoins, sendingUserID, chatFunctions, data );
