@@ -283,12 +283,13 @@ const chatFunctions = ( bot, roomDefaults ) => {
             console.groupEnd();
         },
 
-        readSongStats: function ( data, songFunctions, botFunctions ) {
+        readSongStats: function ( data, songFunctions, botFunctions, databaseFunctions ) {
+            console.log( "ytif:" + data.room.metadata.current_song.metadata.ytid );
+            const youtube_id = data.room.metadata.current_song.metadata.ytid;
+            const artistName = songFunctions.getArtistName( youtube_id, databaseFunctions );
+            const trackName = songFunctions.getTrackName( youtube_id, databaseFunctions );
             if ( botFunctions.readSongStats() ) {
-                const readInOrder = async () => {
-                    this.botSpeak( 'Stats for ' + songFunctions.song() + ' by ' + songFunctions.artist() + '\n:thumbsup:' + songFunctions.previousUpVotes() + ':thumbsdown:' + songFunctions.previousDownVotes() + ':heart:' + songFunctions.previousSnags(), data );
-                }
-                readInOrder();
+                this.botSpeak( 'Stats for ' + trackName + ' by ' + artistName + '\n:thumbsup:' + songFunctions.previousUpVotes() + ':thumbsdown:' + songFunctions.previousDownVotes() + ':heart:' + songFunctions.previousSnags(), data );
             }
         },
 
@@ -311,8 +312,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
                 if ( roomDefaults.eventMessageThroughPm === false ) //if set to send messages through chatbox, do so
                 {
                     bot.speak( roomDefaults.eventMessages[ botFunctions.messageCounter ] + "" );
-                }
-                else //else send message through pm
+                } else //else send message through pm
                 {
                     for ( let jio = 0; jio < userFunctions.userIDs.length; jio++ ) {
                         bot.pm( roomDefaults.eventMessages[ botFunctions.messageCounter ] + "", userFunctions.userIDs[ jio ] );

@@ -455,9 +455,29 @@ const databaseFunctions = () => {
                 } );
         },
 
+        getVerifiedArtistsFromID( youtube_id ) {
+            const selectQuery = "SELECT artistDisplayName FROM videoData WHERE id = ?;";
+            const values = [ youtube_id ];
+
+            return this.runQuery( selectQuery, values )
+                .then( ( result ) => {
+                    return result;
+                } );
+        },
+
         getVerifiedTracksFromName( theSong ) {
             const selectQuery = "SELECT trackDisplayName FROM videoData WHERE trackName = ?;";
             const values = [ theSong ];
+
+            return this.runQuery( selectQuery, values )
+                .then( ( result ) => {
+                    return result;
+                } );
+        },
+
+        getVerifiedTracksFromID( youtube_id ) {
+            const selectQuery = "SELECT trackDisplayName FROM videoData WHERE id = ?;";
+            const values = [ youtube_id ];
 
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {

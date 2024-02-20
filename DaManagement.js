@@ -526,7 +526,7 @@ bot.on( 'endsong', function ( data ) {
     roomFunctions.setLastDJ( djID );
 
     //bot says song stats for each song
-    chatFunctions.readSongStats( data, songFunctions, botFunctions );
+    chatFunctions.readSongStats( data, songFunctions, botFunctions, databaseFunctions );
 
     userFunctions.incrementDJPlayCount( djID, databaseFunctions );
 
