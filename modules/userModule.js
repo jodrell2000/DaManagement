@@ -2354,7 +2354,7 @@ const userFunctions = ( bot ) => {
         giveRoboCoinCommand: async function ( data, args, chatFunctions, databaseFunctions ) {
             const sendingUserID = this.whoSentTheCommand( data );
             const receivingUserID = this.getUserIDFromUsername( this.returnUsernameFromMessageAfterArguments( data.text ) );
-            const numCoins = parseInt( args[ 0 ], 10 );
+            const numCoins = parseFloat( args[ 0 ] );
 
             try {
                 await this.validateNumCoins( numCoins, sendingUserID, chatFunctions, data );
