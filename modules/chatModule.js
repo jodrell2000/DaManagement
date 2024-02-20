@@ -302,7 +302,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
                 console.log( "trackName:" + trackName );
 
                 if ( botFunctions.readSongStats() ) {
-                    this.botSpeak( 'Stats for ' + trackName + ' by ' + artistName +
+                    this.botSpeak( 'Stats for...\nArtist:' + artistName + '\nTitle: ' + trackName +
                         '\n:thumbsup:' + songFunctions.previousUpVotes() +
                         ':thumbsdown:' + songFunctions.previousDownVotes() +
                         ':heart:' + songFunctions.previousSnags(), data );
@@ -312,7 +312,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
             }
             console.groupEnd();
         },
-        
+
         readPlaylistStats: function ( data ) {
             if ( botDefaults.botPlaylist !== null ) {
                 this.botSpeak( 'There are currently ' + botDefaults.botPlaylist.length + ' songs in my playlist.', data );
