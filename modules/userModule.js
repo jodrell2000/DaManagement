@@ -2300,10 +2300,13 @@ const userFunctions = ( bot ) => {
         },
 
         validateNumCoins: async function ( numCoins, sendingUserID, chatFunctions, data ) {
+            console.group( "validateNumCoins" );
+            console.log( "numCoins:" + numCoins );
             if ( numCoins === undefined || isNaN( numCoins ) ) {
                 chatFunctions.botSpeak( '@' + this.getUsername( sendingUserID ) + ' you must give a number of coins to send, e.g. giverc 10 username', data );
                 throw new Error( 'Invalid number of coins' );
             }
+            console.groupEnd();
             return true;
         },
 
