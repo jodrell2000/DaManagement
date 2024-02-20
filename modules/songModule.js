@@ -145,13 +145,22 @@ const songFunctions = ( bot ) => {
         // ========================================================
 
         getArtistName: async function ( youtube_id, databaseFunctions ) {
-            const verifiedName = databaseFunctions.getVerifiedArtistFromID( youtube_id );
-            console.log( "artist name:" + verifiedName );
+            await databaseFunctions.getVerifiedArtistFromID( youtube_id )
+                .then( ( array ) => {
+                    const verifiedName = array[ 0 ].artistDisplayName;
+                    console.log( "artist name:" + verifiedName );
+                    return verifiedName;
+                } );
+
         },
 
         getTrackName: async function ( youtube_id, databaseFunctions ) {
-            const verifiedName = databaseFunctions.getVerifiedTrackFromID( youtube_id );
-            console.log( "track name:" + verifiedName );
+            await databaseFunctions.getVerifiedTrackFromID( youtube_id )
+                .then( ( array ) => {
+                    const verifiedName = array[ 0 ].trackDisplayName;
+                    console.log( "artist name:" + verifiedName );
+                    return verifiedName;
+                } );
         },
 
         // ========================================================
