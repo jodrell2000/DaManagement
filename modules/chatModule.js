@@ -288,7 +288,9 @@ const chatFunctions = ( bot, roomDefaults ) => {
             console.log( "ytid:" + data.room.metadata.current_song.metadata.ytid );
             const youtube_id = data.room.metadata.current_song.metadata.ytid;
             const artistName = await songFunctions.getArtistName( youtube_id, databaseFunctions );
+            console.log( "artistName:" + artistName );
             const trackName = await songFunctions.getTrackName( youtube_id, databaseFunctions );
+            console.log( "artistName:" + artistName );
             if ( botFunctions.readSongStats() ) {
                 this.botSpeak( 'Stats for ' + trackName + ' by ' + artistName + '\n:thumbsup:' + songFunctions.previousUpVotes() + ':thumbsdown:' + songFunctions.previousDownVotes() + ':heart:' + songFunctions.previousSnags(), data );
             }
