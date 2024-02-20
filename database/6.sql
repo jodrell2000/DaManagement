@@ -100,3 +100,10 @@ FROM tracksPlayed tp
 WHERE v.artistDisplayName IS NULL OR v.trackDisplayName IS NULL
 GROUP BY tp.videoData_id ORDER BY tp.whenPlayed DESC
 LIMIT 50
+
+
+SELECT u.username, u.RoboCoins, count(*) 
+    FROM roboCoinAudit ra
+    JOIN users u ON u.id=ra.users_id
+    WHERE ra.auditType_id=5 
+    GROUP BY ra.users_id;

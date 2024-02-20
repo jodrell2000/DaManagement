@@ -774,20 +774,27 @@ app.post( '/signup', async ( req, res, next ) => {
             if ( !verify ) {
                 return res.status( 400 ).send( 'User\'s email does not match' );
             }
-            // Handle other cases where the email is verified
+            bcrypt.hash( password, 10 )
+                .then( passwordHash => {
+                    setPassword( { req, res, next, username, passwordHash } )
+                        .then( () => {
+                            // Redirect after successful password setting
+                            res.redirect( '/listunverified' );
+                        } )
+                        .catch( error => {
+                            console.error( 'Error setting password:', error );
+                            return res.status( 500 ).send( 'Internal server error' );
+                        } );
+                } )
+                .catch( error => {
+                    console.error( 'Error hashing password:', error );
+                    return res.status( 500 ).send( 'Internal server error' );
+                } );
         } )
         .catch( error => {
             console.error( 'Error verifying user email:', error );
             return res.status( 500 ).send( 'Internal server error' );
         } );
-
-    // Hash the password before storing it in the database
-    const passwordHash = await bcrypt.hash( password, 10 );
-
-    // Store the user information in the database (in this case, a simple array)
-    await setPassword( { username, passwordHash, next } );
-
-    res.redirect( '/listunverified' );
     console.groupEnd();
 } );
 
@@ -838,8 +845,7 @@ async function authentication( req, res, next ) {
     }
 }
 
-async function setPassword( req, res, next ) {
-    const { username, passwordHash } = req;
+async function setPassword( { req, res, next, username, passwordHash } ) {
     try {
         const userID = userFunctions.getUserIDFromUsername( username );
         await userFunctions.storeUserData( userID, "password_hash", passwordHash, databaseFunctions );
@@ -848,9 +854,7 @@ async function setPassword( req, res, next ) {
         return next();
     } catch ( error ) {
         console.error( 'Error setting password:', error );
-        const err = new Error( 'Internal server error' );
-        err.status = 500;
-        return next( err );
+        throw new Error( 'Internal server error' );
     }
 }
 
