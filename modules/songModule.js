@@ -145,15 +145,35 @@ const songFunctions = ( bot ) => {
         // ========================================================
 
         getArtistName: async function ( youtube_id, databaseFunctions ) {
-            const array = await databaseFunctions.getVerifiedArtistFromID( youtube_id );
-            console.log( "artist name:", array[ 0 ].artistDisplayName );
-            return array[ 0 ].artistDisplayName || this.artist();
+            try {
+                const array = await databaseFunctions.getVerifiedArtistFromID( youtube_id );
+                if ( array && array.length > 0 ) {
+                    console.log( "artist name:", array[ 0 ].artistDisplayName );
+                    return array[ 0 ].artistDisplayName || this.artist();
+                } else {
+                    console.log( "No artist found for YouTube ID:", youtube_id );
+                    return this.artist();
+                }
+            } catch ( error ) {
+                console.error( "Error retrieving artist name:", error );
+                return this.artist();
+            }
         },
 
         getTrackName: async function ( youtube_id, databaseFunctions ) {
-            const array = await databaseFunctions.getVerifiedTrackFromID( youtube_id );
-            console.log( "track name:", array[ 0 ].trackDisplayName );
-            return array[ 0 ].trackDisplayName || this.artist();
+            try {
+                const array = await databaseFunctions.getVerifiedTrackFromID( youtube_id );
+                if ( array && array.length > 0 ) {
+                    console.log( "artist name:", array[ 0 ].artistDisplayName );
+                    return array[ 0 ].artistDisplayName || this.song();
+                } else {
+                    console.log( "No track found for YouTube ID:", youtube_id );
+                    return this.artist();
+                }
+            } catch ( error ) {
+                console.error( "Error retrieving song name:", error );
+                return this.artist();
+            }
         },
 
         // ========================================================
