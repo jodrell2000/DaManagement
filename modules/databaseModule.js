@@ -455,7 +455,7 @@ const databaseFunctions = () => {
                 } );
         },
 
-        getVerifiedArtistsFromID( youtube_id ) {
+        getVerifiedArtistFromID( youtube_id ) {
             const selectQuery = "SELECT artistDisplayName FROM videoData WHERE id = ?;";
             const values = [ youtube_id ];
 
@@ -475,7 +475,7 @@ const databaseFunctions = () => {
                 } );
         },
 
-        getVerifiedTracksFromID( youtube_id ) {
+        getVerifiedTrackFromID( youtube_id ) {
             const selectQuery = "SELECT trackDisplayName FROM videoData WHERE id = ?;";
             const values = [ youtube_id ];
 
