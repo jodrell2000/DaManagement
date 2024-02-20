@@ -280,12 +280,9 @@ const chatFunctions = ( bot, roomDefaults ) => {
                     }, 2 * 1000 ); // seconds * 1000 to convert to milliseconds
                 }
             }
-            console.groupEnd();
         },
 
         readSongStats: async function ( data, songFunctions, botFunctions, databaseFunctions ) {
-            console.group( "readSongStats" );
-            console.log( "ytid:" + data.room.metadata.current_song.metadata.ytid );
             const youtube_id = data.room.metadata.current_song.metadata.ytid;
 
             try {
@@ -293,13 +290,11 @@ const chatFunctions = ( bot, roomDefaults ) => {
                 if ( !artistName ) {
                     artistName = songFunctions.previousArtist();
                 }
-                console.log( "artistName:" + artistName );
 
                 let trackName = await songFunctions.getTrackName( youtube_id, databaseFunctions );
                 if ( !trackName ) {
                     trackName = songFunctions.previousTrack();
                 }
-                console.log( "trackName:" + trackName );
 
                 if ( botFunctions.readSongStats() ) {
                     this.botSpeak( 'Artist: ' + artistName + '\nTitle: ' + trackName +
@@ -310,7 +305,6 @@ const chatFunctions = ( bot, roomDefaults ) => {
             } catch ( error ) {
                 console.error( "Error reading song stats:", error );
             }
-            console.groupEnd();
         },
 
         readPlaylistStats: function ( data ) {
