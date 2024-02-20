@@ -2356,11 +2356,12 @@ const userFunctions = ( bot ) => {
 
         giveRoboCoinCommand: async function ( data, args, chatFunctions, databaseFunctions ) {
             const sendingUserID = this.whoSentTheCommand( data );
-            const receivingUserID = this.getUserIDFromUsername( this.returnUsernameFromMessageAfterArguments( data.text ) );
-            const numCoins = parseFloat( args[ 0 ] );
+            const numCoins = parseFloat( args.pop() );
+            const username = args.join( " " );
+            const receivingUserID = this.getUserIDFromUsername( username );
             console.log( "args:" + JSON.stringify( args ) );
             console.log( "numcoins:" + numCoins );
-            console.log( "username:" + this.returnUsernameFromMessageAfterArguments( data.text ) );
+            console.log( "username:" + username );
 
             try {
                 await this.validateNumCoins( numCoins, sendingUserID, chatFunctions, data );
