@@ -284,13 +284,16 @@ const chatFunctions = ( bot, roomDefaults ) => {
         },
 
         readSongStats: function ( data, songFunctions, botFunctions, databaseFunctions ) {
-            console.log( "ytif:" + data.room.metadata.current_song.metadata.ytid );
+            console.group( "readSongStats" );
+            console.log( "data:" + JSON.stringify( data ) );
+            console.log( "ytid:" + data.room.metadata.current_song.metadata.ytid );
             const youtube_id = data.room.metadata.current_song.metadata.ytid;
             const artistName = songFunctions.getArtistName( youtube_id, databaseFunctions );
             const trackName = songFunctions.getTrackName( youtube_id, databaseFunctions );
             if ( botFunctions.readSongStats() ) {
                 this.botSpeak( 'Stats for ' + trackName + ' by ' + artistName + '\n:thumbsup:' + songFunctions.previousUpVotes() + ':thumbsdown:' + songFunctions.previousDownVotes() + ':heart:' + songFunctions.previousSnags(), data );
             }
+            console.groupEnd();
         },
 
         readPlaylistStats: function ( data ) {
