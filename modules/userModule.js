@@ -2355,6 +2355,8 @@ const userFunctions = ( bot ) => {
             const sendingUserID = this.whoSentTheCommand( data );
             const receivingUserID = this.getUserIDFromUsername( this.returnUsernameFromMessageAfterArguments( data.text ) );
             const numCoins = parseFloat( args[ 0 ] );
+            console.log( "numcoins:" + numCoins );
+            console.log( "username:" + this.returnUsernameFromMessageAfterArguments( data.text ) );
 
             try {
                 await this.validateNumCoins( numCoins, sendingUserID, chatFunctions, data );
