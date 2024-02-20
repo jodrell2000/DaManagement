@@ -298,9 +298,9 @@ const chatFunctions = ( bot, roomDefaults ) => {
 
                 if ( botFunctions.readSongStats() ) {
                     this.botSpeak( 'Artist: ' + artistName + '\nTitle: ' + trackName +
-                        '\n:thumbsup:' + songFunctions.previousUpVotes() +
-                        ':thumbsdown:' + songFunctions.previousDownVotes() +
-                        ':heart:' + songFunctions.previousSnags(), data );
+                        '\nStats: :thumbsup: ' + songFunctions.previousUpVotes() +
+                        ' :thumbsdown: ' + songFunctions.previousDownVotes() +
+                        ' :heart:' + songFunctions.previousSnags(), data );
                 }
             } catch ( error ) {
                 console.error( "Error reading song stats:", error );
