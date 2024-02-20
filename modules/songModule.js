@@ -147,9 +147,8 @@ const songFunctions = ( bot ) => {
         getArtistName: async function ( youtube_id, databaseFunctions ) {
             await databaseFunctions.getVerifiedArtistFromID( youtube_id )
                 .then( ( array ) => {
-                    const verifiedName = array[ 0 ].artistDisplayName;
-                    console.log( "artist name:" + verifiedName );
-                    return verifiedName;
+                    console.log( "artist name:" + array[ 0 ].artistDisplayName );
+                    return array[ 0 ].artistDisplayName;
                 } );
 
         },
@@ -157,9 +156,8 @@ const songFunctions = ( bot ) => {
         getTrackName: async function ( youtube_id, databaseFunctions ) {
             await databaseFunctions.getVerifiedTrackFromID( youtube_id )
                 .then( ( array ) => {
-                    const verifiedName = array[ 0 ].trackDisplayName;
-                    console.log( "track name:" + verifiedName );
-                    return verifiedName;
+                    console.log( "track name:" + array[ 0 ].trackDisplayName );
+                    return array[ 0 ].trackDisplayName;
                 } );
         },
 
