@@ -158,7 +158,7 @@ const songFunctions = ( bot ) => {
             await databaseFunctions.getVerifiedTrackFromID( youtube_id )
                 .then( ( array ) => {
                     const verifiedName = array[ 0 ].trackDisplayName;
-                    console.log( "artist name:" + verifiedName );
+                    console.log( "track name:" + verifiedName );
                     return verifiedName;
                 } );
         },
