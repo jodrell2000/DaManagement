@@ -556,7 +556,7 @@ const databaseFunctions = () => {
 
         updateArtistDisplayName( id, artistDisplayName ) {
             const selectQuery = "UPDATE videoData SET artistDisplayName=? WHERE id=?;";
-            const values = [ artistDisplayName, id ];
+            const values = [ artistDisplayName.trim(), id ];
 
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
@@ -566,7 +566,7 @@ const databaseFunctions = () => {
 
         updateTrackDisplayName( id, trackDisplayName ) {
             const selectQuery = "UPDATE videoData SET trackDisplayName=? WHERE id=?;";
-            const values = [ trackDisplayName, id ];
+            const values = [ trackDisplayName.trim(), id ];
 
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
