@@ -557,7 +557,7 @@ const databaseFunctions = () => {
         updateArtistDisplayName( id, artistDisplayName ) {
             const trimmedDisplayName = artistDisplayName !== undefined ? artistDisplayName.trim() : artistDisplayName;
             const selectQuery = "UPDATE videoData SET artistDisplayName=? WHERE id=?;";
-            const values = [ trimmedDisplayName.trim(), id ];
+            const values = [ trimmedDisplayName, id ];
 
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
