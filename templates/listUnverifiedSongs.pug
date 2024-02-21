@@ -26,10 +26,10 @@ html(lang="en")
 
     body
     h1 Current list of unverified songs from Robo's DB
-    table
+    table(style="width: 100%;")
         tbody
             tr
-            td
+            td(style="width: 50%;")
                 if dbStats
                     table
                         tbody
@@ -93,7 +93,7 @@ html(lang="en")
                                     else
                                         input(type='text' name='searchTerm')
                                     button(type='submit') Search by Artist
-            td
+            td(style="vertical-align: top;")
                 if djStats
                     ol
                         each value, key in djStats
