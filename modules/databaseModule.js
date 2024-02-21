@@ -431,6 +431,24 @@ const databaseFunctions = () => {
         // DB Track Editing Functions
         // ========================================================
 
+        getVerificationDJStats: async function () {
+            const theQuery = "SELECT u.username AS 'Username', count(*) AS 'Fixes' FROM roboCoinAudit ra JOIN users u ON u.id=ra.users_id WHERE ra.auditType_id=5 GROUP BY ra.users_id ORDER BY count(*) DESC;";
+            const values = [];
+
+            return this.runQuery( theQuery, values )
+                .then( ( result ) => {
+                    const djStats = {};
+                    result.forEach( ( row ) => {
+                        djStats[ row.Username ] = row.Fixes;
+                    } );
+                    return djStats;
+                } )
+                .catch( ( error ) => {
+                    console.error( 'Error in getVerifiedStats:', error );
+                    throw error;
+                } );
+        },
+
         getVerifiedStats: async function () {
             const theQuery = "SELECT 'Fixed' AS 'Metric', count(*) AS 'Count' FROM videoData WHERE artistDisplayName IS NOT NULL AND trackDisplayName IS NOT NULL UNION ALL SELECT 'Unfixed' AS 'Metric', count(*) AS 'Count' FROM videoData WHERE artistDisplayName IS NULL OR trackDisplayName IS NULL UNION ALL SELECT 'Total' AS 'Metric', count(*) AS 'Count' FROM videoData;";
             const values = [];
