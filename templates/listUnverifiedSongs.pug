@@ -96,7 +96,7 @@ html(lang="en")
             td(style="vertical-align: top;")
                 if djStats
                     ol
-                        each value, key in djStats
+                        each value, key in djStats.slice(0, 10)
                             li #{key}: #{value}
 
     table#songqueue
