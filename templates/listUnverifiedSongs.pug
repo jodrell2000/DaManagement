@@ -26,6 +26,12 @@ html(lang="en")
 
     body
     h1 Current list of unverified songs from Robo's DB
+    // Reference the stats object
+    if stats
+        ul
+            each value, key in stats
+                li #{key}: #{value}
+
     table
         tbody
             tr

@@ -431,6 +431,24 @@ const databaseFunctions = () => {
         // DB Track Editing Functions
         // ========================================================
 
+        getVerifiedStats: async function () {
+            const theQuery = "SELECT 'Fixed' AS 'Metric', count(*) AS 'Count' FROM videoData WHERE artistDisplayName IS NOT NULL AND trackDisplayName IS NOT NULL UNION ALL SELECT 'Unfixed' AS 'Metric', count(*) AS 'Count' FROM videoData WHERE artistDisplayName IS NULL OR trackDisplayName IS NULL UNION ALL SELECT 'Total' AS 'Metric', count(*) AS 'Count' FROM videoData;";
+            const values = [];
+
+            return this.runQuery( theQuery, values )
+                .then( ( result ) => {
+                    const stats = {};
+                    result.forEach( ( row ) => {
+                        stats[ row.Metric ] = row.Count;
+                    } );
+                    return stats;
+                } )
+                .catch( ( error ) => {
+                    console.error( 'Error in getVerifiedStats:', error );
+                    throw error;
+                } );
+        },
+
         getRandomVerifiedArtist() {
             return new Promise( ( resolve, _ ) => {
                 const selectQuery = "SELECT DISTINCT(displayName) FROM artists WHERE displayName IS NOT NULL ORDER BY RAND() LIMIT 1;";

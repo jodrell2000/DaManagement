@@ -548,11 +548,13 @@ app.get( '/listunverified', async ( req, res ) => {
         const dbSearchArgs = req.query || req.body;
 
         const songList = await databaseFunctions.getUnverifiedSongList( dbSearchArgs );
+        const stats = await databaseFunctions.getVerifiedStats();
         let html = pug.renderFile( './templates/listUnverifiedSongs.pug', {
             songList,
             sort: sortParam,
             where: whereParam,
-            searchTerm: searchParam
+            searchTerm: searchParam,
+            stats
         } );
         res.send( html );
     } catch ( error ) {
