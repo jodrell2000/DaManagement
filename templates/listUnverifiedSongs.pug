@@ -94,12 +94,10 @@ html(lang="en")
                                         input(type='text' name='searchTerm')
                                     button(type='submit') Search by Artist
             td(style="vertical-align: top;")
-                if Array.isArray( djStats ) // Check if djStats is an array
+                if djStats
                     ol
-                        each value, key in djStats.slice(0, 10) // Slice the first 10 items
+                        each value, key in djStats
                             li #{key}: #{value}
-                else
-                    p DJ stats not available
 
     table#songqueue
         thead
