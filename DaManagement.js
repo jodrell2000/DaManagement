@@ -550,6 +550,7 @@ app.get( '/listunverified', async ( req, res ) => {
         const songList = await databaseFunctions.getUnverifiedSongList( dbSearchArgs );
         const dbStats = await databaseFunctions.getVerifiedStats();
         const djStats = await databaseFunctions.getVerificationDJStats();
+        console.log( typeof djStats );
         let html = pug.renderFile( './templates/listUnverifiedSongs.pug', {
             songList,
             sort: sortParam,
