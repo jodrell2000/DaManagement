@@ -96,8 +96,8 @@ html(lang="en")
             td(style="vertical-align: top;")
                 if djStats
                     ol
-                        each [key, value], index in djStats
-                            li #{index + 1}: #{key}, #{value}
+                        each value, key in djStats
+                            li #{value}
 
     table#songqueue
         thead
