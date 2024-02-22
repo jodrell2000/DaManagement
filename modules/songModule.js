@@ -141,6 +141,22 @@ const songFunctions = ( bot ) => {
         // ========================================================
 
         // ========================================================
+        // Verified DB info
+        // ========================================================
+
+        getArtistName: async function ( youtube_id, databaseFunctions ) {
+            const array = await databaseFunctions.getVerifiedArtistFromID( youtube_id );
+            return array[ 0 ].artistDisplayName;
+        },
+
+        getTrackName: async function ( youtube_id, databaseFunctions ) {
+            const array = await databaseFunctions.getVerifiedTrackFromID( youtube_id );
+            return array[ 0 ].trackDisplayName;
+        },
+
+        // ========================================================
+
+        // ========================================================
         // Song Stats Functions
         // ========================================================
 
@@ -207,7 +223,7 @@ const songFunctions = ( bot ) => {
             ALLREADYCALLED = true; //this makes it so that it can only be called once per song
         },
 
-        clearWatchDogTimer () {
+        clearWatchDogTimer() {
             // If watch dog has been previously set,
             // clear since we've made it to the next song
             if ( curSongWatchdog !== null ) {
@@ -216,7 +232,7 @@ const songFunctions = ( bot ) => {
             }
         },
 
-        clearTakedownTimer ( userFunctions, roomFunctions ) {
+        clearTakedownTimer( userFunctions, roomFunctions ) {
             // If takedown Timer has been set, clear since we've made it to the next song
             if ( takedownTimer !== null && roomFunctions.lastdj() !== undefined ) {
                 clearTimeout( takedownTimer );
@@ -230,7 +246,7 @@ const songFunctions = ( bot ) => {
             }
         },
 
-        startSongWatchdog ( data, userFunctions ) {
+        startSongWatchdog( data, userFunctions ) {
             const length = data.room.metadata.current_song.metadata.length;
             const watchedDJ = userFunctions.getCurrentDJID();
 
@@ -261,7 +277,7 @@ const songFunctions = ( bot ) => {
         // Song Info Functions
         // ========================================================
 
-        songInfoCommand ( data, databaseFunctions, mlFunctions, chatFunctions ) {
+        songInfoCommand( data, databaseFunctions, mlFunctions, chatFunctions ) {
             let verifiedSong;
             let verifiedArtist;
 
@@ -299,7 +315,7 @@ const songFunctions = ( bot ) => {
                 } );
         },
 
-        searchSpotifyCommand ( data, databaseFunctions, mlFunctions, chatFunctions ) {
+        searchSpotifyCommand( data, databaseFunctions, mlFunctions, chatFunctions ) {
             let verifiedSong;
             let verifiedArtist;
 
@@ -339,7 +355,7 @@ const songFunctions = ( bot ) => {
 
         },
 
-        searchMusicBrainzCommand ( data, databaseFunctions, mlFunctions, chatFunctions ) {
+        searchMusicBrainzCommand( data, databaseFunctions, mlFunctions, chatFunctions ) {
             let verifiedSong;
             let verifiedArtist;
 

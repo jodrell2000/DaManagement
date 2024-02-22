@@ -1,9 +1,9 @@
 /** The Management, Turntable.fm bot
-    Adam Reynolds 2021-2022
-    version 0.1 (forked from chillybot)
-    version 0.2 (forked from Mr. Roboto by Jake Smith)
-    version 0.3 (bears very little resemblance to the original now)
-*/
+ Adam Reynolds 2021-2022
+ version 0.1 (forked from chillybot)
+ version 0.2 (forked from Mr. Roboto by Jake Smith)
+ version 0.3 (bears very little resemblance to the original now)
+ */
 
 /*******************************BeginSetUp*****************************************************************************/
 /* load the ttapi */
@@ -26,18 +26,30 @@ let databaseModule = require( './modules/databaseModule.js' );
 let dateModule = require( './modules/dateModule.js' );
 // let mlModule = require( './modules/mlModule.js' );
 
-const express = require( 'express' )
+const express = require( 'express' );
+const path = require( 'path' );
 const app = express();
 const pug = require( 'pug' );
 const bodyParser = require( 'body-parser' );
 const dayjs = require( 'dayjs' );
 const utc = require( 'dayjs/plugin/utc' );
 dayjs.extend( utc )
+const bcrypt = require( 'bcrypt' );
+
+// Use Morgan middleware for logging
+// const morgan = require( 'morgan' );
+// app.use( morgan( 'dev' ) );
+
+// serve static files from teh images folder
+app.use( '/images', express.static( path.join( __dirname, 'images' ) ) );
 
 // client authentication
-app.use( authentication )
-
-app.use( express.json() );
+app.use( ( req, res, next ) => {
+    if ( req.originalUrl === '/signup' || req.originalUrl === '/instructions' || req.originalUrl === '/images' ) {
+        return next();
+    }
+    authentication( req, res, next );
+} );
 
 app.use( `/scripts`, express.static( './scripts' ) );
 app.use( `/modules`, express.static( './node_modules' ) );
@@ -166,10 +178,10 @@ bot.on( 'registered', async function ( data ) {
 //starts up when a user leaves the room
 bot.on( 'deregistered', function ( data ) {
     const username = data.user[ 0 ].name;
-    if ( username !== "Guest") {
-        let theUserID = data.user[0].userid;
-        userFunctions.deregisterUser(theUserID, databaseFunctions);
-        userFunctions.updateRegionAlertsFromUsers(data, videoFunctions, chatFunctions);
+    if ( username !== "Guest" ) {
+        let theUserID = data.user[ 0 ].userid;
+        userFunctions.deregisterUser( theUserID, databaseFunctions );
+        userFunctions.updateRegionAlertsFromUsers( data, videoFunctions, chatFunctions );
     }
 } );
 
@@ -298,34 +310,29 @@ bot.on( 'newsong', function ( data ) {
 
                     if ( typeof userFunctions.getUsername( djCheck ) !== 'undefined' ) {
                         bot.speak( '@' + userFunctions.getUsername( djCheck ) + ' you have played a banned track or artist.' );
-                    }
-                    else {
+                    } else {
                         bot.speak( 'current dj, you have played a banned track or artist.' );
                     }
                 }
-            }
-            else if ( musicDefaults.matchArtists ) //if just artist matching is enabled
+            } else if ( musicDefaults.matchArtists ) //if just artist matching is enabled
             {
                 if ( songFunctions.artist().match( roomFunctions.bannedArtistsMatcher() ) ) {
                     userFunctions.removeDJ( djCheck, 'DJ has played a banned song or artist' );
 
                     if ( typeof userFunctions.getUsername( djCheck ) !== 'undefined' ) {
                         bot.speak( '@' + userFunctions.getUsername( djCheck ) + ' you have played a banned artist.' );
-                    }
-                    else {
+                    } else {
                         bot.speak( 'current dj, you have played a banned artist.' );
                     }
                 }
-            }
-            else if ( musicDefaults.matchSongs ) //if just song matching is enabled
+            } else if ( musicDefaults.matchSongs ) //if just song matching is enabled
             {
                 if ( songFunctions.song().match( roomFunctions.bannedArtistsMatcher() ) ) {
                     userFunctions.removeDJ( djCheck, 'DJ has played a banned song or artist' );
 
                     if ( typeof userFunctions.getUsername( djCheck ) !== 'undefined' ) {
                         bot.speak( '@' + userFunctions.getUsername( djCheck ) + ' you have played a banned track.' );
-                    }
-                    else {
+                    } else {
                         bot.speak( 'current dj, you have played a banned track.' );
                     }
                 }
@@ -519,7 +526,7 @@ bot.on( 'endsong', function ( data ) {
     roomFunctions.setLastDJ( djID );
 
     //bot says song stats for each song
-    chatFunctions.readSongStats( data, songFunctions, botFunctions );
+    chatFunctions.readSongStats( data, songFunctions, botFunctions, databaseFunctions );
 
     userFunctions.incrementDJPlayCount( djID, databaseFunctions );
 
@@ -535,8 +542,23 @@ bot.on( 'endsong', function ( data ) {
 
 app.get( '/listunverified', async ( req, res ) => {
     try {
-        const songList = await databaseFunctions.getUnverifiedSongList( req.query.byrecent );
-        let html = pug.renderFile( './templates/listUnverifiedSongs.pug', { songList } );
+        const sortParam = req.body.sort || req.query.sort || '';
+        const whereParam = req.body.where || req.query.where || '';
+        const searchParam = req.body.searchTerm || req.query.searchTerm || '';
+        const dbSearchArgs = req.query || req.body;
+
+        const songList = await databaseFunctions.getUnverifiedSongList( dbSearchArgs );
+        const dbStats = await databaseFunctions.getVerifiedStats();
+        const djStatsObject = await databaseFunctions.getVerificationDJStats();
+        const djStats = Object.entries( djStatsObject ).slice( 0, 10 );
+        let html = pug.renderFile( './templates/listUnverifiedSongs.pug', {
+            songList,
+            sort: sortParam,
+            where: whereParam,
+            searchTerm: searchParam,
+            dbStats,
+            djStats
+        } );
         res.send( html );
     } catch ( error ) {
         console.error( error );
@@ -544,37 +566,62 @@ app.get( '/listunverified', async ( req, res ) => {
     }
 } );
 
-app.post( '/updateArtistDisplayName', ( req, res ) => {
-    const artistID = req.body.artistID;
-    const artistDisplayName = req.body.artistDisplayName;
+app.post( '/updateArtistDisplayName', async ( req, res ) => {
+    try {
+        const username = req.username;
+        const videoData_id = req.body.videoData_id;
+        const artistDisplayName = req.body.artistDisplayName;
+        const sortParam = req.body.sort || req.query.sort || '';
+        const whereParam = req.body.where || req.query.where || '';
+        const searchParam = req.body.searchTerm || req.query.searchTerm || '';
 
-    // call a function with the artistID and artistDisplayName values
-    databaseFunctions.updateArtistDisplayName( artistID, artistDisplayName )
-        .then( () => {
-            const queryParams = new URLSearchParams( { byrecent: req.body.byrecent } );
-            const redirectUrl = '/listunverified?' + queryParams.toString();
-            res.redirect( redirectUrl );
-        } )
+        await databaseFunctions.updateArtistDisplayName( videoData_id, artistDisplayName );
+
+        const userID = userFunctions.getUserIDFromUsername( username );
+        const numCoins = 0.05;
+        const changeReason = "Fixed artist name for " + videoData_id;
+        const changeID = 5;
+        await userFunctions.addRoboCoins( userID, numCoins, changeReason, changeID, databaseFunctions );
+
+        const queryParams = new URLSearchParams( { sort: sortParam, where: whereParam, searchTerm: searchParam } );
+        const redirectUrl = '/listunverified?' + queryParams.toString();
+        res.redirect( redirectUrl );
+    } catch ( error ) {
+        console.error( 'Error in updateArtistDisplayName:', error );
+        res.status( 500 ).send( 'Internal server error' );
+    }
 } );
+app.post( '/updateTrackDisplayName', async ( req, res ) => {
+    try {
+        const username = req.username;
+        const videoData_id = req.body.videoData_id;
+        const trackDisplayName = req.body.trackDisplayName;
+        const sortParam = req.body.sort || req.query.sort || '';
+        const whereParam = req.body.where || req.query.where || '';
+        const searchParam = req.body.searchTerm || req.query.searchTerm || '';
 
-app.post( '/updateTrackDisplayName', ( req, res ) => {
-    const trackID = req.body.trackID;
-    const trackDisplayName = req.body.trackDisplayName;
+        await databaseFunctions.updateTrackDisplayName( videoData_id, trackDisplayName );
 
-    // call a function with the artistID and artistDisplayName values
-    databaseFunctions.updateTrackDisplayName( trackID, trackDisplayName )
-        .then( () => {
-            const queryParams = new URLSearchParams( { byrecent: req.body.byrecent } );
-            const redirectUrl = '/listunverified?' + queryParams.toString();
-            res.redirect( redirectUrl );
-        } )
+        const userID = userFunctions.getUserIDFromUsername( username );
+        const numCoins = 0.05;
+        const changeReason = "Fixed track name for " + videoData_id;
+        const changeID = 5;
+        await userFunctions.addRoboCoins( userID, numCoins, changeReason, changeID, databaseFunctions );
+
+        const queryParams = new URLSearchParams( { sort: sortParam, where: whereParam, searchTerm: searchParam } );
+        const redirectUrl = '/listunverified?' + queryParams.toString();
+        res.redirect( redirectUrl );
+    } catch ( error ) {
+        console.error( 'Error in updateArtistDisplayName:', error );
+        res.status( 500 ).send( 'Internal server error' );
+    }
 } );
 
 // ########################################################################
 // Top 10 Countdown Data
 // ########################################################################
 
-async function getTop10 ( req, res, functionName, templateFile ) {
+async function getTop10( req, res, functionName, templateFile ) {
     try {
         const { startDate, endDate } = req.query;
         const [ formStartDate, formEndDate, linkStartDate, linkEndDate ] = [
@@ -606,7 +653,7 @@ async function getTop10 ( req, res, functionName, templateFile ) {
     }
 }
 
-async function getSummary ( req, res, templateFile ) {
+async function getSummary( req, res, templateFile ) {
     try {
         const { startDate, endDate } = req.query;
         const [ formStartDate, formEndDate, linkStartDate, linkEndDate ] = [
@@ -697,35 +744,125 @@ app.get( '/deletesong', ( req, res ) => {
 // General functions
 // ########################################################################
 
-function authentication ( req, res, next ) {
-    let authheader = req.headers.authorization;
-    // console.log(req.headers);
+app.get( '/instructions', ( req, res ) => {
+    let html = pug.renderFile( './templates/instructions.pug' );
+    res.send( html );
 
-    if ( !authheader ) {
-        let err = new Error( 'You are not authenticated!' );
-        res.setHeader( 'WWW-Authenticate', 'Basic' );
-        err.status = 401;
-        return next( err )
+} );
+
+app.get( '/signup', ( req, res ) => {
+    let html = pug.renderFile( './templates/signup.pug' );
+    res.send( html );
+
+} );
+
+app.post( '/signup', async ( req, res, next ) => {
+    console.group( "signup" );
+    const { email, username, password, confirmPassword } = req.body;
+    console.log( "email:" + email );
+    console.log( "username:" + username );
+    const userID = userFunctions.getUserIDFromUsername( username );
+
+    // Check if the passwords match
+    if ( password !== confirmPassword ) {
+        return res.status( 400 ).send( 'Passwords do not match' );
     }
 
-    let auth = new Buffer.from( authheader.split( ' ' )[ 1 ],
-        'base64' ).toString().split( ':' );
-    let user = auth[ 0 ];
-    let pass = auth[ 1 ];
+    // Check if the user exists
+    const user = userFunctions.userExists( userID );
+    if ( !user ) {
+        return res.status( 400 ).send( 'User does not exist' );
+    }
 
-    if ( user === process.env.PLAYLIST_USERNAME && pass === process.env.PLAYLIST_PASSWORD ) {
+    userFunctions.verifyUsersEmail( userID, email, databaseFunctions )
+        .then( verify => {
+            if ( !verify ) {
+                return res.status( 400 ).send( 'User\'s email does not match' );
+            }
+            bcrypt.hash( password, 10 )
+                .then( passwordHash => {
+                    setPassword( { req, res, next, username, passwordHash } )
+                        .then( () => {
+                            // Redirect after successful password setting
+                            res.redirect( '/listunverified' );
+                        } )
+                        .catch( error => {
+                            console.error( 'Error setting password:', error );
+                            return res.status( 500 ).send( 'Internal server error' );
+                        } );
+                } )
+                .catch( error => {
+                    console.error( 'Error hashing password:', error );
+                    return res.status( 500 ).send( 'Internal server error' );
+                } );
+        } )
+        .catch( error => {
+            console.error( 'Error verifying user email:', error );
+            return res.status( 500 ).send( 'Internal server error' );
+        } );
+    console.groupEnd();
+} );
 
-        // If Authorized user
-        next();
-    } else {
-        let err = new Error( 'You are not authenticated to access the playlist controls!' );
+async function authentication( req, res, next ) {
+    const authHeader = req.headers.authorization;
+
+    if ( !authHeader ) {
+        const err = new Error( 'You are not authenticated!' );
         res.setHeader( 'WWW-Authenticate', 'Basic' );
-        err.status = 401;
+        res.status( 401 ).send( err );
+        return;
+    }
+
+    const auth = Buffer.from( authHeader.split( ' ' )[ 1 ], 'base64' ).toString().split( ':' );
+    const username = auth[ 0 ];
+    const password = auth[ 1 ];
+
+    try {
+        // Retrieve hashed password from the database based on the username
+        const hashedPassword = await databaseFunctions.retrieveHashedPassword( username );
+
+        if ( !hashedPassword ) {
+            // If the user doesn't have a password set, redirect to the signup page
+            if ( req.originalUrl !== '/signup' ) {
+                return res.redirect( '/signup' );
+            }
+            return next();
+        }
+
+        // Compare hashed password from the database with the provided password
+        const match = await bcrypt.compare( password, hashedPassword );
+
+        if ( match ) {
+            // If the passwords match, the user is authenticated
+            req.username = username;
+            return next();
+        } else {
+            const err = new Error( 'Incorrect username or password' );
+            res.setHeader( 'WWW-Authenticate', 'Basic' );
+            err.status = 401;
+            return next( err );
+        }
+    } catch ( error ) {
+        console.error( 'Error during authentication:', error );
+        const err = new Error( 'Internal server error' );
+        err.status = 500;
         return next( err );
     }
+}
 
+async function setPassword( { req, res, next, username, passwordHash } ) {
+    try {
+        const userID = userFunctions.getUserIDFromUsername( username );
+        await userFunctions.storeUserData( userID, "password_hash", passwordHash, databaseFunctions );
+
+        // Proceed to the next middleware or route
+        return next();
+    } catch ( error ) {
+        console.error( 'Error setting password:', error );
+        throw new Error( 'Internal server error' );
+    }
 }
 
 app.listen( ( 8585 ), () => {
-    console.log( "Server is Running " );
+    console.log( "Server is Running" );
 } )

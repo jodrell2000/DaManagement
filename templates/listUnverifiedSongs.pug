@@ -1,76 +1,158 @@
 doctype html
 html(lang="en")
-  head
-    title List of unverified songs from Robo's DB
-    link(href='/styles/app.css' rel='stylesheet' type='text/css')
-    link(href='/modules/dragula/dist/dragula.css' rel='stylesheet' type='text/css')
-    link(href="/modules/@fortawesome/fontawesome-free/css/fontawesome.css" rel="stylesheet")
-    link(href="/modules/@fortawesome/fontawesome-free/css/solid.css" rel="stylesheet")
-    style.
-      #songqueue {
-        border-collapse: collapse;
-        border: 1px solid #ddd;
-        width: 100%;
-      }
-      #songqueue td, #songqueue th {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-      }
-      #songqueue th {
-        background-color: #f2f2f2;
-        color: black;
-      }
+    head
+        title List of unverified songs from Robo's DB
+        link(href='/styles/app.css' rel='stylesheet' type='text/css')
+        link(href='/modules/dragula/dist/dragula.css' rel='stylesheet' type='text/css')
+        link(href="/modules/@fortawesome/fontawesome-free/css/fontawesome.css" rel="stylesheet")
+        link(href="/modules/@fortawesome/fontawesome-free/css/solid.css" rel="stylesheet")
+        style.
+            #songqueue {
+                border-collapse: collapse;
+                border: 1px solid #ddd;
+                width: 100%;
+            }
 
-  body
+            #songqueue td, #songqueue th {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }
+
+            #songqueue th {
+                background-color: #f2f2f2;
+                color: black;
+            }
+
+    body
     h1 Current list of unverified songs from Robo's DB
+    table(style="width: 100%;")
+        tbody
+            tr
+            td(style="width: 50%;")
+                if dbStats
+                    table
+                        tbody
+                            tr
+                            td(style="text-align: right;") Total tracks in DB:
+                            td #{dbStats.Total}
+                            tr
+                            td(style="text-align: right;") Fixed tracks count:
+                            td #{dbStats.Fixed}
+                            tr
+                            td(style="text-align: right;") Unfixed track count:
+                            td #{dbStats.Unfixed}
+                table
+                    tbody
+                        tr
+                        td
+                            form(action='/listunverified' method='GET')
+                                label
+                                    input(type='radio' name='sort' value='time' checked=sort === 'time')
+                                    | By Recent
+                                label
+                                    input(type='radio' name='sort' value='artist' checked=sort === 'artist')
+                                    | By Artist
+                                label
+                                    input(type='radio' name='sort' value='track' checked=sort === 'track')
+                                    | By Track
+                                button(type='submit') Get unverified tracks
+                        tr
+                        td
+                            form(action='/listunverified' method='GET')
+                                label
+                                    input(type='radio' name='sort' value='time' checked=sort === 'time')
+                                    | By Recent
+                                label
+                                    input(type='radio' name='sort' value='artist' checked=sort === 'artist')
+                                    | By Artist
+                                label
+                                    input(type='radio' name='sort' value='track' checked=sort === 'track')
+                                    | By Track
+                                input(type='hidden' name='where' value="track")
+                                if ( searchTerm )
+                                    input(type='text' name='searchTerm' value=searchTerm)
+                                else
+                                    input(type='text' name='searchTerm')
+                                button(type='submit') Search by Track
+                        tr
+                            td
+                                form(action='/listunverified' method='GET')
+                                    label
+                                        input(type='radio' name='sort' value='time' checked=sort === 'time')
+                                        | By Recent
+                                    label
+                                        input(type='radio' name='sort' value='artist' checked=sort === 'artist')
+                                        | By Artist
+                                    label
+                                        input(type='radio' name='sort' value='track' checked=sort === 'track')
+                                        | By Track
+                                    input(type='hidden' name='where' value="artist")
+                                    if ( searchTerm )
+                                        input(type='text' name='searchTerm' value=searchTerm)
+                                    else
+                                        input(type='text' name='searchTerm')
+                                    button(type='submit') Search by Artist
+            td(style="vertical-align: top;")
+                if djStats
+                    ol
+                        each value, key in djStats
+                            li #{value}
 
     table#songqueue
         thead
             tr
-                th artistID
-                th artistName
-                td artistDisplayName
-                th trackID
-                th trackName
-                th trackDisplayName
-                th length
-                th search
+                th youTube Link
+                th youTube Artist Name
+                td Artist Display Name
+                th youTube Track Name
+                th Track Display Name
+                th Search Link
         tbody
         each song in songList
             tr
-            td= song.artistID
-            td= song.artistName
+            td
+                a(href=`https://www.youtube.com/watch?v=${ encodeURIComponent( song.videoData_id ) }`, target="_blank") #{song.videoData_id}
+            td
+                a(href=`http://141.147.86.68:8585/listunverified?sort=artist&where=artist&searchTerm=${ encodeURIComponent( song.artistName ) }`) #{song.artistName}
             td
                 if song.artistDisplayName
                     | #{song.artistDisplayName}
                     form(action='/updateArtistDisplayName' method='POST')
                         input(type='hidden' name='reset' value=true)
-                        input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
-                        input(type='hidden' name='artistID' value=song.artistID)
+                        input(type='hidden' name='where' value=where)
+                        input(type='hidden' name='sort' value=sort)
+                        input(type='hidden' name='searchTerm' value=searchTerm)
+                        input(type='hidden' name='videoData_id' value=song.videoData_id)
                         button(type='submit') Reset
                 else
                     form(action='/updateArtistDisplayName' method='POST')
                         input(type='text' name='artistDisplayName', value=song.artistName)
-                        input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
-                        input(type='hidden' name='artistID' value=song.artistID)
-                        button(type='submit') UpdateDB
-            td= song.trackID
-            td= song.trackName
+                        input(type='hidden' name='where' value=where)
+                        input(type='hidden' name='sort' value=sort)
+                        input(type='hidden' name='searchTerm' value=searchTerm)
+                        input(type='hidden' name='videoData_id' value=song.videoData_id)
+                        button(type='submit') Update Artist
+
+            td
+                a(href=`http://141.147.86.68:8585/listunverified?sort=track&where=track&searchTerm=${ encodeURIComponent( song.trackName ) }`) #{song.trackName}
             td
                 if song.trackDisplayName
                     | #{song.trackDisplayName}
                     form(action='/updateTrackDisplayName' method='POST')
                         input(type='hidden' name='reset' value=true)
-                        input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
-                        input(type='hidden' name='trackID' value=song.trackID)
+                        input(type='hidden' name='where' value=where)
+                        input(type='hidden' name='sort' value=sort)
+                        input(type='hidden' name='searchTerm' value=searchTerm)
+                        input(type='hidden' name='videoData_id' value=song.videoData_id)
                         button(type='submit') Reset
                 else
                     form(action='/updateTrackDisplayName' method='POST')
                         input(type='text' name='trackDisplayName', value=song.trackName)
-                        input(type='hidden' name='byrecent' value='#{req.query.byrecent}')
-                        input(type='hidden' name='trackID' value=song.trackID)
-                        button(type='submit') UpdateDB
-            td= song.length
+                        input(type='hidden' name='where' value=where)
+                        input(type='hidden' name='sort' value=sort)
+                        input(type='hidden' name='searchTerm' value=searchTerm)
+                        input(type='hidden' name='videoData_id' value=song.videoData_id)
+                        button(type='submit') Update Track Name
             td
-                a(href=`https://www.google.com/search?q=${encodeURIComponent(song.artistName)}%20${encodeURIComponent(song.trackName)}`, target="_blank") Search
+                a(href=`https://www.google.com/search?q=${ encodeURIComponent( song.artistName ) }%20${ encodeURIComponent( song.trackName ) }`, target="_blank") Search

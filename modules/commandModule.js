@@ -443,6 +443,13 @@ const commandFunctions = ( bot ) => {
     moderatorCommands.randomthemeremove.help = "Remove a theme from the randomizer";
     moderatorCommands.randomthemeremove.sampleArguments = [ "The Weather" ];
 
+    moderatorCommands.setemailaddress = ( { data, args, chatFunctions, userFunctions, databaseFunctions } ) => {
+        userFunctions.setEmailAddress( data, args, chatFunctions, databaseFunctions ).then();
+    }
+    moderatorCommands.setemailaddress.argumentCount = 2;
+    moderatorCommands.setemailaddress.help = "Set a users email address for secondary authentication";
+    moderatorCommands.setemailaddress.sampleArguments = [ "username", "email@address" ];
+
     moderatorCommands.readfavouriteartist = ( { data, chatFunctions, botFunctions, databaseFunctions } ) => {
         botFunctions.readFavouriteArtist( data, chatFunctions, databaseFunctions );
     }
@@ -453,15 +460,15 @@ const commandFunctions = ( bot ) => {
     }
     moderatorCommands.choosenewfavourite.help = "Pick a new favourite artist";
 
-    moderatorCommands.askbard = ( { botFunctions, data, args, chatFunctions, mlFunctions } ) => {
-        botFunctions.askBardCommand( data, reassembleArgs( args ), chatFunctions, mlFunctions );
-    }
-    moderatorCommands.askbard.help = "Talk to Robo via Bard";
+    // moderatorCommands.askbard = ( { botFunctions, data, args, chatFunctions, mlFunctions } ) => {
+    //     botFunctions.askBardCommand( data, reassembleArgs( args ), chatFunctions, mlFunctions );
+    // }
+    // moderatorCommands.askbard.help = "Talk to Robo via Bard";
 
-    moderatorCommands.askchatgpt = ( { botFunctions, data, args, chatFunctions, mlFunctions } ) => {
-        botFunctions.askChatGPTCommand( data, reassembleArgs( args ), chatFunctions, mlFunctions );
-    }
-    moderatorCommands.askchatgpt.help = "Talk to Robo via Bard";
+    // moderatorCommands.askchatgpt = ( { botFunctions, data, args, chatFunctions, mlFunctions } ) => {
+    //     botFunctions.askChatGPTCommand( data, reassembleArgs( args ), chatFunctions, mlFunctions );
+    // }
+    // moderatorCommands.askchatgpt.help = "Talk to Robo via Bard";
 
     // #############################################
     // Moderator Greeting commands

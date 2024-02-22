@@ -1,0 +1,25 @@
+//- signup.pug
+
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title Sign Up
+body
+    h1 I ❤️ The 80's youTube Tag fixing Sign Up page
+    form(action="/signup", method="post")
+        div
+            label(for="email") Email:
+            input(type="email", id="email", name="email", required)
+        div
+            label(for="username") Current Full DJ Name:
+            input(type="text", id="username", name="username", required)
+        div
+            label(for="password") Password:
+            input(type="password", id="password", name="password", required)
+        div
+            label(for="confirmPassword") Confirm Password:
+            input(type="password", id="confirmPassword", name="confirmPassword", required)
+        div
+            button(type="submit") Sign Up

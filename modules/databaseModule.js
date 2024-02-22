@@ -35,7 +35,7 @@ const databaseFunctions = () => {
             } );
         },
 
-        buildSaveUserQuery: function ( userObject ) {
+        buildSaveUserQuery: async function ( userObject ) {
             const id = userObject[ "id" ];
             const userInfo = JSON.stringify( userObject ).replace( "'", "\\'" );
             const username = userObject[ "username" ];
@@ -58,6 +58,8 @@ const databaseFunctions = () => {
             let propsCount = 0;
             let RoboCoins = 0;
             let here = "";
+            let email = "";
+            let password_hash = "NULL";
 
             if ( userObject[ "moderator" ] !== undefined ) { moderator = userObject[ "moderator" ] }
             if ( userObject[ "joinTime" ] !== undefined ) { joinTime = userObject[ "joinTime" ] }
@@ -77,8 +79,35 @@ const databaseFunctions = () => {
             if ( userObject[ "propsCount" ] !== undefined ) { propsCount = userObject[ "propsCount" ] }
             if ( userObject[ "RoboCoins" ] !== undefined ) { RoboCoins = userObject[ "RoboCoins" ] }
             if ( userObject[ "here" ] !== undefined ) { here = userObject[ "here" ] }
+            if ( userObject[ "email" ] !== undefined ) { email = userObject[ "email" ] }
+            if ( userObject[ "password_hash" ] !== undefined ) { password_hash = userObject[ "password_hash" ] }
 
-            const query = `REPLACE INTO users (id, userInfo, username, moderator, joinTime, currentDJ, lastVoted, lastSpoke, currentPlayCount, totalPlayCount, joinedStage, firstIdleWarning, secondIdleWarning, spamCount, lastSnagged, region, BBBootTimestamp, noiceCount, propsCount, RoboCoins, here) VALUES ("${ id }", '${ userInfo }', "${ username }", ${ moderator }, ${ joinTime }, "${ currentDJ }", ${ lastVoted }, ${ lastSpoke }, ${ currentPlayCount }, ${ totalPlayCount }, ${ joinedStage }, "${ firstIdleWarning }", "${ secondIdleWarning }", ${ spamCount }, ${ lastSnagged }, "${ region }", ${ BBBootTimestamp }, ${ noiceCount }, ${ propsCount }, ${ RoboCoins }, "${ here }");`;
+            const query = `REPLACE
+                               INTO users (id, userInfo, username, moderator, joinTime, currentDJ, lastVoted, lastSpoke,
+                                           currentPlayCount, totalPlayCount, joinedStage, firstIdleWarning,
+                                           secondIdleWarning, spamCount, lastSnagged, region, BBBootTimestamp,
+                                           noiceCount, propsCount, RoboCoins, here, password_hash, email)
+                           VALUES ("${ id }", '${ userInfo }', "${ username }",
+                                   ${ moderator },
+                                   ${ joinTime },
+                                   "${ currentDJ }",
+                                   ${ lastVoted },
+                                   ${ lastSpoke },
+                                   ${ currentPlayCount },
+                                   ${ totalPlayCount },
+                                   ${ joinedStage },
+                                   "${ firstIdleWarning }",
+                                   "${ secondIdleWarning }",
+                                   ${ spamCount },
+                                   ${ lastSnagged },
+                                   "${ region }",
+                                   ${ BBBootTimestamp },
+                                   ${ noiceCount },
+                                   ${ propsCount },
+                                   ${ RoboCoins },
+                                   "${ here }",
+                                   "${ password_hash }",
+                                   "${ email }");`;
 
             return query;
 
@@ -86,7 +115,7 @@ const databaseFunctions = () => {
 
         writeUserDataToDatabase: async function ( userObject ) {
             try {
-                const query = this.buildSaveUserQuery( userObject );
+                const query = await this.buildSaveUserQuery( userObject );
                 await this.runQuery( query );
             } catch ( error ) {
                 throw new Error( `Error writing user data to database: ${ error.message }` );
@@ -97,7 +126,7 @@ const databaseFunctions = () => {
         // File Functions
         // ========================================================
 
-        writeUserDataToDisk: function ( userObject ) {
+        writeUserDataToDisk: async function ( userObject ) {
             const userID = userObject[ "id" ];
             const dataFilePath = `${ dirname( require.main.filename ) }/data/users/${ userID }.json`;
             fs.writeFileSync( dataFilePath, JSON.stringify( userObject ), function ( err ) {
@@ -126,17 +155,15 @@ const databaseFunctions = () => {
         // Persistent User Functions
         // ========================================================
 
-        storeUserData: function ( userObject ) {
-            return new Promise( ( resolve, reject ) => {
-                try {
-                    const userToSave = this.removeUnsavableDataFromUser( userObject );
-                    this.writeUserDataToDisk( userToSave );
-                    this.writeUserDataToDatabase( userToSave );
-                    resolve();
-                } catch ( error ) {
-                    reject( error );
-                }
-            } );
+        storeUserData: async function ( userObject ) {
+            try {
+                const userToSave = this.removeUnsavableDataFromUser( userObject );
+                await this.writeUserDataToDisk( userToSave );
+                await this.writeUserDataToDatabase( userToSave );
+                return Promise.resolve(); // Resolve the promise
+            } catch ( error ) {
+                return Promise.reject( error ); // Reject the promise
+            }
         },
 
         removeUnsavableDataFromUser: function ( userObject ) {
@@ -154,6 +181,45 @@ const databaseFunctions = () => {
             delete editedUser[ "welcomeTimer" ];
 
             return editedUser;
+        },
+
+        retrieveHashedPassword: async function ( username ) {
+            const theQuery = "SELECT password_hash FROM users WHERE username = ?";
+            const theValues = [ username ];
+
+            try {
+                const result = await this.runQuery( theQuery, theValues );
+
+                if ( result && result.length > 0 && result[ 0 ].password_hash !== null ) {
+                    // If there is a result, return the password hash
+                    return result[ 0 ].password_hash;
+                } else {
+                    // If the result is empty, the user doesn't exist
+                    return false;
+                }
+            } catch ( error ) {
+                console.error( 'Error in retrieveHashedPassword:', error.message );
+                // Handle the error as needed
+                throw error; // Rethrow the error if necessary
+            }
+        },
+
+        getUsersEmailAddress: async function ( userID ) {
+            const theQuery = "SELECT email FROM users WHERE id = ?";
+            const theValues = [ userID ];
+
+            try {
+                const result = await this.runQuery( theQuery, theValues );
+
+                if ( result && result.length > 0 && result[ 0 ].email !== null && result[ 0 ].email !== "" ) {
+                    return result[ 0 ].email;
+                } else {
+                    return false;
+                }
+            } catch ( error ) {
+                console.error( 'Error in retrieveHashedPassword:', error.message );
+                throw error; // Rethrow the error if necessary
+            }
         },
 
         // ========================================================
@@ -199,12 +265,46 @@ const databaseFunctions = () => {
         // ========================================================
 
         saveTrackData: function ( djID, songData ) {
+            this.saveTrackDataOld( djID, songData );
+            this.saveYouTubeTrackData( djID, songData );
+        },
+
+        saveYouTubeTrackData: async function ( djID, songData ) {
+            const videoData_id = songData.metadata.ytid || songData.metadata.scid;
+            const artist = songData.metadata.artist;
+            const song = songData.metadata.song;
+
+            const exists = await this.checkVideoDataExists( videoData_id );
+
+            if ( !exists ) {
+                let theQuery = "INSERT INTO videoData (id, artistName, trackName) VALUES (?, ?, ?)";
+                const values = [ videoData_id, artist, song ];
+                return this.runQuery( theQuery, values );
+            }
+        },
+
+        checkVideoDataExists: async function ( videoData_id ) {
+            const theQuery = "SELECT COUNT(id) as count FROM videoData WHERE id = ?";
+            const values = [ videoData_id ];
+
+            try {
+                const result = await this.runQuery( theQuery, values );
+                const count = result[ 0 ][ 'count' ];
+                return count !== 0;
+            } catch ( error ) {
+                console.error( "Error:", error );
+                throw error;
+            }
+        },
+
+        saveTrackDataOld: function ( djID, songData ) {
+            const videoData_id = songData.metadata.ytid || songData.metadata.scid;
             return this.getArtistID( songData.metadata.artist )
                 .then( ( artistID ) => {
                     this.getTrackID( songData.metadata.song )
                         .then( ( trackID ) => {
-                            let theQuery = "INSERT INTO tracksPlayed (artistID, trackID, djID) VALUES (?, ?, ?);"
-                            let values = [ artistID, trackID, djID ];
+                            let theQuery = "INSERT INTO tracksPlayed (artistID, trackID, djID, videoData_id) VALUES (?, ?, ?, ?);"
+                            let values = [ artistID, trackID, djID, videoData_id ];
                             return this.runQuery( theQuery, values )
                                 .then( ( result ) => {
                                     return this.setTrackLength( result.insertId - 1 );
@@ -225,14 +325,17 @@ const databaseFunctions = () => {
         },
 
         getArtistID: function ( theName ) {
-            const selectQuery = `SELECT id FROM artists WHERE artistName = ?;`;
+            const selectQuery = `SELECT id
+                                 FROM artists
+                                 WHERE artistName = ?;`;
             const values = [ theName ];
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
                     if ( result.length !== 0 ) {
                         return result[ 0 ][ 'id' ];
                     } else {
-                        const insertQuery = `INSERT INTO artists SET ?;`;
+                        const insertQuery = `INSERT INTO artists
+                                             SET ?;`;
                         const values = { artistName: theName }
                         return this.runQuery( insertQuery, values )
                             .then( ( result ) => {
@@ -243,14 +346,17 @@ const databaseFunctions = () => {
         },
 
         getTrackID: function ( theName ) {
-            const selectQuery = `SELECT id FROM tracks WHERE trackName = ?;`;
+            const selectQuery = `SELECT id
+                                 FROM tracks
+                                 WHERE trackName = ?;`;
             const values = [ theName ];
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
                     if ( result.length !== 0 ) {
                         return result[ 0 ][ 'id' ];
                     } else {
-                        const insertQuery = `INSERT INTO tracks SET ?;`;
+                        const insertQuery = `INSERT INTO tracks
+                                             SET ?;`;
                         const values = { trackName: theName }
                         return this.runQuery( insertQuery, values )
                             .then( ( result ) => {
@@ -325,7 +431,43 @@ const databaseFunctions = () => {
         // DB Track Editing Functions
         // ========================================================
 
-        getRandomVerifiedArtist () {
+        getVerificationDJStats: async function () {
+            const theQuery = "SELECT u.username AS 'Username', count(*) AS 'Fixes' FROM roboCoinAudit ra JOIN users u ON u.id=ra.users_id WHERE ra.auditType_id=5 GROUP BY ra.users_id ORDER BY count(*) DESC;";
+            const values = [];
+
+            return this.runQuery( theQuery, values )
+                .then( ( result ) => {
+                    const djStats = {};
+                    result.forEach( ( row ) => {
+                        djStats[ row.Username ] = row.Fixes;
+                    } );
+                    return djStats;
+                } )
+                .catch( ( error ) => {
+                    console.error( 'Error in getVerifiedStats:', error );
+                    throw error;
+                } );
+        },
+
+        getVerifiedStats: async function () {
+            const theQuery = "SELECT 'Fixed' AS 'Metric', count(*) AS 'Count' FROM videoData WHERE artistDisplayName IS NOT NULL AND trackDisplayName IS NOT NULL UNION ALL SELECT 'Unfixed' AS 'Metric', count(*) AS 'Count' FROM videoData WHERE artistDisplayName IS NULL OR trackDisplayName IS NULL UNION ALL SELECT 'Total' AS 'Metric', count(*) AS 'Count' FROM videoData;";
+            const values = [];
+
+            return this.runQuery( theQuery, values )
+                .then( ( result ) => {
+                    const stats = {};
+                    result.forEach( ( row ) => {
+                        stats[ row.Metric ] = row.Count;
+                    } );
+                    return stats;
+                } )
+                .catch( ( error ) => {
+                    console.error( 'Error in getVerifiedStats:', error );
+                    throw error;
+                } );
+        },
+
+        getRandomVerifiedArtist() {
             return new Promise( ( resolve, _ ) => {
                 const selectQuery = "SELECT DISTINCT(displayName) FROM artists WHERE displayName IS NOT NULL ORDER BY RAND() LIMIT 1;";
                 const values = [];
@@ -339,8 +481,8 @@ const databaseFunctions = () => {
             } )
         },
 
-        getVerifiedArtistsFromName ( theArtist ) {
-            const selectQuery = "SELECT displayName FROM artists WHERE artistName = ?;";
+        getVerifiedArtistsFromName( theArtist ) {
+            const selectQuery = "SELECT artistDisplayName FROM videoData WHERE artistName = ?;";
             const values = [ theArtist ];
 
             return this.runQuery( selectQuery, values )
@@ -349,8 +491,18 @@ const databaseFunctions = () => {
                 } );
         },
 
-        getVerifiedTracksFromName ( theSong ) {
-            const selectQuery = "SELECT displayName FROM tracks WHERE trackName = ?;";
+        getVerifiedArtistFromID( youtube_id ) {
+            const selectQuery = "SELECT artistDisplayName FROM videoData WHERE id = ?;";
+            const values = [ youtube_id ];
+
+            return this.runQuery( selectQuery, values )
+                .then( ( result ) => {
+                    return result;
+                } );
+        },
+
+        getVerifiedTracksFromName( theSong ) {
+            const selectQuery = "SELECT trackDisplayName FROM videoData WHERE trackName = ?;";
             const values = [ theSong ];
 
             return this.runQuery( selectQuery, values )
@@ -359,37 +511,71 @@ const databaseFunctions = () => {
                 } );
         },
 
-        getUnverifiedSongList ( byRecent ) {
-            const selectQuery = `
-    SELECT 
-      a.id AS artistID, 
-      a.artistName, 
-      a.displayName AS artistDisplayName, 
-      t.id AS trackID, 
-      t.trackName, 
-      t.displayName AS trackDisplayName, 
-      ROUND(AVG(tp.length)) AS length 
-    FROM 
-      tracksPlayed tp 
-      JOIN artists a ON a.id=tp.artistID 
-      JOIN tracks t ON t.id=tp.trackID 
-    WHERE 
-      a.displayName IS NULL OR t.displayName IS NULL 
-      ${ byRecent ? `GROUP BY tp.id ORDER BY tp.whenPlayed DESC ` : `GROUP BY a.id,t.id 
-    ORDER BY COALESCE( a.displayName, a.artistName ), COALESCE( t.displayName, t.trackname ) ` } 
-    LIMIT 50`;
+        getVerifiedTrackFromID( youtube_id ) {
+            const selectQuery = "SELECT trackDisplayName FROM videoData WHERE id = ?;";
+            const values = [ youtube_id ];
 
+            return this.runQuery( selectQuery, values )
+                .then( ( result ) => {
+                    return result;
+                } );
+        },
+
+        getUnverifiedSongList( args ) {
+            let orderByClause = '';
+            let whereClause = '';
             const values = [];
 
+            switch ( args.sort ) {
+                case 'time':
+                    orderByClause = 'GROUP BY tp.videoData_id ORDER BY MAX(tp.whenPlayed) DESC';
+                    break;
+                case 'artist':
+                    orderByClause = 'GROUP BY tp.videoData_id ORDER BY COALESCE(v.artistDisplayName, v.artistName) ASC, COALESCE(v.trackDisplayName, v.trackName) ASC';
+                    break;
+                case 'track':
+                    orderByClause = 'GROUP BY tp.videoData_id ORDER BY COALESCE(v.trackDisplayName, v.trackName) ASC, COALESCE(v.artistDisplayName, v.artistName) ASC';
+                    break;
+                default:
+                    orderByClause = 'GROUP BY tp.videoData_id ORDER BY MAX(tp.whenPlayed) DESC';
+            }
+
+            switch ( args.where ) {
+                case 'track':
+                    whereClause = 'v.trackName LIKE ? OR v.trackDisplayName LIKE ?';
+                    values.push( `%${ args.searchTerm }%`, `%${ args.searchTerm }%` );
+                    break;
+                case 'artist':
+                    whereClause = 'v.artistName LIKE ? OR v.artistDisplayName LIKE ?';
+                    values.push( `%${ args.searchTerm }%`, `%${ args.searchTerm }%` );
+                    break;
+                default:
+                    whereClause = 'v.artistDisplayName IS NULL OR v.trackDisplayName IS NULL';
+            }
+
+            const selectQuery = `
+                SELECT tp.videoData_id,
+                       v.artistName,
+                       v.artistDisplayName,
+                       v.trackName,
+                       v.trackDisplayName,
+                       MAX(tp.whenPlayed)
+                FROM tracksPlayed tp
+                         JOIN videoData v ON v.id = tp.videoData_id
+                WHERE ${ whereClause }
+                          ${ orderByClause }
+                LIMIT 50`;
+
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
                     return result;
                 } );
         },
 
-        updateArtistDisplayName ( artistID, artistDisplayName ) {
-            const selectQuery = "UPDATE artists SET displayName=? WHERE id=?;";
-            const values = [ artistDisplayName, artistID ];
+        updateArtistDisplayName( id, artistDisplayName ) {
+            const trimmedDisplayName = artistDisplayName !== undefined ? artistDisplayName.trim() : artistDisplayName;
+            const selectQuery = "UPDATE videoData SET artistDisplayName=? WHERE id=?;";
+            const values = [ trimmedDisplayName, id ];
 
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
@@ -397,9 +583,10 @@ const databaseFunctions = () => {
                 } );
         },
 
-        updateTrackDisplayName ( trackID, trackDisplayName ) {
-            const selectQuery = "UPDATE tracks SET displayName=? WHERE id=?;";
-            const values = [ trackDisplayName, trackID ];
+        updateTrackDisplayName( id, trackDisplayName ) {
+            const trimmedDisplayName = trackDisplayName !== undefined ? trackDisplayName.trim() : trackDisplayName;
+            const selectQuery = "UPDATE videoData SET trackDisplayName=? WHERE id=?;";
+            const values = [ trimmedDisplayName, id ];
 
             return this.runQuery( selectQuery, values )
                 .then( ( result ) => {
@@ -493,27 +680,30 @@ const databaseFunctions = () => {
         // Top 10 Functions
         // ========================================================
 
-        async fullTop10Results ( startDate, endDate, includeDays = [ 0, 1, 2, 3, 4, 5, 6 ] ) {
-            const selectQuery = `SELECT COALESCE(a.displayName, a.artistName) AS "artist", COALESCE(t.displayName, t.trackname) AS "track", 
-(SUM(tp.upvotes-tp.downvotes) + SUM(tp.snags*6) + 
-SUM(IF(c.command='props', e.count, 0))*5 +
-SUM(IF(c.command='noice', e.count, 0))*5 +
-SUM(IF(c.command='spin', e.count, 0))*5 +
-SUM(IF(c.command='tune', e.count, 0))*5) * COUNT(DISTINCT(u.id)) AS "points",
-count(tp.id) AS "plays"
-FROM users u 
-JOIN tracksPlayed tp ON tp.djID=u.id 
-JOIN tracks t ON tp.trackID=t.id 
-JOIN artists a ON tp.artistID=a.id
-LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id 
-LEFT JOIN commandsToCount c ON c.id=e.commandsToCount_id
-WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND 
-tp.length>60 AND
-u.username != "Mr. Roboto" AND 
-DAYOFWEEK(CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central")) IN (${ includeDays.join( ', ' ) }) 
-GROUP BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname)
-ORDER BY 3 DESC, 4 DESC
-LIMIT 15;`;
+        async fullTop10Results( startDate, endDate, includeDays = [ 0, 1, 2, 3, 4, 5, 6 ] ) {
+            const selectQuery = `SELECT COALESCE(a.displayName, a.artistName) AS "artist",
+                                        COALESCE(t.displayName, t.trackname)  AS "track",
+                                        (SUM(tp.upvotes - tp.downvotes) + SUM(tp.snags * 6) +
+                                         SUM(IF(c.command = 'props', e.count, 0)) * 5 +
+                                         SUM(IF(c.command = 'noice', e.count, 0)) * 5 +
+                                         SUM(IF(c.command = 'spin', e.count, 0)) * 5 +
+                                         SUM(IF(c.command = 'tune', e.count, 0)) * 5) *
+                                        COUNT(DISTINCT (u.id))                AS "points",
+                                        count(tp.id)                          AS "plays"
+                                 FROM users u
+                                          JOIN tracksPlayed tp ON tp.djID = u.id
+                                          JOIN tracks t ON tp.trackID = t.id
+                                          JOIN artists a ON tp.artistID = a.id
+                                          LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id
+                                          LEFT JOIN commandsToCount c ON c.id = e.commandsToCount_id
+                                 WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND
+                                       tp.length > 60 AND
+                                       u.username != "Mr. Roboto" AND
+                                       DAYOFWEEK(CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central")) IN
+                                       (${ includeDays.join( ', ' ) })
+                                 GROUP BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname)
+                                 ORDER BY 3 DESC, 4 DESC
+                                 LIMIT 15;`;
 
             const values = [ startDate, endDate ];
 
@@ -526,22 +716,26 @@ LIMIT 15;`;
             }
         },
 
-        async top10ByLikesResults ( startDate, endDate, includeDays = [ 0, 1, 2, 3, 4, 5, 6 ] ) {
-            const selectQuery = `SELECT COALESCE( a.displayName, a.artistName ) AS "artist", COALESCE( t.displayName, t.trackname ) AS "track", SUM( tp.upvotes ) as upvotes, SUM( tp.downvotes ) as 'downvotes',
-                count( tp.id ) AS "plays"
-FROM users u 
-JOIN tracksPlayed tp ON tp.djID = u.id 
-JOIN tracks t ON tp.trackID = t.id 
-JOIN artists a ON tp.artistID = a.id
-LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id 
-LEFT JOIN commandsToCount c ON c.id = e.commandsToCount_id
-WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND 
-tp.length > 60 AND
-u.username != "Mr. Roboto" AND 
-DAYOFWEEK(CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central")) IN (${ includeDays.join( ', ' ) }) 
-GROUP BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname)
-ORDER BY 3 DESC, 4 ASC, 5 DESC
-limit 15;`;
+        async top10ByLikesResults( startDate, endDate, includeDays = [ 0, 1, 2, 3, 4, 5, 6 ] ) {
+            const selectQuery = `SELECT COALESCE(a.displayName, a.artistName) AS "artist",
+                                        COALESCE(t.displayName, t.trackname)  AS "track",
+                                        SUM(tp.upvotes)                       as upvotes,
+                                        SUM(tp.downvotes)                     as 'downvotes',
+                                        count(tp.id)                          AS "plays"
+                                 FROM users u
+                                          JOIN tracksPlayed tp ON tp.djID = u.id
+                                          JOIN tracks t ON tp.trackID = t.id
+                                          JOIN artists a ON tp.artistID = a.id
+                                          LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id
+                                          LEFT JOIN commandsToCount c ON c.id = e.commandsToCount_id
+                                 WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND
+                                       tp.length > 60 AND
+                                       u.username != "Mr. Roboto" AND
+                                       DAYOFWEEK(CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central")) IN
+                                       (${ includeDays.join( ', ' ) })
+                                 GROUP BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname)
+                                 ORDER BY 3 DESC, 4 ASC, 5 DESC
+                                 limit 15;`;
 
             const values = [ startDate, endDate ];
 
@@ -554,22 +748,25 @@ limit 15;`;
             }
         },
 
-        async mostPlayedTracksResults ( startDate, endDate, includeDays = [ 0, 1, 2, 3, 4, 5, 6 ] ) {
-            const selectQuery = `SELECT COALESCE(a.displayName, a.artistName) AS "artist", COALESCE(t.displayName, t.trackname) AS "track", SUM(tp.upvotes-tp.downvotes) as 'points',
-count(tp.id) AS "plays"
-FROM users u 
-JOIN tracksPlayed tp ON tp.djID=u.id 
-JOIN tracks t ON tp.trackID=t.id 
-JOIN artists a ON tp.artistID=a.id
-LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id 
-LEFT JOIN commandsToCount c ON c.id=e.commandsToCount_id
-WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND 
-tp.length>60 AND
-u.username != "Mr. Roboto" AND 
-DAYOFWEEK(CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central")) IN (${ includeDays.join( ', ' ) }) 
-GROUP BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname)
-ORDER BY 4 DESC, 3 DESC 
-limit 15;`;
+        async mostPlayedTracksResults( startDate, endDate, includeDays = [ 0, 1, 2, 3, 4, 5, 6 ] ) {
+            const selectQuery = `SELECT COALESCE(a.displayName, a.artistName) AS "artist",
+                                        COALESCE(t.displayName, t.trackname)  AS "track",
+                                        SUM(tp.upvotes - tp.downvotes)        as 'points',
+                                        count(tp.id)                          AS "plays"
+                                 FROM users u
+                                          JOIN tracksPlayed tp ON tp.djID = u.id
+                                          JOIN tracks t ON tp.trackID = t.id
+                                          JOIN artists a ON tp.artistID = a.id
+                                          LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id
+                                          LEFT JOIN commandsToCount c ON c.id = e.commandsToCount_id
+                                 WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND
+                                       tp.length > 60 AND
+                                       u.username != "Mr. Roboto" AND
+                                       DAYOFWEEK(CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central")) IN
+                                       (${ includeDays.join( ', ' ) })
+                                 GROUP BY COALESCE(a.displayName, a.artistName), COALESCE(t.displayName, t.trackname)
+                                 ORDER BY 4 DESC, 3 DESC
+                                 limit 15;`;
 
             const values = [ startDate, endDate ];
 
@@ -582,28 +779,30 @@ limit 15;`;
             }
         },
 
-        async mostPlayedArtistsResults ( startDate, endDate, includeDays = [ 0, 1, 2, 3, 4, 5, 6 ] ) {
-            const selectQuery = `SELECT artist, COUNT(*) as "plays", SUM(points) as "points" FROM (
-SELECT COALESCE(a.displayName, a.artistName) as "artist", (tp.upvotes-tp.downvotes+(tp.snags*6)+ 
-SUM(IF(c.command='props', e.count, 0))*5+
-SUM(IF(c.command='noice', e.count, 0))*5+
-SUM(IF(c.command='spin', e.count, 0))*5+
-SUM(IF(c.command='tune', e.count, 0))*5) * COUNT(DISTINCT(u.id)) AS points
-FROM users u 
-JOIN tracksPlayed tp ON tp.djID=u.id 
-JOIN tracks t ON tp.trackID=t.id 
-JOIN artists a ON tp.artistID=a.id
-LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id 
-LEFT JOIN commandsToCount c ON c.id=e.commandsToCount_id
-WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND 
-tp.length>60 AND
-u.username != "Mr. Roboto" AND
-DAYOFWEEK(CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central")) IN (${ includeDays.join( ', ' ) }) 
-GROUP BY tp.id, COALESCE(a.displayName, a.artistName)
-) trackPoints
-GROUP BY Artist
-ORDER BY 2 DESC, 3 DESC
-limit 15;`;
+        async mostPlayedArtistsResults( startDate, endDate, includeDays = [ 0, 1, 2, 3, 4, 5, 6 ] ) {
+            const selectQuery = `SELECT artist, COUNT(*) as "plays", SUM(points) as "points"
+                                 FROM (SELECT COALESCE(a.displayName, a.artistName) as "artist",
+                                              (tp.upvotes - tp.downvotes + (tp.snags * 6) +
+                                               SUM(IF(c.command = 'props', e.count, 0)) * 5 +
+                                               SUM(IF(c.command = 'noice', e.count, 0)) * 5 +
+                                               SUM(IF(c.command = 'spin', e.count, 0)) * 5 +
+                                               SUM(IF(c.command = 'tune', e.count, 0)) * 5) *
+                                              COUNT(DISTINCT (u.id))                AS points
+                                       FROM users u
+                                                JOIN tracksPlayed tp ON tp.djID = u.id
+                                                JOIN tracks t ON tp.trackID = t.id
+                                                JOIN artists a ON tp.artistID = a.id
+                                                LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id
+                                                LEFT JOIN commandsToCount c ON c.id = e.commandsToCount_id
+                                       WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND
+                                             tp.length > 60 AND
+                                             u.username != "Mr. Roboto" AND
+                                             DAYOFWEEK(CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central")) IN
+                                             (${ includeDays.join( ', ' ) })
+                                       GROUP BY tp.id, COALESCE(a.displayName, a.artistName)) trackPoints
+                                 GROUP BY Artist
+                                 ORDER BY 2 DESC, 3 DESC
+                                 limit 15;`;
 
             const values = [ startDate, endDate ];
 
@@ -616,12 +815,15 @@ limit 15;`;
             }
         },
 
-        async roomSummaryResults ( startDate, endDate ) {
-            const selectQuery = `SELECT COUNT(tp.id) AS "plays", COUNT(DISTINCT(u.id)) AS "djs", SUM(tp.upvotes) "upvotes",  SUM(tp.downvotes) as "downvotes"
-FROM tracksPlayed tp 
-JOIN users u ON tp.djID=u.id 
-WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND 
-u.username != "Mr. Roboto";`;
+        async roomSummaryResults( startDate, endDate ) {
+            const selectQuery = `SELECT COUNT(tp.id)           AS "plays",
+                                        COUNT(DISTINCT (u.id)) AS "djs",
+                                        SUM(tp.upvotes)           "upvotes",
+                                        SUM(tp.downvotes)      as "downvotes"
+                                 FROM tracksPlayed tp
+                                          JOIN users u ON tp.djID = u.id
+                                 WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND
+                                       u.username != "Mr. Roboto";`;
             const values = [ startDate, endDate ];
 
             try {
@@ -633,26 +835,26 @@ u.username != "Mr. Roboto";`;
             }
         },
 
-        async top10DJResults ( startDate, endDate ) {
-            const selectQuery = `SELECT dj, SUM(points) as "points" FROM (
-SELECT u.username as "dj", SUM(tp.upvotes)-SUM(tp.downvotes)+SUM(tp.snags*6)+
-(SUM(IF(c.command='props', e.count, 0))*5)+
-(SUM(IF(c.command='noice', e.count, 0))*5)+
-(SUM(IF(c.command='spin', e.count, 0))*5)+
-(SUM(IF(c.command='tune', e.count, 0))*5) AS points
-FROM users u 
-JOIN tracksPlayed tp ON tp.djID=u.id 
-JOIN tracks t ON tp.trackID=t.id 
-JOIN artists a ON tp.artistID=a.id
-LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id 
-LEFT JOIN commandsToCount c ON c.id=e.commandsToCount_id
-WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND 
-tp.length>60
-GROUP BY tp.id, u.username
-) trackPoints
-GROUP BY dj
-ORDER BY 2 DESC
-LIMIT 11;`;
+        async top10DJResults( startDate, endDate ) {
+            const selectQuery = `SELECT dj, SUM(points) as "points"
+                                 FROM (SELECT u.username                                    as "dj",
+                                              SUM(tp.upvotes) - SUM(tp.downvotes) + SUM(tp.snags * 6) +
+                                              (SUM(IF(c.command = 'props', e.count, 0)) * 5) +
+                                              (SUM(IF(c.command = 'noice', e.count, 0)) * 5) +
+                                              (SUM(IF(c.command = 'spin', e.count, 0)) * 5) +
+                                              (SUM(IF(c.command = 'tune', e.count, 0)) * 5) AS points
+                                       FROM users u
+                                                JOIN tracksPlayed tp ON tp.djID = u.id
+                                                JOIN tracks t ON tp.trackID = t.id
+                                                JOIN artists a ON tp.artistID = a.id
+                                                LEFT JOIN extendedTrackStats e ON e.tracksPlayed_id = tp.id
+                                                LEFT JOIN commandsToCount c ON c.id = e.commandsToCount_id
+                                       WHERE CONVERT_TZ(tp.whenPlayed, "UTC", "US/Central") BETWEEN ? AND ? AND
+                                             tp.length > 60
+                                       GROUP BY tp.id, u.username) trackPoints
+                                 GROUP BY dj
+                                 ORDER BY 2 DESC
+                                 LIMIT 11;`;
             const values = [ startDate, endDate ];
 
             try {
@@ -667,8 +869,6 @@ LIMIT 11;`;
         // ========================================================
 
     }
-
-
 
 
 }

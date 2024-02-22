@@ -280,15 +280,30 @@ const chatFunctions = ( bot, roomDefaults ) => {
                     }, 2 * 1000 ); // seconds * 1000 to convert to milliseconds
                 }
             }
-            console.groupEnd();
         },
 
-        readSongStats: function ( data, songFunctions, botFunctions ) {
-            if ( botFunctions.readSongStats() ) {
-                const readInOrder = async () => {
-                    this.botSpeak( 'Stats for ' + songFunctions.song() + ' by ' + songFunctions.artist() + '\n:thumbsup:' + songFunctions.previousUpVotes() + ':thumbsdown:' + songFunctions.previousDownVotes() + ':heart:' + songFunctions.previousSnags(), data );
+        readSongStats: async function ( data, songFunctions, botFunctions, databaseFunctions ) {
+            const youtube_id = data.room.metadata.current_song.metadata.ytid;
+
+            try {
+                let artistName = await songFunctions.getArtistName( youtube_id, databaseFunctions );
+                if ( !artistName ) {
+                    artistName = songFunctions.previousArtist();
                 }
-                readInOrder();
+
+                let trackName = await songFunctions.getTrackName( youtube_id, databaseFunctions );
+                if ( !trackName ) {
+                    trackName = songFunctions.previousTrack();
+                }
+
+                if ( botFunctions.readSongStats() ) {
+                    this.botSpeak( 'Artist: ' + artistName + '\nTitle: ' + trackName +
+                        '\nStats: :thumbsup: ' + songFunctions.previousUpVotes() +
+                        ' :thumbsdown: ' + songFunctions.previousDownVotes() +
+                        ' :heart:' + songFunctions.previousSnags(), data );
+                }
+            } catch ( error ) {
+                console.error( "Error reading song stats:", error );
             }
         },
 
@@ -311,8 +326,7 @@ const chatFunctions = ( bot, roomDefaults ) => {
                 if ( roomDefaults.eventMessageThroughPm === false ) //if set to send messages through chatbox, do so
                 {
                     bot.speak( roomDefaults.eventMessages[ botFunctions.messageCounter ] + "" );
-                }
-                else //else send message through pm
+                } else //else send message through pm
                 {
                     for ( let jio = 0; jio < userFunctions.userIDs.length; jio++ ) {
                         bot.pm( roomDefaults.eventMessages[ botFunctions.messageCounter ] + "", userFunctions.userIDs[ jio ] );
