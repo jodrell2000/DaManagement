@@ -292,6 +292,7 @@ const songFunctions = ( bot ) => {
         songInfoCommand( data, databaseFunctions, chatFunctions ) {
             console.group();
             console.log( "data:" + JSON.stringify( data ) );
+            console.log( "ytid:" + this.ytid() );
 
             console.groupEnd();
         },
