@@ -550,6 +550,7 @@ app.get( '/listunverified', async ( req, res ) => {
         const songList = await databaseFunctions.getUnverifiedSongList( dbSearchArgs );
         const dbStats = await databaseFunctions.getVerifiedStats();
         const djStatsObject = await databaseFunctions.getVerificationDJStats();
+        console.log( "djStatsObject:" + JSON.stringify( djStatsObject ) );
         const unfixedCount = djStatsObject[ 'Unfixed' ];
         console.log( "unfixedCount:" + unfixedCount );
         const availableRoboCoins = songFunctions.fixTrackPayments() * unfixedCount;
