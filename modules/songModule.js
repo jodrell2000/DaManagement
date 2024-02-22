@@ -298,11 +298,11 @@ const songFunctions = ( bot ) => {
 
             if ( await databaseFunctions.checkVideoDataExists( this.ytid() ) ) {
                 songInfo = await databaseFunctions.getSongInfoData( this.ytid() );
+                chatFunctions.botSpeak( "The song " + songInfo[ 0 ].trackName + " by " + songInfo[ 0 ].artistName + " has been played " + songInfo[ 0 ].playCount + " times and was first played " + songInfo[ 0 ].firstPlay, data );
             } else {
-                songInfo = [ 1 ];
+                chatFunctions.botSpeak( "I can't find a confirmed listing for this track", data );
             }
 
-            chatFunctions.botSpeak( JSON.stringify( songInfo ), data );
             console.groupEnd();
         },
 
