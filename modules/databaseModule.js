@@ -430,7 +430,7 @@ const databaseFunctions = () => {
             const nameQuery = "SELECT COALESCE(artistDisplayName, artistName) AS artistName, COALESCE(trackDisplayName, trackName) AS trackName FROM videoData WHERE id=?";
             const nameValues = [ ytid ];
 
-            const whenQuery = "SELECT DATE_FORMAT(MIN(tp.whenPlayed), '%w %D %M %Y') as firstPlay, count(tp.id) AS playCount FROM videoData vd JOIN tracksPlayed tp ON tp.videoData_id=vd.id  where vd.artistName = ? AND vd.trackDisplayName = ?;";
+            const whenQuery = "SELECT DATE_FORMAT(MIN(tp.whenPlayed), '%W %D %M %Y') as firstPlay, count(tp.id) AS playCount FROM videoData vd JOIN tracksPlayed tp ON tp.videoData_id=vd.id  where vd.artistName = ? AND vd.trackDisplayName = ?;";
 
             return this.runQuery( nameQuery, nameValues )
                 .then( ( results ) => {
