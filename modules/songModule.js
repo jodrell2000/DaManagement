@@ -299,7 +299,7 @@ const songFunctions = ( bot ) => {
                 await databaseFunctions.getSongInfoData( this.ytid() )
                     .then( ( songInfo ) => {
                         console.log( "songInfo:" + JSON.stringify( songInfo ) );
-                        chatFunctions.botSpeak( "The song " + songInfo.trackName + " by " + songInfo.artistName + " has been played " + songInfo.playCount + " times and was first played on " + songInfo.firstPlay, data );
+                        chatFunctions.botSpeak( "The song " + songInfo.trackName + " by " + songInfo.artistName + " has been played " + songInfo.playCount + " times by " + songInfo.djCount + " different DJs, and was first played on " + songInfo.firstPlay, data );
                     } )
             } else {
                 chatFunctions.botSpeak( "I can't find a confirmed listing for this track", data );
