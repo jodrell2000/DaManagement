@@ -762,10 +762,7 @@ app.get( '/signup', ( req, res ) => {
 } );
 
 app.post( '/signup', async ( req, res, next ) => {
-    console.group( "signup" );
     const { email, username, password, confirmPassword } = req.body;
-    console.log( "email:" + email );
-    console.log( "username:" + username );
     const userID = userFunctions.getUserIDFromUsername( username );
 
     // Check if the passwords match
@@ -805,7 +802,6 @@ app.post( '/signup', async ( req, res, next ) => {
             console.error( 'Error verifying user email:', error );
             return res.status( 500 ).send( 'Internal server error' );
         } );
-    console.groupEnd();
 } );
 
 async function authentication( req, res, next ) {
