@@ -293,6 +293,8 @@ const songFunctions = ( bot ) => {
             console.group();
             console.log( "data:" + JSON.stringify( data ) );
             console.log( "ytid:" + this.ytid() );
+            console.log( "song:" + this.song() );
+            console.log( "artist:" + this.artist() );
 
             console.groupEnd();
         },
