@@ -23,6 +23,7 @@ let ALLREADYCALLED = false; //resets votesnagging so that it can be called again
 let curSongWatchdog = null; //used to hold the timer for stuck songs
 let takedownTimer = null; //used to hold the timer that fires after curSongWatchDog which represents the time a person with a stuck song has left to skip their song
 let votesLeft = roomDefaults.HowManyVotesToSkip;
+const fixTrackPayments = 0.1;
 
 const songFunctions = ( bot ) => {
     return {
@@ -43,6 +44,9 @@ const songFunctions = ( bot ) => {
         votesLeft: () => votesLeft,
         setVotesLeft: function ( value ) { votesLeft = value; },
         decrementVotesLeft: function () { --votesLeft; },
+
+        fixTrackPayments: () => fixTrackPayments,
+
 
         // ========================================================
         // Playlist Functions
