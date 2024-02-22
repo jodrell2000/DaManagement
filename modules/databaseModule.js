@@ -428,13 +428,20 @@ const databaseFunctions = () => {
             const nameQuery = "SELECT COALESCE(artistDisplayName, artistName) AS artistName, COALESCE(trackDisplayName, trackName) AS trackName FROM videoData WHERE id=?";
             const values = [ ytid ];
             return this.runQuery( nameQuery, values )
-                .then( ( result ) => {
-                    const artistName = result.artistName;
-                    console.log( "artistName:" + artistName );
-                    const trackName = result.trackName;
-                    console.log( "trackName:" + trackName );
-                    console.groupEnd();
+                .then( ( results ) => {
+                    if ( results.length > 0 ) {
+                        const artistName = results[ 0 ].artistName;
+                        console.log( "artistName:", artistName );
+                        const trackName = results[ 0 ].trackName;
+                        console.log( "trackName:", trackName );
+                    } else
+                        console.groupEnd();
                 } )
+                .catch( ( error ) => {
+                    console.error( 'Error:', error );
+                    console.groupEnd(); // Make sure to end the console group in case of an error
+                    throw error; // Rethrow the error for further investigation
+                } );
         },
 
         // ========================================================
