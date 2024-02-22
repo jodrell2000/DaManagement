@@ -117,10 +117,10 @@ const commandFunctions = ( bot ) => {
     }
     generalCommands.robocoin.help = "How many Robo points do you have?";
 
-    generalCommands.songinfo = ( { songFunctions, data, databaseFunctions, mlFunctions, chatFunctions } ) => {
-        songFunctions.songInfoCommand( data, databaseFunctions, mlFunctions, chatFunctions );
+    generalCommands.songinfo = ( { songFunctions, data, databaseFunctions, chatFunctions } ) => {
+        songFunctions.songInfoCommand( data, databaseFunctions, chatFunctions );
     }
-    generalCommands.songinfo.help = "Lookup song info from Discogs";
+    generalCommands.songinfo.help = "Lookup song info from the DB";
 
     generalCommands.searchspotify = ( { songFunctions, data, databaseFunctions, mlFunctions, chatFunctions } ) => {
         songFunctions.searchSpotifyCommand( data, databaseFunctions, mlFunctions, chatFunctions );

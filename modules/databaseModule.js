@@ -334,8 +334,7 @@ const databaseFunctions = () => {
                     if ( result.length !== 0 ) {
                         return result[ 0 ][ 'id' ];
                     } else {
-                        const insertQuery = `INSERT INTO artists
-                                             SET ?;`;
+                        const insertQuery = "INSERT INTO artists (artistName) VALUES (?);";
                         const values = { artistName: theName }
                         return this.runQuery( insertQuery, values )
                             .then( ( result ) => {
@@ -355,8 +354,7 @@ const databaseFunctions = () => {
                     if ( result.length !== 0 ) {
                         return result[ 0 ][ 'id' ];
                     } else {
-                        const insertQuery = `INSERT INTO tracks
-                                             SET ?;`;
+                        const insertQuery = "INSERT INTO tracks (trackName) VALUES (?);";
                         const values = { trackName: theName }
                         return this.runQuery( insertQuery, values )
                             .then( ( result ) => {
@@ -423,6 +421,33 @@ const databaseFunctions = () => {
                     }
                 } )
                 .catch( ( ex ) => { console.error( "Something went wrong getting the track played time: " + ex ); } );
+        },
+
+        getSongInfoData: async function ( ytid ) {
+            console.group( "getSongInfoData" );
+            let songInfo = {};
+
+            const nameQuery = "SELECT COALESCE(artistDisplayName, artistName) AS artistName, COALESCE(trackDisplayName, trackName) AS trackName FROM videoData WHERE id=?";
+            const nameValues = [ ytid ];
+
+            const whenQuery = "SELECT DATE_FORMAT(MIN(tp.whenPlayed), '%W %D %M %Y') as firstPlay, count(tp.id) AS playCount FROM videoData vd JOIN tracksPlayed tp ON tp.videoData_id=vd.id  where vd.artistName = ? AND vd.trackDisplayName = ?;";
+
+            return this.runQuery( nameQuery, nameValues )
+                .then( ( results ) => {
+                    songInfo.artistName = results[ 0 ].artistName;
+                    songInfo.trackName = results[ 0 ].trackName;
+                    const whenValues = [ songInfo.artistName, songInfo.trackName ];
+                    return this.runQuery( whenQuery, whenValues )
+                        .then( ( results ) => {
+                            songInfo.firstPlay = results[ 0 ].firstPlay;
+                            songInfo.playCount = results[ 0 ].playCount;
+                            return songInfo;
+                        } );
+                } )
+                .catch( ( error ) => {
+                    console.error( 'Error:', error );
+                    throw error;
+                } );
         },
 
         // ========================================================
