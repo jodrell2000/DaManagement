@@ -289,13 +289,20 @@ const songFunctions = ( bot ) => {
         // Song Info Functions
         // ========================================================
 
-        songInfoCommand( data, databaseFunctions, chatFunctions ) {
+        songInfoCommand: async function ( data, databaseFunctions, chatFunctions ) {
             console.group();
-            console.log( "data:" + JSON.stringify( data ) );
             console.log( "ytid:" + this.ytid() );
             console.log( "song:" + this.song() );
             console.log( "artist:" + this.artist() );
+            let songInfo = [];
 
+            if ( await databaseFunctions.checkVideoDataExists( this.ytid() ) ) {
+                songInfo = await databaseFunctions.getSongInfoData( this.ytid() );
+            } else {
+                songInfo = [ 1 ];
+            }
+
+            chatFunctions.botSpeak( JSON.stringify( songInfo ), data );
             console.groupEnd();
         },
 

@@ -334,8 +334,7 @@ const databaseFunctions = () => {
                     if ( result.length !== 0 ) {
                         return result[ 0 ][ 'id' ];
                     } else {
-                        const insertQuery = `INSERT INTO artists
-                                             SET ?;`;
+                        const insertQuery = "INSERT INTO artists (artistName) VALUES (?);";
                         const values = { artistName: theName }
                         return this.runQuery( insertQuery, values )
                             .then( ( result ) => {
@@ -355,8 +354,7 @@ const databaseFunctions = () => {
                     if ( result.length !== 0 ) {
                         return result[ 0 ][ 'id' ];
                     } else {
-                        const insertQuery = `INSERT INTO tracks
-                                             SET ?;`;
+                        const insertQuery = "INSERT INTO tracks (trackName) VALUES (?);";
                         const values = { trackName: theName }
                         return this.runQuery( insertQuery, values )
                             .then( ( result ) => {
@@ -423,6 +421,20 @@ const databaseFunctions = () => {
                     }
                 } )
                 .catch( ( ex ) => { console.error( "Something went wrong getting the track played time: " + ex ); } );
+        },
+
+        getSongInfoData: async function ( ytid ) {
+            console.group( "getSongInfoData" );
+            const nameQuery = "SELECT COALESCE(artistDisplayName, artistName) AS artistName, COALESCE(trackDisplayName, trackName) AS trackName FROM videoData WHERE id=?";
+            const values = [ ytid ];
+            return this.runQuery( nameQuery, values )
+                .then( ( result ) => {
+                    const artistName = result.artistName;
+                    console.log( "artistName:" + artistName );
+                    const trackName = result.trackName;
+                    console.log( "trackName:" + trackName );
+                    console.groupEnd();
+                } )
         },
 
         // ========================================================
