@@ -425,7 +425,7 @@ const databaseFunctions = () => {
 
         getSongInfoData: async function ( ytid ) {
             console.group( "getSongInfoData" );
-            let dataArray = [];
+            let songInfo = {};
 
             const nameQuery = "SELECT COALESCE(artistDisplayName, artistName) AS artistName, COALESCE(trackDisplayName, trackName) AS trackName FROM videoData WHERE id=?";
             const nameValues = [ ytid ];
@@ -434,12 +434,14 @@ const databaseFunctions = () => {
 
             return this.runQuery( nameQuery, nameValues )
                 .then( ( results ) => {
-                    dataArray.push( { artistName: results[ 0 ].artistName, trackName: results[ 0 ].trackName } );
-                    const whenValues = [ dataArray[ 0 ].artistName, dataArray[ 0 ].trackName ]; // Access elements with index
+                    songInfo.artistName = results[ 0 ].artistName;
+                    songInfo.trackName = results[ 0 ].trackName;
+                    const whenValues = [ songInfo.artistName, songInfo.trackName ];
                     return this.runQuery( whenQuery, whenValues )
                         .then( ( results ) => {
-                            dataArray.push( { firstPlay: results[ 0 ].firstPlay, playCount: results[ 0 ].playCount } );
-                            return dataArray;
+                            songInfo.firstPlay = results[ 0 ].firstPlay;
+                            songInfo.playCount = results[ 0 ].playCount;
+                            return songInfo;
                         } );
                 } )
                 .catch( ( error ) => {
