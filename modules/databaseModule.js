@@ -478,7 +478,7 @@ const databaseFunctions = () => {
         },
 
         getVerifiedStats: async function () {
-            const theQuery = "SELECT 'Fixed' AS 'Metric', count(*) AS 'Count' FROM videoData WHERE artistDisplayName IS NOT NULL AND trackDisplayName IS NOT NULL UNION ALL SELECT 'Unfixed' AS 'Metric', count(*) AS 'Count' FROM videoData WHERE artistDisplayName IS NULL OR trackDisplayName IS NULL UNION ALL SELECT 'Total' AS 'Metric', count(*) AS 'Count' FROM videoData;";
+            const theQuery = "SELECT 'Fixed' AS 'Metric', count(*) AS 'Count' FROM videoData WHERE artistDisplayName IS NOT NULL AND trackDisplayName IS NOT NULL UNION ALL SELECT 'Unfixed' AS 'Metric', SUM(if(artistDisplayName IS NULL, 1, 0))+SUM(if(trackDisplayName IS NULL, 1, 0)) AS 'Count' FROM videoData UNION ALL SELECT 'Total' AS 'Metric', count(*) AS 'Count' FROM videoData;";
             const values = [];
 
             return this.runQuery( theQuery, values )
