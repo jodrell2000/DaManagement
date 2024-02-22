@@ -553,7 +553,7 @@ app.get( '/listunverified', async ( req, res ) => {
         const unfixedCount = dbStats[ 'Unfixed' ];
         let availableRoboCoins = songFunctions.fixTrackPayments() * unfixedCount;
         availableRoboCoins = availableRoboCoins.toFixed( 2 );
-        const djStats = Object.entries( djStatsObject ).slice( 0, 10 );
+        const djStats = Object.entries( djStatsObject ).slice( 0, 7 );
 
         let html = pug.renderFile( './templates/listUnverifiedSongs.pug', {
             songList,
