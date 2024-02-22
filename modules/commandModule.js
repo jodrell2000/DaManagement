@@ -120,7 +120,7 @@ const commandFunctions = ( bot ) => {
     generalCommands.songinfo = ( { songFunctions, data, databaseFunctions, mlFunctions, chatFunctions } ) => {
         songFunctions.songInfoCommand( data, databaseFunctions, mlFunctions, chatFunctions );
     }
-    generalCommands.songinfo.help = "Lookup song info from Discogs";
+    generalCommands.songinfo.help = "Lookup song info from the DB";
 
     generalCommands.searchspotify = ( { songFunctions, data, databaseFunctions, mlFunctions, chatFunctions } ) => {
         songFunctions.searchSpotifyCommand( data, databaseFunctions, mlFunctions, chatFunctions );

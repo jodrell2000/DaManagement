@@ -150,12 +150,20 @@ const songFunctions = ( bot ) => {
 
         getArtistName: async function ( youtube_id, databaseFunctions ) {
             const array = await databaseFunctions.getVerifiedArtistFromID( youtube_id );
-            return array[ 0 ].artistDisplayName;
+            if ( array.length > 0 ) {
+                return array[ 0 ].artistDisplayName;
+            } else {
+                return false;
+            }
         },
 
         getTrackName: async function ( youtube_id, databaseFunctions ) {
             const array = await databaseFunctions.getVerifiedTrackFromID( youtube_id );
-            return array[ 0 ].trackDisplayName;
+            if ( array.length > 0 ) {
+                return array[ 0 ].trackDisplayName;
+            } else {
+                return false;
+            }
         },
 
         // ========================================================
@@ -281,42 +289,11 @@ const songFunctions = ( bot ) => {
         // Song Info Functions
         // ========================================================
 
-        songInfoCommand( data, databaseFunctions, mlFunctions, chatFunctions ) {
-            let verifiedSong;
-            let verifiedArtist;
+        songInfoCommand( data, databaseFunctions, chatFunctions ) {
+            console.group();
+            console.log( "data:" + JSON.stringify( data ) );
 
-            const getVerifiedTracks = databaseFunctions.getVerifiedTracksFromName( song )
-                .then( ( array ) => {
-                    verifiedSong = array[ 0 ].displayName;
-                } );
-
-            const getVerifiedArtists = databaseFunctions.getVerifiedArtistsFromName( artist )
-                .then( ( array ) => {
-                    verifiedArtist = array[ 0 ].displayName;
-                } );
-
-            Promise.all( [ getVerifiedTracks, getVerifiedArtists ] )
-                .then( () => {
-                    if ( verifiedSong && verifiedArtist ) {
-                        mlFunctions.searchDiscogs( verifiedSong, verifiedArtist )
-                            .then( ( returned ) => {
-                                chatFunctions.botSpeak( "This is " + verifiedSong + " by " + verifiedArtist, data );
-                                chatFunctions.botSpeak( returned.thumbnail, data );
-                                chatFunctions.botSpeak( "Released in " + returned.releaseCountry + " in " + returned.releaseYear, data );
-                                chatFunctions.botSpeak( "More info can be found here: " + returned.discogsUrl, data );
-
-                                //console.log( "tracklist:" + returned.tracklist );
-                            } )
-                            .catch( () => {
-                                chatFunctions.botSpeak( "Sorry, I couldn't find that online: " + verifiedSong + " by " + verifiedArtist, data );
-                            } )
-                    } else {
-                        chatFunctions.botSpeak( "Sorry, I couldn't find that in my Database", data );
-                    }
-                } )
-                .catch( ( error ) => {
-                    console.log( "Error:", error );
-                } );
+            console.groupEnd();
         },
 
         searchSpotifyCommand( data, databaseFunctions, mlFunctions, chatFunctions ) {
