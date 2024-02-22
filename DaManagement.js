@@ -578,7 +578,7 @@ app.post( '/updateArtistDisplayName', async ( req, res ) => {
         await databaseFunctions.updateArtistDisplayName( videoData_id, artistDisplayName );
 
         const userID = userFunctions.getUserIDFromUsername( username );
-        const numCoins = 0.05;
+        const numCoins = 0.1;
         const changeReason = "Fixed artist name for " + videoData_id;
         const changeID = 5;
         await userFunctions.addRoboCoins( userID, numCoins, changeReason, changeID, databaseFunctions );
@@ -603,7 +603,7 @@ app.post( '/updateTrackDisplayName', async ( req, res ) => {
         await databaseFunctions.updateTrackDisplayName( videoData_id, trackDisplayName );
 
         const userID = userFunctions.getUserIDFromUsername( username );
-        const numCoins = 0.05;
+        const numCoins = 0.1;
         const changeReason = "Fixed track name for " + videoData_id;
         const changeID = 5;
         await userFunctions.addRoboCoins( userID, numCoins, changeReason, changeID, databaseFunctions );
