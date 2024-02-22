@@ -294,11 +294,10 @@ const songFunctions = ( bot ) => {
             console.log( "ytid:" + this.ytid() );
             console.log( "song:" + this.song() );
             console.log( "artist:" + this.artist() );
-            let songInfo = [];
 
             if ( await databaseFunctions.checkVideoDataExists( this.ytid() ) ) {
                 await databaseFunctions.getSongInfoData( this.ytid() )
-                    .then( () => {
+                    .then( ( songInfo ) => {
                         console.log( "songInfo:" + JSON.stringify( songInfo ) );
                         chatFunctions.botSpeak( "The song " + songInfo[ 0 ].trackName + " by " + songInfo[ 0 ].artistName + " has been played " + songInfo[ 0 ].playCount + " times and was first played " + songInfo[ 0 ].firstPlay, data );
                     } )
