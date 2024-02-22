@@ -290,11 +290,6 @@ const songFunctions = ( bot ) => {
         // ========================================================
 
         songInfoCommand: async function ( data, databaseFunctions, chatFunctions ) {
-            console.group();
-            console.log( "ytid:" + this.ytid() );
-            console.log( "song:" + this.song() );
-            console.log( "artist:" + this.artist() );
-
             if ( await databaseFunctions.checkVideoDataExists( this.ytid() ) ) {
                 await databaseFunctions.getSongInfoData( this.ytid() )
                     .then( ( songInfo ) => {
@@ -304,8 +299,6 @@ const songFunctions = ( bot ) => {
             } else {
                 chatFunctions.botSpeak( "I can't find a confirmed listing for this track", data );
             }
-
-            console.groupEnd();
         },
 
         searchSpotifyCommand( data, databaseFunctions, mlFunctions, chatFunctions ) {

@@ -424,7 +424,6 @@ const databaseFunctions = () => {
         },
 
         getSongInfoData: async function ( ytid ) {
-            console.group( "getSongInfoData" );
             let songInfo = {};
 
             const nameQuery = "SELECT COALESCE(artistDisplayName, artistName) AS artistName, COALESCE(trackDisplayName, trackName) AS trackName FROM videoData WHERE id=?";
