@@ -805,6 +805,7 @@ app.post( '/signup', async ( req, res, next ) => {
 } );
 
 async function authentication( req, res, next ) {
+    console.group( authentication );
     const authHeader = req.headers.authorization;
 
     if ( !authHeader ) {
@@ -817,36 +818,44 @@ async function authentication( req, res, next ) {
     const auth = Buffer.from( authHeader.split( ' ' )[ 1 ], 'base64' ).toString().split( ':' );
     const username = auth[ 0 ];
     const password = auth[ 1 ];
+    console.log( "username:" + username );
+    console.log( "password:" + password );
 
     try {
         // Retrieve hashed password from the database based on the username
         const hashedPassword = await databaseFunctions.retrieveHashedPassword( username );
+        console.log( "hashedPassword:" + hashedPassword );
 
         if ( !hashedPassword ) {
             // If the user doesn't have a password set, redirect to the signup page
             if ( req.originalUrl !== '/signup' ) {
                 return res.redirect( '/signup' );
             }
+            console.groupEnd();
             return next();
         }
 
         // Compare hashed password from the database with the provided password
         const match = await bcrypt.compare( password, hashedPassword );
+        console.log( "match:" + match );
 
         if ( match ) {
             // If the passwords match, the user is authenticated
             req.username = username;
+            console.groupEnd();
             return next();
         } else {
             const err = new Error( 'Incorrect username or password' );
             res.setHeader( 'WWW-Authenticate', 'Basic' );
             err.status = 401;
+            console.groupEnd();
             return next( err );
         }
     } catch ( error ) {
         console.error( 'Error during authentication:', error );
         const err = new Error( 'Internal server error' );
         err.status = 500;
+        console.groupEnd();
         return next( err );
     }
 }
