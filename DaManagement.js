@@ -35,10 +35,19 @@ const dayjs = require( 'dayjs' );
 const utc = require( 'dayjs/plugin/utc' );
 dayjs.extend( utc )
 const bcrypt = require( 'bcrypt' );
+const session = require( 'express-session' );
+const cookieParser = require( 'cookie-parser' );
+
 
 // Use Morgan middleware for logging
 // const morgan = require( 'morgan' );
 // app.use( morgan( 'dev' ) );
+
+app.use( session( {
+    secret: 'your_secret_key',
+    resave: false,
+    saveUninitialized: true
+} ) );
 
 // serve static files from teh images folder
 app.use( '/images', express.static( path.join( __dirname, 'images' ) ) );
@@ -48,7 +57,7 @@ app.use( ( req, res, next ) => {
     if ( req.originalUrl === '/signup' || req.originalUrl === '/instructions' || req.originalUrl === '/images' ) {
         return next();
     }
-    authentication( req, res, next );
+    protectRoute( req, res, next );
 } );
 
 app.use( `/scripts`, express.static( './scripts' ) );
@@ -779,11 +788,11 @@ app.post( '/signup', async ( req, res, next ) => {
     userFunctions.verifyUsersEmail( userID, email, databaseFunctions )
         .then( verify => {
             if ( !verify ) {
-                return res.status( 400 ).send( 'User\'s email does not match' );
+                return res.status( 400 ).send( "User's email does not match" );
             }
             bcrypt.hash( password, 10 )
                 .then( passwordHash => {
-                    setPassword( { req, res, next, username, passwordHash } )
+                    setPassword( { next, username, passwordHash } )
                         .then( () => {
                             // Redirect after successful password setting
                             res.redirect( '/listunverified' );
@@ -804,54 +813,42 @@ app.post( '/signup', async ( req, res, next ) => {
         } );
 } );
 
-async function authentication( req, res, next ) {
-    const authHeader = req.headers.authorization;
-
-    if ( !authHeader ) {
-        const err = new Error( 'You are not authenticated!' );
-        res.setHeader( 'WWW-Authenticate', 'Basic' );
-        res.status( 401 ).send( err );
-        return;
-    }
-
-    const auth = Buffer.from( authHeader.split( ' ' )[ 1 ], 'base64' ).toString().split( ':' );
-    const username = auth[ 0 ];
-    const password = auth[ 1 ];
-
-    try {
-        // Retrieve hashed password from the database based on the username
-        const hashedPassword = await databaseFunctions.retrieveHashedPassword( username );
-
-        if ( !hashedPassword ) {
-            // If the user doesn't have a password set, redirect to the signup page
-            if ( req.originalUrl !== '/signup' ) {
-                return res.redirect( '/signup' );
-            }
-            return next();
-        }
-
-        // Compare hashed password from the database with the provided password
-        const match = await bcrypt.compare( password, hashedPassword );
-
-        if ( match ) {
-            // If the passwords match, the user is authenticated
-            req.username = username;
-            return next();
-        } else {
-            const err = new Error( 'Incorrect username or password' );
-            res.setHeader( 'WWW-Authenticate', 'Basic' );
-            err.status = 401;
-            return next( err );
-        }
-    } catch ( error ) {
-        console.error( 'Error during authentication:', error );
-        const err = new Error( 'Internal server error' );
-        err.status = 500;
-        return next( err );
+function protectRoute( req, res, next ) {
+    if ( req.session && req.session.user ) {
+        // User is authenticated, proceed to the next middleware
+        next();
+    } else {
+        // User is not authenticated, redirect to the login page
+        res.redirect( '/login' );
     }
 }
 
-async function setPassword( { req, res, next, username, passwordHash } ) {
+app.post( '/login', async ( req, res ) => {
+    // Implement your login logic here
+    const { username, password } = req.body;
+    if ( await authentication( username, password ) ) {
+        req.session.user = username; // Store user information in the session
+        res.redirect( '/listunverified' ); // Redirect to the home page after successful login
+    } else {
+        res.redirect( '/signup' );
+    }
+} );
+
+async function authentication( username, password ) {
+    try {
+        const hashedPassword = await databaseFunctions.retrieveHashedPassword( username );
+        if ( !hashedPassword ) {
+            return false; // User not found
+        }
+
+        return await bcrypt.compare( password, hashedPassword ); // Return true if passwords match, false otherwise
+    } catch ( error ) {
+        console.error( 'Error during authentication:', error );
+        throw new Error( 'Internal server error' );
+    }
+}
+
+async function setPassword( { next, username, passwordHash } ) {
     try {
         const userID = userFunctions.getUserIDFromUsername( username );
         await userFunctions.storeUserData( userID, "password_hash", passwordHash, databaseFunctions );

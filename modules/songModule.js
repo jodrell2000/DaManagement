@@ -293,7 +293,6 @@ const songFunctions = ( bot ) => {
             if ( await databaseFunctions.checkVideoDataExists( this.ytid() ) ) {
                 await databaseFunctions.getSongInfoData( this.ytid() )
                     .then( ( songInfo ) => {
-                        console.log( "songInfo:" + JSON.stringify( songInfo ) );
                         chatFunctions.botSpeak( "The song " + songInfo.trackName + " by " + songInfo.artistName + " has been played " + songInfo.playCount + " times by " + songInfo.djCount + " different DJs, and was first played on " + songInfo.firstPlay, data );
                     } )
             } else {
