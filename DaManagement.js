@@ -829,6 +829,7 @@ async function authentication( req, res, next ) {
         if ( !hashedPassword ) {
             // If the user doesn't have a password set, redirect to the signup page
             if ( req.originalUrl !== '/signup' ) {
+                console.groupEnd();
                 return res.redirect( '/signup' );
             }
             console.groupEnd();
