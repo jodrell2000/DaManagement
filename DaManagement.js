@@ -822,6 +822,12 @@ function protectRoute( req, res, next ) {
     }
 }
 
+app.get( '/signup', ( req, res ) => {
+    let html = pug.renderFile( './templates/signup.pug' );
+    res.send( html );
+
+} );
+
 app.post( '/login', async ( req, res ) => {
     // Implement your login logic here
     const { username, password } = req.body;
