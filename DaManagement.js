@@ -36,7 +36,6 @@ const utc = require( 'dayjs/plugin/utc' );
 dayjs.extend( utc )
 const bcrypt = require( 'bcrypt' );
 const session = require( 'express-session' );
-const cookieParser = require( 'cookie-parser' );
 
 
 // Use Morgan middleware for logging

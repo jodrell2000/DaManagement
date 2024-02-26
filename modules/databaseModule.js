@@ -431,7 +431,7 @@ const databaseFunctions = () => {
 
             const whenQuery = "SELECT DATE_FORMAT(MIN(tp.whenPlayed), '%W %D %M %Y') as firstPlay, COUNT(tp.id) AS playCount, COUNT(DISTINCT(djID)) AS djCount " +
                 "FROM videoData vd JOIN tracksPlayed tp ON tp.videoData_id=vd.id " +
-                "WHERE vd.artistName = ? AND vd.trackDisplayName = ?;";
+                "WHERE COALESCE(artistDisplayName, artistName) = ? AND COALESCE(trackDisplayName, trackName) = ?;";
 
             return this.runQuery( nameQuery, nameValues )
                 .then( ( results ) => {
