@@ -734,6 +734,9 @@ const databaseFunctions = () => {
 
             const values = [ startDate, endDate ];
 
+            console.group( "fullTop10Results" );
+            console.log( "selectQuery:" + selectQuery );
+            console.groupEnd();
             try {
                 const result = await this.runQuery( selectQuery, values );
                 return result;
@@ -766,6 +769,9 @@ const databaseFunctions = () => {
 
             const values = [ startDate, endDate ];
 
+            console.group( "top10ByLikesResults" );
+            console.log( "selectQuery:" + selectQuery );
+            console.groupEnd();
             try {
                 const result = await this.runQuery( selectQuery, values );
                 return result;
@@ -797,6 +803,9 @@ const databaseFunctions = () => {
 
             const values = [ startDate, endDate ];
 
+            console.group( "mostPlayedTracksResults" );
+            console.log( "selectQuery:" + selectQuery );
+            console.groupEnd();
             try {
                 const result = await this.runQuery( selectQuery, values );
                 return result;
@@ -833,6 +842,9 @@ const databaseFunctions = () => {
 
             const values = [ startDate, endDate ];
 
+            console.group( "mostPlayedArtistsResults" );
+            console.log( "selectQuery:" + selectQuery );
+            console.groupEnd();
             try {
                 const result = await this.runQuery( selectQuery, values );
                 return result;
@@ -853,6 +865,9 @@ const databaseFunctions = () => {
                                        u.username != "Mr. Roboto";`;
             const values = [ startDate, endDate ];
 
+            console.group( "roomSummaryResults" );
+            console.log( "selectQuery:" + selectQuery );
+            console.groupEnd();
             try {
                 const result = await this.runQuery( selectQuery, values );
                 return result;
@@ -884,6 +899,9 @@ const databaseFunctions = () => {
                                  LIMIT 11;`;
             const values = [ startDate, endDate ];
 
+            console.group( "top10DJResults" );
+            console.log( "selectQuery:" + selectQuery );
+            console.groupEnd();
             try {
                 const result = await this.runQuery( selectQuery, values );
                 return result;
