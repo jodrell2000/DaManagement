@@ -53,7 +53,7 @@ app.use( '/images', express.static( path.join( __dirname, 'images' ) ) );
 
 // client authentication
 app.use( ( req, res, next ) => {
-    if ( req.originalUrl === '/signup' || req.originalUrl === '/instructions' || req.originalUrl === '/images' ) {
+    if ( req.originalUrl === '/login' || req.originalUrl === '/signup' || req.originalUrl === '/instructions' || req.originalUrl === '/images' ) {
         return next();
     }
     protectRoute( req, res, next );
