@@ -818,6 +818,7 @@ function protectRoute( req, res, next ) {
         next();
     } else {
         // User is not authenticated, redirect to the login page
+        req.session.originalUrl = req.originalUrl;
         res.redirect( '/login' );
     }
 }
@@ -829,11 +830,12 @@ app.get( '/login', ( req, res ) => {
 } );
 
 app.post( '/login', async ( req, res ) => {
-    // Implement your login logic here
     const { username, password } = req.body;
     if ( await authentication( username, password ) ) {
-        req.session.user = username; // Store user information in the session
-        res.redirect( '/listunverified' ); // Redirect to the home page after successful login
+        req.session.user = username;
+        const redirectTo = req.session.originalUrl || '/listunverified';
+        delete req.session.originalUrl;
+        res.redirect( redirectTo );
     } else {
         res.redirect( '/signup' );
     }
