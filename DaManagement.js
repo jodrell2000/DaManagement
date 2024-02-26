@@ -822,8 +822,8 @@ function protectRoute( req, res, next ) {
     }
 }
 
-app.get( '/signup', ( req, res ) => {
-    let html = pug.renderFile( './templates/signup.pug' );
+app.get( '/login', ( req, res ) => {
+    let html = pug.renderFile( './templates/login.pug' );
     res.send( html );
 
 } );
