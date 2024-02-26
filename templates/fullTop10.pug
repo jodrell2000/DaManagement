@@ -1,113 +1,123 @@
 doctype html
 html(lang="en")
-  head
-    title Full Top 10
-    link(href='/styles/app.css' rel='stylesheet' type='text/css')
-    link(href='/modules/dragula/dist/dragula.css' rel='stylesheet' type='text/css')
-    link(href="/modules/@fortawesome/fontawesome-free/css/fontawesome.css" rel="stylesheet")
-    link(href="/modules/@fortawesome/fontawesome-free/css/solid.css" rel="stylesheet")
-    style.
-      #songqueue {
-        border-collapse: collapse;
-        border: 1px solid #ddd;
-        width: 100%;
-      }
-      #songqueue td, #songqueue th {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-      }
-      #songqueue th {
-        background-color: #f2f2f2;
-        color: black;
-      }
+    head
+        title Full Top 10
+        link(href='/styles/app.css' rel='stylesheet' type='text/css')
+        link(href='/modules/dragula/dist/dragula.css' rel='stylesheet' type='text/css')
+        link(href="/modules/@fortawesome/fontawesome-free/css/fontawesome.css" rel="stylesheet")
+        link(href="/modules/@fortawesome/fontawesome-free/css/solid.css" rel="stylesheet")
+        style.
+            #songqueue {
+                border-collapse: collapse;
+                border: 1px solid #ddd;
+                width: 100%;
+            }
 
-  body
-    h1 Full Top 10 for #{formStartDate} to #{formEndDate}
+            #songqueue td, #songqueue th {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }
 
-    ul
-    li
-        a(href=`http://141.147.86.68:8585/fullTop10?startDate=${linkStartDate}&endDate=${linkEndDate}`) Full Top 10 Lists
-    li
-        a(href=`http://141.147.86.68:8585/likesTop10?startDate=${linkStartDate}&endDate=${linkEndDate}`) Top 10 (Likes Only)
-    li
-        a(href=`http://141.147.86.68:8585/mostplayedartists?startDate=${linkStartDate}&endDate=${linkEndDate}`) Most Played Artists
-    li
-        a(href=`http://141.147.86.68:8585/mostplayedtracks?startDate=${linkStartDate}&endDate=${linkEndDate}`) Most Played Tracks
-    li
-        a(href=`http://141.147.86.68:8585/summary?startDate=${linkStartDate}&endDate=${linkEndDate}`) Room Summary & Top DJs
+            #songqueue th {
+                background-color: #f2f2f2;
+                color: black;
+            }
 
-    form(action='/fulltop10' method='GET')
-        label(for='startDate') Start Date:
-        input#startDate(type='date' name='startDate' value=formStartDate)
-        label(for='endDate') End Date:
-        input#endDate(type='date' name='endDate' value=formEndDate)
-        input(type='submit' value='Update')
+    body
+        h1 Full Top 10 for #{formStartDate} to #{formEndDate}
 
-    table#songqueue
-        thead
-            tr
-                th Artist
-                th Track
-                td Total Points
-                th Play Count
-        tbody
-        each song in top10SongList
-            tr
-            td= song.artist
-            td= song.track
-            td= song.points
-            td= song.plays
+        ul
+        li
+            a(href=`http://141.147.86.68:8585/fullTop10?startDate=${ linkStartDate }&endDate=${ linkEndDate }`) Full Top 10 Lists
+        li
+            a(href=`http://141.147.86.68:8585/likesTop10?startDate=${ linkStartDate }&endDate=${ linkEndDate }`) Top 10 (Likes Only)
+        li
+            a(href=`http://141.147.86.68:8585/mostplayedartists?startDate=${ linkStartDate }&endDate=${ linkEndDate }`) Most Played Artists
+        li
+            a(href=`http://141.147.86.68:8585/mostplayedtracks?startDate=${ linkStartDate }&endDate=${ linkEndDate }`) Most Played Tracks
+        li
+            a(href=`http://141.147.86.68:8585/summary?startDate=${ linkStartDate }&endDate=${ linkEndDate }`) Room Summary & Top DJs
 
-    h2 80s Only (No 90s or Covers)
+        form(action='/fulltop10' method='GET')
+            label(for='startDate') Start Date:
+            input#startDate(type='date' name='startDate' value=formStartDate)
+            label(for='endDate') End Date:
+            input#endDate(type='date' name='endDate' value=formEndDate)
+            input(type='submit' value='Update')
 
-    table#songqueue
-        thead
-            tr
-                th Artist
-                th Track
-                td Total Points
-                th Play Count
-        tbody
-        each song in top1080sSongList
-            tr
-            td= song.artist
-            td= song.track
-            td= song.points
-            td= song.plays
+        table#songqueue
+            thead
+                tr
+                    th Artist
+                    th Track
+                    td Total Points
+                    th Play Count
+            tbody
+            each song in top10SongList
+                tr
+                td
+                    a(href=`http://141.147.86.68:8585/listunverified?sort=artist&where=artist&searchTerm=${ encodeURIComponent( song.artist ) }`) #{song.artist}
+                td
+                    a(href=`http://141.147.86.68:8585/listunverified?sort=track&where=track&searchTerm=${ encodeURIComponent( song.track ) }`) #{song.track}
+                td= song.points
+                td= song.plays
 
+        h2 80s Only (No 90s or Covers)
 
-    h2 Only Wednesdays (90s Day)
-
-    table#songqueue
-        thead
-            tr
-                th Artist
-                th Track
-                td Total Points
-                th Play Count
-        tbody
-        each song in top10WednesdaySongList
-            tr
-            td= song.artist
-            td= song.track
-            td= song.points
-            td= song.plays
+        table#songqueue
+            thead
+                tr
+                    th Artist
+                    th Track
+                    td Total Points
+                    th Play Count
+            tbody
+            each song in top1080sSongList
+                tr
+                td
+                    a(href=`http://141.147.86.68:8585/listunverified?sort=artist&where=artist&searchTerm=${ encodeURIComponent( song.artist ) }`) #{song.artist}
+                td
+                    a(href=`http://141.147.86.68:8585/listunverified?sort=track&where=track&searchTerm=${ encodeURIComponent( song.track ) }`) #{song.track}
+                td= song.points
+                td= song.plays
 
 
-    h2 Only Fridays (Covers day)
+        h2 Only Wednesdays (90s Day)
 
-    table#songqueue
-        thead
-            tr
-                th Artist
-                th Track
-                td Total Points
-                th Play Count
-        tbody
-        each song in top10FridaySongList
-            tr
-            td= song.artist
-            td= song.track
-            td= song.points
-            td= song.plays
+        table#songqueue
+            thead
+                tr
+                    th Artist
+                    th Track
+                    td Total Points
+                    th Play Count
+            tbody
+            each song in top10WednesdaySongList
+                tr
+                td
+                    a(href=`http://141.147.86.68:8585/listunverified?sort=artist&where=artist&searchTerm=${ encodeURIComponent( song.artist ) }`) #{song.artist}
+                td
+                    a(href=`http://141.147.86.68:8585/listunverified?sort=track&where=track&searchTerm=${ encodeURIComponent( song.track ) }`) #{song.track}
+                td= song.points
+                td= song.plays
+
+
+        h2 Only Fridays (Covers day)
+
+        table#songqueue
+            thead
+                tr
+                    th Artist
+                    th Track
+                    td Total Points
+                    th Play Count
+            tbody
+            each song in top10FridaySongList
+                tr
+                td
+                    a(href=`http://141.147.86.68:8585/listunverified?sort=artist&where=artist&searchTerm=${ encodeURIComponent( song.artist ) }`) #{song.artist}
+                td
+                    a(href=`http://141.147.86.68:8585/listunverified?sort=track&where=track&searchTerm=${ encodeURIComponent( song.track ) }`) #{song.track}
+                td= song.points
+                td= song.plays
