@@ -581,7 +581,7 @@ app.get( '/listunverified', async ( req, res ) => {
 
 app.post( '/updateArtistDisplayName', async ( req, res ) => {
     try {
-        const username = req.username;
+        const username = req.session.user;
         const videoData_id = req.body.videoData_id;
         const artistDisplayName = req.body.artistDisplayName;
         const sortParam = req.body.sort || req.query.sort || '';
@@ -606,7 +606,7 @@ app.post( '/updateArtistDisplayName', async ( req, res ) => {
 } );
 app.post( '/updateTrackDisplayName', async ( req, res ) => {
     try {
-        const username = req.username;
+        const username = req.session.user;
         const videoData_id = req.body.videoData_id;
         const trackDisplayName = req.body.trackDisplayName;
         const sortParam = req.body.sort || req.query.sort || '';
