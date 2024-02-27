@@ -549,6 +549,7 @@ bot.on( 'endsong', function ( data ) {
 // ########################################################################
 
 app.get( '/listunverified', async ( req, res ) => {
+    console.group( "listunverified" );
     try {
         const sortParam = req.body.sort || req.query.sort || '';
         const whereParam = req.body.where || req.query.where || '';
@@ -577,6 +578,7 @@ app.get( '/listunverified', async ( req, res ) => {
         console.error( error );
         res.sendStatus( 500 );
     }
+    console.groupEnd();
 } );
 
 app.post( '/updateArtistDisplayName', async ( req, res ) => {
@@ -770,6 +772,7 @@ app.get( '/signup', ( req, res ) => {
 } );
 
 app.post( '/signup', async ( req, res, next ) => {
+    console.group( "signup" );
     const { email, username, password, confirmPassword } = req.body;
     const userID = await userFunctions.getUserIDFromUsername( username );
 
@@ -798,11 +801,13 @@ app.post( '/signup', async ( req, res, next ) => {
         await setPassword( { next, username, passwordHash } );
 
         // Redirect after successful password setting
+        console.log( "before redirect" );
         res.redirect( '/listunverified' );
     } catch ( error ) {
         console.error( 'Error during signup:', error );
         return res.status( 500 ).send( 'Internal server error' );
     }
+    console.groupEnd();
 } );
 
 function protectRoute( req, res, next ) {
