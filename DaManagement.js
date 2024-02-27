@@ -550,6 +550,7 @@ bot.on( 'endsong', function ( data ) {
 
 app.get( '/listunverified', async ( req, res ) => {
     console.group( "listunverified" );
+    console.log( "here" );
     try {
         const sortParam = req.body.sort || req.query.sort || '';
         const whereParam = req.body.where || req.query.where || '';
