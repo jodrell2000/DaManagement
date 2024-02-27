@@ -780,18 +780,21 @@ app.post( '/signup', async ( req, res, next ) => {
     try {
         // Check if the passwords match
         if ( password !== confirmPassword ) {
+            console.log( "Passwords don't match" );
             return res.status( 400 ).send( 'Passwords do not match' );
         }
 
         // Check if the user exists
-        const user = await userFunctions.userExists( userID );
+        const user = userFunctions.userExists( userID );
         if ( !user ) {
+            console.log( "User doesn't exist" );
             return res.status( 400 ).send( 'User does not exist' );
         }
 
         // Verify user's email
         const verify = await userFunctions.verifyUsersEmail( userID, email, databaseFunctions );
         if ( !verify ) {
+            console.log( "Email doesn't match" );
             return res.status( 400 ).send( "User's email does not match" );
         }
 
