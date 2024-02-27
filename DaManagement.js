@@ -796,7 +796,6 @@ app.post( '/signup', async ( req, res, next ) => {
         }
 
         const passwordHash = await bcrypt.hash( password, 10 );
-        console.log( "passwordHash:" + passwordHash );
 
         const passwordSet = await setPassword( { next, username, passwordHash } );
         if ( !passwordSet ) {
@@ -805,7 +804,7 @@ app.post( '/signup', async ( req, res, next ) => {
         }
 
         console.log( "before redirect" );
-        // res.redirect( '/login' );
+        res.redirect( '/login' );
     } catch ( error ) {
         console.error( 'Error during signup:', error );
         return res.status( 500 ).send( 'Internal server error' );
