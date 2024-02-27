@@ -800,7 +800,7 @@ app.post( '/signup', async ( req, res, next ) => {
         await setPassword( { next, username, passwordHash } );
 
         console.log( "before redirect" );
-        res.redirect( '/login' );
+        // res.redirect( '/login' );
     } catch ( error ) {
         console.error( 'Error during signup:', error );
         return res.status( 500 ).send( 'Internal server error' );
