@@ -773,43 +773,36 @@ app.post( '/signup', async ( req, res, next ) => {
     const { email, username, password, confirmPassword } = req.body;
     const userID = userFunctions.getUserIDFromUsername( username );
 
-    // Check if the passwords match
-    if ( password !== confirmPassword ) {
-        return res.status( 400 ).send( 'Passwords do not match' );
-    }
+    try {
+        // Check if the passwords match
+        if ( password !== confirmPassword ) {
+            return res.status( 400 ).send( 'Passwords do not match' );
+        }
 
-    // Check if the user exists
-    const user = userFunctions.userExists( userID );
-    if ( !user ) {
-        return res.status( 400 ).send( 'User does not exist' );
-    }
+        // Check if the user exists
+        const user = userFunctions.userExists( userID );
+        if ( !user ) {
+            return res.status( 400 ).send( 'User does not exist' );
+        }
 
-    userFunctions.verifyUsersEmail( userID, email, databaseFunctions )
-        .then( verify => {
-            if ( !verify ) {
-                return res.status( 400 ).send( "User's email does not match" );
-            }
-            bcrypt.hash( password, 10 )
-                .then( passwordHash => {
-                    setPassword( { next, username, passwordHash } )
-                        .then( () => {
-                            // Redirect after successful password setting
-                            res.redirect( '/listunverified' );
-                        } )
-                        .catch( error => {
-                            console.error( 'Error setting password:', error );
-                            return res.status( 500 ).send( 'Internal server error' );
-                        } );
-                } )
-                .catch( error => {
-                    console.error( 'Error hashing password:', error );
-                    return res.status( 500 ).send( 'Internal server error' );
-                } );
-        } )
-        .catch( error => {
-            console.error( 'Error verifying user email:', error );
-            return res.status( 500 ).send( 'Internal server error' );
-        } );
+        // Verify user's email
+        const verify = await userFunctions.verifyUsersEmail( userID, email, databaseFunctions );
+        if ( !verify ) {
+            return res.status( 400 ).send( "User's email does not match" );
+        }
+
+        // Hash the password
+        const passwordHash = await bcrypt.hash( password, 10 );
+
+        // Set the password in the database
+        await setPassword( { username, passwordHash, next } );
+
+        // Redirect after successful password setting
+        res.redirect( '/listunverified' );
+    } catch ( error ) {
+        console.error( 'Error during signup:', error );
+        return res.status( 500 ).send( 'Internal server error' );
+    }
 } );
 
 function protectRoute( req, res, next ) {
