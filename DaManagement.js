@@ -380,7 +380,7 @@ bot.on( 'nosong', function () {
 } )
 
 //checks when the bot speaks
-bot.on( 'speak', function ( data ) {
+bot.on( 'speak', async function ( data ) {
     let text = data.text; //the most recent text in the chatbox on turntable
     let theUserID = data.userid;
     userFunctions.name = data.name; //name of latest person to say something
@@ -397,7 +397,7 @@ bot.on( 'speak', function ( data ) {
     const foundUsernames = userFunctions.checkTextForUsernames( text );
 
     for ( let userLoop = 0; userLoop < foundUsernames.length; userLoop++ ) {
-        let thisAFKUserID = userFunctions.getUserIDFromUsername( foundUsernames[ userLoop ] );
+        let thisAFKUserID = await userFunctions.getUserIDFromUsername( foundUsernames[ userLoop ] );
         if ( userFunctions.isUserAFK( thisAFKUserID ) && !userFunctions.isThisTheBot( theUserID ) === true ) {
             userFunctions.sendUserIsAFKMessage( data, thisAFKUserID, chatFunctions );
         }
