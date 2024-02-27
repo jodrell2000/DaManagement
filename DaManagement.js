@@ -783,7 +783,7 @@ app.post( '/signup', async ( req, res, next ) => {
             return res.status( 400 ).send( 'Passwords do not match' );
         }
     } catch ( error ) {
-        console.error( 'Error during signup:', error );
+        console.error( 'Error during password check signup:', error );
         return res.status( 500 ).send( 'Internal server error' );
     }
 
@@ -794,7 +794,7 @@ app.post( '/signup', async ( req, res, next ) => {
             return res.status( 400 ).send( 'User does not exist' );
         }
     } catch ( error ) {
-        console.error( 'Error during signup:', error );
+        console.error( 'Error during use  check of signup:', error );
         return res.status( 500 ).send( 'Internal server error' );
     }
 
@@ -805,7 +805,7 @@ app.post( '/signup', async ( req, res, next ) => {
             return res.status( 400 ).send( "User's email does not match" );
         }
     } catch ( error ) {
-        console.error( 'Error during signup:', error );
+        console.error( 'Error during email check of signup:', error );
         return res.status( 500 ).send( 'Internal server error' );
     }
 
@@ -815,9 +815,10 @@ app.post( '/signup', async ( req, res, next ) => {
         await setPassword( { next, username, passwordHash } );
 
         console.log( "before redirect" );
+        req.session.user = username;
         res.redirect( '/listunverified' );
     } catch ( error ) {
-        console.error( 'Error during signup:', error );
+        console.error( 'Error during final signup phase:', error );
         return res.status( 500 ).send( 'Internal server error' );
     }
     console.groupEnd();
