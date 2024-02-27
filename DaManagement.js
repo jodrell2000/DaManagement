@@ -796,8 +796,13 @@ app.post( '/signup', async ( req, res, next ) => {
         }
 
         const passwordHash = await bcrypt.hash( password, 10 );
+        console.log( "passwordHash:" + passwordHash );
 
-        await setPassword( { next, username, passwordHash } );
+        const passwordSet = await setPassword( { next, username, passwordHash } );
+        if ( !passwordSet ) {
+            console.log( "Couldn't set the password" );
+            return res.status( 400 ).send( "Couldn't set the password" );
+        }
 
         console.log( "before redirect" );
         // res.redirect( '/login' );
@@ -851,15 +856,14 @@ async function authentication( username, password ) {
     }
 }
 
-async function setPassword( { next, username, passwordHash } ) {
+async function setPassword( { username, passwordHash } ) {
     try {
         const userID = await userFunctions.getUserIDFromUsername( username );
         await userFunctions.storeUserData( userID, "password_hash", passwordHash, databaseFunctions );
-
-        return next();
+        return true;
     } catch ( error ) {
         console.error( 'Error setting password:', error );
-        throw new Error( 'Internal server error' );
+        return false;
     }
 }
 
