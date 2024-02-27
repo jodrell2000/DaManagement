@@ -776,7 +776,6 @@ app.post( '/signup', async ( req, res, next ) => {
     console.group( "signup" );
     const { email, username, password, confirmPassword } = req.body;
     const userID = await userFunctions.getUserIDFromUsername( username );
-    return res.status( 500 ).send( 'Dummy error' );
 
     try {
         if ( password !== confirmPassword ) {
