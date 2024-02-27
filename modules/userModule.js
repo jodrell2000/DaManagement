@@ -2354,17 +2354,10 @@ const userFunctions = ( bot ) => {
         },
 
         giveRoboCoinCommand: async function ( data, args, chatFunctions, databaseFunctions ) {
-            console.group( "giveRoboCoinCommand" );
             const sendingUserID = this.whoSentTheCommand( data );
             const [ numCoins, ...restArgs ] = args;
             const username = restArgs.join( " " );
             const receivingUserID = await this.getUserIDFromUsername( username );
-
-            console.log( "args:" + JSON.stringify( args ) );
-            console.log( "sendingUserID:" + sendingUserID );
-            console.log( "numCoins:" + numCoins );
-            console.log( "username:" + username );
-            console.log( "receivingUserID:" + receivingUserID );
 
             try {
                 await this.validateNumCoins( numCoins, sendingUserID, chatFunctions, data );
@@ -2394,7 +2387,6 @@ const userFunctions = ( bot ) => {
                     await this.handleError( new Error( error ), chatFunctions, data );
                 }
             }
-            console.groupEnd();
         },
 
         confirmCommand: async function ( data, chatFunctions ) {
