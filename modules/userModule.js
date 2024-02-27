@@ -2258,7 +2258,6 @@ const userFunctions = ( bot ) => {
         },
 
         addRoboCoins: async function ( userID, numCoins, changeReason, changeID, databaseFunctions ) {
-            console.log( "userID:" + userID );
             try {
                 const coins = parseFloat( numCoins );
                 await this.processRoboCoins( userID, coins, changeReason, changeID, addRCOperation, databaseFunctions );
@@ -2269,7 +2268,6 @@ const userFunctions = ( bot ) => {
         },
 
         processRoboCoins: async function ( userID, numCoins, changeReason, changeID, operation, databaseFunctions ) {
-            console.log( "userID:" + userID );
             try {
                 const before = await this.getRoboCoins( userID );
                 const updatedCoins = await operation( before, numCoins );
