@@ -225,7 +225,7 @@ const userFunctions = ( bot ) => {
             return data.userid;
         },
 
-        getUserIDFromUsername: function ( theUsername ) {
+        getUserIDFromUsername: async function ( theUsername ) {
             for ( let userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
                 if ( theUsersList[ userLoop ].username === theUsername ) {
                     return theUsersList[ userLoop ].id;

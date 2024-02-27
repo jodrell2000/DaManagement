@@ -771,7 +771,7 @@ app.get( '/signup', ( req, res ) => {
 
 app.post( '/signup', async ( req, res, next ) => {
     const { email, username, password, confirmPassword } = req.body;
-    const userID = userFunctions.getUserIDFromUsername( username );
+    const userID = await userFunctions.getUserIDFromUsername( username );
 
     try {
         // Check if the passwords match
@@ -795,7 +795,7 @@ app.post( '/signup', async ( req, res, next ) => {
         const passwordHash = await bcrypt.hash( password, 10 );
 
         // Set the password in the database
-        await setPassword( { username, passwordHash, next } );
+        await setPassword( { next, username, passwordHash } );
 
         // Redirect after successful password setting
         res.redirect( '/listunverified' );
@@ -850,10 +850,9 @@ async function authentication( username, password ) {
 
 async function setPassword( { next, username, passwordHash } ) {
     try {
-        const userID = userFunctions.getUserIDFromUsername( username );
+        const userID = await userFunctions.getUserIDFromUsername( username );
         await userFunctions.storeUserData( userID, "password_hash", passwordHash, databaseFunctions );
 
-        // Proceed to the next middleware or route
         return next();
     } catch ( error ) {
         console.error( 'Error setting password:', error );
