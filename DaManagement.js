@@ -549,8 +549,6 @@ bot.on( 'endsong', function ( data ) {
 // ########################################################################
 
 app.get( '/listunverified', async ( req, res ) => {
-    console.group( "listunverified" );
-    console.log( "here" );
     try {
         const sortParam = req.body.sort || req.query.sort || '';
         const whereParam = req.body.where || req.query.where || '';
@@ -579,7 +577,6 @@ app.get( '/listunverified', async ( req, res ) => {
         console.error( error );
         res.sendStatus( 500 );
     }
-    console.groupEnd();
 } );
 
 app.post( '/updateArtistDisplayName', async ( req, res ) => {
@@ -773,25 +770,21 @@ app.get( '/signup', ( req, res ) => {
 } );
 
 app.post( '/signup', async ( req, res, next ) => {
-    console.group( "signup" );
     const { email, username, password, confirmPassword } = req.body;
     const userID = await userFunctions.getUserIDFromUsername( username );
 
     try {
         if ( password !== confirmPassword ) {
-            console.log( "Passwords don't match" );
             return res.status( 400 ).send( 'Passwords do not match' );
         }
 
         const user = userFunctions.userExists( userID );
         if ( !user ) {
-            console.log( "User doesn't exist" );
             return res.status( 400 ).send( 'User does not exist' );
         }
 
         const verify = await userFunctions.verifyUsersEmail( userID, email, databaseFunctions );
         if ( !verify ) {
-            console.log( "Email doesn't match" );
             return res.status( 400 ).send( "User's email does not match" );
         }
 
@@ -799,17 +792,14 @@ app.post( '/signup', async ( req, res, next ) => {
 
         const passwordSet = await setPassword( { next, username, passwordHash } );
         if ( !passwordSet ) {
-            console.log( "Couldn't set the password" );
             return res.status( 400 ).send( "Couldn't set the password" );
         }
 
-        console.log( "before redirect" );
         res.redirect( '/login' );
     } catch ( error ) {
         console.error( 'Error during signup:', error );
         return res.status( 500 ).send( 'Internal server error' );
     }
-    console.groupEnd();
 } );
 
 function protectRoute( req, res, next ) {
