@@ -186,7 +186,7 @@ const userFunctions = ( bot ) => {
             return userID === auth.USERID;
         },
 
-        userExists: function ( userID ) {
+        userExists: async function ( userID ) {
             return theUsersList[ this.getPositionOnUsersList( userID ) ] !== undefined;
         },
 

@@ -784,7 +784,7 @@ app.post( '/signup', async ( req, res, next ) => {
         }
 
         // Check if the user exists
-        const user = userFunctions.userExists( userID );
+        const user = await userFunctions.userExists( userID );
         if ( !user ) {
             return res.status( 400 ).send( 'User does not exist' );
         }
