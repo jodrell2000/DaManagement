@@ -39,8 +39,8 @@ const session = require( 'express-session' );
 
 
 // Use Morgan middleware for logging
-// const morgan = require( 'morgan' );
-// app.use( morgan( 'dev' ) );
+const morgan = require( 'morgan' );
+app.use( morgan( 'dev' ) );
 
 app.use( session( {
     secret: 'your_secret_key',
@@ -778,33 +778,27 @@ app.post( '/signup', async ( req, res, next ) => {
     const userID = await userFunctions.getUserIDFromUsername( username );
 
     try {
-        // Check if the passwords match
         if ( password !== confirmPassword ) {
             console.log( "Passwords don't match" );
             return res.status( 400 ).send( 'Passwords do not match' );
         }
 
-        // Check if the user exists
         const user = userFunctions.userExists( userID );
         if ( !user ) {
             console.log( "User doesn't exist" );
             return res.status( 400 ).send( 'User does not exist' );
         }
 
-        // Verify user's email
         const verify = await userFunctions.verifyUsersEmail( userID, email, databaseFunctions );
         if ( !verify ) {
             console.log( "Email doesn't match" );
             return res.status( 400 ).send( "User's email does not match" );
         }
 
-        // Hash the password
         const passwordHash = await bcrypt.hash( password, 10 );
 
-        // Set the password in the database
         await setPassword( { next, username, passwordHash } );
 
-        // Redirect after successful password setting
         console.log( "before redirect" );
         res.redirect( '/listunverified' );
     } catch ( error ) {

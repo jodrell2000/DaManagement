@@ -168,7 +168,7 @@ const databaseFunctions = () => {
 
         removeUnsavableDataFromUser: function ( userObject ) {
             // delete the spamTimer if it's in the object or it'll crash the save due to a circular reference
-            var editedUser = Object.assign( {}, userObject, { spamTimer: undefined } )
+            const editedUser = Object.assign( {}, userObject, { spamTimer: undefined } );
 
             // remove refresh properties from permanent storage
             delete editedUser[ "RefreshCount" ];
