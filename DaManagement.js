@@ -591,7 +591,7 @@ app.post( '/updateArtistDisplayName', async ( req, res ) => {
 
         await databaseFunctions.updateArtistDisplayName( videoData_id, artistDisplayName );
 
-        const userID = userFunctions.getUserIDFromUsername( username );
+        const userID = await userFunctions.getUserIDFromUsername( username );
         const numCoins = songFunctions.fixTrackPayments();
         const changeReason = "Fixed artist name for " + videoData_id;
         const changeID = 5;
@@ -617,7 +617,7 @@ app.post( '/updateTrackDisplayName', async ( req, res ) => {
 
         await databaseFunctions.updateTrackDisplayName( videoData_id, trackDisplayName );
 
-        const userID = userFunctions.getUserIDFromUsername( username );
+        const userID = await userFunctions.getUserIDFromUsername( username );
         const numCoins = songFunctions.fixTrackPayments();
         const changeReason = "Fixed track name for " + videoData_id;
         const changeID = 5;
