@@ -815,7 +815,6 @@ app.post( '/signup', async ( req, res, next ) => {
         await setPassword( { next, username, passwordHash } );
 
         console.log( "before redirect" );
-        req.session.user = username;
         res.redirect( '/login' );
     } catch ( error ) {
         console.error( 'Error during final signup phase:', error );
