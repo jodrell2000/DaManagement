@@ -816,7 +816,7 @@ app.post( '/signup', async ( req, res, next ) => {
 
         console.log( "before redirect" );
         req.session.user = username;
-        res.redirect( '/listunverified' );
+        res.redirect( '/login' );
     } catch ( error ) {
         console.error( 'Error during final signup phase:', error );
         return res.status( 500 ).send( 'Internal server error' );
