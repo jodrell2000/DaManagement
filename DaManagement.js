@@ -39,8 +39,8 @@ const session = require( 'express-session' );
 
 
 // Use Morgan middleware for logging
-const morgan = require( 'morgan' );
-app.use( morgan( 'dev' ) );
+// const morgan = require( 'morgan' );
+// app.use( morgan( 'dev' ) );
 
 app.use( session( {
     secret: 'your_secret_key',
