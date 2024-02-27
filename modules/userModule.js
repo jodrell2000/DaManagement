@@ -225,7 +225,7 @@ const userFunctions = ( bot ) => {
             return data.userid;
         },
 
-        getUserIDFromUsername: function ( theUsername ) {
+        getUserIDFromUsername: async function ( theUsername ) {
             for ( let userLoop = 0; userLoop < theUsersList.length; userLoop++ ) {
                 if ( theUsersList[ userLoop ].username === theUsername ) {
                     return theUsersList[ userLoop ].id;
@@ -413,8 +413,8 @@ const userFunctions = ( bot ) => {
 
         superDJs: () => superDJs,
 
-        addSuperDJ: function ( username, data, chatFunctions ) {
-            const userID = this.getUserIDFromUsername( username );
+        addSuperDJ: async function ( username, data, chatFunctions ) {
+            const userID = await this.getUserIDFromUsername( username );
             this.isSuperDJ( userID )
                 .then( ( isSuperDJ ) => {
                     if ( !isSuperDJ ) {
@@ -426,8 +426,8 @@ const userFunctions = ( bot ) => {
                 } );
         },
 
-        removeSuperDJ: function ( username, data, chatFunctions ) {
-            const userID = this.getUserIDFromUsername( username );
+        removeSuperDJ: async function ( username, data, chatFunctions ) {
+            const userID = await this.getUserIDFromUsername( username );
             this.isSuperDJ( userID )
                 .then( ( isSuperDJ ) => {
                     if ( !isSuperDJ ) {
@@ -478,14 +478,14 @@ const userFunctions = ( bot ) => {
             this.readUserStatus( data, username, chatFunctions );
         },
 
-        readUserStatus: function ( data, args, chatFunctions ) {
+        readUserStatus: async function ( data, args, chatFunctions ) {
             let theUsername = '';
             for ( let userLoop = 0; userLoop < args.length; userLoop++ ) {
                 theUsername += args[ userLoop ] + ' ';
             }
             theUsername = theUsername.substring( 0, theUsername.length - 1 );
 
-            const theUserID = this.getUserIDFromUsername( theUsername );
+            const theUserID = await this.getUserIDFromUsername( theUsername );
             const roomJoined = formatRelativeTime( ( Date.now() - this.getUserJoinedRoom( theUserID ) ) / 1000 );
             let modText = '';
             if ( this.isUserModerator( theUserID ) !== true ) {
@@ -1445,14 +1445,14 @@ const userFunctions = ( bot ) => {
             }
         },
 
-        setDJCurrentPlaycountCommand: function ( data, theCount, theUsername, chatFunctions, databaseFunctions ) {
+        setDJCurrentPlaycountCommand: async function ( data, theCount, theUsername, chatFunctions, databaseFunctions ) {
             if ( theCount === undefined || isNaN( theCount ) ) {
                 chatFunctions.botSpeak( "The new playcount doesn't seem to be a number. Check the command help for an example", data )
             } else if ( theUsername === '' || theUsername === undefined ) {
                 chatFunctions.botSpeak( "I can't see a username there. Check the command help for an example", data )
             } else {
                 chatFunctions.botSpeak( "Setting the Current playcount for @" + theUsername + " to " + theCount, data )
-                this.setDJCurrentPlayCount( this.getUserIDFromUsername( theUsername ), theCount, databaseFunctions );
+                this.setDJCurrentPlayCount( await this.getUserIDFromUsername( theUsername ), theCount, databaseFunctions );
             }
         },
 
@@ -1583,9 +1583,9 @@ const userFunctions = ( bot ) => {
             return inQueue !== -1;
         },
 
-        changeUsersQueuePosition: function ( data, args, chatFunctions, botFunctions ) {
+        changeUsersQueuePosition: async function ( data, args, chatFunctions, botFunctions ) {
             const username = args[ 0 ];
-            const userID = this.getUserIDFromUsername( username );
+            const userID = await this.getUserIDFromUsername( username );
             const newPosition = args[ 1 ] - 1;
             const [ err, ] = this.removeUserFromQueue( userID, botFunctions );
 
@@ -2258,6 +2258,7 @@ const userFunctions = ( bot ) => {
         },
 
         addRoboCoins: async function ( userID, numCoins, changeReason, changeID, databaseFunctions ) {
+            console.log( "userID:" + userID );
             try {
                 const coins = parseFloat( numCoins );
                 await this.processRoboCoins( userID, coins, changeReason, changeID, addRCOperation, databaseFunctions );
@@ -2268,6 +2269,7 @@ const userFunctions = ( bot ) => {
         },
 
         processRoboCoins: async function ( userID, numCoins, changeReason, changeID, operation, databaseFunctions ) {
+            console.log( "userID:" + userID );
             try {
                 const before = await this.getRoboCoins( userID );
                 const updatedCoins = await operation( before, numCoins );
@@ -2353,9 +2355,9 @@ const userFunctions = ( bot ) => {
 
         giveRoboCoinCommand: async function ( data, args, chatFunctions, databaseFunctions ) {
             const sendingUserID = this.whoSentTheCommand( data );
-            const numCoins = parseFloat( args.pop() );
-            const username = args.join( " " );
-            const receivingUserID = this.getUserIDFromUsername( username );
+            const [ numCoins, ...restArgs ] = args;
+            const username = restArgs.join( " " );
+            const receivingUserID = await this.getUserIDFromUsername( username );
 
             try {
                 await this.validateNumCoins( numCoins, sendingUserID, chatFunctions, data );

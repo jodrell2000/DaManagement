@@ -380,7 +380,7 @@ bot.on( 'nosong', function () {
 } )
 
 //checks when the bot speaks
-bot.on( 'speak', function ( data ) {
+bot.on( 'speak', async function ( data ) {
     let text = data.text; //the most recent text in the chatbox on turntable
     let theUserID = data.userid;
     userFunctions.name = data.name; //name of latest person to say something
@@ -397,7 +397,7 @@ bot.on( 'speak', function ( data ) {
     const foundUsernames = userFunctions.checkTextForUsernames( text );
 
     for ( let userLoop = 0; userLoop < foundUsernames.length; userLoop++ ) {
-        let thisAFKUserID = userFunctions.getUserIDFromUsername( foundUsernames[ userLoop ] );
+        let thisAFKUserID = await userFunctions.getUserIDFromUsername( foundUsernames[ userLoop ] );
         if ( userFunctions.isUserAFK( thisAFKUserID ) && !userFunctions.isThisTheBot( theUserID ) === true ) {
             userFunctions.sendUserIsAFKMessage( data, thisAFKUserID, chatFunctions );
         }
@@ -590,7 +590,7 @@ app.post( '/updateArtistDisplayName', async ( req, res ) => {
 
         await databaseFunctions.updateArtistDisplayName( videoData_id, artistDisplayName );
 
-        const userID = userFunctions.getUserIDFromUsername( username );
+        const userID = await userFunctions.getUserIDFromUsername( username );
         const numCoins = songFunctions.fixTrackPayments();
         const changeReason = "Fixed artist name for " + videoData_id;
         const changeID = 5;
@@ -615,7 +615,7 @@ app.post( '/updateTrackDisplayName', async ( req, res ) => {
 
         await databaseFunctions.updateTrackDisplayName( videoData_id, trackDisplayName );
 
-        const userID = userFunctions.getUserIDFromUsername( username );
+        const userID = await userFunctions.getUserIDFromUsername( username );
         const numCoins = songFunctions.fixTrackPayments();
         const changeReason = "Fixed track name for " + videoData_id;
         const changeID = 5;
@@ -771,45 +771,35 @@ app.get( '/signup', ( req, res ) => {
 
 app.post( '/signup', async ( req, res, next ) => {
     const { email, username, password, confirmPassword } = req.body;
-    const userID = userFunctions.getUserIDFromUsername( username );
+    const userID = await userFunctions.getUserIDFromUsername( username );
 
-    // Check if the passwords match
-    if ( password !== confirmPassword ) {
-        return res.status( 400 ).send( 'Passwords do not match' );
+    try {
+        if ( password !== confirmPassword ) {
+            return res.status( 400 ).send( 'Passwords do not match' );
+        }
+
+        const user = userFunctions.userExists( userID );
+        if ( !user ) {
+            return res.status( 400 ).send( 'User does not exist' );
+        }
+
+        const verify = await userFunctions.verifyUsersEmail( userID, email, databaseFunctions );
+        if ( !verify ) {
+            return res.status( 400 ).send( "User's email does not match" );
+        }
+
+        const passwordHash = await bcrypt.hash( password, 10 );
+
+        const passwordSet = await setPassword( { next, username, passwordHash } );
+        if ( !passwordSet ) {
+            return res.status( 400 ).send( "Couldn't set the password" );
+        }
+
+        res.redirect( '/login' );
+    } catch ( error ) {
+        console.error( 'Error during signup:', error );
+        return res.status( 500 ).send( 'Internal server error' );
     }
-
-    // Check if the user exists
-    const user = userFunctions.userExists( userID );
-    if ( !user ) {
-        return res.status( 400 ).send( 'User does not exist' );
-    }
-
-    userFunctions.verifyUsersEmail( userID, email, databaseFunctions )
-        .then( verify => {
-            if ( !verify ) {
-                return res.status( 400 ).send( "User's email does not match" );
-            }
-            bcrypt.hash( password, 10 )
-                .then( passwordHash => {
-                    setPassword( { next, username, passwordHash } )
-                        .then( () => {
-                            // Redirect after successful password setting
-                            res.redirect( '/listunverified' );
-                        } )
-                        .catch( error => {
-                            console.error( 'Error setting password:', error );
-                            return res.status( 500 ).send( 'Internal server error' );
-                        } );
-                } )
-                .catch( error => {
-                    console.error( 'Error hashing password:', error );
-                    return res.status( 500 ).send( 'Internal server error' );
-                } );
-        } )
-        .catch( error => {
-            console.error( 'Error verifying user email:', error );
-            return res.status( 500 ).send( 'Internal server error' );
-        } );
 } );
 
 function protectRoute( req, res, next ) {
@@ -818,6 +808,7 @@ function protectRoute( req, res, next ) {
         next();
     } else {
         // User is not authenticated, redirect to the login page
+        req.session.originalUrl = req.originalUrl;
         res.redirect( '/login' );
     }
 }
@@ -829,11 +820,12 @@ app.get( '/login', ( req, res ) => {
 } );
 
 app.post( '/login', async ( req, res ) => {
-    // Implement your login logic here
     const { username, password } = req.body;
     if ( await authentication( username, password ) ) {
-        req.session.user = username; // Store user information in the session
-        res.redirect( '/listunverified' ); // Redirect to the home page after successful login
+        req.session.user = username;
+        const redirectTo = req.session.originalUrl || '/listunverified';
+        delete req.session.originalUrl;
+        res.redirect( redirectTo );
     } else {
         res.redirect( '/signup' );
     }
@@ -853,16 +845,14 @@ async function authentication( username, password ) {
     }
 }
 
-async function setPassword( { next, username, passwordHash } ) {
+async function setPassword( { username, passwordHash } ) {
     try {
-        const userID = userFunctions.getUserIDFromUsername( username );
+        const userID = await userFunctions.getUserIDFromUsername( username );
         await userFunctions.storeUserData( userID, "password_hash", passwordHash, databaseFunctions );
-
-        // Proceed to the next middleware or route
-        return next();
+        return true;
     } catch ( error ) {
         console.error( 'Error setting password:', error );
-        throw new Error( 'Internal server error' );
+        return false;
     }
 }
 
