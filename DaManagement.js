@@ -796,7 +796,7 @@ app.post( '/signup', async ( req, res, next ) => {
 
         // Set the password in the database
         await setPassword( { next, username, passwordHash } );
-        console.log( "Got this far" );
+
         // Redirect after successful password setting
         res.redirect( '/listunverified' );
     } catch ( error ) {
