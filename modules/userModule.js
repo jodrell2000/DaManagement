@@ -2360,6 +2360,7 @@ const userFunctions = ( bot ) => {
             const username = args.join( " " );
             const receivingUserID = await this.getUserIDFromUsername( username );
 
+            console.log( "args:" + JSON.stringify( args ) );
             console.log( "sendingUserID:" + sendingUserID );
             console.log( "numCoins:" + numCoins );
             console.log( "username:" + username );
