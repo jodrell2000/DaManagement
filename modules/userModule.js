@@ -2356,8 +2356,8 @@ const userFunctions = ( bot ) => {
         giveRoboCoinCommand: async function ( data, args, chatFunctions, databaseFunctions ) {
             console.group( "giveRoboCoinCommand" );
             const sendingUserID = this.whoSentTheCommand( data );
-            const numCoins = parseFloat( args.pop() );
-            const username = args.join( " " );
+            const [ numCoins, ...restArgs ] = args;
+            const username = restArgs.join( " " );
             const receivingUserID = await this.getUserIDFromUsername( username );
 
             console.log( "args:" + JSON.stringify( args ) );
