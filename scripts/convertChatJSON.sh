@@ -27,6 +27,7 @@ escape_single_quotes() {
 
 # Parse chatMessages data
 parse_chat_messages() {
+  mysql --login-path=local $DBNAME -e "truncate chatCommands; truncate chatMessages; truncate chatImages;"
   local messageSQL="INSERT INTO chatMessages (command_id, message) VALUES (?, ?);"
   local imagesSQL="INSERT INTO chatImages (command_id, imageURL) VALUES (?, ?);"
     local chat_data
