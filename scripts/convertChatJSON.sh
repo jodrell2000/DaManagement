@@ -1,14 +1,6 @@
 #!/bin/bash
 
-# Load environment variables from .env file
-set -o allexport
-if [ -f ../.env ]; then
-    source ../.env
-    echo "MYSQL_USER: $DBUSERNAME"
-    echo "MYSQL_PASSWORD: $DBPASSWORD"
-    echo "MYSQL_DATABASE: $DBNAME"
-fi
-set +o allexport
+DBNAME="robotoDB"
 
 # JSON file containing the data
 JSON_FILE="../data/chat.json"
@@ -22,8 +14,14 @@ parse_and_insert() {
     local sql="INSERT INTO $table ($key) VALUES ('$value');"
 
     # Execute SQL query and return the inserted ID
-    local id=$(mysql -u $DBUSERNAME -p$DBPASSWORD $DBNAME -e "$sql" -sN -e "SELECT LAST_INSERT_ID();")
+    local id=$(mysql --login-path=local $DBNAME -e "$sql" -sN -e "SELECT LAST_INSERT_ID();")
     echo "$id"
+}
+
+# Function to escape single quotes in a string
+escape_single_quotes() {
+    local value="$1"
+    echo "$value" | sed "s/'/''/g"
 }
 
 # Parse chatMessages data
@@ -37,11 +35,11 @@ parse_chat_messages() {
         local images=$(jq -r --arg cmd "$chat_message" '.chatMessages[$cmd].pictures[]' $JSON_FILE)
 
         for message in $messages; do
-            mysql -u $DBUSERNAME -p$DBPASSWORD $DBNAME -e "INSERT INTO chatMessages (command_id, message) VALUES ('$command_id', '$message');"
+            mysql --login-path=local $DBNAME -e "INSERT INTO chatMessages (command_id, message) VALUES ($command_id, '$(escape_single_quotes "$message")');"
         done
 
         for picture in $pictures; do
-            mysql -u $DBUSERNAME -p$DBPASSWORD $DBNAME -e "INSERT INTO chatImages (command_id, imageURL) VALUES ('$command_id', '$picture');"
+            mysql --login-path=local $DBNAME -e "INSERT INTO chatImages (command_id, imageURL) VALUES ($command_id, '$(escape_single_quotes "$picture")');"
         done
     done
 }
