@@ -22,7 +22,7 @@ parse_and_insert() {
 # Parse chatMessages data
 parse_aliases() {
     local aliases
-    commands=$(jq -r '.commands | keys[]' "$JSON_FILE")
+    commands=$(jq -r '.commands' "$JSON_FILE")
     echo "commands: ${aliases[0]}"
     # Loop through each alias
     while IFS= read -r line; do
