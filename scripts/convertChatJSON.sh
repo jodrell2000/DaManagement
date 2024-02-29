@@ -1,9 +1,11 @@
 #!/bin/bash
 
-# MySQL credentials
-MYSQL_USER="$DBUSERNAME"
-MYSQL_PASSWORD="$DBPASSWORD"
-MYSQL_DATABASE="$DBNAME"
+# Load environment variables from .env file
+set -o allexport
+if [ -f .env ]; then
+    source .env
+fi
+set +o allexport
 
 # JSON file containing the data
 JSON_FILE="../data/chat.json"
@@ -17,7 +19,7 @@ parse_and_insert() {
     local sql="INSERT INTO $table ($key) VALUES ('$value');"
 
     # Execute SQL query and return the inserted ID
-    local id=$(mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE -e "$sql" -sN -e "SELECT LAST_INSERT_ID();")
+    local id=$(mysql -u $DBUSERNAME -p$DBPASSWORD $DBNAME -e "$sql" -sN -e "SELECT LAST_INSERT_ID();")
     echo "$id"
 }
 
@@ -32,11 +34,11 @@ parse_chat_messages() {
         local images=$(jq -r --arg cmd "$chat_message" '.chatMessages[$cmd].pictures[]' $JSON_FILE)
 
         for message in $messages; do
-            mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE -e "INSERT INTO chatMessages (command_id, message) VALUES ('$command_id', '$message');"
+            mysql -u $DBUSERNAME -p$DBPASSWORD $DBNAME -e "INSERT INTO chatMessages (command_id, message) VALUES ('$command_id', '$message');"
         done
 
         for picture in $pictures; do
-            mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE -e "INSERT INTO chatImages (command_id, imageURL) VALUES ('$command_id', '$picture');"
+            mysql -u $DBUSERNAME -p$DBPASSWORD $DBNAME -e "INSERT INTO chatImages (command_id, imageURL) VALUES ('$command_id', '$picture');"
         done
     done
 }
