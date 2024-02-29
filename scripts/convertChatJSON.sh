@@ -6,7 +6,7 @@ MYSQL_PASSWORD="$DBPASSWORD"
 MYSQL_DATABASE="$DBNAME"
 
 # JSON file containing the data
-JSON_FILE="data.json"
+JSON_FILE="../data/data.json"
 
 # Parse JSON data and insert into database
 parse_and_insert() {
