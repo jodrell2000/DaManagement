@@ -38,7 +38,7 @@ parse_chat_messages() {
 
         local messages
         messages=$(jq -r --arg cmd "$command_data" '.chatMessages[$cmd].messages[]' $JSON_FILE)
-        echo "$messages"
+        echo "$command_id = $messages"
         local images
         images=$(jq -r --arg cmd "$command_data" '.chatMessages[$cmd].pictures[]' $JSON_FILE)
 
