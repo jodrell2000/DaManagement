@@ -18,6 +18,12 @@ parse_and_insert() {
     echo "$id"
 }
 
+# Function to escape single quotes in a string
+escape_single_quotes() {
+    local value="$1"
+    echo "$value" | sed "s/'/''/g"
+}
+
 # Parse chatMessages data
 parse_chat_messages() {
   local messageSQL="INSERT INTO chatMessages (command_id, message) VALUES (?, ?);"
