@@ -28,11 +28,13 @@ parse_aliases() {
     while IFS= read -r line; do
         local alias
         alias=$(echo "$line" | jq -r 'keys[]')
+        echo "alias: $alias"
         local command
         command=$(echo "$line" | jq -r '.[]')
+        echo "command: $command"
 
         # Insert alias and command into database
-        parse_and_insert aliases_table "$alias" "$command"
+        parse_and_insert chatAliases "$alias" "$command"
     done <<<"$aliases"
 }
 
