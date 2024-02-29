@@ -3,8 +3,7 @@
 DBNAME="robotoDB"
 
 # JSON file containing the data
-# JSON_FILE="../data/chat.json"
-JSON_FILE="../data/testchat.json"
+JSON_FILE="../data/chat.json"
 
 # Parse JSON data and insert into database
 parse_and_insert() {
