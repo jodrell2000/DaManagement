@@ -31,16 +31,19 @@ parse_chat_messages() {
 
     for command_data in $chat_data; do
         local command_id=$(parse_and_insert chatCommands command "$command_data")
-        
+
         local messages=$(jq -r --arg cmd "$command_data" '.chatMessages[$cmd].messages[]' $JSON_FILE)
         local images=$(jq -r --arg cmd "$command_data" '.chatMessages[$cmd].pictures[]' $JSON_FILE)
 
-        for message in $messages; do
-            mysql --login-path=local $DBNAME -e "INSERT INTO chatMessages (command_id, message) VALUES ($command_id, '$(escape_single_quotes "$message")');"
+        local message=""
+        for m in "${messages[@]}"; do
+            message+="$m "
         done
 
-        for image in $images; do
-            mysql --login-path=local $DBNAME -e "INSERT INTO chatImages (command_id, imageURL) VALUES ($command_id, '$(escape_single_quotes "$image")');"
+        mysql --login-path=local $DBNAME -e "INSERT INTO chatMessages (command_id, message) VALUES ($command_id, '$(escape_single_quotes "$message")');"
+
+        for image in "${images[@]}"; do
+            mysql --login-path=local $DBNAME -e "INSERT INTO chatPictures (command_id, pictureURL) VALUES ($command_id, '$(escape_single_quotes "$image")');"
         done
     done
 }
