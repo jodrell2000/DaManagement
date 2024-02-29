@@ -16,7 +16,7 @@ parse_and_insert() {
     sql="INSERT INTO $table ($key) VALUES ('$value');"
 
     # Execute SQL query using MySQL client
-    echo mysql --login-path=local $DBNAME -e "$sql"
+    echo "$sql"
 }
 
 get_command_id() {
