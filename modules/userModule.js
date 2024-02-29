@@ -198,10 +198,14 @@ const userFunctions = ( bot ) => {
         },
 
         setEmailAddress: async function ( data, args, chatFunctions, databaseFunctions ) {
+            console.group( "setEmailAddress" );
             try {
                 const username = args.slice( 0, args.length - 1 ).join( " " );
                 const userID = this.getUserIDFromUsername( username );
                 const email = args[ args.length - 1 ];
+                console.log( "username:" + username );
+                console.log( "userID:" + userID );
+                console.log( "email:" + email );
 
                 await this.storeUserData( userID, "email", email, databaseFunctions );
                 chatFunctions.botSpeak( 'Email address for ' + username + ' set to ' + email, data );
