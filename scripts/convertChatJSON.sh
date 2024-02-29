@@ -3,7 +3,7 @@
 # Load environment variables from .env file
 set -o allexport
 if [ -f .env ]; then
-    source .env
+    source ../.env
 fi
 set +o allexport
 
