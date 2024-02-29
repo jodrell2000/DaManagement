@@ -37,19 +37,11 @@ parse_chat_messages() {
         IFS=$'\n' read -r -a messages_array <<< "$messages"
 
         for message in "${messages_array[@]}"; do
-            mysql --login-path=local -D $DBNAME -B -e \
-                                                          "PREPARE stmt FROM '$messageSQL'; \
-                                                          SET @command_id='$command_id', @message='$message'; \
-                                                          EXECUTE stmt USING @command_id, @message; \
-                                                          DEALLOCATE PREPARE stmt;"
+            mysql --login-path=local $DBNAME -e "INSERT INTO chatMessages (command_id, message) VALUES ($command_id, '$(escape_single_quotes "$message")');"
         done
 
         for image in $images; do
-            mysql --login-path=local -D $DBNAME -e \
-                                                          "PREPARE stmt FROM '$imagesSQL'; \
-                                                          SET @command_id='$command_id', @image='$image'; \
-                                                          EXECUTE stmt USING @command_id, @image; \
-                                                          DEALLOCATE PREPARE stmt;"
+            mysql --login-path=local $DBNAME -e "INSERT INTO chatImages (command_id, imageURL) VALUES ($command_id, '$(escape_single_quotes "$image")');"
         done
     done
 }
