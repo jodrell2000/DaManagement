@@ -30,7 +30,7 @@ parse_chat_messages() {
     local chat_data=$(jq -r '.chatMessages | keys[]' $JSON_FILE)
 
     for command_data in $chat_data; do
-        local command_id=$(parse_and_insert chatCommands command "command_data")
+        local command_id=$(parse_and_insert chatCommands command "$command_data")
         
         local messages=$(jq -r --arg cmd "$command_data" '.chatMessages[$cmd].messages[]' $JSON_FILE)
         local images=$(jq -r --arg cmd "$command_data" '.chatMessages[$cmd].pictures[]' $JSON_FILE)
