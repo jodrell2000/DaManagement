@@ -37,11 +37,19 @@ parse_chat_messages() {
         IFS=$'\n' read -r -a messages_array <<< "$messages"
 
         for message in "${messages_array[@]}"; do
-            mysql --login-path=local $DBNAME -e "$messageSQL" --bind "$command_id" --bind "$message"
+            mysql --login-path=local -D $DBNAME -B -e \
+                                                          "PREPARE stmt FROM '$messageSQL'; \
+                                                          SET @command_id='$command_id', @message='$message'; \
+                                                          EXECUTE stmt USING @command_id, @message; \
+                                                          DEALLOCATE PREPARE stmt;"
         done
 
         for image in $images; do
-            mysql --login-path=local $DBNAME -e "$imagesSQL" --bind "$command_id" --bind "$image"
+            mysql --login-path=local -D $DBNAME -e \
+                                                          "PREPARE stmt FROM '$imagesSQL'; \
+                                                          SET @command_id='$command_id', @image='$image'; \
+                                                          EXECUTE stmt USING @command_id, @image; \
+                                                          DEALLOCATE PREPARE stmt;"
         done
     done
 }
