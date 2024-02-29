@@ -27,20 +27,20 @@ escape_single_quotes() {
 
 # Parse chatMessages data
 parse_chat_messages() {
-    local chat_messages=$(jq -r '.chatMessages | keys[]' $JSON_FILE)
+    local chat_data=$(jq -r '.chatMessages | keys[]' $JSON_FILE)
 
-    for chat_message in $chat_messages; do
-        local command_id=$(parse_and_insert chatCommands command "$chat_message")
+    for command_data in $chat_data; do
+        local command_id=$(parse_and_insert chatCommands command "command_data")
         
-        local messages=$(jq -r --arg cmd "$chat_message" '.chatMessages[$cmd].messages[]' $JSON_FILE)
-        local images=$(jq -r --arg cmd "$chat_message" '.chatMessages[$cmd].pictures[]' $JSON_FILE)
+        local messages=$(jq -r --arg cmd "$command_data" '.chatMessages[$cmd].messages[]' $JSON_FILE)
+        local images=$(jq -r --arg cmd "$command_data" '.chatMessages[$cmd].pictures[]' $JSON_FILE)
 
         for message in $messages; do
             mysql --login-path=local $DBNAME -e "INSERT INTO chatMessages (command_id, message) VALUES ($command_id, '$(escape_single_quotes "$message")');"
         done
 
-        for picture in $pictures; do
-            mysql --login-path=local $DBNAME -e "INSERT INTO chatImages (command_id, imageURL) VALUES ($command_id, '$(escape_single_quotes "$picture")');"
+        for image in $images; do
+            mysql --login-path=local $DBNAME -e "INSERT INTO chatImages (command_id, imageURL) VALUES ($command_id, '$(escape_single_quotes "$image")');"
         done
     done
 }
