@@ -35,12 +35,9 @@ parse_chat_messages() {
         local messages=$(jq -r --arg cmd "$command_data" '.chatMessages[$cmd].messages[]' $JSON_FILE)
         local images=$(jq -r --arg cmd "$command_data" '.chatMessages[$cmd].pictures[]' $JSON_FILE)
 
-        local message=""
-        for m in "${messages[@]}"; do
-            message+="$m "
+        for message in "${messages[@]}"; do
+            mysql --login-path=local $DBNAME -e "INSERT INTO chatMessages (command_id, message) VALUES ($command_id, '$(escape_single_quotes "$message")');"
         done
-
-        mysql --login-path=local $DBNAME -e "INSERT INTO chatMessages (command_id, message) VALUES ($command_id, '$(escape_single_quotes "$message")');"
 
         for image in $images; do
             mysql --login-path=local $DBNAME -e "INSERT INTO chatImages (command_id, imageURL) VALUES ($command_id, '$(escape_single_quotes "$image")');"
