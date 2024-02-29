@@ -18,30 +18,30 @@ parse_and_insert() {
     echo "$id"
 }
 
-# Function to escape single quotes in a string
-escape_single_quotes() {
-    local value="$1"
-    echo "$value" | sed "s/'/''/g"
-}
-
 # Parse chatMessages data
 parse_chat_messages() {
-    local chat_data=$(jq -r '.chatMessages | keys[]' $JSON_FILE)
+  local messageSQL="INSERT INTO chatMessages (command_id, message) VALUES (?, ?);"
+  local imagesSQL="INSERT INTO chatImages (command_id, imageURL) VALUES (?, ?);"
+    local chat_data
+    chat_data=$(jq -r '.chatMessages | keys[]' $JSON_FILE)
 
     for command_data in $chat_data; do
-        local command_id=$(parse_and_insert chatCommands command "$command_data")
+        local command_id
+        command_id=$(parse_and_insert chatCommands command "$command_data")
 
-        local messages=$(jq -r --arg cmd "$command_data" '.chatMessages[$cmd].messages[]' $JSON_FILE)
-        local images=$(jq -r --arg cmd "$command_data" '.chatMessages[$cmd].pictures[]' $JSON_FILE)
+        local messages
+        messages=$(jq -r --arg cmd "$command_data" '.chatMessages[$cmd].messages[]' $JSON_FILE)
+        local images
+        images=$(jq -r --arg cmd "$command_data" '.chatMessages[$cmd].pictures[]' $JSON_FILE)
 
         IFS=$'\n' read -r -a messages_array <<< "$messages"
 
         for message in "${messages_array[@]}"; do
-            mysql --login-path=local $DBNAME -e "INSERT INTO chatMessages (command_id, message) VALUES ($command_id, '$(escape_single_quotes "$message")');"
+            mysql --login-path=local $DBNAME -e "$messageSQL" --bind "$command_id" --bind "$message"
         done
 
         for image in $images; do
-            mysql --login-path=local $DBNAME -e "INSERT INTO chatImages (command_id, imageURL) VALUES ($command_id, '$(escape_single_quotes "$image")');"
+            mysql --login-path=local $DBNAME -e "$imagesSQL" --bind "$command_id" --bind "$image"
         done
     done
 }
