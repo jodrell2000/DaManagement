@@ -23,7 +23,7 @@ parse_and_insert() {
 parse_aliases() {
     local aliases
     commands=$(jq -r '.commands' "$JSON_FILE")
-    echo "commands: ${aliases[0]}"
+    echo "commands: ${commands[0]}"
     # Loop through each alias
     while IFS= read -r line; do
         local alias
