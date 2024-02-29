@@ -42,7 +42,7 @@ parse_chat_messages() {
 
         mysql --login-path=local $DBNAME -e "INSERT INTO chatMessages (command_id, message) VALUES ($command_id, '$(escape_single_quotes "$message")');"
 
-        for image in "${images[@]}"; do
+        for image in $images; do
             mysql --login-path=local $DBNAME -e "INSERT INTO chatImages (command_id, imageURL) VALUES ($command_id, '$(escape_single_quotes "$image")');"
         done
     done
