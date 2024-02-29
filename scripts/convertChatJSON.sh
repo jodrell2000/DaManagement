@@ -2,7 +2,7 @@
 
 # Load environment variables from .env file
 set -o allexport
-if [ -f .env ]; then
+if [ -f ../.env ]; then
     source ../.env
     echo "MYSQL_USER: $DBUSERNAME"
     echo "MYSQL_PASSWORD: $DBPASSWORD"
