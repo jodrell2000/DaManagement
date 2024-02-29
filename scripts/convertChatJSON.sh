@@ -4,6 +4,9 @@
 set -o allexport
 if [ -f .env ]; then
     source ../.env
+    echo "MYSQL_USER: $DBUSERNAME"
+    echo "MYSQL_PASSWORD: $DBPASSWORD"
+    echo "MYSQL_DATABASE: $DBNAME"
 fi
 set +o allexport
 
