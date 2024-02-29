@@ -45,4 +45,4 @@ CREATE TABLE chatAliases
     alias      VARCHAR(16) NOT NULL,
     INDEX aliasCommand (alias, command_id),
     INDEX commandAlias (command_id, alias)
-)
+);

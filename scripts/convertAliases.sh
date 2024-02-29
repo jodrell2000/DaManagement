@@ -15,6 +15,7 @@ escape_single_quotes() {
 parse_chat_messages() {
   local alias_data
   alias_data=$(jq -r '.aliases | keys[]' $JSON_FILE)
+  echo "alias: $alias_data"
   
   for alias_data in $alias_data; do
 
