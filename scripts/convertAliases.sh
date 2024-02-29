@@ -16,7 +16,7 @@ parse_and_insert() {
     sql="INSERT INTO $table ($key) VALUES ('$value');"
 
     # Execute SQL query using MySQL client
-    echo "$sql"
+    echo mysql --login-path=local $DBNAME -e "$sql"
 }
 
 get_command_id() {
@@ -27,7 +27,9 @@ get_command_id() {
     sql="SELECT id FROM chatCommands WHERE command = '$command';"
 
     # Execute SQL query using MySQL client
-    echo mysql --login-path=local $DBNAME -e "$sql"
+    local id=$(mysql --login-path=local $DBNAME -e "$sql" -sN -e "SELECT LAST_INSERT_ID();")
+    echo "$id"
+
 }
 
 # Parse chatMessages data
