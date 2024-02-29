@@ -41,9 +41,10 @@ parse_aliases() {
     
     for command_data in $commands; do
       while IFS=$'\n' read -r alias; do
+          echo "command_data: $command_data"
           command_id=$(get_command_id chatCommands "$command_data")
           echo "command ID: $command_id"
-          echo mysql --login-path=local $DBNAME -e "INSERT INTO chatAliases (command_id, alias) VALUES ($command_id, '$(escape_single_quotes "$alias")');"
+          echo mysql --login-path=local $DBNAME -e "INSERT INTO chatAliases (command_id, alias) VALUES ($command_id, $alias);"
       done < <(jq -r --arg cmd "$command_data" '.commands[$cmd]' $JSON_FILE)
     done
 }
