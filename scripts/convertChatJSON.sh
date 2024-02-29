@@ -27,8 +27,6 @@ escape_single_quotes() {
 
 # Parse chatMessages data
 parse_chat_messages() {
-  local messageSQL="INSERT INTO chatMessages (command_id, message) VALUES (?, ?);"
-  local imagesSQL="INSERT INTO chatImages (command_id, imageURL) VALUES (?, ?);"
     local chat_data
     chat_data=$(jq -r '.chatMessages | keys[]' $JSON_FILE)
 
@@ -39,6 +37,8 @@ parse_chat_messages() {
         local messages
         messages=$(jq -r --arg cmd "$command_data" '.chatMessages[$cmd].messages[]' $JSON_FILE)
         echo "$command_id = $messages"
+        echo "wibble"
+        
         local images
         images=$(jq -r --arg cmd "$command_data" '.chatMessages[$cmd].pictures[]' $JSON_FILE)
 
