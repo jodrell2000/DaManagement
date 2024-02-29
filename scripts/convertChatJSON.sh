@@ -6,7 +6,7 @@ MYSQL_PASSWORD="$DBPASSWORD"
 MYSQL_DATABASE="$DBNAME"
 
 # JSON file containing the data
-JSON_FILE="../data/data.json"
+JSON_FILE="../data/chat.json"
 
 # Parse JSON data and insert into database
 parse_and_insert() {
@@ -29,16 +29,14 @@ parse_chat_messages() {
         local command_id=$(parse_and_insert chatCommands command "$chat_message")
         
         local messages=$(jq -r --arg cmd "$chat_message" '.chatMessages[$cmd].messages[]' $JSON_FILE)
-        local pictures=$(jq -r --arg cmd "$chat_message" '.chatMessages[$cmd].pictures[]' $JSON_FILE)
+        local images=$(jq -r --arg cmd "$chat_message" '.chatMessages[$cmd].pictures[]' $JSON_FILE)
 
         for message in $messages; do
-            local message_id=$(parse_and_insert chatMessages message "$message")
-            mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE -e "INSERT INTO chatMessages (command_id, message_id) VALUES ('$command_id', '$message_id');"
+            mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE -e "INSERT INTO chatMessages (command_id, message) VALUES ('$command_id', '$message');"
         done
 
         for picture in $pictures; do
-            local picture_id=$(parse_and_insert chatPictures pictureURL "$picture")
-            mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE -e "INSERT INTO chatPictures (command_id, picture_id) VALUES ('$command_id', '$picture_id');"
+            mysql -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE -e "INSERT INTO chatImages (command_id, imageURL) VALUES ('$command_id', '$picture');"
         done
     done
 }
