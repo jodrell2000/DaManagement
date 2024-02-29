@@ -38,7 +38,7 @@ parse_aliases() {
 
 # Main function
 main() {
-  parse_chat_messages
+  parse_aliases
 }
 
 main
