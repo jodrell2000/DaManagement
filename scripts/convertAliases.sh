@@ -5,26 +5,35 @@ DBNAME="robotoDB"
 # JSON file containing the data
 JSON_FILE="../data/aliases.json"
 
-# Function to escape single quotes in a string
-escape_single_quotes() {
-  local value="$1"
-  echo "$value" | sed "s/'/''/g"
+# Parse JSON data and insert into database
+parse_and_insert() {
+    local table="$1"
+    local key="$2"
+    local value="$3"
+
+    # Construct SQL query with placeholders
+    local sql
+    sql="INSERT INTO $table ($key) VALUES ('$value');"
+
+    # Execute SQL query using MySQL client
+    echo mysql --login-path=local $DBNAME -e "$sql"
 }
 
 # Parse chatMessages data
-parse_chat_messages() {
-  local alias_data
-  alias_data=$(jq -r '.aliases | keys[]' $JSON_FILE)
-  echo "alias: $alias_data"
-  
-  for alias_data in $alias_data; do
+parse_aliases() {
+    local aliases
+    aliases=$(jq -r '.aliases' "$JSON_FILE")
 
-    while IFS=$'\n' read -r alias; do
-      echo mysql --login-path=local $DBNAME -e "SELECT id FROM chatCommands WHERE command = '$(escape_single_quotes "$command")';"
-      echo mysql --login-path=local $DBNAME -e "INSERT INTO chatMessages (command_id, message) VALUES ($command, '$(escape_single_quotes "$alias")');"
-    done < <(jq -r --arg cmd "$alias_data" '.aliases[$cmd].command[]' $JSON_FILE)
-    
-  done
+    # Loop through each alias
+    while IFS= read -r line; do
+        local alias
+        alias=$(echo "$line" | jq -r 'keys[]')
+        local command
+        command=$(echo "$line" | jq -r '.[]')
+
+        # Insert alias and command into database
+        parse_and_insert aliases_table "$alias" "$command"
+    done <<<"$aliases"
 }
 
 # Main function
