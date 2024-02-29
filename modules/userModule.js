@@ -201,7 +201,7 @@ const userFunctions = ( bot ) => {
             console.group( "setEmailAddress" );
             try {
                 const username = args.slice( 0, args.length - 1 ).join( " " );
-                const userID = this.getUserIDFromUsername( username );
+                const userID = await this.getUserIDFromUsername( username );
                 const email = args[ args.length - 1 ];
                 console.log( "username:" + username );
                 console.log( "userID:" + userID );
