@@ -28,7 +28,7 @@ parse_and_insert() {
 
 # Parse chatMessages data
 parse_chat_messages() {
-    local chat_messages=$(jq -r 'keys[]' $JSON_FILE)
+    local chat_messages=$(jq -r '.chatMessages | keys[]' $JSON_FILE)
 
     for chat_message in $chat_messages; do
         local command_id=$(parse_and_insert chatCommands command "$chat_message")
