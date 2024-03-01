@@ -26,7 +26,7 @@ get_command_id() {
     # Construct SQL query with placeholders
     local sql
     sql="SELECT id FROM $table WHERE command = '$command';"
-    echo "sql: $sql"
+
     # Execute SQL query using MySQL client
     local id=$(mysql --login-path=local $DBNAME -e "$sql" -sN -e "SELECT LAST_INSERT_ID();")
     echo "$id"
