@@ -28,7 +28,8 @@ get_command_id() {
     sql="SELECT id FROM $table WHERE command = '$command';"
 
     # Execute SQL query using MySQL client
-    local id=$(mysql --login-path=local $DBNAME -e "$sql" -sN -e "SELECT LAST_INSERT_ID();")
+    local id
+    id=$(mysql --login-path=local $DBNAME -e "$sql" -sN)
     echo "$id"
 
 }
@@ -60,7 +61,7 @@ extract_and_insert_aliases() {
 
 # Main function
 main() {
-  extract_and_insert_aliases
+  extract_commands
 }
 
 main
