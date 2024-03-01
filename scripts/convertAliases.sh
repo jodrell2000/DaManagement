@@ -12,12 +12,10 @@ get_command_id() {
     # Construct SQL query with placeholders
     local sql
     sql="SELECT id FROM $table WHERE command = '$command';"
-    echo "SQL Query: $sql"
     
     # Execute SQL query using MySQL client
     local id
     id=$(mysql --login-path=local $DBNAME -e "$sql" -sN)
-    echo "Command ID: $id"  # Add this line for debugging purposes
     echo "$id"
 
 }
@@ -45,16 +43,6 @@ extract_and_insert_aliases() {
         
         # Insert the alias into the database
         insert_aliases "$command_id" "$alias"
-    done
-}
-
-debug() {
-    local commands=$(jq -r '.commands' "$JSON_FILE")
-
-    # Loop through each command
-    echo "$commands" | jq -r 'to_entries[] | .key as $key | .value[] | "\($key),\(.)"' | while IFS=',' read -r command alias; do
-      echo "command: $command"
-      echo "alias: $alias"
     done
 }
 
