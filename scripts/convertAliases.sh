@@ -54,7 +54,7 @@ debug() {
     local commands=$(jq -r '.commands' "$JSON_FILE")
 
     # Loop through each command
-    echo "$commands" | jq -r 'to_entries[] | .key as $key | .value[] | "Key: \($key)\nValue: \(.)\n-------------------------"'
+    echo "$commands" | jq -r 'to_entries[] | .key as $key | .value[]'
 }
 
 # Main function
