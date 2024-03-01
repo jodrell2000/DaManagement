@@ -36,7 +36,7 @@ get_command_id() {
 # Parse chatMessages data
 parse_aliases() {
     local aliases
-    commands=$(jq -r '.commands' "$JSON_FILE")
+    commands=$(jq -r '.commands | keys[]' "$JSON_FILE")
     echo "commands: ${commands[0]}"
     
     for command_data in $commands; do
