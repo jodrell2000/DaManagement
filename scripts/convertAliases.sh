@@ -38,13 +38,11 @@ extract_and_insert_aliases() {
     local commands=$(jq -r '.commands' "$JSON_FILE")
 
     # Loop through each command
-    echo "$commands" | jq -r 'to_entries[] | .key as $key | .value[] | "Key: \($key)\nValue: \(.)\n-------------------------"' | while IFS=$'\t' read -r command alias; do
+    echo "$commands" | jq -r 'to_entries[] | .key as $key | .value[] | "\($key),\(.)"' | while IFS=',' read -r command alias; do
         # Get the command ID
-        echo "command: $command"
         local command_id
         command_id=$(get_command_id "chatCommands" "$command")
         
-        echo "command_id: $command_id - alias: $alias"
         # Insert the alias into the database
         insert_aliases "$command_id" "$alias"
     done
@@ -62,7 +60,7 @@ debug() {
 
 # Main function
 main() {
-  debug
+  extract_and_insert_aliases
 }
 
 main
