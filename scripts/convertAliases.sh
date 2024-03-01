@@ -50,9 +50,16 @@ extract_and_insert_aliases() {
     done
 }
 
+debug() {
+    local commands=$(jq -r '.commands' "$JSON_FILE")
+
+    # Loop through each command
+    echo "$commands" | jq -r 'to_entries[] | .key as $key | .value[] | "Key: \($key)\nValue: \(.)\n-------------------------"'
+}
+
 # Main function
 main() {
-  extract_and_insert_aliases
+  debug
 }
 
 main
