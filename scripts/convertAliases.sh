@@ -11,7 +11,7 @@ insert_aliases() {
     local alias="$2"
 
     # Construct SQL query to insert alias
-    local sql="INSERT INTO aliases (command, alias) VALUES ($command, '$alias');"
+    local sql="INSERT INTO aliases (command, alias) VALUES ('$command', '$alias');"
 
     # Execute SQL query using MySQL client
     mysql --login-path=local $DBNAME -e "$sql"
