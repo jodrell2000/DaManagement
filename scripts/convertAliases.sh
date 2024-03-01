@@ -33,32 +33,34 @@ get_command_id() {
 
 }
 
-# Parse chatMessages data
-parse_aliases() {
-    local aliases
-    commands=$(jq -r '.commands | keys[]' "$JSON_FILE")
-    echo "commands: ${commands[0]}"
-    
-    for command_data in $commands; do
-      while IFS=$'\n' read -r alias; do
-          echo "command_data: $command_data"
-          command_id=$(get_command_id chatCommands "$command_data")
-          echo "command ID: $command_id"
-          echo mysql --login-path=local $DBNAME -e "INSERT INTO chatAliases (command_id, alias) VALUES ($command_id, $alias);"
-      done < <(jq -r --arg cmd "$command_data" '.commands[$cmd].[]' $JSON_FILE)
-    done
+# Function to insert aliases into the database
+insert_aliases() {
+    local command_id="$1"
+    local alias="$2"
+
+    # Construct SQL query to insert alias
+    local sql="INSERT INTO chatAliases (command_id, alias) VALUES ($command_id, '$alias');"
+
+    # Execute SQL query using MySQL client
+    mysql --login-path=local $DBNAME -e "$sql"
 }
 
-extract_commands() {
+extract_and_insert_aliases() {
     local commands=$(jq -r '.commands' "$JSON_FILE")
 
     # Loop through each command
-    echo "$commands" | jq -r 'to_entries[] | .key as $key | .value[] | "Key: \($key)\nValue: \(.)\n-------------------------"'
+    echo "$commands" | jq -r 'to_entries[] | .key as $key | .value[] | "Key: \($key)\nValue: \(.)\n-------------------------"' | while IFS=$'\t' read -r command alias; do
+        # Get the command ID
+        local command_id=$(get_command_id "chatCommands" "$command")
+
+        # Insert the alias into the database
+        insert_aliases "$command_id" "$alias"
+    done
 }
 
 # Main function
 main() {
-  extract_commands
+  extract_and_insert_aliases
 }
 
 main
