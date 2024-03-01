@@ -61,7 +61,7 @@ extract_and_insert_aliases() {
 
 # Main function
 main() {
-  extract_commands
+  extract_and_insert_aliases
 }
 
 main
