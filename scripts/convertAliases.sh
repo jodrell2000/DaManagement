@@ -43,7 +43,7 @@ insert_aliases() {
     local sql="INSERT INTO chatAliases (command_id, alias) VALUES ($command_id, '$alias');"
 
     # Execute SQL query using MySQL client
-    mysql --login-path=local $DBNAME -e "$sql"
+    echo mysql --login-path=local $DBNAME -e "$sql"
 }
 
 extract_and_insert_aliases() {
