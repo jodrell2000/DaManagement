@@ -49,9 +49,24 @@ parse_aliases() {
     done
 }
 
+extract_commands() {
+    local commands=$(jq -r '.commands' "$JSON_FILE")
+
+    # Loop through each command
+    while IFS= read -r line; do
+        local key=$(echo "$line" | jq -r 'keys[]')
+        local values=$(echo "$line" | jq -r '.[] | @csv' | tr -d '"')
+
+        # Output key and corresponding values
+        echo "Key: $key"
+        echo "Values: $values"
+        echo "-------------------------"
+    done <<<"$commands"
+}
+
 # Main function
 main() {
-  parse_aliases
+  extract_commands
 }
 
 main
