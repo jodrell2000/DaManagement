@@ -40,6 +40,7 @@ extract_and_insert_aliases() {
     # Loop through each command
     echo "$commands" | jq -r 'to_entries[] | .key as $key | .value[] | "Key: \($key)\nValue: \(.)\n-------------------------"' | while IFS=$'\t' read -r command alias; do
         # Get the command ID
+        echo "command: $command"
         local command_id
         command_id=$(get_command_id "chatCommands" "$command")
         
