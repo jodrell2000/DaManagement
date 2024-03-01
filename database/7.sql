@@ -39,10 +39,10 @@ CREATE TABLE chatImages
     INDEX command_id (command_id)
 );
 
-CREATE TABLE chatAliases
+CREATE TABLE aliases
 (
-    command_id INT         NOT NULL,
-    alias      VARCHAR(16) NOT NULL,
-    INDEX aliasCommand (alias, command_id),
-    INDEX commandAlias (command_id, alias)
+    command VARCHAR(16) NOT NULL,
+    alias   VARCHAR(16) NOT NULL,
+    INDEX aliasCommand (alias, command),
+    INDEX commandAlias (command, alias)
 );
