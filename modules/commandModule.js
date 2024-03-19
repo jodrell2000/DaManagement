@@ -875,8 +875,13 @@ const commandFunctions = ( bot ) => {
 
             const theAliases = store.get( 'aliases' );
 
-            const isAlias = await databaseFunctions.isAlias( passedArgument )
-            console.log( "DB Check: " + isAlias );
+            try {
+                const isAlias = await databaseFunctions.isAlias( passedArgument )
+                console.log( "DB Check: ", isAlias );
+            } catch ( error ) {
+                console.error( error );
+            }
+
 
             let findAlias = theAliases[ passedArgument ];
             console.groupEnd();
