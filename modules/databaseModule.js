@@ -921,11 +921,12 @@ const databaseFunctions = () => {
                 console.error( error );
                 throw error;
             }
-        },
+        }
 
         // ========================================================
 
     }
+
 
 }
 
