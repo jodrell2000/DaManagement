@@ -899,8 +899,8 @@ const databaseFunctions = () => {
         // Command & Alias Functions
         // ========================================================
 
-        isAlias: async function ( value ) {
-            const selectQuery = 'SELECT count(*) AS count FROM aliases WHERE alias=?;';
+        isChatCommand: async function ( value ) {
+            const selectQuery = 'SELECT count(*) AS count FROM chatCommands WHERE alias=?;';
             const values = [ value ];
             try {
                 const result = await this.runQuery( selectQuery, values );
@@ -909,13 +909,24 @@ const databaseFunctions = () => {
                 console.error( error );
                 throw error;
             }
-        }
-        
+        },
+
+        isAlias: async function ( value ) {
+            const selectQuery = 'SELECT count(*) AS count FROM aliases WHERE command=?;';
+            const values = [ value ];
+            try {
+                const result = await this.runQuery( selectQuery, values );
+                return result.count > 0;
+            } catch ( error ) {
+                console.error( error );
+                throw error;
+            }
+        },
+
         // ========================================================
 
     }
-
-
+    
 }
 
 module.exports = databaseFunctions;

@@ -827,7 +827,9 @@ const commandFunctions = ( bot ) => {
             return !!allCommands[ command ];
         },
 
-        isChatCommand: function ( command ) {
+        isChatCommand: async function ( command ) {
+            console.group( "isChatCommand" );
+            console.log( "command:" + command );
             const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
             const store = new Storage( dataFilePath );
 
@@ -835,6 +837,14 @@ const commandFunctions = ( bot ) => {
 
             const findCommand = theCommands[ command ];
 
+            try {
+                const isCommand = await databaseFunctions.isChatCommand( command )
+                console.log( "DB Command Check: ", isCommand );
+            } catch ( error ) {
+                console.error( error );
+            }
+
+            console.groupEnd();
             return findCommand !== undefined;
         },
 
@@ -877,7 +887,7 @@ const commandFunctions = ( bot ) => {
 
             try {
                 const isAlias = await databaseFunctions.isAlias( passedArgument )
-                console.log( "DB Check: ", isAlias );
+                console.log( "DB Alias Check: ", isAlias );
             } catch ( error ) {
                 console.error( error );
             }
