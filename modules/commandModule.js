@@ -873,7 +873,8 @@ const commandFunctions = ( bot ) => {
 
             const theAliases = store.get( 'aliases' );
 
-            console.log( "DB Check: " + await databaseFunctions.isAlias( passedArgument ) );
+            const isAlias = await databaseFunctions.isAlias( passedArgument )
+            console.log( "DB Check: " + isAlias );
 
             let findAlias = theAliases[ passedArgument ];
             console.groupEnd();
