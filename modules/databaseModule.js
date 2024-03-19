@@ -900,7 +900,7 @@ const databaseFunctions = () => {
         // ========================================================
 
         isChatCommand: async function ( value ) {
-            const selectQuery = 'SELECT count(*) AS count FROM chatCommands WHERE alias=?;';
+            const selectQuery = 'SELECT count(*) AS count FROM chatCommands WHERE command=?;';
             const values = [ value ];
             try {
                 const result = await this.runQuery( selectQuery, values );
@@ -912,7 +912,7 @@ const databaseFunctions = () => {
         },
 
         isAlias: async function ( value ) {
-            const selectQuery = 'SELECT count(*) AS count FROM aliases WHERE command=?;';
+            const selectQuery = 'SELECT count(*) AS count FROM aliases WHERE alias=?;';
             const values = [ value ];
             try {
                 const result = await this.runQuery( selectQuery, values );
@@ -926,7 +926,7 @@ const databaseFunctions = () => {
         // ========================================================
 
     }
-    
+
 }
 
 module.exports = databaseFunctions;
