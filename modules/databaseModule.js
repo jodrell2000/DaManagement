@@ -900,17 +900,17 @@ const databaseFunctions = () => {
         // ========================================================
 
         isAlias: async function ( value ) {
-            const selectQuery = 'SELECT count(*) FROM aliases WHERE alias=?;'
+            const selectQuery = 'SELECT count(*) AS count FROM aliases WHERE alias=?;';
             const values = [ value ];
             try {
                 const result = await this.runQuery( selectQuery, values );
-                return result;
+                return result.count > 0;
             } catch ( error ) {
                 console.error( error );
                 throw error;
             }
         }
-
+        
         // ========================================================
 
     }
