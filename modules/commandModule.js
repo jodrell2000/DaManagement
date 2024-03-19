@@ -837,12 +837,12 @@ const commandFunctions = ( bot ) => {
 
             const findCommand = theCommands[ command ];
 
-            try {
-                const isCommand = await databaseFunctions.isChatCommand( command )
-                console.log( "DB Command Check: ", isCommand );
-            } catch ( error ) {
-                console.error( error );
-            }
+            // try {
+            //     const isCommand = await databaseFunctions.isChatCommand( command )
+            //     console.log( "DB Command Check: ", isCommand );
+            // } catch ( error ) {
+            //     console.error( error );
+            // }
 
             console.groupEnd();
             return findCommand !== undefined;
