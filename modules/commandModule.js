@@ -864,13 +864,16 @@ const commandFunctions = ( bot ) => {
             return splitData;
         },
 
-        checkForAlias: function ( passedArgument ) {
+        checkForAlias: async function ( passedArgument ) {
             console.group( "checkForAlias" );
             console.log( "passedArgument:" + passedArgument );
+
             const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
             const store = new Storage( dataFilePath );
 
             const theAliases = store.get( 'aliases' );
+
+            console.log( "DB Check: " + await databaseFunctions.isAlias( passedArgument ) );
 
             let findAlias = theAliases[ passedArgument ];
             console.groupEnd();

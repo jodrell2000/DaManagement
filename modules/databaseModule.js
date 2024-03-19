@@ -893,6 +893,26 @@ const databaseFunctions = () => {
 
         // ========================================================
 
+        // ========================================================
+
+        // ========================================================
+        // Command & Alias Functions
+        // ========================================================
+
+        isAlias: async function ( value ) {
+            const selectQuery = 'SELECT count(*) FROM aliases WHERE alias=?;'
+            const values = [ value ];
+            try {
+                const result = await this.runQuery( selectQuery, values );
+                return result;
+            } catch ( error ) {
+                console.error( error );
+                throw error;
+            }
+        }
+
+        // ========================================================
+
     }
 
 
