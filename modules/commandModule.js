@@ -2,7 +2,9 @@ let chatDefaults = require( '../defaultSettings/chatDefaults.js' );
 let chatCommandItems = require( '../defaultSettings/chatCommandItems.js' );
 const Storage = require( 'node-storage' );
 const { dirname } = require( 'path' );
-const databaseFunctions = require( './databaseModule.js' );
+
+let databaseModule = require( '../modules/databaseModule.js' );
+const databaseFunctions = databaseModule();
 
 const generalCommands = {};
 const userCommands = {};
