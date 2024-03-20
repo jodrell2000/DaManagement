@@ -759,7 +759,7 @@ const commandFunctions = ( bot ) => {
 
             // If the command doesn't exist, check aliases and switch the sent alias for the returned command
             if ( !commandObj ) {
-                const aliasCommand = this.checkForAlias( theCommand );
+                const aliasCommand = await this.checkForAlias( theCommand );
                 if ( aliasCommand !== undefined ) {
                     if ( await this.isChatCommand( aliasCommand ) ) {
                         dynamic = true;
@@ -849,7 +849,7 @@ const commandFunctions = ( bot ) => {
         },
 
         canCommandBeAdded: async function ( theCommand ) {
-            const alias = this.checkForAlias( theCommand );
+            const alias = await this.checkForAlias( theCommand );
 
             const messageHeader = "The command " + theCommand + " can't be added as ";
             // Check if the command is an existing alias
@@ -900,14 +900,14 @@ const commandFunctions = ( bot ) => {
     }
 }
 
-const listAlias = ( data, chatFunctions ) => {
+const listAlias = async ( data, chatFunctions ) => {
     const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
 
     const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
     const passedArgument = strippedCommand[ 1 ];
-    const alias = commandModule.checkForAlias( passedArgument );
+    const alias = await commandModule.checkForAlias( passedArgument );
 
     const aliasLookup = alias ? `commands.${ alias }` : `commands.${ passedArgument }`;
 
@@ -936,14 +936,14 @@ const getAliasReturnText = ( aliases, alias, command ) => {
     return returnText;
 }
 
-const addAlias = ( data, chatFunctions ) => {
+const addAlias = async ( data, chatFunctions ) => {
     const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
 
     const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
     const newAlias = strippedCommand[ 1 ];
-    const currentAlias = commandModule.checkForAlias( newAlias );
+    const currentAlias = await commandModule.checkForAlias( newAlias );
 
     // does the command we're aliasing actually exist
     const commandToLink = strippedCommand[ 2 ];
@@ -980,7 +980,7 @@ const addAlias = ( data, chatFunctions ) => {
     chatFunctions.botSpeak( "Update successful.", data );
 }
 
-const removeAlias = ( data, chatFunctions ) => {
+const removeAlias = async ( data, chatFunctions ) => {
     const dataFilePath = `${ dirname( require.main.filename ) }/data/${ aliasDataFileName }`;
     const store = new Storage( dataFilePath );
     const commandModule = commandFunctions();
@@ -988,7 +988,7 @@ const removeAlias = ( data, chatFunctions ) => {
     const strippedCommand = data.text.slice( 1 ).toLowerCase().split( " " );
 
     const aliasBeingRemoved = strippedCommand[ 1 ];
-    const rootCommand = commandModule.checkForAlias( `${ strippedCommand[ 1 ] }` );
+    const rootCommand = await commandModule.checkForAlias( `${ strippedCommand[ 1 ] }` );
 
     store.remove( `aliases.${ aliasBeingRemoved }` );
 
