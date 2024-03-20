@@ -797,7 +797,7 @@ const commandFunctions = ( bot ) => {
                 senderID = data.userid;
             }
 
-            const [ command, args, moderatorOnly ] = this.getCommandAndArguments( data.text, allCommands );
+            const [ command, args, moderatorOnly ] = await this.getCommandAndArguments( data.text, allCommands );
             if ( moderatorOnly && !userFunctions.isUserModerator( senderID ) ) {
                 chatFunctions.botSpeak( "Sorry, that function is only available to moderators", data );
             } else if ( args === 'dynamicChat' ) {
