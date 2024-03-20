@@ -62,7 +62,7 @@ const botModule = ( bot ) => {
             }
         },
 
-        wasThisACommand: function( data ) {
+        wasThisACommand: function ( data ) {
             let text = data.text;
             let commandIdentifier = '!';
 
@@ -80,7 +80,7 @@ const botModule = ( bot ) => {
             }
         },
 
-        getCommandAndArguments: function( text ) {
+        getCommandAndArguments: function ( text ) {
             const [ sentCommand, ...args ] = text.split( " " );
             let theCommand = sentCommand.substring( 1, sentCommand.length );
             theCommand = theCommand.toLowerCase();
@@ -92,7 +92,7 @@ const botModule = ( bot ) => {
             }
         },
 
-        parseCommands: function( data ) {
+        parseCommands: async function ( data ) {
             const [ command, args ] = this.getCommandAndArguments( data.text );
             if ( command ) {
                 command.call( null, data, args );

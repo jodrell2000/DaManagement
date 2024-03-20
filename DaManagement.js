@@ -390,7 +390,7 @@ bot.on( 'speak', async function ( data ) {
 
     if ( commandFunctions.wasThisACommand( data ) ) {
         // commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions );
-        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions );
+        await commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions );
     }
 
     //checks to see if someone is trying to speak to an afk person or not.
@@ -405,10 +405,10 @@ bot.on( 'speak', async function ( data ) {
 } );
 
 //checks when the bot receives a pm
-bot.on( 'pmmed', function ( data ) {
+bot.on( 'pmmed', async function ( data ) {
     if ( commandFunctions.wasThisACommand( data ) ) {
         // commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions, mlFunctions );
-        commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions );
+        await commandFunctions.parseCommands( data, userFunctions, botFunctions, roomFunctions, songFunctions, chatFunctions, videoFunctions, documentationFunctions, databaseFunctions, dateFunctions );
     }
 } );
 
