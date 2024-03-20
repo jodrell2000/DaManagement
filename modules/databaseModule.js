@@ -908,7 +908,7 @@ const databaseFunctions = () => {
             try {
                 const result = await this.runQuery( selectQuery, values );
                 console.log( "result: " + JSON.stringify( result ) );
-                console.log( "result.count: " + result.count );
+                console.log( "result.count: " + result[ 0 ].count );
                 console.groupEnd();
                 return result.count > 0;
             } catch ( error ) {
