@@ -900,16 +900,10 @@ const databaseFunctions = () => {
         // ========================================================
 
         isChatCommand: async function ( value ) {
-            console.group( "Database Module: isChatCommand" );
-            console.log( "value", value );
             const selectQuery = 'SELECT count(*) AS count FROM chatCommands WHERE command=?;';
-            console.log( "selectQuery: " + selectQuery );
             const values = [ value ];
             try {
                 const result = await this.runQuery( selectQuery, values );
-                console.log( "result: " + JSON.stringify( result ) );
-                console.log( "result.count: " + result[ 0 ].count );
-                console.groupEnd();
                 return result[ 0 ].count > 0;
             } catch ( error ) {
                 console.error( error );
@@ -918,11 +912,7 @@ const databaseFunctions = () => {
         },
 
         isAlias: async function ( value ) {
-            console.group( "isAlias" );
-            console.log( "value", value );
             const selectQuery = 'SELECT count(*) AS count FROM aliases WHERE alias=?;';
-            console.log( "selectQuery: " + selectQuery );
-            console.groupEnd();
             const values = [ value ];
             try {
                 const result = await this.runQuery( selectQuery, values );
@@ -931,7 +921,19 @@ const databaseFunctions = () => {
                 console.error( error );
                 throw error;
             }
-        }
+        },
+
+        getAliases: async function ( command ) {
+            const selectQuery = 'SELECT alias FROM aliases WHERE command=?;';
+            const values = [ command ];
+            try {
+                const result = await this.runQuery( selectQuery, values );
+                return result.length > 0 ? result : false;
+            } catch ( error ) {
+                console.error( error );
+                throw error;
+            }
+        },
 
         // ========================================================
 
