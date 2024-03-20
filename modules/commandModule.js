@@ -828,7 +828,7 @@ const commandFunctions = ( bot ) => {
         },
 
         isChatCommand: async function ( command ) {
-            console.group( "isChatCommand" );
+            console.group( "Command Module: isChatCommand" );
             console.log( "command:", command );
             const dataFilePath = `${ dirname( require.main.filename ) }/data/${ chatDataFileName }`;
             const store = new Storage( dataFilePath );

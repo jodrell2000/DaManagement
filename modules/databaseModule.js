@@ -900,7 +900,7 @@ const databaseFunctions = () => {
         // ========================================================
 
         isChatCommand: async function ( value ) {
-            console.group( "isChatCommand" );
+            console.group( "Database Module: isChatCommand" );
             console.log( "value", value );
             const selectQuery = 'SELECT count(*) AS count FROM chatCommands WHERE command=?;';
             console.log( "selectQuery: " + selectQuery );
@@ -908,6 +908,7 @@ const databaseFunctions = () => {
             try {
                 const result = await this.runQuery( selectQuery, values );
                 console.log( "result: " + JSON.stringify( result ) );
+                console.log( "result.count: " + result.count );
                 console.groupEnd();
                 return result.count > 0;
             } catch ( error ) {
