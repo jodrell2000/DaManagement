@@ -336,7 +336,6 @@ const chatFunctions = ( bot, roomDefaults ) => {
                 ++botFunctions.messageCounter; //increment message counter
             }
         },
-
     }
 }
 
