@@ -903,11 +903,12 @@ const databaseFunctions = () => {
             console.group( "isChatCommand" );
             console.log( "value", value );
             const selectQuery = 'SELECT count(*) AS count FROM chatCommands WHERE command=?;';
-            console.log( "selectQuery" + selectQuery );
-            console.groupEnd();
+            console.log( "selectQuery: " + selectQuery );
             const values = [ value ];
             try {
                 const result = await this.runQuery( selectQuery, values );
+                console.log( "result: " + JSON.stringify( result ) );
+                console.groupEnd();
                 return result.count > 0;
             } catch ( error ) {
                 console.error( error );
@@ -919,7 +920,7 @@ const databaseFunctions = () => {
             console.group( "isAlias" );
             console.log( "value", value );
             const selectQuery = 'SELECT count(*) AS count FROM aliases WHERE alias=?;';
-            console.log( "selectQuery" + selectQuery );
+            console.log( "selectQuery: " + selectQuery );
             console.groupEnd();
             const values = [ value ];
             try {
