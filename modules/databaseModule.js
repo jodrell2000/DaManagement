@@ -900,7 +900,11 @@ const databaseFunctions = () => {
         // ========================================================
 
         isChatCommand: async function ( value ) {
+            console.group( "isChatCommand" );
+            console.log( "value" + value );
             const selectQuery = 'SELECT count(*) AS count FROM chatCommands WHERE command=?;';
+            console.log( "selectQuery" + selectQuery );
+            console.groupEnd();
             const values = [ value ];
             try {
                 const result = await this.runQuery( selectQuery, values );
@@ -912,7 +916,11 @@ const databaseFunctions = () => {
         },
 
         isAlias: async function ( value ) {
+            console.group( "isAlias" );
+            console.log( "value" + value );
             const selectQuery = 'SELECT count(*) AS count FROM aliases WHERE alias=?;';
+            console.log( "selectQuery" + selectQuery );
+            console.groupEnd();
             const values = [ value ];
             try {
                 const result = await this.runQuery( selectQuery, values );
